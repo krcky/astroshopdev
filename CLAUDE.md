@@ -88,7 +88,18 @@ racun — ide u `lib/` i dobija test.
 tabela i composer se izvrsava NA SERVERU; app dobija samo gotov tekst za taj
 dan. Korpus je jedina stvar koju konkurencija ne moze da kopira.
 
-**8. Paywall se proverava na serveru.**
+**8. @firecms/neat nosi VODENI ZIG i licencu vezanu za domen.**
+Biblioteka je ugradjena u `src/vendor/neat-umd.ts` i vrti se u WebView-u.
+Bez placenog kljuca crta zig "NEAT" u svaki kadar:
+`this._licensed || this._renderWatermark(n)`. Kljuc se izdaje za DOMEN
+(`LicensePayload { domain, email }`, provera preko `window.location.hostname`),
+a mobilna aplikacija domen nema. U kodu postoji izuzetak za razvojne hostove
+koji bi u WebView-u prosao — NE oslanjati se na to, jer je to zaobilazenje
+naplate. Pre izlaska: ili dogovor sa autorima, ili zamena sopstvenim sejderom
+(`components/flow-gradient.tsx` je zapoceta osnova, radi kroz expo-gl bez
+ikakve licence).
+
+**9. Paywall se proverava na serveru.**
 `isPremium` dolazi iz tabele `entitlements`, koju korisnik po RLS politici sme
 samo da CITA. Upis ide iskljucivo preko RevenueCat webhook-a sa service_role
 kljucem na serveru. Da postoji politika za upis, svako bi sebi mogao da upise
@@ -96,27 +107,27 @@ kljucem na serveru. Da postoji politika za upis, svako bi sebi mogao da upise
 Kad stigne backend: API mora da vraca SKRACEN tekst korisniku bez prava
 pristupa — nikad pun tekst pa sakriven u UI-ju.
 
-**9. Anon kljuc je javan, service_role nikad ne sme u aplikaciju.**
+**10. Anon kljuc je javan, service_role nikad ne sme u aplikaciju.**
 `EXPO_PUBLIC_*` promenljive se ugradjuju u bundle i svako moze da ih procita.
 Za anon (publishable) kljuc to je u redu — podatke stiti RLS. `service_role`
 kljuc zaobilazi RLS i njegovo mesto je iskljucivo na serveru.
 
-**10. Podaci o rodjenju moraju biti izmenjivi.**
+**11. Podaci o rodjenju moraju biti izmenjivi.**
 Izmena ide kroz `/edit` — SVE na jednom ekranu, ne kroz cetiri koraka.
 Onboarding vodi korak po korak jer korisnik tada ne zna sta ga ceka; kod izmene
 zna tacno sta menja.
 
-**11. Bez naloga se ne vidi nista.**
+**12. Bez naloga se ne vidi nista.**
 `app/index.tsx` je jedina kapija: nema sesije -> welcome, ima sesiju bez karte
 -> unos podataka, sve postoji -> tabovi. Nijedan ekran ne sme sam da odlucuje
 o preusmeravanju.
 
-**12. Onboarding draft NE ide na disk.**
+**13. Onboarding draft NE ide na disk.**
 `store/draft.ts` je namerno bez `persist` — dogovoreno je da prekid znaci
 pocetak ispocetka. Karta se upisuje na server odmah po potvrdi koda, da se
 podaci ne izgube ako korisnik prekine na koraku sa imenom.
 
-**13. Jedinstveni ID-jevi u SVG gradijentima.**
+**14. Jedinstveni ID-jevi u SVG gradijentima.**
 `url(#id)` se razresava na PRVI element sa tim id-jem u celom dokumentu, a
 React Navigation drzi prethodne ekrane montirane (sakrivene, 0x0). Dva SVG-a
 sa istim id-jem = vidljivi ostaje bez ispune. Uvek `React.useId()`.
