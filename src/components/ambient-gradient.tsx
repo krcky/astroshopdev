@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, {
-  Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming,
-} from 'react-native-reanimated';
+import {
+  AccessibilityInfo, Animated, Easing, Platform, StyleSheet, useWindowDimensions, View,
+} from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 // expo-router sam izvozi ovaj hook — nema potrebe dodavati @react-navigation/native
 import { useIsFocused } from 'expo-router';
@@ -10,16 +9,17 @@ import { useIsFocused } from 'expo-router';
 /**
  * Ambijentalna pozadina — tri meke mrlje boje koje polako plutaju.
  *
- * ZASTO OVAKO, a ne video kao na referentnom sajtu: tamo je to 5,7 MB .mp4
- * po ekranu. Cetiri taba bi bila preko 20 MB i dekoder bi radio non-stop.
- * Ovde su mrlje ciste matematika — nula bajtova assetsa, boje su parametri.
+ * ZASTO OVAKO, a ne video kao na referentnom sajtu: tamo je to 5,7 MB .mp4 po
+ * ekranu. Cetiri taba bi bila preko 20 MB uz dekoder koji radi non-stop. Ovde
+ * su mrlje ciste matematike — nula bajtova assetsa, boje su parametri.
  *
- * ZASTO NE SKIA: za ovako blag efekat je nepotrebno teska zavisnost, a i ne
- * radi na vebu bez dodatnog podesavanja. Ovako se animira TRANSFORM celog
- * sloja, sto Reanimated radi na UI niti — jeftino i na starijim telefonima.
+ * ZASTO UGRADJENI Animated, a ne Reanimated: za pomeranje jednog sloja nam ne
+ * trebaju worklet-i, a Reanimated 4 zahteva poseban Babel dodatak koji, ako
+ * nedostaje, TIHO ne radi — animacija stoji bez ijedne greske. Ugradjeni
+ * Animated sa `useNativeDriver` radi na UI niti bez ijedne dodatne postavke.
  *
- * Boje su namerno svetle (oko 95% svetline). Crn tekst preko njih ostaje
- * citljiv; jaci gradijent bi ga progutao.
+ * Boje su namerno svetle. Crn tekst preko njih mora da ostane citljiv;
+ * najgori kontrast u trenutnim paletama je 10,5:1 (AAA trazi 7:1).
  */
 
 export type Palette = {
@@ -27,31 +27,49 @@ export type Palette = {
   colors: [string, string, string];
 };
 
-/** Po jedna paleta za svaki tab — dovoljno razlicite da se oseti promena. */
 export const TAB_PALETTES: Record<string, Palette> = {
-  home:    { colors: ['#FFE3CC', '#FFEFDD', '#FFE0E6'] }, // topla: breskva, med, ruza
-  daily:   { colors: ['#E4DCFF', '#E2E9FF', '#F0E4FF'] }, // hladna: lavanda, perla, ljubicasta
-  chart:   { colors: ['#DCEBFF', '#DFF3EC', '#E9F0FF'] }, // vedra: nebo, menta
-  profile: { colors: ['#E6F0E2', '#F5EFE2', '#EAF2E6'] }, // mirna: zalfija, pesak
+  home:    { colors: ['#B9C1F2', '#CDD3F8', '#DCD6FB'] }, // periwinkle, lavanda, ljubicasta
+  daily:   { colors: ['#FFD9C2', '#FFE8D4', '#FFD6DE'] }, // breskva, med, ruza
+  chart:   { colors: ['#C8E2FF', '#CFEEE4', '#DCE8FF'] }, // nebo, menta
+  profile: { colors: ['#D8E8D2', '#F0E7D2', '#DFEcd9'] }, // zalfija, pesak
 };
 
-type Blob = { cx: number; cy: number; r: number; dur: number; dx: number; dy: number };
+type Blob = { cx: number; cy: number; r: number; dur: number; dx: number; dy: number; o: [number, number] };
 
-/** Rasporedjene tako da pokriju uglove, a da se u sredini preklapaju. */
+/**
+ * Polja su NAMERNO veca od ekrana (r > 1). Tako se ne vide kao tri mrlje nego
+ * kao velike povrsine boje koje se preplavljuju — to je karakter reference.
+ *
+ * Pored pomeranja, menja se i PROZIRNOST svake povrsine, pa se menjaju
+ * proporcije boja: jedna preuzima ekran dok se druga povlaci. To je ono sto
+ * pomeranje samo po sebi ne daje.
+ *
+ * Ciklusi su namerno neuporedivi (17/23/29 s) da se kompozicija ne ponavlja
+ * ocigledno — najmanji zajednicki sadrzalac je preko tri minuta.
+ */
 const BLOBS: Blob[] = [
-  { cx: 0.18, cy: 0.12, r: 0.62, dur: 17000, dx: 0.10, dy: 0.07 },
-  { cx: 0.88, cy: 0.42, r: 0.70, dur: 23000, dx: -0.09, dy: 0.11 },
-  { cx: 0.28, cy: 0.92, r: 0.66, dur: 29000, dx: 0.12, dy: -0.08 },
+  { cx: 0.12, cy: 0.02, r: 0.82, dur: 17000, dx:  0.62, dy:  0.48, o: [1.00, 0.30] },
+  { cx: 1.00, cy: 0.28, r: 0.90, dur: 23000, dx: -0.58, dy:  0.52, o: [0.35, 1.00] },
+  { cx: 0.20, cy: 1.02, r: 0.78, dur: 29000, dx:  0.55, dy: -0.60, o: [0.90, 0.25] },
 ];
 
 type Props = {
   palette: Palette;
-  /** Kad ekran nije u fokusu, animacija staje — inace trosi bateriju u pozadini. */
+  /** Kad ekran nije u fokusu animacija staje — inace trosi bateriju u pozadini. */
   active?: boolean;
 };
 
 export function AmbientGradient({ palette, active = true }: Props) {
   const { width, height } = useWindowDimensions();
+  const [reduced, setReduced] = React.useState(false);
+
+  React.useEffect(() => {
+    let alive = true;
+    AccessibilityInfo.isReduceMotionEnabled().then((v) => alive && setReduced(v));
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduced);
+    return () => { alive = false; sub?.remove?.(); };
+  }, []);
+
   const size = Math.max(width, height);
 
   return (
@@ -64,7 +82,7 @@ export function AmbientGradient({ palette, active = true }: Props) {
           size={size}
           width={width}
           height={height}
-          active={active}
+          active={active && !reduced}
         />
       ))}
     </View>
@@ -74,42 +92,71 @@ export function AmbientGradient({ palette, active = true }: Props) {
 function FloatingBlob({ blob, color, size, width, height, active }: {
   blob: Blob; color: string; size: number; width: number; height: number; active: boolean;
 }) {
-  const t = useSharedValue(0);
-  const reduced = useReducedMotion();
+  const t = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    if (!active || reduced) { t.value = 0; return; }
-    t.value = withRepeat(
-      withTiming(1, { duration: blob.dur, easing: Easing.inOut(Easing.sin) }),
-      -1,
-      true // napred-nazad, da nema skoka na kraju petlje
-    );
-  }, [active, reduced, blob.dur]);
+    if (!active) { t.setValue(0); return; }
+    // Napred-nazad, da nema skoka na kraju ciklusa.
+    const leg = (to: number) =>
+      Animated.timing(t, {
+        toValue: to,
+        duration: blob.dur,
+        easing: Easing.inOut(Easing.sin),
+        // Na vebu native driver ne postoji: animacija bi "radila" na strani
+        // koje nema i nijedan stil se ne bi azurirao. Na telefonu ostaje
+        // ukljucen, jer tamo radi na UI niti i ne opterecuje JS.
+        useNativeDriver: Platform.OS !== 'web',
+      });
+    const loop = Animated.loop(Animated.sequence([leg(1), leg(0)]));
+    loop.start();
+    return () => loop.stop();
+  }, [active, blob.dur, t]);
 
-  const style = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: t.value * blob.dx * width },
-      { translateY: t.value * blob.dy * height },
-      { scale: 1 + t.value * 0.12 },
-    ],
-  }));
+  const range = (to: number) => t.interpolate({ inputRange: [0, 1], outputRange: [0, to] });
 
   // Jedinstven id po instanci: url(#id) hvata PRVI element sa tim id-jem u
   // celom dokumentu, a navigacija drzi prethodne ekrane montirane.
   const gid = `blob-${React.useId().replace(/:/g, '')}`;
-  const r = blob.r * size;
+
+  // Dovoljno veliko da polje nikad ne dodirne ivicu platna:
+  // najveci poluprecnik (0.9) + najveci pomeraj (0.62) + uvecanje (1.45).
+  const canvas = size * 2.6;
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, style]}>
-      <Svg width={width} height={height}>
+    <Animated.View
+      style={[
+        StyleSheet.absoluteFill,
+        {
+          opacity: t.interpolate({ inputRange: [0, 1], outputRange: blob.o }),
+          transform: [
+            { translateX: range(blob.dx * width) },
+            { translateY: range(blob.dy * height) },
+            { scale: t.interpolate({ inputRange: [0, 1], outputRange: [1, 1.45] }) },
+          ],
+        },
+      ]}>
+      {/*
+        Platno je NAMERNO vece od ekrana i centrirano preko njega. Polja su
+        veca od ekrana i putuju daleko; da je platno velicine ekrana, SVG bi ih
+        odsekao i videla bi se prava ivica umesto mekog prelaza.
+      */}
+      <Svg
+        width={canvas}
+        height={canvas}
+        style={{ position: 'absolute', left: (width - canvas) / 2, top: (height - canvas) / 2 }}>
         <Defs>
           <RadialGradient id={gid} cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor={color} stopOpacity={1} />
-            <Stop offset="55%" stopColor={color} stopOpacity={0.55} />
+            <Stop offset="45%" stopColor={color} stopOpacity={0.75} />
             <Stop offset="100%" stopColor={color} stopOpacity={0} />
           </RadialGradient>
         </Defs>
-        <Circle cx={blob.cx * width} cy={blob.cy * height} r={r} fill={`url(#${gid})`} />
+        <Circle
+          cx={blob.cx * width - (width - canvas) / 2}
+          cy={blob.cy * height - (height - canvas) / 2}
+          r={blob.r * size}
+          fill={`url(#${gid})`}
+        />
       </Svg>
     </Animated.View>
   );
