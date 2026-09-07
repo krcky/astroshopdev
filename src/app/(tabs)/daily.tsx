@@ -7,6 +7,7 @@ import { Lock, Sparkles } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { TabBackground } from '@/components/ambient-gradient';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
@@ -38,6 +39,7 @@ export default function Daily() {
 
   return (
     <View className="flex-1 bg-background">
+      <TabBackground tab="daily" />
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
 

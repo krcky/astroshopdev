@@ -9,6 +9,8 @@ export default function OnboardingLayout() {
         // Nazad gestom je iskljucen: koraci imaju sopstvenu strelicu, a
         // preskakanje unazad gestom bi ostavilo draft u nedoslednom stanju.
         gestureEnabled: false,
+        // vidi komentar u korenskom layout-u
+        autoHideHomeIndicator: false,
       }}
     />
   );

@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { TabBackground } from '@/components/ambient-gradient';
 import { signOut, useAuthStore } from '@/store/auth';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export default function ProfileTab() {
 
   return (
     <View className="flex-1 bg-background">
+      <TabBackground tab="profile" />
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
 

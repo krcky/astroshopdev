@@ -37,7 +37,17 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
           <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }} />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: '#FFFFFF' },
+              // iOS home indikator mora da ostane vidljiv — tako izgleda svaka
+              // druga aplikacija. Podrazumevana vrednost bi trebalo da bude
+              // false, ali je postavljamo izricito jer se u Expo Go ponasalo
+              // kao da je ukljuceno.
+              autoHideHomeIndicator: false,
+            }}
+          />
         </SafeAreaProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
