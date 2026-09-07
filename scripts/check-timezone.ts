@@ -62,5 +62,41 @@ const b = localBirthToUtc(1990, 6, 15, 15, 30, BG);
 console.log(`  Sat razlike u vremenu rodjenja = ${((b.getTime() - a.getTime()) / 3600000)} h razlike u UTC`);
 console.log(`  Zemlja se okrene 15°/h -> ascendent se pomeri za ~15° (pola znaka)`);
 
+// --- 6. Rezerva mora da se slaze sa Intl i PRE 1996 ---
+// Ovo je uhvatilo pravu gresku: rodjenje 1988. racunato je sa pomerajem 0
+// umesto +2, jer je rezervni put vracao pogresnu vrednost umesto da prizna
+// da ne zna. Do 1995. letnje vreme se zavrsavalo u SEPTEMBRU, ne oktobru.
+console.log('\n=== 6. Rezervno pravilo pre 1996. ===');
+if (hasFullIntl) {
+  let mismatch = 0, checked = 0, firstBad = '';
+  for (let y = 1983; y <= 1995; y++) {
+    for (let doy = 0; doy < 365; doy++) {
+      const d = new Date(Date.UTC(y, 0, 1 + doy, 12, 0, 0));
+      const a = zoneOffsetMinutes(d, BG, false);
+      const b = zoneOffsetMinutes(d, BG, true);
+      checked++;
+      if (a !== b) { mismatch++; if (!firstBad) firstBad = d.toISOString().slice(0, 10); }
+    }
+  }
+  ok(mismatch === 0, 'rezerva = Intl za sve dane 1983—1995',
+     `provereno ${checked} dana${firstBad ? ', prvo neslaganje ' + firstBad : ''}`);
+} else {
+  console.log('     (preskoceno — Intl nije dostupan)');
+}
+
+console.log('\n=== 7. Konkretan slucaj koji je bio pogresan ===');
+// Nis, 30.6.1988. u 03:30 lokalno. Tada je vazilo letnje vreme -> 01:30 UTC.
+const rodjenje = localBirthToUtc(1988, 6, 30, 3, 30, BG);
+ok(rodjenje.toISOString() === '1988-06-30T01:30:00.000Z',
+   'rodjenje 1988. daje tacan UTC preko Intl', rodjenje.toISOString());
+const rezerva = localBirthToUtc(1988, 6, 30, 3, 30, BG, true);
+ok(rezerva.toISOString() === '1988-06-30T01:30:00.000Z',
+   'isto i kad Intl NIJE dostupan', rezerva.toISOString());
+
+// Oktobar 1988: letnje vreme je vec bilo gotovo (zavrsavalo se u septembru).
+const oktobar = localBirthToUtc(1988, 10, 15, 12, 0, BG, true);
+ok(oktobar.toISOString() === '1988-10-15T11:00:00.000Z',
+   'oktobar 1988. je ZIMSKO vreme (+1), ne letnje', oktobar.toISOString());
+
 console.log(`\n${fail === 0 ? 'SVE PROSLO' : fail + ' TESTOVA PALO'}\n`);
 process.exit(fail === 0 ? 0 : 1);

@@ -12,20 +12,26 @@
  */
 
 /** Da li JS runtime ume da racuna pomeraj za proizvoljnu IANA zonu. */
+/**
+ * Da li runtime ume da izracuna pomeraj za proizvoljnu IANA zonu.
+ *
+ * Ne proverava se da li poziv PROLAZI nego da li daje TACAN rezultat, na dva
+ * poznata slucaja: Beograd u julu mora biti +120, u januaru +60. Hermes na
+ * nekim uredjajima prihvata opciju ali vraca beskoristan odgovor — takav
+ * runtime mora da padne na eksplicitno pravilo, a ne da tiho gresi.
+ */
 export const hasFullIntl: boolean = (() => {
   try {
-    const f = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Belgrade',
-      timeZoneName: 'longOffset',
-    });
-    return f.format(new Date()).includes('GMT');
+    const leto = rawOffsetViaIntl(new Date(Date.UTC(2020, 6, 1, 12)), 'Europe/Belgrade');
+    const zima = rawOffsetViaIntl(new Date(Date.UTC(2020, 0, 1, 12)), 'Europe/Belgrade');
+    return leto === 120 && zima === 60;
   } catch {
     return false;
   }
 })();
 
-/** Pomeraj zone u minutima za dati trenutak, preko Intl. */
-function offsetViaIntl(utc: Date, timeZone: string): number | null {
+/** Pomeraj zone u minutima za dati trenutak, preko Intl. Null ako ne zna. */
+function rawOffsetViaIntl(utc: Date, timeZone: string): number | null {
   try {
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone,
@@ -33,8 +39,12 @@ function offsetViaIntl(utc: Date, timeZone: string): number | null {
     }).formatToParts(utc);
     const name = parts.find((p) => p.type === 'timeZoneName')?.value; // npr. "GMT+02:00"
     if (!name) return null;
-    const m = name.match(/GMT([+-])(\d{2}):?(\d{2})?/);
-    if (!m) return name === 'GMT' ? 0 : null;
+    const m = name.match(/GMT([+-])(\d{1,2}):?(\d{2})?/);
+    // Goli "GMT" NE znaci nulti pomeraj. Runtime koji ne ume da izracuna
+    // pomeraj za trazenu zonu vraca upravo to. Ako bismo ga procitali kao 0,
+    // dobili bismo pogresnu kartu koja izgleda ispravno — najgora greska.
+    // Zato: ne znamo -> null -> ide se na eksplicitno pravilo.
+    if (!m) return null;
     const sign = m[1] === '-' ? -1 : 1;
     return sign * (parseInt(m[2], 10) * 60 + parseInt(m[3] ?? '0', 10));
   } catch {
@@ -50,13 +60,18 @@ function lastSundayUtc(year: number, month: number): number {
 }
 
 /**
- * Rezervno pravilo za evropske zone: letnje vreme od poslednje nedelje marta
- * do poslednje nedelje oktobra (01:00 UTC). Vazi u EU od 1996.
+ * Rezervno pravilo za evropske zone.
+ *
+ * Pocetak je uvek poslednja nedelja marta u 01:00 UTC. KRAJ SE MENJAO:
+ * do 1995. zakljucno letnje vreme se zavrsavalo poslednje nedelje SEPTEMBRA,
+ * a od 1996. poslednje nedelje OKTOBRA. Bez te razlike svako rodjenje u
+ * oktobru pre 1996. dobija sat viska — sto pomera ascendent za 15 stepeni.
  */
 function offsetEuropeFallback(utc: Date, standardOffsetMinutes: number): number {
   const y = utc.getUTCFullYear();
   const t = utc.getTime();
-  const dst = t >= lastSundayUtc(y, 2) && t < lastSundayUtc(y, 9);
+  const krajMeseca = y >= 1996 ? 9 : 8; // oktobar : septembar
+  const dst = t >= lastSundayUtc(y, 2) && t < lastSundayUtc(y, krajMeseca);
   return standardOffsetMinutes + (dst ? 60 : 0);
 }
 
@@ -82,7 +97,7 @@ export function zoneOffsetMinutes(
   /** Za testiranje: preskoci Intl i koristi eksplicitno pravilo. */
   forceFallback = false
 ): number {
-  const viaIntl = !forceFallback && hasFullIntl ? offsetViaIntl(utc, tz.name) : null;
+  const viaIntl = !forceFallback && hasFullIntl ? rawOffsetViaIntl(utc, tz.name) : null;
   if (viaIntl !== null) return viaIntl;
   return tz.europeanDst
     ? offsetEuropeFallback(utc, tz.standardOffsetMinutes)
