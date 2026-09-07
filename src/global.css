@@ -22,7 +22,8 @@
     --secondary-foreground: 0 0% 8%;
 
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 42%;
+    /* 30%, ne 42%: preko obojene pozadine 42% pada ispod AA (3,2:1). */
+    --muted-foreground: 0 0% 30%;
 
     --accent: 0 0% 94%;
     --accent-foreground: 0 0% 8%;
