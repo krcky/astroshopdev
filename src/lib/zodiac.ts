@@ -38,22 +38,37 @@ export type SignPosition = {
   sign: ZodiacSign;
   /** Stepen unutar znaka, 0—29.99… */
   degree: number;
-  /** Za prikaz: "12° 34' Bik" */
+  /** Za prikaz: "12° 34' Bik" — minuti ZAOKRUZENI. */
   formatted: string;
+  /** Za proveru sa astroloskim softverom: "12° 34' 56\" Bik". */
+  formattedPrecise: string;
 };
 
 /** Ekliptička longituda (0—360) -> znak + stepen u znaku. */
 export function signFromLongitude(longitude: number): SignPosition {
   const lon = norm360(longitude);
-  const index = Math.floor(lon / 30);
-  const degree = lon - index * 30;
+
+  // Zaokruzivanje na najblizi lucni minut radi se nad APSOLUTNOM longitudom,
+  // pre odredjivanja znaka. Inace bi 29° 59.7' ostalo prikazano kao 29° 60'
+  // u prethodnom znaku, umesto kao 0° sledeceg.
+  const totalMin = Math.round(lon * 60) % (360 * 60);
+  const index = Math.floor(totalMin / 1800);
+  const within = totalMin - index * 1800;
   const sign = SIGNS[index];
-  const d = Math.floor(degree);
-  const m = Math.floor((degree - d) * 60);
+
+  // Precizan oblik zadrzava sekunde i NE zaokruzuje minute — tako pise i
+  // astro.com za planete, pa se vrednosti mogu porediti cifru po cifru.
+  const rawIndex = Math.floor(lon / 30);
+  const rawDeg = lon - rawIndex * 30;
+  const pd = Math.floor(rawDeg);
+  const pm = Math.floor((rawDeg - pd) * 60);
+  const ps = Math.round((rawDeg - pd - pm / 60) * 3600);
+
   return {
     sign,
-    degree,
-    formatted: `${d}° ${String(m).padStart(2, '0')}' ${sign.name}`,
+    degree: lon - rawIndex * 30,
+    formatted: `${Math.floor(within / 60)}° ${String(within % 60).padStart(2, '0')}' ${sign.name}`,
+    formattedPrecise: `${pd}° ${String(pm).padStart(2, '0')}' ${String(ps).padStart(2, '0')}" ${SIGNS[rawIndex].name}`,
   };
 }
 
