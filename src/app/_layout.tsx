@@ -1,18 +1,45 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import '@/global.css';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import * as React from 'react';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { colorScheme } from 'nativewind';
 
-SplashScreen.preventAutoHideAsync();
+import { useAuthListener } from '@/store/auth';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// Astroshop je light-first. Tamna tema ostaje definisana u global.css
+// (.dark:root) ako je ikad budemo ponudili kao opciju.
+//
+// Guard: pri static web renderu Expo izvrsava ovaj modul u Node-u, gde nema
+// DOM-a i colorScheme.set baca gresku. Na native-u i u browseru window postoji.
+if (typeof window !== 'undefined') {
+  colorScheme.set('light');
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Dnevni horoskop se menja jednom dnevno; nema potrebe za refetch-om.
+      staleTime: 1000 * 60 * 30,
+      retry: 2,
+    },
+  },
+});
+
+export default function RootLayout() {
+  useAuthListener();
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#FFFFFF' } }} />
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

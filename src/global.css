@@ -1,9 +1,85 @@
-:root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Svetla tema — cisto belo, crn tekst. Primarna tema aplikacije. */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    /* Primarna akcija je crna — najbolji kontrast i najcistiji izgled na belom. */
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 8%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 8%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 88%;
+    --ring: 0 0% 9%;
+
+    --cosmos-deep: 0 0% 100%;
+    --cosmos-mid: 0 0% 100%;
+    --cosmos-glow: 0 0% 100%;
+
+    /* Zlatna se zadrzava SAMO kao akcenat na placenom sadrzaju.
+       Zatamnjena na 38% svetline da bude citljiva na belom (kontrast ~5.2:1). */
+    --gold: 38 72% 38%;
+
+    --radius: 1rem;
+  }
+
+  .dark:root {
+    /* Tamna tema — primarna. Duboko nocno nebo. */
+    --background: 250 45% 7%;
+    --foreground: 45 25% 94%;
+
+    --card: 250 38% 11%;
+    --card-foreground: 45 25% 94%;
+
+    --popover: 250 40% 10%;
+    --popover-foreground: 45 25% 94%;
+
+    /* Zlatna svetli na tamnom — glavni akcenat */
+    --primary: 43 74% 62%;
+    --primary-foreground: 250 45% 8%;
+
+    --secondary: 255 28% 18%;
+    --secondary-foreground: 45 25% 94%;
+
+    --muted: 252 25% 15%;
+    --muted-foreground: 250 14% 63%;
+
+    --accent: 280 52% 58%;
+    --accent-foreground: 250 45% 8%;
+
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 45 25% 96%;
+
+    --border: 252 24% 20%;
+    --input: 252 24% 22%;
+    --ring: 43 74% 62%;
+
+    /* Gradijent stops za nocno nebo */
+    --cosmos-deep: 250 50% 5%;
+    --cosmos-mid: 262 42% 13%;
+    --cosmos-glow: 280 45% 22%;
+    --gold: 43 74% 62%;
+  }
 }
