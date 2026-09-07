@@ -5,17 +5,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
 import { supabase } from '@/lib/supabase';
-import { useDraft } from '@/store/draft';
-import { pushProfile } from '@/lib/sync';
-import { useProfileStore, type Profile } from '@/store/profile';
+import { completeSignup, routeAfterSignup } from '@/lib/signup';
 
 const LENGTH = 6;
 
 export default function Code() {
   const { email } = useLocalSearchParams<{ email: string }>();
-  const draft = useDraft();
-  const setProfile = useProfileStore((s) => s.setProfile);
-
   const [code, setCode] = React.useState('');
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -40,18 +35,9 @@ export default function Code() {
       return;
     }
 
-    // Karta se upisuje ODMAH po prijavi — da se podaci o rodjenju ne izgube
-    // ako korisnik prekine na koraku sa imenom.
-    const profile: Profile = {
-      name: initialName(String(email)),
-      birth: draft.date!,
-      time: draft.time,
-      cityName: draft.cityName!,
-    };
-    await pushProfile(data.session.user.id, profile);
-    setProfile(profile);
+    const outcome = await completeSignup(data.session.user.id, String(email));
     setBusy(false);
-    router.replace('/name');
+    router.replace(routeAfterSignup(outcome));
   };
 
   const resend = async () => {
@@ -95,8 +81,3 @@ export default function Code() {
   );
 }
 
-/** Privremeno ime dok korisnik ne unese svoje — baza ne prima prazno. */
-function initialName(email: string): string {
-  const local = email.split('@')[0].replace(/[._-]+/g, ' ').trim();
-  return local ? local.charAt(0).toUpperCase() + local.slice(1) : 'Ti';
-}
