@@ -81,7 +81,7 @@ export default function ProfileTab() {
               <View className="flex-row items-center justify-between border-t border-border px-4 py-3.5">
                 <Text className="text-sm">Ističe</Text>
                 <Text variant="muted" className="text-sm">
-                  {new Date(entitlement.expiresAt).toLocaleDateString('sr-RS')}
+                  {new Date(entitlement.expiresAt).toLocaleDateString('sr-Latn-RS')}
                 </Text>
               </View>
             )}

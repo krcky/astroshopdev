@@ -38,7 +38,9 @@ export function WheelPicker({ mode, value, onChange, maximumDate, minimumDate }:
           display="spinner"
           // 24-casovni format: rodjenje u 3 ujutru i 3 popodne nisu ista karta.
           is24Hour
-          locale="sr-RS"
+          // "sr-RS" na iOS-u daje CIRILICU. Za latinicu je neophodan zapis
+          // pisma u oznaci jezika — "sr-Latn-RS", ne "sr-RS".
+          locale="sr-Latn-RS"
           maximumDate={maximumDate}
           minimumDate={minimumDate}
           onChange={(_e: DateTimePickerEvent, d?: Date) => d && onChange(d)}
