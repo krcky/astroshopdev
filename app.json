@@ -8,7 +8,8 @@
     "scheme": "astroshop",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.krcky.astroshop"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.krcky.astroshop"
     },
     "web": {
       "output": "single",
@@ -39,6 +41,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "owner": "krcky",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "80bd5bd5-0efe-48b4-a039-4c85b7cd5a9f"
+      }
     }
   }
 }
