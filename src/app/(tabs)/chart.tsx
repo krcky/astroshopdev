@@ -5,7 +5,6 @@ import { Redirect } from 'expo-router';
 
 import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
-import { TabBackground } from '@/components/ambient-gradient';
 import { Glyph } from '@/components/ui/glyph';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { findAspects } from '@/lib/astro';
@@ -33,7 +32,6 @@ export default function ChartScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <TabBackground tab="chart" />
       <SafeAreaView className="flex-1" edges={['top']}>
         <View className="px-5 pb-1 pt-4">
           <Text variant="label">Natalna karta</Text>

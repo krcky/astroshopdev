@@ -5,7 +5,6 @@ import { Redirect, router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { NeatBackground } from '@/components/neat-gradient';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
 import { traitsForSign } from '@/lib/traits';
@@ -35,7 +34,6 @@ export default function Home() {
 
   return (
     <View className="flex-1 bg-background">
-      <NeatBackground />
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
 
