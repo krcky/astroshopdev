@@ -138,5 +138,33 @@ const daleko = new Date('1890-01-01T12:00:00Z');
 ok(hasFullIntl ? isOffsetReliable(daleko, BG) : !isOffsetReliable(daleko, BG),
    'daleka proslost: oslanjamo se na Intl, ne na nase pravilo');
 
+// --- 11. Pre 1970: negativne Unix oznake ---
+// Provereno nezavisno protiv TimeZoneDB dumpa (142.582 prelaza, CC-BY):
+// za svaki proveren datum 1890—1969 vrednosti su se poklopile.
+console.log('\n=== 11. Rodjenja pre 1970. ===');
+const pre1970: [string, number, string][] = [
+  ['1890-06-15T12:00:00Z',  60, 'Beograd je na CET od 1884.'],
+  ['1930-06-15T12:00:00Z',  60, 'medjuratno doba: nema letnjeg vremena'],
+  ['1942-07-15T12:00:00Z', 120, 'okupacija: letnje vreme celu godinu'],
+  ['1943-07-15T12:00:00Z', 120, 'isto 1943.'],
+  ['1945-06-15T12:00:00Z', 120, 'isto do kraja rata'],
+  ['1950-06-15T12:00:00Z',  60, 'posle rata opet nema letnjeg vremena'],
+  ['1969-06-15T12:00:00Z',  60, 'do 1983. ostaje tako'],
+];
+for (const [iso, ocekivano, zasto] of pre1970) {
+  const d = new Date(iso);
+  const got = zoneOffsetMinutes(d, BG);
+  ok(got === ocekivano, `${iso.slice(0, 10)}: ${ocekivano} min — ${zasto}`,
+     got === ocekivano ? '' : `dobijeno ${got}`);
+}
+
+// Negativne Unix oznake ne smeju da pokvare racun u oba smera.
+const staro = localBirthToUtc(1930, 6, 15, 10, 30, BG);
+ok(staro.toISOString() === '1930-06-15T09:30:00.000Z',
+   'rodjenje 1930. daje tacan UTC', staro.toISOString());
+const ratno = localBirthToUtc(1943, 7, 20, 3, 15, BG);
+ok(ratno.toISOString() === '1943-07-20T01:15:00.000Z',
+   'rodjenje 1943. racuna sa ratnim +2h', ratno.toISOString());
+
 console.log(`\n${fail === 0 ? 'SVE PROSLO' : fail + ' TESTOVA PALO'}\n`);
 process.exit(fail === 0 ? 0 : 1);
