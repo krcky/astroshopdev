@@ -1,5 +1,5 @@
 /** Provera konverzije lokalnog vremena rodjenja u UTC. */
-import { localBirthToUtc, zoneOffsetMinutes, hasFullIntl, type TimeZoneInfo } from '../src/lib/timezone';
+import { localBirthToUtc, zoneOffsetMinutes, hasFullIntl, isOffsetReliable, type TimeZoneInfo } from '../src/lib/timezone';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -123,6 +123,20 @@ console.log('\n=== 9. Intl bez longOffset ===');
 ok(hasFullIntl, 'Intl je prepoznat kao upotrebljiv');
 ok(zoneOffsetMinutes(new Date('1973-07-15T12:00:00Z'), BG) === 60,
    'Intl zna da 1973. nije bilo letnjeg vremena');
+
+// --- 10. Radije priznati nego pogadjati ---
+console.log('\n=== 10. Pouzdanost pomeraja ===');
+const VIENNA: TimeZoneInfo = { name: 'Europe/Vienna', standardOffsetMinutes: 60, europeanDst: true };
+const SYDNEY: TimeZoneInfo = { name: 'Australia/Sydney', standardOffsetMinutes: 600, europeanDst: false };
+
+ok(isOffsetReliable(new Date('1973-03-25T19:10:00Z'), BG), 'Beograd 1973: pouzdano');
+ok(isOffsetReliable(new Date('1973-07-15T12:00:00Z'), VIENNA), 'Bec 1973: pouzdano dok Intl radi');
+ok(isOffsetReliable(new Date('1990-07-15T04:30:00Z'), SYDNEY), 'Sidnej 1990: pouzdano dok Intl radi');
+
+// Godina van opsega koji je test pokrio — bez Intl-a ne bismo smeli da tvrdimo.
+const daleko = new Date('1890-01-01T12:00:00Z');
+ok(hasFullIntl ? isOffsetReliable(daleko, BG) : !isOffsetReliable(daleko, BG),
+   'daleka proslost: oslanjamo se na Intl, ne na nase pravilo');
 
 console.log(`\n${fail === 0 ? 'SVE PROSLO' : fail + ' TESTOVA PALO'}\n`);
 process.exit(fail === 0 ? 0 : 1);

@@ -25,7 +25,7 @@ export default function ChartScreen() {
   if (!hydrated) return <View className="flex-1 bg-background" />;
   if (!resolved) return <Redirect href="/" />;
 
-  const { chart, profile, city, timeUnknown } = resolved;
+  const { chart, profile, city, timeUnknown, zoneUnreliable } = resolved;
   const b = profile.birth;
   const t = profile.time;
   const wheelSize = Math.min(width - 16, 430);
@@ -47,9 +47,24 @@ export default function ChartScreen() {
             </Text>
           </View>
 
-          <View className="items-center">
-            <NatalWheel chart={chart} size={wheelSize} />
-          </View>
+          {zoneUnreliable ? (
+            <View className="mx-5 rounded-xl border border-destructive/40 bg-secondary p-5">
+              <Text variant="h3">Karta ne može da se izračuna</Text>
+              <Text variant="muted" className="mt-2">
+                Ne možemo pouzdano da utvrdimo koliko je sati bilo po UTC-u u
+                mestu {city.name} na taj datum. Greška od sat vremena pomeri
+                ascendent za pola znaka, pa radije ne prikazujemo ništa nego
+                pogrešne brojeve.
+              </Text>
+              <Text variant="muted" className="mt-3 text-xs">
+                Javi nam ovo — zona: {city.tz.name}
+              </Text>
+            </View>
+          ) : (
+            <View className="items-center">
+              <NatalWheel chart={chart} size={wheelSize} />
+            </View>
+          )}
 
           {timeUnknown && (
             <View className="mx-5 mt-4 rounded-lg bg-secondary p-4">

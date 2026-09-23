@@ -173,3 +173,28 @@ export function formatOffset(minutes: number): string {
   const m = a % 60;
   return `UTC${sign}${h}${m ? ':' + String(m).padStart(2, '0') : ''}`;
 }
+
+/** Zone za koje je nase rezervno pravilo PROVERENO testom (1970—2030). */
+const PROVERENE_ZONE = new Set([
+  'Europe/Belgrade', 'Europe/Zagreb', 'Europe/Sarajevo',
+  'Europe/Podgorica', 'Europe/Skopje', 'Europe/Ljubljana',
+]);
+
+/**
+ * Da li za ovaj trenutak i ovu zonu UOPSTE znamo pomeraj.
+ *
+ * Postoji zato sto smo dvaput imali istu gresku: kod nije znao pomeraj pa je
+ * vratio nesto sto IZGLEDA tacno. Rodjenje 1973. je dobilo sat viska i
+ * ascendent u pogresnom znaku, bez ijedne poruke o gresci.
+ *
+ * Pogresna karta je gora od poruke da karta ne moze da se izracuna.
+ */
+export function isOffsetReliable(utc: Date, tz: TimeZoneInfo): boolean {
+  // Intl nosi punu IANA bazu, sa istorijom — ako radi, znamo tacno.
+  if (hasFullIntl && zoneOffsetMinutes(utc, tz, false) !== null) return true;
+
+  // Bez Intl-a verujemo samo pravilu koje je test pokrio, i samo u opsegu
+  // koji test pokriva. Za Bec, Berlin ili Njujork istorija je drugacija.
+  const godina = utc.getUTCFullYear();
+  return PROVERENE_ZONE.has(tz.name) && godina >= 1970 && godina <= 2030;
+}

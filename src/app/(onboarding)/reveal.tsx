@@ -26,6 +26,19 @@ export default function Reveal() {
   // Ako je draft izgubljen (npr. ponovo ucitana aplikacija), pocinje se ispocetka.
   if (!resolved) return <Redirect href="/welcome" />;
 
+  // Bolje zaustaviti ovde nego pustiti korisnika da napravi nalog sa kartom
+  // koju ne umemo da izracunamo.
+  if (resolved.zoneUnreliable) {
+    return (
+      <OnboardingStep
+        exit={{ kind: 'back', onPress: () => router.back() }}
+        question="Ne možemo da izračunamo kartu"
+        note={`Ne znamo pouzdano koliko je sati bilo po UTC-u u mestu ${resolved.city.name} na taj datum. Probaj drugo mesto rođenja, ili nam javi — zona: ${resolved.city.tz.name}`}
+        primary={{ label: 'Nazad na mesto rođenja', onPress: () => router.back() }}
+      />
+    );
+  }
+
   const sun = resolved.chart.planets.find((p) => p.key === 'sun')!;
   const moon = resolved.chart.planets.find((p) => p.key === 'moon')!;
   const asc = resolved.chart.ascendantSign.sign;

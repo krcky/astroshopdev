@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { cityById, cityByName, type City } from '@/lib/cities';
 import { ZONE_STANDARD_OFFSET } from '@/lib/zone-offsets';
-import { localBirthToUtc } from '@/lib/timezone';
+import { isOffsetReliable, localBirthToUtc } from '@/lib/timezone';
 import { buildNatalChart, type NatalChart } from '@/lib/natal';
 
 /** Polja profila koja opisuju mesto rodjenja, izvedena iz izabranog grada. */
@@ -89,6 +89,11 @@ export type ResolvedProfile = {
    * (osim Meseca, koji za 12 sati predje i do 7 stepeni).
    */
   timeUnknown: boolean;
+  /**
+   * true ako pomeraj zone nije mogao pouzdano da se odredi. Kad je ovo tacno,
+   * karta se NE prikazuje — bolje priznati nego pokazati pogresne brojeve.
+   */
+  zoneUnreliable: boolean;
 };
 
 /** Sklapa sve: profil -> grad -> UTC -> natalna karta. */
@@ -134,7 +139,7 @@ export function resolveProfile(profile: Profile | null): ResolvedProfile | null 
     timeUnknown ? 'whole-sign' : 'placidus'
   );
 
-  return { profile, city, utc, chart, timeUnknown };
+  return { profile, city, utc, chart, timeUnknown, zoneUnreliable: !isOffsetReliable(utc, city.tz) };
 }
 
 /** Hook: razresen profil ili null ako korisnik jos nije prosao onboarding. */

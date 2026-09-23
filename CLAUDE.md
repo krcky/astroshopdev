@@ -73,7 +73,13 @@ tekstualni font. Nikad ne stavljati simbol direktno u `<Text>`.
 Rezervno pravilo je GRUBA APROKSIMACIJA i tacno je samo za Srbiju/Jugoslaviju:
 nema letnjeg vremena pre 1983, kraj u septembru do 1995, u oktobru od 1996.
 Za druge evropske zemlje istorija je drugacija — zato Intl mora da radi, a
-rezerva je samo mreza za pad. Ne siriti listu gradova van Evrope bez provere.
+rezerva je samo mreza za pad.
+
+RADIJE PRIZNATI NEGO POGADJATI. `isOffsetReliable()` kaze da li za dati
+trenutak i zonu uopste znamo pomeraj. Ako ne znamo, karta se NE prikazuje.
+Dvaput smo imali istu gresku: kod nije znao pomeraj pa je vratio nesto sto
+izgleda tacno, a ascendent je zavrsio u pogresnom znaku bez ijedne poruke.
+Pogresna karta je gora od poruke da karta ne moze da se izracuna.
 Zemlja se okrene 15°/h — greska od sat vremena pomeri ascendent za pola znaka.
 Zimsko/letnje vreme se racuna ZA DATUM RODJENJA. Nikad ne koristiti
 `new Date(...)` sa lokalnim vremenom direktno.
