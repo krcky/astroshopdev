@@ -7,11 +7,12 @@ import { ChevronRight, Lock, Sparkles } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { TabBarSpacer } from '@/components/floating-tab-bar';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore, useEntitlement } from '@/store/auth';
 import { cn } from '@/lib/utils';
 
 const GOLD = '#A7731B';
@@ -21,8 +22,9 @@ export default function Daily() {
   const authLoading = useAuthStore((s) => s.loading);
   const resolved = useResolvedProfile();
 
-  // Pravo pristupa iskljucivo sa servera — RLS dozvoljava samo citanje svog reda.
-  const entitlement = useAuthStore((s) => s.entitlement);
+  // Pravo pristupa iskljucivo sa servera — RLS dozvoljava samo citanje svog
+  // reda. U razvoju kroz ovo prolazi i test prekidac iz /profile.
+  const entitlement = useEntitlement();
   const isPremium = entitlement?.active ?? false;
 
   const today = React.useMemo(() => new Date(), []);
@@ -47,7 +49,7 @@ export default function Daily() {
   return (
     <View className="flex-1 bg-background">
       <SafeAreaView className="flex-1" edges={['top']}>
-        <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerClassName="px-5" showsVerticalScrollIndicator={false}>
 
           <View className="pt-4 pb-6">
             <Text variant="label">{formatDate(today)}</Text>
@@ -168,6 +170,7 @@ export default function Daily() {
               ))}
             </View>
           )}
+          <TabBarSpacer />
         </ScrollView>
       </SafeAreaView>
     </View>

@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/text';
 import { Glyph } from '@/components/ui/glyph';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
-import { useAuthStore } from '@/store/auth';
+import { useEntitlement } from '@/store/auth';
 import { findTransits } from '@/lib/transits';
 
 const GOLD = '#A7731B';
@@ -25,7 +25,7 @@ const GOLD = '#A7731B';
 export default function TransitDetail() {
   const { key } = useLocalSearchParams<{ key: string }>();
   const resolved = useResolvedProfile();
-  const entitlement = useAuthStore((s) => s.entitlement);
+  const entitlement = useEntitlement();
 
   const kljucevi = React.useMemo(() => (key ? [String(key)] : []), [key]);
   const { texts: duga, loading: dugaLoading } = useTransitTexts(kljucevi, 'long');
@@ -40,7 +40,6 @@ export default function TransitDetail() {
 
   const puna = duga.get(String(key));
   const sazeta = kratka.get(String(key));
-  const zakljucano = !dugaLoading && !puna;
 
   return (
     <View className="flex-1 bg-background">
@@ -85,26 +84,29 @@ export default function TransitDetail() {
             <>
               {!!sazeta?.body && <Text variant="body">{sazeta.body}</Text>}
 
-              <View className="mt-8 rounded-xl border border-gold/40 bg-secondary/40 p-6">
-                <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-gold/10">
-                  <Lock size={20} color={GOLD} />
-                </View>
-                <Text variant="h3" className="mt-4 text-center">Detaljno tumačenje</Text>
-                <Text variant="muted" className="mt-2 text-center">
-                  Dugoročni efekti, sfere života na koje se odnosi, i konkretni
-                  saveti za ovaj period.
+              {/* Pristup je placen a duga verzija ipak nije dosla — tekst za
+                  ovaj tranzit jos nije u korpusu. Poziv na kupovinu bi tu bio
+                  pogresan: nema sta da se otkljuca. */}
+              {entitlement?.active ? (
+                <Text variant="muted" className="mt-6 text-xs">
+                  Tumačenje za ovaj tranzit još nije napisano.
                 </Text>
-                <Button className="mt-5 w-full" onPress={() => router.push('/profile')}>
-                  <Text>Otključaj</Text>
-                </Button>
-              </View>
+              ) : (
+                <View className="mt-8 rounded-xl border border-gold/40 bg-secondary/40 p-6">
+                  <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-gold/10">
+                    <Lock size={20} color={GOLD} />
+                  </View>
+                  <Text variant="h3" className="mt-4 text-center">Detaljno tumačenje</Text>
+                  <Text variant="muted" className="mt-2 text-center">
+                    Dugoročni efekti, sfere života na koje se odnosi, i konkretni
+                    saveti za ovaj period.
+                  </Text>
+                  <Button className="mt-5 w-full" onPress={() => router.push('/profile')}>
+                    <Text>Otključaj</Text>
+                  </Button>
+                </View>
+              )}
             </>
-          )}
-
-          {zakljucano && entitlement?.active && (
-            <Text variant="muted" className="mt-6 text-xs">
-              Tumačenje za ovaj tranzit još nije napisano.
-            </Text>
           )}
         </ScrollView>
       </SafeAreaView>

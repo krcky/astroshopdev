@@ -5,6 +5,7 @@ import { Redirect, router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { TabBarSpacer } from '@/components/floating-tab-bar';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
 import { traitsForSign } from '@/lib/traits';
@@ -35,7 +36,7 @@ export default function Home() {
   return (
     <View className="flex-1 bg-background">
       <SafeAreaView className="flex-1" edges={['top']}>
-        <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerClassName="px-5" showsVerticalScrollIndicator={false}>
 
           <View className="pt-4 pb-7">
             <Text variant="label">{formatDate(today)}</Text>
@@ -95,6 +96,7 @@ export default function Home() {
               </View>
             )}
           </Pressable>
+          <TabBarSpacer />
         </ScrollView>
       </SafeAreaView>
     </View>
