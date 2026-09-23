@@ -70,6 +70,10 @@ sistem ih renderuje kao obojene kvadratice. `components/ui/glyph.tsx` forsira
 tekstualni font. Nikad ne stavljati simbol direktno u `<Text>`.
 
 **4. Vreme rodjenja mora u UTC preko `timezone.ts`.**
+Rezervno pravilo je GRUBA APROKSIMACIJA i tacno je samo za Srbiju/Jugoslaviju:
+nema letnjeg vremena pre 1983, kraj u septembru do 1995, u oktobru od 1996.
+Za druge evropske zemlje istorija je drugacija — zato Intl mora da radi, a
+rezerva je samo mreza za pad. Ne siriti listu gradova van Evrope bez provere.
 Zemlja se okrene 15°/h — greska od sat vremena pomeri ascendent za pola znaka.
 Zimsko/letnje vreme se racuna ZA DATUM RODJENJA. Nikad ne koristiti
 `new Date(...)` sa lokalnim vremenom direktno.

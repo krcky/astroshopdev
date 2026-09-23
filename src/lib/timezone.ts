@@ -30,8 +30,44 @@ export const hasFullIntl: boolean = (() => {
   }
 })();
 
+/**
+ * Pomeraj preko obicnog formatiranja datuma u zadatoj zoni.
+ *
+ * Ovo trazi SAMO osnovnu podrsku za `timeZone`, koju Hermes na telefonu ima.
+ * Opcija `timeZoneName: 'longOffset'` je novija i Hermes je nema — zato je
+ * telefon padao na rezervno pravilo i gresio za istorijske datume.
+ *
+ * Postupak: formatiraj trenutak u ciljanoj zoni, procitaj komponente kao da
+ * su UTC, pa oduzmi. Razlika je pomeraj.
+ */
+function offsetViaFormatParts(utc: Date, timeZone: string): number | null {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour12: false,
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(utc);
+
+    const num = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+    const y = num('year'), mo = num('month'), d = num('day');
+    let h = num('hour');
+    const mi = num('minute'), sec = num('second');
+    if ([y, mo, d, h, mi, sec].some(Number.isNaN)) return null;
+    if (h === 24) h = 0; // neki engine-i vracaju 24 umesto 0
+
+    const kaoUtc = Date.UTC(y, mo - 1, d, h, mi, sec);
+    return Math.round((kaoUtc - utc.getTime()) / 60_000);
+  } catch {
+    return null;
+  }
+}
+
 /** Pomeraj zone u minutima za dati trenutak, preko Intl. Null ako ne zna. */
 function rawOffsetViaIntl(utc: Date, timeZone: string): number | null {
+  // Prvo pouzdaniji nacin; `longOffset` ostaje kao drugi pokusaj.
+  const viaParts = offsetViaFormatParts(utc, timeZone);
+  if (viaParts !== null) return viaParts;
   try {
     const parts = new Intl.DateTimeFormat('en-US', {
       timeZone,
@@ -69,8 +105,16 @@ function lastSundayUtc(year: number, month: number): number {
  */
 function offsetEuropeFallback(utc: Date, standardOffsetMinutes: number): number {
   const y = utc.getUTCFullYear();
+
+  // Jugoslavija NIJE imala letnje vreme od 1945. do 1982. Uvedeno je 1983.
+  // Bez ove granice svako rodjenje pre 1983. dobija sat viska, sto pomera
+  // ascendent za oko 15 stepeni — dovoljno da promeni znak.
+  if (y < 1983) return standardOffsetMinutes;
+
   const t = utc.getTime();
-  const krajMeseca = y >= 1996 ? 9 : 8; // oktobar : septembar
+  // Do 1995. zakljucno letnje vreme se zavrsavalo poslednje nedelje SEPTEMBRA,
+  // od 1996. poslednje nedelje OKTOBRA.
+  const krajMeseca = y >= 1996 ? 9 : 8;
   const dst = t >= lastSundayUtc(y, 2) && t < lastSundayUtc(y, krajMeseca);
   return standardOffsetMinutes + (dst ? 60 : 0);
 }

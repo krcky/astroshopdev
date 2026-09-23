@@ -66,10 +66,10 @@ console.log(`  Zemlja se okrene 15°/h -> ascendent se pomeri za ~15° (pola zna
 // Ovo je uhvatilo pravu gresku: rodjenje 1988. racunato je sa pomerajem 0
 // umesto +2, jer je rezervni put vracao pogresnu vrednost umesto da prizna
 // da ne zna. Do 1995. letnje vreme se zavrsavalo u SEPTEMBRU, ne oktobru.
-console.log('\n=== 6. Rezervno pravilo pre 1996. ===');
+console.log('\n=== 6. Rezervno pravilo pre 1996. (ukljucujuci doba bez letnjeg vremena) ===');
 if (hasFullIntl) {
   let mismatch = 0, checked = 0, firstBad = '';
-  for (let y = 1983; y <= 1995; y++) {
+  for (let y = 1970; y <= 1995; y++) {
     for (let doy = 0; doy < 365; doy++) {
       const d = new Date(Date.UTC(y, 0, 1 + doy, 12, 0, 0));
       const a = zoneOffsetMinutes(d, BG, false);
@@ -78,7 +78,7 @@ if (hasFullIntl) {
       if (a !== b) { mismatch++; if (!firstBad) firstBad = d.toISOString().slice(0, 10); }
     }
   }
-  ok(mismatch === 0, 'rezerva = Intl za sve dane 1983—1995',
+  ok(mismatch === 0, 'rezerva = Intl za sve dane 1970—1995',
      `provereno ${checked} dana${firstBad ? ', prvo neslaganje ' + firstBad : ''}`);
 } else {
   console.log('     (preskoceno — Intl nije dostupan)');
@@ -97,6 +97,32 @@ ok(rezerva.toISOString() === '1988-06-30T01:30:00.000Z',
 const oktobar = localBirthToUtc(1988, 10, 15, 12, 0, BG, true);
 ok(oktobar.toISOString() === '1988-10-15T11:00:00.000Z',
    'oktobar 1988. je ZIMSKO vreme (+1), ne letnje', oktobar.toISOString());
+
+// --- 8. Doba pre 1983: Jugoslavija nije imala letnje vreme ---
+// Ovo je uhvaceno poredjenjem sa astro-seek: rodjenje 25.3.1973. u 20:10
+// racunato je sa UTC+2 umesto UTC+1, pa je ascendent bio 11 stepeni pomeren
+// i zavrsio u pogresnom znaku (Vaga umesto Skorpije).
+console.log('\n=== 8. Nema letnjeg vremena pre 1983. ===');
+const leto1973 = localBirthToUtc(1973, 7, 15, 12, 0, BG, true);
+ok(leto1973.toISOString() === '1973-07-15T11:00:00.000Z',
+   'jul 1973. je UTC+1, ne +2 (nije bilo letnjeg vremena)', leto1973.toISOString());
+
+const prijavljeni = localBirthToUtc(1973, 3, 25, 20, 10, BG, true);
+ok(prijavljeni.toISOString() === '1973-03-25T19:10:00.000Z',
+   'konkretan prijavljeni slucaj: 25.3.1973. 20:10 -> UTC+1', prijavljeni.toISOString());
+
+// 1983. je letnje vreme uvedeno — od tada pravilo vazi.
+const leto1983 = localBirthToUtc(1983, 7, 15, 12, 0, BG, true);
+ok(leto1983.toISOString() === '1983-07-15T10:00:00.000Z',
+   'jul 1983. JESTE letnje vreme (+2) — pravilo pocinje da vazi', leto1983.toISOString());
+
+// --- 9. Intl mora da radi i bez "longOffset" ---
+// Hermes na telefonu nema tu opciju; zato se pomeraj racuna iz obicnog
+// formatiranja datuma, sto trazi samo osnovnu podrsku za timeZone.
+console.log('\n=== 9. Intl bez longOffset ===');
+ok(hasFullIntl, 'Intl je prepoznat kao upotrebljiv');
+ok(zoneOffsetMinutes(new Date('1973-07-15T12:00:00Z'), BG) === 60,
+   'Intl zna da 1973. nije bilo letnjeg vremena');
 
 console.log(`\n${fail === 0 ? 'SVE PROSLO' : fail + ' TESTOVA PALO'}\n`);
 process.exit(fail === 0 ? 0 : 1);
