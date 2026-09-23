@@ -16,6 +16,7 @@ type Row = {
   birth_day: number;
   birth_hour: number | null;
   birth_minute: number | null;
+  city_id: number | null;
   city_name: string;
 };
 
@@ -25,6 +26,7 @@ const toProfile = (r: Row): Profile => ({
   time: r.birth_hour !== null && r.birth_minute !== null
     ? { hour: r.birth_hour, minute: r.birth_minute }
     : null,
+  cityId: r.city_id ?? 0,
   cityName: r.city_name,
 });
 
@@ -36,13 +38,14 @@ const toRow = (p: Profile, userId: string) => ({
   birth_day: p.birth.day,
   birth_hour: p.time?.hour ?? null,
   birth_minute: p.time?.minute ?? null,
+  city_id: p.cityId,
   city_name: p.cityName,
 });
 
 export async function pullProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('name, birth_year, birth_month, birth_day, birth_hour, birth_minute, city_name')
+    .select('name, birth_year, birth_month, birth_day, birth_hour, birth_minute, city_id, city_name')
     .eq('id', userId)
     .maybeSingle();
 

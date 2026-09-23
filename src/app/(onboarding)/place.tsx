@@ -16,7 +16,7 @@ export default function BirthPlace() {
 
   const next = () => {
     if (!city) return;
-    draft.set({ cityName: city.name });
+    draft.set({ cityId: city.id });
     router.push('/reveal');
   };
 

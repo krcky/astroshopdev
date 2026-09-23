@@ -12,11 +12,12 @@ export type Draft = {
   time: { hour: number; minute: number } | null;
   /** true ako je korisnik svesno preskocio vreme (SKIP), a ne da jos nije stigao dotle. */
   timeSkipped: boolean;
-  cityName: string | null;
+  /** GeoNames id grada. Ime se izvodi iz njega. */
+  cityId: number | null;
   name: string;
 };
 
-const EMPTY: Draft = { date: null, time: null, timeSkipped: false, cityName: null, name: '' };
+const EMPTY: Draft = { date: null, time: null, timeSkipped: false, cityId: null, name: '' };
 
 type DraftState = Draft & {
   set: (patch: Partial<Draft>) => void;
@@ -31,6 +32,6 @@ export const useDraft = create<DraftState>((set, get) => ({
   reset: () => set(EMPTY),
   isComplete: () => {
     const s = get();
-    return s.date !== null && s.cityName !== null && (s.time !== null || s.timeSkipped);
+    return s.date !== null && s.cityId !== null && (s.time !== null || s.timeSkipped);
   },
 }));

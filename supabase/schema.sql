@@ -17,6 +17,10 @@ create table if not exists public.profiles (
   -- NULL = korisnik ne zna tacno vreme rodjenja; app tada prelazi na Whole Sign
   birth_hour   int      check (birth_hour between 0 and 23),
   birth_minute int      check (birth_minute between 0 and 59),
+  -- GeoNames id grada. Kljuc je ID a ne ime: 53 imena se u regionu ponavljaju
+  -- (tri "Nova Sela" u tri zemlje), a razlicite koordinate daju razlicit
+  -- ascendent. `city_name` je denormalizovan, samo za prikaz.
+  city_id      bigint,
   city_name    text not null,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),

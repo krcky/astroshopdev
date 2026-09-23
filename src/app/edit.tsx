@@ -7,7 +7,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { WheelPicker } from '@/components/ui/wheel-picker';
-import { searchCities, cityByName, type City } from '@/lib/cities';
+import { searchCities, cityById, cityByName, type City } from '@/lib/cities';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
@@ -33,7 +33,7 @@ export default function EditBirthData() {
     return d;
   });
   const [timeKnown, setTimeKnown] = React.useState(Boolean(profile?.time));
-  const [city, setCity] = React.useState<City | null>(profile ? cityByName(profile.cityName) ?? null : null);
+  const [city, setCity] = React.useState<City | null>(profile ? cityById(profile.cityId) ?? cityByName(profile.cityName) ?? null : null);
   const [query, setQuery] = React.useState('');
   const [busy, setBusy] = React.useState(false);
 
@@ -48,6 +48,7 @@ export default function EditBirthData() {
       name: name.trim(),
       birth: { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() },
       time: timeKnown ? { hour: time.getHours(), minute: time.getMinutes() } : null,
+      cityId: city.id,
       cityName: city.name,
     };
     setProfile(updated);

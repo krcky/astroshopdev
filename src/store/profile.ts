@@ -9,7 +9,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { cityByName, type City } from '@/lib/cities';
+import { cityById, cityByName, type City } from '@/lib/cities';
 import { localBirthToUtc } from '@/lib/timezone';
 import { buildNatalChart, type NatalChart } from '@/lib/natal';
 
@@ -18,6 +18,13 @@ export type Profile = {
   birth: { year: number; month: number; day: number };
   /** null = korisnik ne zna tacno vreme rodjenja. */
   time: { hour: number; minute: number } | null;
+  /**
+   * GeoNames id grada. Kljuc je ID a ne ime jer se 53 imena u regionu
+   * ponavljaju — dva "Novo Sela" imaju razlicite koordinate i razlicit
+   * ascendent.
+   */
+  cityId: number;
+  /** Ime u trenutku unosa. Samo za prikaz; izvor istine je cityId. */
   cityName: string;
 };
 
@@ -65,7 +72,8 @@ export type ResolvedProfile = {
 /** Sklapa sve: profil -> grad -> UTC -> natalna karta. */
 export function resolveProfile(profile: Profile | null): ResolvedProfile | null {
   if (!profile) return null;
-  const city = cityByName(profile.cityName);
+  // Prvo po ID-ju; ime je rezerva za profile sacuvane pre uvodjenja ID-ja.
+  const city = cityById(profile.cityId) ?? cityByName(profile.cityName);
   if (!city) return null;
 
   const timeUnknown = profile.time === null;
