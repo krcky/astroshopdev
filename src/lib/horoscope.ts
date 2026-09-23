@@ -97,32 +97,8 @@ export function formatDate(date: Date): string {
  * Ovo je placeni sadrzaj: jedinstven po korisniku, ne po znaku.
  * ------------------------------------------------------------------------- */
 
-/**
- * Stub korpusa za tranzite. Kljucevi su isti format koji generise findTransits().
- * U produkciji: `SELECT text FROM snippets WHERE content_key = $1`.
- */
-const TRANSIT_CORPUS: Record<string, string[]> = {
-  'transit.uranus.conjunction.natal.mercury': [
-    'Način na koji misliš menja se brže nego što stigneš da primetiš. Ideja koja ti danas deluje neozbiljno za mesec dana biće ono čime se baviš.',
-  ],
-  'transit.mars.trine.natal.moon': [
-    'Osećanja i akcija idu u istom smeru, što ti se ne dešava često. Ono što danas kreneš iz stomaka, ispašće tačno.',
-  ],
-  'transit.mars.square.natal.ascendant': [
-    'Naletećeš na nekoga ko ti se suprotstavlja direktno. Nije lično — proveri da li braniš stav ili samo teritoriju.',
-  ],
-  'transit.saturn.square.natal.neptune': [
-    'Nešto u šta si verovao pokazuje svoje stvarne granice. Nije gubitak iluzije nego njeno preciziranje.',
-  ],
-  'transit.venus.trine.natal.sun': [
-    'Lakše te vide onakvog kakav jesi. Dobar dan da tražiš nešto što inače ne bi tražio.',
-  ],
-};
-
 export type PersonalEntry = {
   transit: Transit;
-  /** null = nema jos teksta u korpusu za ovaj kljuc. */
-  text: string | null;
 };
 
 export type PersonalDaily = {
@@ -145,16 +121,11 @@ export function buildPersonalDaily(
   const sunSign = resolved.chart.planets.find((p) => p.key === 'sun')!.position.sign;
   const generic = buildDailyHoroscope(sunSign, date);
 
-  const dayIndex = Math.floor(date.getTime() / 86_400_000);
+  // Tekstovi se NE spajaju ovde — dolaze sa servera, jer korpus ne sme u
+  // aplikaciju. Ovde se samo bira KOJI tranziti ulaze u danasnji horoskop.
   const entries: PersonalEntry[] = findTransits(resolved.chart, date)
     .slice(0, 5)
-    .map((transit) => {
-      const variants = TRANSIT_CORPUS[transit.contentKey];
-      return {
-        transit,
-        text: variants?.length ? variants[dayIndex % variants.length] : null,
-      };
-    });
+    .map((transit) => ({ transit }));
 
   const houseHighlights = findHouseTransits(resolved.chart, date)
     .filter((t) => t.score >= 0.9) // samo spore planete — one prave temu perioda

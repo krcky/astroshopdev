@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
+import { useTransitTexts } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,13 @@ export default function Daily() {
     () => (resolved ? buildPersonalDaily(resolved, today) : null),
     [resolved, today]
   );
+
+  // Tranziti se racunaju na telefonu, tekstovi stizu sa servera.
+  const keys = React.useMemo(
+    () => daily?.entries.map((e) => e.transit.contentKey) ?? [],
+    [daily]
+  );
+  const { texts, loading: textsLoading } = useTransitTexts(keys);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-background" />;
   if (!resolved || !daily) return <Redirect href="/" />;
@@ -59,25 +67,42 @@ export default function Daily() {
             {daily.entries.map((e, i) => {
               const t = e.transit;
               const hidden = locked && i > 0;
+              const tekst = texts.get(t.contentKey);
               return (
                 <Card key={t.contentKey} className={cn('mb-3', hidden && 'border-dashed')}>
                   <CardContent className="p-5">
-                    <View className="flex-row items-center gap-2 pb-2">
+                    <View className="flex-row items-center gap-2 pb-1">
                       <Glyph size={15} className="text-foreground">
                         {`${t.transiting.glyph} ${t.aspect.glyph} ${t.natal.glyph}`}
                       </Glyph>
-                      <Text className="text-sm font-semibold">
+                      <Text variant="label">
                         {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
                       </Text>
                     </View>
 
                     {hidden ? (
-                      <Text variant="muted">Otključaj da vidiš šta ovo znači za tebe.</Text>
-                    ) : e.text ? (
-                      <Text variant="body">{e.text}</Text>
+                      <Text variant="muted" className="mt-2">Otključaj da vidiš šta ovo znači za tebe.</Text>
+                    ) : tekst ? (
+                      <>
+                        {!!tekst.title && (
+                          <Text variant="h3" className="mb-2 mt-1">{tekst.title}</Text>
+                        )}
+                        <Text variant="body">{tekst.body}</Text>
+                        {!!tekst.positive && (
+                          <Polje oznaka="Pozitivno" tekst={tekst.positive} />
+                        )}
+                        {!!tekst.challenge && (
+                          <Polje oznaka="Izazov" tekst={tekst.challenge} />
+                        )}
+                        {!!tekst.advice && (
+                          <Polje oznaka="Savet" tekst={tekst.advice} />
+                        )}
+                      </>
+                    ) : textsLoading ? (
+                      <Text variant="muted" className="mt-2">Učitavam…</Text>
                     ) : (
-                      <Text variant="muted">
-                        Tekst za ovaj tranzit još nije u bazi — nedostaje ključ {t.contentKey}
+                      <Text variant="muted" className="mt-2">
+                        Tumačenje za ovaj tranzit još nije napisano.
                       </Text>
                     )}
                   </CardContent>
@@ -124,6 +149,15 @@ export default function Daily() {
           )}
         </ScrollView>
       </SafeAreaView>
+    </View>
+  );
+}
+
+function Polje({ oznaka, tekst }: { oznaka: string; tekst: string }) {
+  return (
+    <View className="mt-3 border-t border-border pt-3">
+      <Text variant="label" className="mb-1">{oznaka}</Text>
+      <Text variant="muted">{tekst}</Text>
     </View>
   );
 }
