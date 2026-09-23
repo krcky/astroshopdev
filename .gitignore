@@ -47,3 +47,6 @@ example
 
 # Supabase CLI ostavlja ovde privremene podatke o projektu
 supabase/.temp/
+
+# Preuzeti Noto izvori za sklapanje AstroGlyphs.ttf — vidi scripts/font/
+scripts/font/.izvori/

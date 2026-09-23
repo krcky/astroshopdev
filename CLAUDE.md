@@ -22,26 +22,30 @@ src/
   app/
     index.tsx        KAPIJA — jedino mesto koje odlucuje gde korisnik ide
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
+    sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
-    (tabs)/          home (pregled dana), daily, chart, profile
+    (tabs)/          home (pregled dana), daily, chart, sky, profile
   components/
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
-    ui/                  text, button, card, input, glyph, wheel-picker
+    ui/                  text, button, card, input, glyph, row, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
     profile.ts       podaci o rodjenju, kes servera
     auth.ts          sesija + pravo pristupa
+    sky-place.ts     mesto posmatranja, null = grad iz profila
   lib/
     zodiac.ts        12 znakova, longituda -> znak
     astro.ts         ephemeris + aspekti        <- engine
     natal.ts         ASC, MC, Placidus kuce     <- engine
     transits.ts      tranziti na natalnu kartu  <- personalizacija
+    points.ts        cvor, Lilit, Tacka srece   <- nema ih u engine-u
+    sky.ts           stanje neba SADA nad gradom iz profila
     timezone.ts      lokalno vreme -> UTC
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
-    cities.ts        ugradjena lista gradova
+    cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — PRIVREMENO, ceka astrologa
     horoscope.ts     composer                   <- ovde ulazi korpus
     supabase.ts      klijent
@@ -50,6 +54,7 @@ supabase/
   schema.sql         tabele + RLS politike
 scripts/
   check-*.ts         provere tacnosti
+  font/              sklapanje AstroGlyphs.ttf iz Noto izvora
 ```
 
 ## Pravila koja se ne krse
@@ -155,6 +160,19 @@ nema. Token je jednokratan, pa se trazi neposredno pre poziva i nikad se ne cuva
 `react-native-webview` NE trazi dev build — Expo Go ga nosi u sebi. Dev build
 ceka samo Apple i Google prijava.
 
+**16. Izvedene tacke ne ulaze u `BODIES`.**
+Cvor, Lilit i Tacka srece stoje u `lib/points.ts`, odvojeno od `astro.ts`. Da
+su u `BODIES`, usle bi u natalnu kartu SVAKOG korisnika, u `findAspects()` i u
+dnevne tranzite — a korpus za njihove aspekte nema nijedan tekst, pa bi
+`daily.tsx` dobio gomilu sazetih redova bez tumacenja. Za sada se samo
+PRIKAZUJU, na ekranu "Trenutno na nebu".
+
+Konvencije su izabrane i proverene, ne pretpostavljene: cvor je PRAVI
+(oskulirajuci, iz vektora ugaonog momenta Meseca) jer srednji odstupa i do
+1,8°; Lilit je SREDNJI apogej jer pravi skace i do 30°. Oznaka "R" na cvoru se
+RACUNA — pravi cvor po nekoliko dana mesecno ide napred. Sve troje drzi
+`npm run check:sky`, prema vrednostima sa astro-seek-a.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -172,6 +190,8 @@ npm run typecheck         TypeScript
 npm run check:ephemeris   pozicije planeta
 npm run check:natal       ascendent, MC, Placidus kuce, tranziti
 npm run check:timezone    vreme rodjenja -> UTC
+npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
+npm run check:cities      predlozi gradova + da se pretraga nije suzila
 ```
 
 ## Jos nije uradjeno
@@ -192,6 +212,25 @@ npm run check:timezone    vreme rodjenja -> UTC
       ostaju u proracunu, ocekuju se tekstovi. Ako ne stignu, izbaciti ih iz
       `transits.ts`. Dotle nije kvar — `daily.tsx` tranzit bez teksta prikazuje
       kao sazet red, ne kao praznu karticu.
+- [x] "Trenutno na nebu" (peti tab) — nebo SADA nad gradom iz profila: tocak,
+      planete sa kucama, cvor/Lilit/Tacka srece, aspekti, pomeranje vremena,
+      izbor mesta posmatranja. Bez tumacenja — prikazuje
+      se samo ono sto se racuna. Lokacija je grad iz profila, bez `expo-location`:
+      razlika izmedju dva grada u Srbiji se na ekranu ni ne vidi, a sistemska
+      dozvola bi trazila razlog i objasnjenje u prodavnici. Grad se moze promeniti
+      rucno (`/sky-place`, `store/sky-place.ts`) — kroz ISTU pretragu kao onboarding,
+      ali u zasebnom store-u: mesto rodjenja se menja jedino u `/edit`, jer od njega
+      zavisi natalna karta. Pozicije tela su geocentricne i sa mestom se ne menjaju;
+      menjaju se uglovi, kuce i dnevna/nocna formula za Tacku srece.
+- [x] Pomeranje vremena na tom ekranu — dugmad za SAT i DAN, plus "Trenutno" za
+      povratak. Cim se vreme pomeri, minutno osvezavanje staje i naslov se menja u
+      "Nebo u izabranom trenutku" — ekran ne sme da tvrdi da je sadasnjost.
+      Dan ide preko ZID-SATA (`shiftDays`), pa u noci kad se pomera sat i dalje
+      pogadja isti sat; sat je prostih 60 minuta stvarnog vremena, jer u satu koji
+      se ponovi isti zid-sat postoji dvaput. Mesec i godina nisu dodati.
+- [ ] Kiron — jedino telo sa referentnog snimka koje ne prikazujemo. Nema ga u
+      `astronomy-engine` (nije ni geometrijska tacka kao cvor), pa mu treba zasebna
+      efemerida. Kad stigne: i font se mora presloziti, ⚷ u njemu ne postoji.
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
 - [x] Brisanje naloga u aplikaciji — Edge Function `delete-account` deplojovana,
       dugme u `profile.tsx`. Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
@@ -202,10 +241,13 @@ npm run check:timezone    vreme rodjenja -> UTC
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
-- [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,3 KB), sklopljen iz dva
-      Noto izvora jer nijedan sam ne pokriva svih 27 znakova. Postupak i razlozi:
-      `assets/fonts/POREKLO.md`. Ako se doda novo telo (cvorovi, Hiron, Lilit),
-      font se MORA presloziti — novog znaka u njemu nema.
+- [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,6 KB), 30 znakova iz tri
+      Noto izvora. Sklapa ga `scripts/font/build-astroglyphs.py`, koji spisak znakova
+      cita IZ KODA. Ako se doda novo telo, font se MORA presloziti — novog znaka u
+      njemu nema. Skripta podrazumevano samo DOPUNJUJE postojeci font; sklapanje
+      iznova bi promenilo izgled 16 starih simbola, jer se danasnji staticki Noto
+      razlikuje od varijabilnog iz kog su prvobitno izvuceni. Razlozi i merenja:
+      `assets/fonts/POREKLO.md`.
 - [ ] Proveriti kako izgledaju ASC i MC — oni idu kroz `<Glyph>` kao obicna slova
       (`transits.ts:45`), a font nema latinicu, pa ih sistem crta rezervnim fontom.
       Ako odudaraju, prikazivati ih kroz obican `<Text>`.

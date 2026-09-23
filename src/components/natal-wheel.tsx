@@ -37,14 +37,32 @@ const ASPECT_STYLE: Record<string, { color: string; width: number; dash?: string
   opposition: { color: COLORS.tense, width: 1.3 },
 };
 
+/** Sve sto se crta na prstenu planeta — telo ili izvedena tacka. */
+type Simbol = {
+  key: string;
+  glyph: string;
+  longitude: number;
+  retrograde?: boolean;
+  /** Izvedena tacka (cvor, Lilit, Tacka srece), ne telo. */
+  izvedena?: boolean;
+};
+
 type Props = {
   chart: NatalChart;
   size?: number;
   /** Sakrij linije aspekata (citljivije na malom prikazu). */
   showAspects?: boolean;
+  /**
+   * Izvedene tacke uz planete — cvor, Lilit, Tacka srece.
+   *
+   * Idu u ISTO razmicanje kao planete, inace se simboli preklope cim se tacka
+   * nadje na istom stepenu kao neko telo. Crtaju se prigusenom bojom, da se na
+   * prvi pogled vidi sta je telo a sta racun.
+   */
+  points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[];
 };
 
-export function NatalWheel({ chart, size = 360, showAspects = true }: Props) {
+export function NatalWheel({ chart, size = 360, showAspects = true, points }: Props) {
   const cx = 180;
   const cy = 180;
   const asc = chart.houses.ascendant;
@@ -55,10 +73,21 @@ export function NatalWheel({ chart, size = 360, showAspects = true }: Props) {
   /** Za vec izracunat ugao (posle razmicanja). */
   const atAngle = (deg: number, r: number) => polar(cx, cy, r, deg);
 
-  // Razmaknute pozicije simbola planeta.
-  const planetAngles = React.useMemo(
-    () => spreadAngles(chart.planets.map((p) => angleOf(p.longitude)), 9.5),
-    [chart]
+  const simboli = React.useMemo<Simbol[]>(
+    () => [
+      ...chart.planets.map((p) => ({
+        key: p.key, glyph: p.glyph, longitude: p.longitude, retrograde: p.retrograde,
+      })),
+      ...(points ?? []).map((t) => ({ ...t, izvedena: true })),
+    ],
+    [chart, points]
+  );
+
+  // Razmaknute pozicije simbola. Sa vise od deset simbola razmak mora da se
+  // smanji, inace relaksacija gurne ceo klaster u stranu.
+  const symbolAngles = React.useMemo(
+    () => spreadAngles(simboli.map((s) => angleOf(s.longitude)), simboli.length > 11 ? 8.5 : 9.5),
+    [simboli]
   );
 
   const aspects = React.useMemo(
@@ -151,11 +180,12 @@ export function NatalWheel({ chart, size = 360, showAspects = true }: Props) {
         })}
       </G>
 
-      {/* --- planete --- */}
+      {/* --- planete i izvedene tacke --- */}
       <G>
-        {chart.planets.map((p, i) => {
-          const spread = planetAngles[i];
+        {simboli.map((p, i) => {
+          const spread = symbolAngles[i];
           const pos = atAngle(spread, R.planet);
+          const boja = p.izvedena ? COLORS.muted : COLORS.ink;
           // Crtica koja povezuje simbol sa STVARNIM stepenom na prstenu.
           const trueOuter = at(p.longitude, R.zodiacIn);
           const trueInner = at(p.longitude, R.zodiacIn - 7);
@@ -163,12 +193,12 @@ export function NatalWheel({ chart, size = 360, showAspects = true }: Props) {
           return (
             <G key={p.key}>
               <Line x1={trueOuter.x} y1={trueOuter.y} x2={trueInner.x} y2={trueInner.y}
-                    stroke={COLORS.ink} strokeWidth={1.2} />
+                    stroke={boja} strokeWidth={p.izvedena ? 0.9 : 1.2} />
               <Line x1={trueInner.x} y1={trueInner.y} x2={leadFrom.x} y2={leadFrom.y}
                     stroke={COLORS.line} strokeWidth={0.7} />
               <SvgText
                 x={pos.x} y={pos.y + 6}
-                fontSize={17} fontFamily={GLYPH_FONT} fill={COLORS.ink}
+                fontSize={p.izvedena ? 15 : 17} fontFamily={GLYPH_FONT} fill={boja}
                 textAnchor="middle">
                 {p.glyph}
               </SvgText>

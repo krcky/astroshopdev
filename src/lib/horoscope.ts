@@ -19,8 +19,20 @@ const MESECI = [
   'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar',
 ];
 
-export function formatDate(date: Date): string {
-  const s = `${DANI[date.getDay()]}, ${date.getDate()}. ${MESECI[date.getMonth()]}`;
+/**
+ * "Četvrtak, 24. septembar".
+ *
+ * `utc` cita UTC polja umesto lokalnih. Sluzi ekranu "Trenutno na nebu": tamo
+ * se datum ispisuje uz sat NAD GRADOM IZ PROFILA, pa se dobija pomeren trenutak
+ * (`zoneShift`) ciji je zid-sat upisan u UTC polja. Bez toga bi korisniku u
+ * Becu, sa kartom rodjenja u Beogradu, oko ponoci pisao sat jednog a datum
+ * drugog dana.
+ */
+export function formatDate(date: Date, utc = false): string {
+  const dan = utc ? date.getUTCDay() : date.getDay();
+  const broj = utc ? date.getUTCDate() : date.getDate();
+  const mesec = utc ? date.getUTCMonth() : date.getMonth();
+  const s = `${DANI[dan]}, ${broj}. ${MESECI[mesec]}`;
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 

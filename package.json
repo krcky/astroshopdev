@@ -62,7 +62,9 @@
     "typecheck": "tsc --noEmit",
     "check:natal": "tsx scripts/check-natal.ts",
     "check:timezone": "tsx scripts/check-timezone.ts",
-    "check": "npm run typecheck && npm run check:ephemeris && npm run check:natal && npm run check:timezone"
+    "check:sky": "tsx scripts/check-sky.ts",
+    "check:cities": "tsx scripts/check-cities.ts",
+    "check": "npm run typecheck && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities"
   },
   "private": true
 }

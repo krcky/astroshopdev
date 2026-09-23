@@ -2163,10 +2163,60 @@ function fold(s: string): string {
     .normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
+/**
+ * Sta se nudi PRE nego sto korisnik bilo sta otkuca.
+ *
+ * Ranije je to bio prosto pocetak `PACKED` liste, poredjane po velicini na
+ * nivou celog regiona — pa su prva cetiri predloga bila Beograd, Sarajevo,
+ * Zagreb i Pristina. Aplikacija se prodaje u Srbiji i vecina korisnika je tu
+ * rodjena, pa predlozi idu po srpskim gradovima. Pretraga se NE menja: cim se
+ * otkuca slovo, nalazi se ceo region, a preko `lib/city-search.ts` i svet.
+ *
+ * Spisak je rucno izabran, a ne izveden iz podataka, iz dva razloga:
+ *   1. GeoNames vodi beogradske opstine kao zasebne gradove, pa bi sortiranje
+ *      po velicini dalo "Beograd, Novi Beograd, Zemun, Cukarica…";
+ *   2. kosovski gradovi su u podacima upisani pod Srbijom — ostaju dostupni
+ *      kroz pretragu, ali se ne guraju u predloge.
+ *
+ * Kljucevi su GeoNames id-jevi iz istog razloga kao svuda: ime nije jedinstveno.
+ */
+export const suggestedCityIds = [
+  792680,  // Beograd
+  3194360, // Novi Sad
+  787657,  // Niš
+  789128,  // Kragujevac
+  3189595, // Subotica
+  787595,  // Novi Pazar
+  788709,  // Leskovac
+  783814,  // Zrenjanin
+  787237,  // Pančevo
+  792078,  // Čačak
+  785756,  // Smederevo
+  788975,  // Kruševac
+  789107,  // Kraljevo
+  3191376, // Šabac
+  3188402, // Valjevo
+  3188434, // Užice
+];
+
+/** Predlozi bez upita — najveci gradovi Srbije, redom. */
+export function suggestedCities(limit = 8): City[] {
+  const index = new Map(all().map((c) => [c.id, c]));
+  const out: City[] = [];
+  for (const id of suggestedCityIds) {
+    const c = index.get(id);
+    // Ako grad nekim cudom nestane iz podataka, preskace se u tisini — predlog
+    // koji fali je sitnica, a pad ekrana zbog njega nije.
+    if (c) out.push(c);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 export function searchCities(query: string, limit = 8): City[] {
   const list = all();
   const q = fold(query.trim());
-  if (!q) return list.slice(0, limit);
+  if (!q) return suggestedCities(limit);
 
   const starts: City[] = [];
   const contains: City[] = [];

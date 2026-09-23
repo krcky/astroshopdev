@@ -5,10 +5,10 @@ import { Redirect } from 'expo-router';
 
 import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
-import { Glyph } from '@/components/ui/glyph';
+import { TabBarSpacer } from '@/components/floating-tab-bar';
+import { AspectRow, Row, RowHead } from '@/components/ui/row';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { findAspects } from '@/lib/astro';
-import { cn } from '@/lib/utils';
 
 const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
 
@@ -37,7 +37,7 @@ export default function ChartScreen() {
           <Text variant="label">Natalna karta</Text>
         </View>
 
-        <ScrollView contentContainerClassName="pb-16" showsVerticalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View className="px-5 pb-5">
             <Text variant="display">{profile.name}</Text>
             <Text variant="muted" className="mt-1.5">
@@ -113,49 +113,18 @@ export default function ChartScreen() {
           <View className="mx-5 mt-4 rounded-xl border border-border">
             <RowHead>Aspekti · {aspects.length}</RowHead>
             {aspects.map((a, i) => (
-              <View key={a.contentKey}
-                    className={cn('flex-row items-center justify-between px-4 py-3',
-                                  i < aspects.length - 1 && 'border-b border-border')}>
-                <View className="flex-row items-center gap-2">
-                  <Glyph size={15} className="text-foreground">
-                    {`${a.a.glyph} ${a.aspect.glyph} ${a.b.glyph}`}
-                  </Glyph>
-                  <Text className="text-sm">
-                    {a.a.name} {a.aspect.name} {a.b.name}
-                  </Text>
-                </View>
-                <Text variant="muted" className="text-xs">{a.orb.toFixed(1)}°</Text>
-              </View>
+              <AspectRow
+                key={a.contentKey}
+                glyphs={`${a.a.glyph} ${a.aspect.glyph} ${a.b.glyph}`}
+                label={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
+                orb={a.orb}
+                last={i === aspects.length - 1}
+              />
             ))}
           </View>
+          <TabBarSpacer />
         </ScrollView>
       </SafeAreaView>
-    </View>
-  );
-}
-
-function RowHead({ children }: { children: React.ReactNode }) {
-  return (
-    <View className="border-b border-border px-4 py-3">
-      <Text variant="label">{children}</Text>
-    </View>
-  );
-}
-
-function Row({ glyph, name, value, extra, retro, muted, last }: {
-  glyph: string; name: string; value: string;
-  extra?: string; retro?: boolean; muted?: boolean; last?: boolean;
-}) {
-  return (
-    <View className={cn('flex-row items-center px-4 py-3', !last && 'border-b border-border')}>
-      <Glyph size={17} className={muted ? 'text-muted-foreground' : 'text-foreground'}>{glyph}</Glyph>
-      <Text className={cn('ml-3 flex-1 text-sm', muted && 'text-muted-foreground')}>{name}</Text>
-      <View className="items-end">
-        <Text className={cn('text-sm', muted && 'text-muted-foreground')}>
-          {value}{retro ? '  R' : ''}
-        </Text>
-        {extra && <Text variant="muted" className="text-xs">{extra}</Text>}
-      </View>
     </View>
   );
 }
