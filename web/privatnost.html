@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="sr-Latn-RS">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politika privatnosti — Astroshop</title>
+<meta name="description" content="Koje podatke Astroshop prikuplja, zašto, s kim ih deli i kako ih obrisati.">
+<link rel="stylesheet" href="stil.css">
+</head>
+<body>
+<main>
+<header>
+  <a class="nazad" href="/">Astroshop</a>
+  <h1>Politika privatnosti</h1>
+  <p class="datum">Poslednja izmena: 23. septembar 2026.</p>
+</header>
+
+<div class="popuniti">
+  <strong>Za popunjavanje pre objave:</strong> naziv pravnog lica, adresa sedišta, matični broj i PIB,
+  kao i region u kome je smešten Supabase projekat (Supabase → Project Settings → General → Region).
+  Polja su označena uglastim zagradama.
+</div>
+
+<p>Astroshop je mobilna aplikacija koja računa vašu natalnu kartu i dnevne tranzite.
+Da bi to bilo moguće, aplikaciji su potrebni podaci o vašem rođenju. Ovaj dokument
+objašnjava koji su to podaci, zašto ih tražimo, gde se čuvaju i kako ih možete obrisati.</p>
+
+<h2>1. Ko obrađuje vaše podatke</h2>
+<p>Rukovalac podacima je <strong>[NAZIV PRAVNOG LICA]</strong>, [ADRESA SEDIŠTA], Republika Srbija,
+matični broj [MB], PIB [PIB].</p>
+<p>Kontakt za sva pitanja u vezi sa podacima: <a href="mailto:privatnost@astroshop.rs">privatnost@astroshop.rs</a>.</p>
+
+<h2>2. Koje podatke prikupljamo</h2>
+
+<table>
+<tr><th>Podatak</th><th>Zašto</th></tr>
+<tr>
+  <td>Email adresa</td>
+  <td>Jedini način prijave. Na nju šaljemo šestocifreni kod. Nemamo lozinke.</td>
+</tr>
+<tr>
+  <td>Ime</td>
+  <td>Obraćanje u aplikaciji. Možete uneti i nadimak — ništa ne proveravamo.</td>
+</tr>
+<tr>
+  <td>Datum rođenja</td>
+  <td>Bez njega nema položaja planeta, dakle nema karte.</td>
+</tr>
+<tr>
+  <td>Vreme rođenja</td>
+  <td>
+    Neobavezno. Određuje ascendent i podelu na kuće. Zemlja se okrene 15° na sat,
+    pa greška od jednog sata pomera ascendent za pola znaka. Ako vreme ne znate,
+    aplikacija to prizna i pređe na sistem u kome ascendent nije potreban.
+  </td>
+</tr>
+<tr>
+  <td>Mesto rođenja</td>
+  <td>
+    Čuvamo identifikator grada, naziv, geografsku širinu i dužinu i vremensku zonu.
+    Koordinate su neophodne za izračunavanje ascendenta, a zona da bismo lokalno
+    vreme rođenja preveli u univerzalno.
+  </td>
+</tr>
+<tr>
+  <td>Status pristupa</td>
+  <td>Da li imate plaćen pristup i do kada. Podatke o kartici ne vidimo nikada.</td>
+</tr>
+</table>
+
+<h2>3. Šta ne radimo</h2>
+<div class="okvir">
+<p>U aplikaciji <strong>nema nijednog alata za analitiku niti za praćenje</strong> — ni Google Analytics,
+ni Firebase, ni reklamnih SDK-ova, ni piksela društvenih mreža. To nije obećanje nego
+činjenica koja se može proveriti raspakivanjem aplikacije.</p>
+<p>Ne prodajemo i ne iznajmljujemo vaše podatke. Ne pravimo reklamne profile.
+Ne delimo podatke sa oglašivačima ni sa posrednicima u oglašavanju.</p>
+</div>
+
+<h2>4. Kome poveravamo obradu</h2>
+<p>Da bi aplikacija radila, određene poslove obavljaju pružaoci usluga koji u naše ime
+obrađuju podatke:</p>
+
+<table>
+<tr><th>Ko</th><th>Šta radi</th><th>Šta vidi</th></tr>
+<tr>
+  <td>Supabase</td>
+  <td>Baza podataka i prijava</td>
+  <td>Email, ime, podatke o rođenju. Region: [REGION].</td>
+</tr>
+<tr>
+  <td>Twilio SendGrid</td>
+  <td>Slanje email poruka</td>
+  <td>Email adresu i sadržaj poruke sa kodom.</td>
+</tr>
+<tr>
+  <td>Cloudflare</td>
+  <td>Zaštita prijave od zloupotrebe (Turnstile)</td>
+  <td>
+    IP adresu i tehničke signale uređaja u trenutku prijave. Bez toga bi bilo moguće
+    skriptom slati kodove na tuđe adrese u naše ime.
+  </td>
+</tr>
+<tr>
+  <td>Apple i Google</td>
+  <td>Naplata pretplate i jednokratnih kupovina</td>
+  <td>
+    Podatke o plaćanju obrađuju oni, u svoje ime i po svojim pravilima.
+    Mi dobijamo samo potvrdu da pristup postoji i do kada traje.
+  </td>
+</tr>
+</table>
+
+<p>Neki od ovih pružalaca imaju servere izvan Srbije i izvan Evropskog ekonomskog prostora.
+Prenos se vrši na osnovu standardnih ugovornih klauzula i drugih mehanizama predviđenih
+propisima o zaštiti podataka.</p>
+
+<h2>5. Pravni osnov</h2>
+<ul>
+  <li><strong>Izvršenje ugovora</strong> — podaci o rođenju i email adresa, jer bez njih usluga ne postoji.</li>
+  <li><strong>Legitimni interes</strong> — zaštita prijave od automatizovane zloupotrebe.</li>
+  <li><strong>Pristanak</strong> — obaveštenja na telefon, ako ih uključite. Možete ih isključiti u svakom trenutku.</li>
+</ul>
+
+<h2>6. Koliko dugo čuvamo</h2>
+<p>Podatke čuvamo dok postoji vaš nalog. Kada nalog obrišete, profil sa podacima o rođenju
+briše se istog trenutka, automatski, jer je u bazi vezan za nalog. Zapisi koje smo dužni
+da čuvamo po poreskim propisima čuvaju se u zakonskom roku i odnose se na transakcije,
+ne na podatke o rođenju.</p>
+
+<h2>7. Vaša prava</h2>
+<p>Po Zakonu o zaštiti podataka o ličnosti, a za korisnike iz Evropske unije i po Opštoj
+uredbi o zaštiti podataka (GDPR), imate pravo da:</p>
+<ul>
+  <li>zatražite pristup podacima koje o vama imamo;</li>
+  <li>ispravite netačne podatke — podaci o rođenju se menjaju u samoj aplikaciji, u svakom trenutku;</li>
+  <li>obrišete nalog i podatke;</li>
+  <li>zatražite prenos podataka u mašinski čitljivom obliku;</li>
+  <li>uložite prigovor na obradu;</li>
+  <li>podnesete pritužbu Povereniku za informacije od javnog značaja i zaštitu podataka o
+      ličnosti, Bulevar kralja Aleksandra 15, Beograd.</li>
+</ul>
+<p>Zahtev šaljete na <a href="mailto:privatnost@astroshop.rs">privatnost@astroshop.rs</a>.
+Odgovaramo najkasnije u roku od 30 dana.</p>
+
+<h2>8. Brisanje naloga</h2>
+<p>Nalog brišete zahtevom sa email adrese kojom se prijavljujete. Postupak, rokovi i spisak
+onoga što se briše su na stranici <a href="brisanje-naloga.html">Brisanje naloga</a>.</p>
+
+<h2>9. Deca</h2>
+<p>Aplikacija nije namenjena licima mlađim od 16 godina i svesno ne prikupljamo njihove podatke.
+Ako saznamo da je nalog napravilo dete mlađe od 16 godina bez saglasnosti roditelja, obrisaćemo ga.</p>
+
+<h2>10. Izmene</h2>
+<p>Ako ovu politiku izmenimo, novi datum stoji na vrhu stranice. O izmenama koje bitno menjaju
+način obrade podataka obavestićemo vas i u aplikaciji.</p>
+
+<footer>
+  <p>
+    <a href="uslovi.html">Uslovi korišćenja</a> ·
+    <a href="podrska.html">Podrška</a> ·
+    <a href="brisanje-naloga.html">Brisanje naloga</a>
+  </p>
+  <p>© 2026 Astroshop</p>
+</footer>
+</main>
+</body>
+</html>
