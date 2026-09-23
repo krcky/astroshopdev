@@ -60,7 +60,11 @@ def pasusi(putanja: Path) -> list[dict]:
         xml = z.read('word/document.xml').decode('utf-8')
     out = []
     for p in re.findall(r'<w:p[ >].*?</w:p>|<w:p/>', xml, re.S):
-        t = ''.join(re.findall(r'<w:t[^>]*>(.*?)</w:t>', p, re.S))
+        # <w:t(?:\s...)?> a NE <w:t[^>]*> — ovaj drugi hvata i <w:tab w:val="clear"/>,
+        # <w:tabs>, <w:tblPr>... jer je 'ab' validan [^>]*. Kad pasus ima tabulator,
+        # zahvat krene od <w:tab> i pokupi ceo <w:pPr> blok kao da je tekst, pa
+        # sirovi XML zavrsi u bazi i na ekranu korisnika.
+        t = ''.join(re.findall(r'<w:t(?:\s[^>]*)?>(.*?)</w:t>', p, re.S))
         t = (t.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>')
               .replace('&quot;', '"').replace('&apos;', "'")).strip()
         if t:
