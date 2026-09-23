@@ -79,7 +79,11 @@ export default function Home() {
               <Text variant="label">Danas za tebe</Text>
               <ChevronRight size={16} color="#9A9A9A" />
             </View>
-            <Text variant="body" className="mt-3" numberOfLines={3}>{daily.free}</Text>
+            <Text variant="body" className="mt-3">
+              {daily.entries.length > 0
+                ? `${daily.entries[0].transit.transiting.name} ${daily.entries[0].transit.aspect.name} tvoj natalni ${daily.entries[0].transit.natal.name}`
+                : 'Danas nema jakih tranzita na tvoju kartu.'}
+            </Text>
             {top && (
               <View className="mt-4 flex-row items-center gap-2 border-t border-border pt-3">
                 <Glyph size={13} className="text-muted-foreground">

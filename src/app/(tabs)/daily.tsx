@@ -54,14 +54,11 @@ export default function Daily() {
             <Text variant="display" className="mt-1">Dnevni horoskop</Text>
           </View>
 
-          <Card>
-            <CardContent className="p-5">
-              <Text variant="label" className="mb-2.5">Danas za {sun.position.sign.name}</Text>
-              <Text variant="body">{daily.free}</Text>
-            </CardContent>
-          </Card>
+          <View className="mb-6 self-start rounded-full bg-secondary px-4 py-2">
+            <Text className="text-xs text-muted-foreground">{daily.skyline}</Text>
+          </View>
 
-          <View className="mt-6">
+          <View>
             <Text variant="label" className="mb-3">Tvoji tranziti danas</Text>
 
             {daily.entries.map((e, i) => {

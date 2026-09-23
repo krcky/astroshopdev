@@ -1,84 +1,17 @@
 /**
- * Composer — sklapa dnevni tekst iz astro dogadjaja.
+ * Sklapa dnevni horoskop — BIRA sta ulazi, ne pise tekst.
  *
- * ARHITEKTURA: ovde se prikljucuje korpus od 800 strana.
- * Sada je CORPUS stub objekat u kodu; u produkciji je Postgres tabela
- * `snippets(content_key, variant, text, life_area, tone)` i ova funkcija
- * postaje SQL upit. Potpis funkcija se NE menja — samo izvor podataka.
+ * Tekstovi dolaze sa servera (`lib/transit-texts.ts`), jer korpus astrologa
+ * ne sme u aplikaciju. Ovde se samo racuna sta je danas jako i redja po
+ * vaznosti.
  *
- * Korpus nikad ne ide na klijenta. Ovo se izvrsava na serveru; app dobija
- * samo gotov tekst za taj dan.
+ * Ranije je ovde stajao stub od pet pasusa koje sam napisao dok nije bilo
+ * pravog sadrzaja. Izbacen je: stajao je na vrhu ekrana i ostavljao utisak
+ * da je glas astrologa.
  */
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
 import { findTransits, findHouseTransits, type Transit } from '@/lib/transits';
 import type { ResolvedProfile } from '@/store/profile';
-import type { ZodiacSign } from '@/lib/zodiac';
-
-/** Stub korpusa. Kljucevi su isti format koji generise findAspects(). */
-const CORPUS: Record<string, string[]> = {
-  'moon.trine.pluto': [
-    'Danas ti intuicija radi dublje nego obično. Ono što si nedeljama slutio o jednoj osobi ili situaciji izlazi na površinu — i nećeš moći da se pretvaraš da ne vidiš.',
-  ],
-  'moon.sextile.neptune': [
-    'Granica između osećanja i maštanja tanja ti je nego inače. Odlično za sve što stvaraš, opasno za odluke koje uključuju novac.',
-  ],
-  'mars.square.saturn': [
-    'Naići ćeš na otpor tamo gde si očekivao da ide glatko. Ne guraj jače — Saturn ne popušta na silu, nego na strpljenje.',
-  ],
-  'jupiter.trine.saturn': [
-    'Redak sklad između smelosti i discipline. Ako imaš plan koji odlažeš mesecima, ovo je nedelja da mu daš prvi konkretan korak.',
-  ],
-  'moon.conjunction.uranus': [
-    'Nemir bez jasnog razloga. Umesto da ga gasiš, daj mu nešto novo da radi — promena rutine danas vredi više od odmora.',
-  ],
-};
-
-const FALLBACK =
-  'Nebo je danas mirno za tvoj znak. Dani bez jakih aspekata su oni u kojima se vidi šta si sam izgradio — koristi ih za ono što si odlagao.';
-
-export type DailyHoroscope = {
-  date: Date;
-  sign: ZodiacSign;
-  /** Kratak pregled neba — prikazuje se i besplatnim korisnicima. */
-  skyline: string;
-  /** Besplatni deo: prvi pasus. */
-  free: string;
-  /** Placeni deo: ostatak. */
-  premium: string[];
-  /** Dogadjaji od kojih je tekst nastao — korisno za debug i "zasto ovo pise". */
-  events: Aspect[];
-};
-
-export function buildDailyHoroscope(sign: ZodiacSign, date: Date = new Date()): DailyHoroscope {
-  const positions = planetPositions(date);
-  const aspects = findAspects(positions);
-  const moon = positions.find((p) => p.key === 'moon')!;
-  const phase = moonPhase(date);
-
-  // Selektor: uzmi najjace dogadjaje koji imaju tekst u korpusu.
-  const chosen = aspects.filter((a) => CORPUS[a.contentKey]?.length).slice(0, 4);
-
-  const paragraphs = chosen.map((a) => {
-    const variants = CORPUS[a.contentKey];
-    // Deterministicna rotacija varijanti po danu — isti dan uvek isti tekst,
-    // ali se varijante smenjuju kroz vreme da se ne ponavlja.
-    const dayIndex = Math.floor(date.getTime() / 86_400_000);
-    return variants[dayIndex % variants.length];
-  });
-
-  const retro = positions.filter((p) => p.retrograde && p.key !== 'moon');
-
-  return {
-    date,
-    sign,
-    skyline:
-      `Mesec u znaku ${moon.position.sign.name} · ${phase.name}` +
-      (retro.length ? ` · retrogradni: ${retro.map((r) => r.name).join(', ')}` : ''),
-    free: paragraphs[0] ?? FALLBACK,
-    premium: paragraphs.slice(1),
-    events: chosen,
-  };
-}
 
 const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
 const MESECI = [
@@ -106,9 +39,7 @@ export type PersonalDaily = {
   name: string;
   /** Kratak pregled neba — isti za sve. */
   skyline: string;
-  /** Besplatno: jedan pasus prema suncevom znaku. */
-  free: string;
-  /** Placeno: tranziti na licnu kartu. */
+  /** Tranziti na licnu kartu, poredjani po jacini. */
   entries: PersonalEntry[];
   /** Kroz koje natalne kuce prolaze spore planete danas. */
   houseHighlights: { house: number; planetName: string; glyph: string; contentKey: string }[];
@@ -118,9 +49,6 @@ export function buildPersonalDaily(
   resolved: ResolvedProfile,
   date: Date = new Date()
 ): PersonalDaily {
-  const sunSign = resolved.chart.planets.find((p) => p.key === 'sun')!.position.sign;
-  const generic = buildDailyHoroscope(sunSign, date);
-
   // Tekstovi se NE spajaju ovde — dolaze sa servera, jer korpus ne sme u
   // aplikaciju. Ovde se samo bira KOJI tranziti ulaze u danasnji horoskop.
   const entries: PersonalEntry[] = findTransits(resolved.chart, date)
@@ -137,11 +65,18 @@ export function buildPersonalDaily(
       contentKey: t.contentKey,
     }));
 
+  // Stanje neba je RACUNAT podatak, ne pisan tekst — faza Meseca i koje su
+  // planete retrogradne. Zato ostaje u aplikaciji.
+  const nebo = planetPositions(date);
+  const moon = nebo.find((p) => p.key === 'moon')!;
+  const retro = nebo.filter((p) => p.retrograde);
+
   return {
     date,
     name: resolved.profile.name,
-    skyline: generic.skyline,
-    free: generic.free,
+    skyline:
+      `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +
+      (retro.length ? ` · retrogradni: ${retro.map((r) => r.name).join(', ')}` : ''),
     entries,
     houseHighlights,
   };
