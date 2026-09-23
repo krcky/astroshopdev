@@ -51,8 +51,9 @@ export function buildPersonalDaily(
 ): PersonalDaily {
   // Tekstovi se NE spajaju ovde — dolaze sa servera, jer korpus ne sme u
   // aplikaciju. Ovde se samo bira KOJI tranziti ulaze u danasnji horoskop.
+  // SVI tranziti, ne samo najjacih nekoliko. Besplatna verzija pokazuje
+  // kratko tumacenje svakog; placa se dubina, ne pristup.
   const entries: PersonalEntry[] = findTransits(resolved.chart, date)
-    .slice(0, 5)
     .map((transit) => ({ transit }));
 
   const houseHighlights = findHouseTransits(resolved.chart, date)

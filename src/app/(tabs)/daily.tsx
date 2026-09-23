@@ -59,84 +59,97 @@ export default function Daily() {
           </View>
 
           <View>
-            <Text variant="label" className="mb-3">Tvoji tranziti danas</Text>
+            <View className="mb-3 flex-row items-baseline justify-between">
+              <Text variant="label">Tvoji tranziti danas</Text>
+              <Text variant="muted" className="text-xs">{daily.entries.length}</Text>
+            </View>
 
-            {daily.entries.map((e, i) => {
+            {daily.entries.map((e) => {
               const t = e.transit;
-              const hidden = locked && i > 0;
               const tekst = texts.get(t.contentKey);
+
+              // Bez teksta u korpusu — prikazuje se kao sazet red, ne kao
+              // prazna kartica. Iskreno je, a ne izgleda kao kvar.
+              if (!tekst) {
+                return (
+                  <View key={t.contentKey} className="flex-row items-center gap-2 border-b border-border py-3">
+                    <Glyph size={14} className="text-muted-foreground">
+                      {`${t.transiting.glyph} ${t.aspect.glyph} ${t.natal.glyph}`}
+                    </Glyph>
+                    <Text variant="muted" className="flex-1 text-xs">
+                      {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
+                    </Text>
+                    {textsLoading && <Text variant="muted" className="text-xs">…</Text>}
+                  </View>
+                );
+              }
+
               return (
                 <Pressable
                   key={t.contentKey}
                   onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+                  disabled={locked}
                   accessibilityRole="button"
-                  accessibilityLabel={`Detaljno tumačenje: ${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`}
-                  className="active:opacity-60">
-                <Card className={cn('mb-3', hidden && 'border-dashed')}>
-                  <CardContent className="p-5">
-                    <View className="flex-row items-center gap-2 pb-1">
-                      <Glyph size={15} className="text-foreground">
-                        {`${t.transiting.glyph} ${t.aspect.glyph} ${t.natal.glyph}`}
-                      </Glyph>
-                      <Text variant="label">
-                        {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
-                      </Text>
-                    </View>
+                  accessibilityLabel={
+                    locked
+                      ? 'Detaljno tumačenje zahteva plaćen pristup'
+                      : `Detaljno tumačenje: ${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`
+                  }
+                  className={cn(!locked && 'active:opacity-60')}>
+                  <Card className="mb-3">
+                    <CardContent className="p-5">
+                      <View className="flex-row items-center gap-2 pb-1">
+                        <Glyph size={15} className="text-foreground">
+                          {`${t.transiting.glyph} ${t.aspect.glyph} ${t.natal.glyph}`}
+                        </Glyph>
+                        <Text variant="label">
+                          {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
+                        </Text>
+                      </View>
 
-                    {hidden ? (
-                      <Text variant="muted" className="mt-2">Otključaj da vidiš šta ovo znači za tebe.</Text>
-                    ) : tekst ? (
-                      <>
-                        {!!tekst.title && (
-                          <Text variant="h3" className="mb-2 mt-1">{tekst.title}</Text>
+                      {!!tekst.title && <Text variant="h3" className="mb-2 mt-1">{tekst.title}</Text>}
+                      <Text variant="body">{tekst.body}</Text>
+
+                      {!!tekst.positive && <Polje oznaka="Pozitivno" tekst={tekst.positive} />}
+                      {!!tekst.challenge && <Polje oznaka="Izazov" tekst={tekst.challenge} />}
+                      {!!tekst.advice && <Polje oznaka="Savet" tekst={tekst.advice} />}
+
+                      <View className="mt-4 flex-row items-center justify-between border-t border-border pt-3">
+                        {locked ? (
+                          <>
+                            <Text variant="label" className="text-muted-foreground">
+                              Detaljno tumačenje — uz plaćen pristup
+                            </Text>
+                            <Lock size={14} color={GOLD} />
+                          </>
+                        ) : (
+                          <>
+                            <Text variant="label">Detaljno tumačenje</Text>
+                            <ChevronRight size={15} color="#9A9A9A" />
+                          </>
                         )}
-                        <Text variant="body">{tekst.body}</Text>
-                        {!!tekst.positive && (
-                          <Polje oznaka="Pozitivno" tekst={tekst.positive} />
-                        )}
-                        {!!tekst.challenge && (
-                          <Polje oznaka="Izazov" tekst={tekst.challenge} />
-                        )}
-                        {!!tekst.advice && (
-                          <Polje oznaka="Savet" tekst={tekst.advice} />
-                        )}
-                      </>
-                    ) : textsLoading ? (
-                      <Text variant="muted" className="mt-2">Učitavam…</Text>
-                    ) : (
-                      <Text variant="muted" className="mt-2">
-                        Tumačenje za ovaj tranzit još nije napisano.
-                      </Text>
-                    )}
-                    <View className="mt-4 flex-row items-center justify-between border-t border-border pt-3">
-                      <Text variant="label">Detaljno tumačenje</Text>
-                      <ChevronRight size={15} color="#9A9A9A" />
-                    </View>
-                  </CardContent>
-                </Card>
+                      </View>
+                    </CardContent>
+                  </Card>
                 </Pressable>
               );
             })}
 
             {locked && (
-              <Card className="mt-1 border-gold/40 bg-secondary/40">
+              <Card className="mb-3 mt-2 border-gold/40 bg-secondary/40">
                 <CardContent className="items-center p-6">
                   <View className="h-12 w-12 items-center justify-center rounded-full bg-gold/10">
                     <Lock size={20} color={GOLD} />
                   </View>
-                  <Text variant="h3" className="mt-4 text-center">
-                    Još {Math.max(0, daily.entries.length - 1)} tranzita za danas
-                  </Text>
+                  <Text variant="h3" className="mt-4 text-center">Detaljna tumačenja</Text>
                   <Text variant="muted" className="mt-2 text-center">
-                    Računato prema tvom datumu, vremenu i mestu rođenja — ne prema znaku.
+                    Dugoročni efekti, sfere života na koje se tranzit odnosi, i
+                    konkretni saveti — za svaki tranzit posebno.
                   </Text>
                   <Button className="mt-5 w-full" onPress={() => router.push('/profile')}>
                     <Sparkles size={18} color="#FFFFFF" />
-                    <Text>Otključaj ceo horoskop</Text>
+                    <Text>Otključaj</Text>
                   </Button>
-                  <Text className="mt-3 text-center text-xs text-muted-foreground">
-                    Kupovina se uključuje kad povežemo RevenueCat
-                  </Text>
                 </CardContent>
               </Card>
             )}
