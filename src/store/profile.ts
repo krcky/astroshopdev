@@ -10,8 +10,20 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { cityById, cityByName, type City } from '@/lib/cities';
+import { ZONE_STANDARD_OFFSET } from '@/lib/zone-offsets';
 import { localBirthToUtc } from '@/lib/timezone';
 import { buildNatalChart, type NatalChart } from '@/lib/natal';
+
+/** Polja profila koja opisuju mesto rodjenja, izvedena iz izabranog grada. */
+export function placeFields(city: City) {
+  return {
+    cityId: city.id,
+    cityName: city.name,
+    latitude: city.latitude,
+    longitude: city.longitude,
+    timeZone: city.tz.name,
+  };
+}
 
 export type Profile = {
   name: string;
@@ -24,8 +36,18 @@ export type Profile = {
    * ascendent.
    */
   cityId: number;
-  /** Ime u trenutku unosa. Samo za prikaz; izvor istine je cityId. */
   cityName: string;
+  /**
+   * Koordinate i zona se cuvaju UZ grad, ne izvode iz njega.
+   *
+   * Dva razloga. Prvo, gradovi dijaspore dolaze iz baze i nisu u ugradjenoj
+   * listi — bez ovoga se karta ne bi mogla izracunati bez mreze. Drugo,
+   * necija karta ne sme da se pomeri ako GeoNames sutra ispravi koordinate.
+   */
+  latitude: number;
+  longitude: number;
+  /** IANA ime zone, npr. "Europe/Vienna". */
+  timeZone: string;
 };
 
 type ProfileState = {
@@ -73,8 +95,26 @@ export type ResolvedProfile = {
 export function resolveProfile(profile: Profile | null): ResolvedProfile | null {
   if (!profile) return null;
   // Prvo po ID-ju; ime je rezerva za profile sacuvane pre uvodjenja ID-ja.
-  const city = cityById(profile.cityId) ?? cityByName(profile.cityName);
-  if (!city) return null;
+  // Podaci iz profila su izvor istine. Lokalna lista se konsultuje samo za
+  // profile sacuvane pre nego sto su koordinate poceli da se cuvaju uz grad.
+  const stari = cityById(profile.cityId) ?? cityByName(profile.cityName);
+  const latitude = profile.latitude ?? stari?.latitude;
+  const longitude = profile.longitude ?? stari?.longitude;
+  const zoneName = profile.timeZone ?? stari?.tz.name;
+  if (latitude === undefined || longitude === undefined || !zoneName) return null;
+
+  const city: City = {
+    id: profile.cityId,
+    name: profile.cityName,
+    country: stari?.country ?? '',
+    latitude,
+    longitude,
+    tz: {
+      name: zoneName,
+      standardOffsetMinutes: ZONE_STANDARD_OFFSET[zoneName] ?? stari?.tz.standardOffsetMinutes ?? 0,
+      europeanDst: zoneName.startsWith('Europe/'),
+    },
+  };
 
   const timeUnknown = profile.time === null;
   const t = profile.time ?? { hour: 12, minute: 0 };

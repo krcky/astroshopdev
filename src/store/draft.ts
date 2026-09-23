@@ -7,17 +7,20 @@
  */
 import { create } from 'zustand';
 
+import type { City } from '@/lib/cities';
+
 export type Draft = {
   date: { year: number; month: number; day: number } | null;
   time: { hour: number; minute: number } | null;
   /** true ako je korisnik svesno preskocio vreme (SKIP), a ne da jos nije stigao dotle. */
   timeSkipped: boolean;
-  /** GeoNames id grada. Ime se izvodi iz njega. */
-  cityId: number | null;
+  /** Ceo izabrani grad — koordinate i zona putuju s njim, jer gradovi
+   *  dijaspore nisu u ugradjenoj listi. */
+  city: City | null;
   name: string;
 };
 
-const EMPTY: Draft = { date: null, time: null, timeSkipped: false, cityId: null, name: '' };
+const EMPTY: Draft = { date: null, time: null, timeSkipped: false, city: null, name: '' };
 
 type DraftState = Draft & {
   set: (patch: Partial<Draft>) => void;
@@ -32,6 +35,6 @@ export const useDraft = create<DraftState>((set, get) => ({
   reset: () => set(EMPTY),
   isComplete: () => {
     const s = get();
-    return s.date !== null && s.cityId !== null && (s.time !== null || s.timeSkipped);
+    return s.date !== null && s.city !== null && (s.time !== null || s.timeSkipped);
   },
 }));

@@ -7,8 +7,9 @@ import { ChevronLeft } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { WheelPicker } from '@/components/ui/wheel-picker';
-import { searchCities, cityById, cityByName, type City } from '@/lib/cities';
-import { useProfileStore, useResolvedProfile } from '@/store/profile';
+import { cityById, cityByName, type City } from '@/lib/cities';
+import { useCitySearch } from '@/lib/city-search';
+import { placeFields, useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
 
@@ -36,6 +37,7 @@ export default function EditBirthData() {
   const [city, setCity] = React.useState<City | null>(profile ? cityById(profile.cityId) ?? cityByName(profile.cityName) ?? null : null);
   const [query, setQuery] = React.useState('');
   const [busy, setBusy] = React.useState(false);
+  const { results: cityResults, loading: cityLoading } = useCitySearch(city ? '' : query, 6);
 
   if (!profile || !resolved) return <Redirect href="/" />;
 
@@ -48,8 +50,7 @@ export default function EditBirthData() {
       name: name.trim(),
       birth: { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() },
       time: timeKnown ? { hour: time.getHours(), minute: time.getMinutes() } : null,
-      cityId: city.id,
-      cityName: city.name,
+      ...placeFields(city),
     };
     setProfile(updated);
     if (user) await pushProfile(user.id, updated);
@@ -114,7 +115,7 @@ export default function EditBirthData() {
             />
             {!city && (
               <View className="mt-3">
-                {searchCities(query, 6).map((c) => (
+                {cityResults.map((c) => (
                   <Pressable
                     key={`${c.name}-${c.country}`}
                     onPress={() => { setCity(c); setQuery(''); }}
@@ -123,6 +124,9 @@ export default function EditBirthData() {
                     <Text variant="muted">{c.country}</Text>
                   </Pressable>
                 ))}
+                {cityLoading && (
+                  <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
+                )}
               </View>
             )}
           </Section>

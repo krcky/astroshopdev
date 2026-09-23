@@ -8,9 +8,8 @@
  * ulancano prijavi postojecim nalogom — i njegova prava karta bude prepisana
  * podacima koje je uneo neko drugi.
  */
-import { cityById } from '@/lib/cities';
 import { useDraft } from '@/store/draft';
-import { useProfileStore, type Profile } from '@/store/profile';
+import { placeFields, useProfileStore, type Profile } from '@/store/profile';
 import { pullProfile, pushProfile } from '@/lib/sync';
 
 /** Privremeno ime dok korisnik ne unese svoje — baza ne prima prazno. */
@@ -36,15 +35,13 @@ export async function completeSignup(userId: string, email: string): Promise<Sig
   }
 
   const d = useDraft.getState();
-  const city = d.cityId !== null ? cityById(d.cityId) : null;
-  if (!d.date || !city) return 'incomplete';
+  if (!d.date || !d.city) return 'incomplete';
 
   const profile: Profile = {
     name: initialName(email),
     birth: d.date,
     time: d.time,
-    cityId: city.id,
-    cityName: city.name,
+    ...placeFields(d.city),
   };
 
   useProfileStore.getState().setProfile(profile);

@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
-import { searchCities, type City } from '@/lib/cities';
+import type { City } from '@/lib/cities';
+import { useCitySearch } from '@/lib/city-search';
 import { useDraft } from '@/store/draft';
 
 export default function BirthPlace() {
@@ -12,11 +13,11 @@ export default function BirthPlace() {
   const [query, setQuery] = React.useState('');
   const [city, setCity] = React.useState<City | null>(null);
 
-  const results = React.useMemo(() => (city ? [] : searchCities(query)), [query, city]);
+  const { results, loading } = useCitySearch(city ? '' : query);
 
   const next = () => {
     if (!city) return;
-    draft.set({ cityId: city.id });
+    draft.set({ city });
     router.push('/reveal');
   };
 
@@ -38,7 +39,7 @@ export default function BirthPlace() {
       />
 
       <View className="mt-4">
-        {results.map((c) => (
+        {!city && results.map((c) => (
           <Pressable
             key={`${c.name}-${c.country}`}
             onPress={() => { setCity(c); setQuery(''); }}
@@ -47,6 +48,9 @@ export default function BirthPlace() {
             <Text variant="muted">{c.country}</Text>
           </Pressable>
         ))}
+        {loading && (
+          <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
+        )}
       </View>
     </OnboardingStep>
   );

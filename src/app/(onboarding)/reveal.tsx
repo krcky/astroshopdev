@@ -6,25 +6,22 @@ import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
 import { Glyph } from '@/components/ui/glyph';
 import { CelestialOrb } from '@/components/celestial-orb';
-import { cityById } from '@/lib/cities';
 import { useDraft } from '@/store/draft';
-import { resolveProfile } from '@/store/profile';
+import { placeFields, resolveProfile } from '@/store/profile';
 import { traitsForSign } from '@/lib/traits';
 
 export default function Reveal() {
   const draft = useDraft();
 
   const resolved = React.useMemo(() => {
-    const city = draft.cityId !== null ? cityById(draft.cityId) : null;
-    if (!draft.date || !city) return null;
+    if (!draft.date || !draft.city) return null;
     return resolveProfile({
       name: '',
       birth: draft.date,
       time: draft.time,
-      cityId: city.id,
-      cityName: city.name,
+      ...placeFields(draft.city),
     });
-  }, [draft.date, draft.time, draft.cityId]);
+  }, [draft.date, draft.time, draft.city]);
 
   // Ako je draft izgubljen (npr. ponovo ucitana aplikacija), pocinje se ispocetka.
   if (!resolved) return <Redirect href="/welcome" />;

@@ -22,6 +22,11 @@ create table if not exists public.profiles (
   -- ascendent. `city_name` je denormalizovan, samo za prikaz.
   city_id      bigint,
   city_name    text not null,
+  -- Koordinate i zona se cuvaju UZ profil: gradovi dijaspore dolaze iz tabele
+  -- `cities`, pa se bez ovoga karta ne bi mogla izracunati bez mreze.
+  latitude     double precision,
+  longitude    double precision,
+  time_zone    text,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
   -- sat i minut idu zajedno ili nijedan
