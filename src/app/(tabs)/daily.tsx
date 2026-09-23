@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, router } from 'expo-router';
-import { Lock, Sparkles } from 'lucide-react-native';
+import { ChevronRight, Lock, Sparkles } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -66,7 +66,13 @@ export default function Daily() {
               const hidden = locked && i > 0;
               const tekst = texts.get(t.contentKey);
               return (
-                <Card key={t.contentKey} className={cn('mb-3', hidden && 'border-dashed')}>
+                <Pressable
+                  key={t.contentKey}
+                  onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Detaljno tumačenje: ${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`}
+                  className="active:opacity-60">
+                <Card className={cn('mb-3', hidden && 'border-dashed')}>
                   <CardContent className="p-5">
                     <View className="flex-row items-center gap-2 pb-1">
                       <Glyph size={15} className="text-foreground">
@@ -102,8 +108,13 @@ export default function Daily() {
                         Tumačenje za ovaj tranzit još nije napisano.
                       </Text>
                     )}
+                    <View className="mt-4 flex-row items-center justify-between border-t border-border pt-3">
+                      <Text variant="label">Detaljno tumačenje</Text>
+                      <ChevronRight size={15} color="#9A9A9A" />
+                    </View>
                   </CardContent>
                 </Card>
+                </Pressable>
               );
             })}
 
