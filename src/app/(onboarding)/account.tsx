@@ -3,6 +3,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
+import { useTurnstile } from '@/components/turnstile';
 import { Text } from '@/components/ui/text';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { AUTH_MODE } from '@/lib/auth-mode';
@@ -14,6 +15,7 @@ export default function Account() {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [socialNote, setSocialNote] = React.useState(false);
+  const captcha = useTurnstile();
 
   const emailOk = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email.trim());
   const valid = AUTH_MODE === 'otp' ? emailOk : emailOk && password.length >= 6;
@@ -26,10 +28,20 @@ export default function Account() {
     const mail = email.trim().toLowerCase();
 
     try {
+      // Token je jednokratan i vazi oko pet minuta — trazi se ovde, neposredno
+      // pre poziva. Bez podesenog site key-a vraca undefined i nista se ne menja.
+      let captchaToken: string | undefined;
+      try {
+        captchaToken = await captcha.getToken();
+      } catch {
+        setError('Nismo uspeli da potvrdimo da nisi robot. Proveri internet pa probaj ponovo.');
+        return;
+      }
+
       if (AUTH_MODE === 'otp') {
         const { error } = await supabase.auth.signInWithOtp({
           email: mail,
-          options: { shouldCreateUser: true },
+          options: { shouldCreateUser: true, captchaToken },
         });
         if (error) {
           setError(/rate|limit|seconds/i.test(error.message)
@@ -44,10 +56,14 @@ export default function Account() {
       // --- lozinka ---
       // Jedan ekran pokriva i registraciju i prijavu: prvo probamo da napravimo
       // nalog, a ako vec postoji, odmah probamo prijavu istom lozinkom.
-      let { data, error } = await supabase.auth.signUp({ email: mail, password });
+      let { data, error } = await supabase.auth.signUp({ email: mail, password, options: { captchaToken } });
 
       if (error && /already registered/i.test(error.message)) {
-        ({ data, error } = await supabase.auth.signInWithPassword({ email: mail, password }));
+        // Prvi token je potrosen na signUp — za drugi poziv treba nov.
+        const retryToken = await captcha.getToken().catch(() => undefined);
+        ({ data, error } = await supabase.auth.signInWithPassword({
+          email: mail, password, options: { captchaToken: retryToken },
+        }));
         if (error) {
           setError('Nalog sa ovim emailom postoji, ali lozinka nije tačna.');
           return;
@@ -126,6 +142,9 @@ export default function Account() {
           </Text>
         )}
       </View>
+
+      {captcha.gate}
+
     </OnboardingStep>
   );
 }

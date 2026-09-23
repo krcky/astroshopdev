@@ -3,6 +3,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
+import { useTurnstile } from '@/components/turnstile';
 import { Text } from '@/components/ui/text';
 import { supabase } from '@/lib/supabase';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
@@ -15,6 +16,7 @@ export default function Code() {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [resentAt, setResentAt] = React.useState<number | null>(null);
+  const captcha = useTurnstile();
 
   const verify = async () => {
     if (code.length !== LENGTH || busy) return;
@@ -42,7 +44,17 @@ export default function Code() {
 
   const resend = async () => {
     setError(null);
-    const { error } = await supabase.auth.signInWithOtp({ email: String(email) });
+    let captchaToken: string | undefined;
+    try {
+      captchaToken = await captcha.getToken();
+    } catch {
+      setError('Nismo uspeli da potvrdimo da nisi robot. Probaj ponovo.');
+      return;
+    }
+    const { error } = await supabase.auth.signInWithOtp({
+      email: String(email),
+      options: { captchaToken },
+    });
     if (error) setError('Sačekaj minut pre nego što tražiš novi kod.');
     else setResentAt(Date.now());
   };
@@ -77,6 +89,9 @@ export default function Code() {
           <Text variant="muted" className="mt-5 text-center text-sm">Novi kod je poslat.</Text>
         )}
       </View>
+
+      {captcha.gate}
+
     </OnboardingStep>
   );
 }
