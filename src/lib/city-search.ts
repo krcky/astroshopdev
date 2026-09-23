@@ -52,12 +52,10 @@ export async function searchCitiesRemote(query: string, limit = 8): Promise<City
   const q = fold(query.trim());
   if (!isSupabaseConfigured || q.length < 2) return [];
 
-  const { data, error } = await supabase
-    .from('cities')
-    .select('id,name,country_code,latitude,longitude,timezone')
-    .like('search_name', `${q}%`)
-    .order('population', { ascending: false })
-    .limit(limit);
+  // Funkcija u bazi, ne obican upit: mora da pogleda i glavna imena i
+  // alijase. GeoNames glavno ime je englesko ("Vienna"), a korisnik kuca
+  // "bec" — bez alijasa pretraga dijaspore ne radi.
+  const { data, error } = await supabase.rpc('search_cities', { q, lim: limit });
 
   if (error || !data) return [];
 
