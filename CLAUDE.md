@@ -12,6 +12,8 @@ Mobilna aplikacija za horoskop (iOS + Android), Expo + React Native.
 | Ephemeris | `astronomy-engine` (MIT) | lokalno racunanje, bez API-ja i bez troska |
 | Data | TanStack Query + Zustand | |
 | Placanja | RevenueCat (jos nije integrisan) | IAP je obavezan za digitalni sadrzaj |
+| Prijava | Supabase Auth, sestocifreni kod na email | SMTP je SendGrid, ne Resend |
+| CAPTCHA | Cloudflare Turnstile u WebView-u | stiti `/auth/v1/otp` od zloupotrebe |
 
 ## Struktura
 
@@ -26,6 +28,7 @@ src/
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
+    turnstile.tsx        CAPTCHA kapija pred slanje koda
     ui/                  text, button, card, input, glyph, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
@@ -131,9 +134,26 @@ podaci ne izgube ako korisnik prekine na koraku sa imenom.
 React Navigation drzi prethodne ekrane montirane (sakrivene, 0x0). Dva SVG-a
 sa istim id-jem = vidljivi ostaje bez ispune. Uvek `React.useId()`.
 
-**13. Nekadasnje pravilo — nalog nije uslov — VISE NE VAZI.**
+**14. Nekadasnje pravilo — nalog nije uslov — VISE NE VAZI.**
 Zid je uveden namerno, ali je postavljen POSLE ekrana sa velikom trojkom —
 korisnik prvo vidi vrednost pa se onda trazi nalog. Ne pomerati ga na pocetak.
+
+**15. Dva podesenja u Supabase-u su spregnuta sa kodom.**
+Ako se razidju, prijava pada — i to za sve odjednom, tiho.
+
+`Email OTP length` mora biti **6**. Toliko prima `/code` ekran (`LENGTH` u
+`code.tsx`), a visak odseca i na `maxLength` i na `slice` — korisnik onda nikad
+ne moze da unese osmocifreni kod i dobija "Kod nije tacan". Zatecena vrednost je
+bila 8 i tako je i otkriveno.
+
+CAPTCHA prekidac (Authentication -> Attack Protection) se ukljucuje **poslednji**,
+tek kad je verzija koja salje `captchaToken` na telefonima. Obrnutim redosledom
+svaki `signInWithOtp` vraca `400 captcha_failed`. Prekidac za nuzdu je praznjenje
+`EXPO_PUBLIC_TURNSTILE_SITE_KEY` — tada `getToken()` vraca `undefined` i kapije
+nema. Token je jednokratan, pa se trazi neposredno pre poziva i nikad se ne cuva.
+
+`react-native-webview` NE trazi dev build — Expo Go ga nosi u sebi. Dev build
+ceka samo Apple i Google prijava.
 
 ## Kanonski kljucevi sadrzaja
 
@@ -157,11 +177,35 @@ npm run check:timezone    vreme rodjenja -> UTC
 ## Jos nije uradjeno
 
 - [x] Auth (Supabase) — registracija, prijava, odjava, sinhronizacija profila
-- [ ] POKRENUTI `supabase/schema.sql` u Supabase SQL Editoru (bez toga nema tabela)
-- [ ] Apple i Google prijava — dugmad postoje, logika ceka dev build (native moduli)
-- [ ] SMTP (Resend) + `{{ .Token }}` u Supabase email sablonu — bez toga kod ne stize
+- [x] `supabase/schema.sql` pokrenut — tabele postoje, RLS provoren (anon ne vidi tudje redove)
+- [ ] Apple i Google prijava — dugmad postoje, ceka dev build. Xcode nije instaliran
+      na masini, pa ide ili preko App Store-a ili preko EAS Build-a.
+- [x] SMTP (SendGrid) + `{{ .Token }}` u sablonu **Magic Link** — dok je "Confirm
+      email" iskljucen, Supabase salje samo taj sablon, "Confirm signup" se ne koristi
+- [x] Turnstile — widget, `captchaToken` u oba poziva, provera upaljena u Supabase-u
 - [ ] Osobine po znaku od astrologa (`lib/traits.ts`) — 12 x 3 reda, mali posao
-- [ ] Backend + Postgres, ETL korpusa od 800 strana. CEKA: format dokumenata.
+- [x] ETL korpusa — 18 .docx fajlova parsirano (`scripts/korpus/parse_docx.py`),
+      tekstovi u `transit_texts`. Popunjeno 433/600 kratkih i 443/600 dugih.
+- [ ] MESEC — nema nijedan tekst, a jedini menja ton svakog dana. 50 po verziji.
+      CEKA astrologa. Spisak: `python3 scripts/korpus/izvestaj.py`
+- [ ] Ascendent i MC kao meta — 100 tekstova po verziji. ODLUCENO 23.9.2026:
+      ostaju u proracunu, ocekuju se tekstovi. Ako ne stignu, izbaciti ih iz
+      `transits.ts`. Dotle nije kvar — `daily.tsx` tranzit bez teksta prikazuje
+      kao sazet red, ne kao praznu karticu.
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
+- [x] Brisanje naloga u aplikaciji — Edge Function `delete-account` deplojovana,
+      dugme u `profile.tsx`. Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
+      cita ISKLJUCIVO iz tokena; anon kljuc je validan JWT i prolazi platformsku
+      proveru, pa je `getUser()` u kodu jedina prava kapija — ne uklanjati je.
+- [ ] Objaviti `web/` na Cloudflare Pages (`pravila.astroshop.rs`) — popuniti
+      podatke o pravnom licu, napraviti aliase, dati pravniku. Vidi `web/README.md`.
+      ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
+      aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
-- [ ] Pravi astroloski font umesto sistemskog (vidi `glyph.tsx`)
+- [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,3 KB), sklopljen iz dva
+      Noto izvora jer nijedan sam ne pokriva svih 27 znakova. Postupak i razlozi:
+      `assets/fonts/POREKLO.md`. Ako se doda novo telo (cvorovi, Hiron, Lilit),
+      font se MORA presloziti — novog znaka u njemu nema.
+- [ ] Proveriti kako izgledaju ASC i MC — oni idu kroz `<Glyph>` kao obicna slova
+      (`transits.ts:45`), a font nema latinicu, pa ih sistem crta rezervnim fontom.
+      Ako odudaraju, prikazivati ih kroz obican `<Text>`.
