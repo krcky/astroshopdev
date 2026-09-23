@@ -11,6 +11,7 @@ import type { Session, User } from '@supabase/supabase-js';
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useProfileStore } from '@/store/profile';
+import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
 
 export type Entitlement = { active: boolean; productId: string | null; expiresAt: string | null };
 
@@ -32,6 +33,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   setSession: (session) => set({ session, user: session?.user ?? null, loading: false }),
   setEntitlement: (entitlement) => set({ entitlement }),
 }));
+
+/** Test override iz /profile ima isti oblik kao pravi red u bazi. */
+const DEV_ENTITLEMENT: Record<'on' | 'off', Entitlement> = {
+  on: { active: true, productId: 'dev.override', expiresAt: null },
+  off: { active: false, productId: null, expiresAt: null },
+};
+
+/**
+ * Pravo pristupa kako ga vidi UI — jedina tacka citanja u aplikaciji.
+ *
+ * Ekrani NE citaju `useAuthStore(s => s.entitlement)` direktno, jer bi tada
+ * test prekidac morao da se ugradjuje na svako mesto posebno. U release bildu
+ * je `DEV_TOOLS_ENABLED` false i ovo vraca netaknutu vrednost sa servera.
+ */
+export function useEntitlement(): Entitlement | null {
+  const server = useAuthStore((s) => s.entitlement);
+  const override = useDevStore((s) => s.entitlementOverride);
+
+  if (!DEV_TOOLS_ENABLED || override === null) return server;
+  return override ? DEV_ENTITLEMENT.on : DEV_ENTITLEMENT.off;
+}
 
 /** Pokrece se jednom iz korenskog layout-a. */
 export function useAuthListener() {
@@ -66,6 +88,27 @@ export async function signUp(email: string, password: string) {
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
   return { data, error };
+}
+
+/**
+ * Brise nalog trajno.
+ *
+ * Poziv ide na Edge Function `delete-account`, jer brisanje iz `auth.users`
+ * trazi service_role kljuc — a on po pravilu 9 ne sme u aplikaciju. Funkcija
+ * koga brise odredjuje iz tokena, ne iz onoga sto posaljemo.
+ *
+ * Profil i pravo pristupa nestaju sami, preko `on delete cascade` u bazi.
+ */
+export async function deleteAccount() {
+  const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
+  if (error) return { error };
+
+  // `scope: 'local'` namerno: nalog na serveru vise ne postoji, pa bi obicna
+  // odjava pokusala da povuce sesiju koje nema i vratila 401. Ovde samo
+  // cistimo ono sto je ostalo na telefonu.
+  await supabase.auth.signOut({ scope: 'local' });
+  useProfileStore.getState().clear();
+  return { error: null };
 }
 
 export async function signOut() {

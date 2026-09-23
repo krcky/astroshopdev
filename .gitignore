@@ -44,3 +44,6 @@ example
 
 # lokalne promenljive okruzenja
 .env
+
+# Supabase CLI ostavlja ovde privremene podatke o projektu
+supabase/.temp/

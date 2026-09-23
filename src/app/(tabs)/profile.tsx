@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect, router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { signOut, useAuthStore } from '@/store/auth';
+import { TabBarSpacer } from '@/components/floating-tab-bar';
+import { deleteAccount, signOut, useAuthStore, useEntitlement } from '@/store/auth';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
+import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
 import { cn } from '@/lib/utils';
 
 const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
@@ -15,7 +17,11 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
 export default function ProfileTab() {
   const hydrated = useProfileStore((s) => s.hydrated);
-  const { user, entitlement, loading } = useAuthStore();
+  const { user, loading } = useAuthStore();
+  const entitlement = useEntitlement();
+  const serverEntitlement = useAuthStore((s) => s.entitlement);
+  const override = useDevStore((s) => s.entitlementOverride);
+  const setOverride = useDevStore((s) => s.setEntitlementOverride);
   const resolved = useResolvedProfile();
   const [busy, setBusy] = React.useState(false);
 
@@ -32,10 +38,38 @@ export default function ProfileTab() {
     router.replace('/');
   };
 
+  // Dva koraka namerno. Brisanje je nepovratno i brise podatke o rodjenju,
+  // koje je korisnik unosio kroz ceo onboarding — jedan pogresan dodir
+  // ne sme da ih odnese.
+  const doDelete = () => {
+    Alert.alert(
+      'Obrisati nalog?',
+      'Briše se nalog, ime i svi podaci o rođenju. Ovo se ne može poništiti.\n\n' +
+        'Pretplata se ovim NE otkazuje — nju otkazuješ u podešavanjima Apple ili Google naloga.',
+      [
+        { text: 'Odustani', style: 'cancel' },
+        {
+          text: 'Obriši nalog',
+          style: 'destructive',
+          onPress: async () => {
+            setBusy(true);
+            const { error } = await deleteAccount();
+            setBusy(false);
+            if (error) {
+              Alert.alert('Nije uspelo', 'Nalog nije obrisan. Proveri internet pa probaj ponovo.');
+              return;
+            }
+            router.replace('/');
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View className="flex-1 bg-background">
       <SafeAreaView className="flex-1" edges={['top']}>
-        <ScrollView contentContainerClassName="px-5 pb-10" showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerClassName="px-5" showsVerticalScrollIndicator={false}>
 
           <View className="pt-4 pb-7">
             <Text variant="label">Profil</Text>
@@ -87,9 +121,54 @@ export default function ProfileTab() {
             )}
           </View>
 
+          {/* Test prekidac — postoji samo u razvoju (__DEV__). U release bildu
+              se ni ne renderuje, a override se ni ne primenjuje. */}
+          {DEV_TOOLS_ENABLED && (
+            <View className="mt-4 rounded-xl border border-dashed border-border">
+              <View className="border-b border-border px-4 py-3">
+                <Text variant="label">Test (samo razvoj)</Text>
+              </View>
+
+              <View className="flex-row items-center justify-between px-4 py-3">
+                <View className="flex-1 pr-3">
+                  <Text className="text-sm">Plaćeni korisnik</Text>
+                  <Text variant="muted" className="mt-0.5 text-xs">
+                    {override === null
+                      ? `prati server (${serverEntitlement?.active ? 'plaćen' : 'nije plaćen'})`
+                      : 'ručno postavljeno'}
+                  </Text>
+                </View>
+                <Switch
+                  value={entitlement?.active ?? false}
+                  onValueChange={setOverride}
+                  accessibilityLabel="Test prekidač: plaćeni korisnik"
+                />
+              </View>
+
+              {override !== null && (
+                <Pressable
+                  onPress={() => setOverride(null)}
+                  accessibilityRole="button"
+                  className="border-t border-border px-4 py-3 active:opacity-60">
+                  <Text variant="muted" className="text-xs">Vrati na pravo stanje sa servera</Text>
+                </Pressable>
+              )}
+            </View>
+          )}
+
           <Button variant="ghost" className="mt-8" disabled={busy} onPress={doSignOut}>
             <Text className="text-destructive">{busy ? 'Odjavljujem…' : 'Odjavi se'}</Text>
           </Button>
+
+          <Pressable
+            onPress={doDelete}
+            disabled={busy}
+            accessibilityRole="button"
+            accessibilityLabel="Obriši nalog i sve podatke"
+            className="mt-2 items-center py-3 active:opacity-60">
+            <Text variant="muted" className="text-xs">Obriši nalog</Text>
+          </Pressable>
+          <TabBarSpacer />
         </ScrollView>
       </SafeAreaView>
     </View>
