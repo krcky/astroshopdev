@@ -29,11 +29,19 @@ funkciju.
 
 Opcije, po redu pozeljnosti:
 
-1. **Test OTP u Supabase-u** — fiksan kod za tacno jednu adresu. Za telefon
-   sigurno postoji; za email PROVERITI u Auth podesavanjima. Ako postoji, ovo
-   je najcistije: nalog radi samo reviewer-u i ne dira ostale korisnike.
+1. ~~**Test OTP u Supabase-u**~~ — PROVERENO 25.9.2026, NE POSTOJI za email.
+   U konzoli, Email provider ima samo `Email OTP expiration` i `Email OTP
+   length`. Polje **Test Phone Numbers and OTPs** postoji iskljucivo pod Phone
+   providerom. Opcija otpada, ne proveravati ponovo.
 2. **Demo nalog sa pristupom sanducetu** — `review@astroshop.rs`, pa Apple-u
-   dati i lozinku webmail-a, u poljima "Demo Account" i "Notes".
+   dati i lozinku webmail-a, u poljima "Demo Account" i "Notes". OVO JE JEDINI
+   PUT posto test OTP za email ne postoji.
+
+   U Notes obavezno napisati: da kod stize na email, gde se cita, i da pri
+   prijavi postoji Turnstile provera "niste robot" (Managed rezim ga skoro
+   sigurno pusti bez klika, ali neka zna da nije kvar).
+
+   Nalog NE brisati pri ciscenju test korisnika — sledeci review bi pao.
 3. ~~Prebaciti `AUTH_MODE` na `'password'`~~ — grana postoji u kodu, ali binary
    koji reviewer dobija je isti onaj koji ide u prodaju, pa bi lozinku dobili
    svi korisnici. Nije resenje za review, nego promena proizvoda.
