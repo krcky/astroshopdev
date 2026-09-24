@@ -1,27 +1,89 @@
 import * as React from 'react';
-import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
 import { GLYPH_FONT } from '@/components/ui/glyph';
-import { SIGNS, norm360 } from '@/lib/zodiac';
+import { SIGNS, norm360, signFromLongitude } from '@/lib/zodiac';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
-import { chartAngle, polar, spreadAngles } from '@/lib/wheel';
+import {
+  chartAngle, degreeTickPaths, polar, spreadAngles,
+  LABEL as NUM, LABEL_SEP, WHEEL_R as R,
+} from '@/lib/wheel';
 
-/* Poluprecnici, u koordinatama viewBox-a (0—360). */
-const R = {
-  outer: 174,      // spoljasnji krug
-  zodiacIn: 144,   // unutrasnja ivica zodijackog prstena
-  tick: 136,       // kraj crtica za stepene
-  planet: 116,     // gde stoje simboli planeta
-  houseRing: 88,   // unutrasnji krug, granica polja aspekata
-  houseNum: 97,    // brojevi kuca
+/* Poluprecnici i velicine ispisa stoje u `lib/wheel.ts` — proverava ih
+   `npm run check:sky`, sekcija 10. */
+
+/*
+ * Crtice za stepene, ka centru od `R.zodiacIn`.
+ *
+ * Bez stepena se crtaju samo 5° i 10°, tacno kao ranije — bledo, jer su tamo
+ * samo orijentir. Sa stepenima se dodaje crtica na SVAKI stepen, 360 komada,
+ * pa idu kao tri putanje umesto kao 360 `<Line>` cvorova (`degreeTickPaths`).
+ *
+ * Tada boje moraju da potamne. Prva verzija je crtala 1° sa sirinom 0.35 u
+ * `faint` (#ECECEC) — na belom je to kontrast 1.1:1 i crtice se nisu videle
+ * uopste. Druga je bila #E4E4E4 i na telefonu je i dalje bila presvetla:
+ * crtica od 0.5 jedinice je na 359 tacaka 0.43 piksela, pa je antialiasing
+ * pojede. Zato su crtice i tamnije I deblje. Lenjir ima smisla samo ako se
+ * tri nivoa razlikuju: 1° jedva vidljivo, 5° jasno, 10° najjace.
+ */
+const TICK = { d1: 2.5, d5: 5, d10: 8 };
+const TICK_STYLE = {
+  /** Sa stepenima — tri nivoa koja se stvarno razlikuju. */
+  fine: {
+    d1: { color: '#D6D6D6', width: 0.6 },
+    d5: { color: '#BABABA', width: 0.8 },
+    d10: { color: '#9E9E9E', width: 1.1 },
+  },
+  /** Bez stepena — zatecen izgled, ne dirati. */
+  plain: {
+    d5: { color: '#ECECEC', width: 0.6 },
+    d10: { color: '#ECECEC', width: 1 },
+  },
 };
+
+
+/*
+ * Zasto minut stoji DESNO od stepena, a ne u svom prstenu.
+ *
+ * Prva verzija je imala dva prstena — stepen spolja, minut ka unutra. Problem
+ * je sto "spolja" i "unutra" na ekranu menjaju smer: kod planete na vrhu tocka
+ * minut je ISPOD stepena, kod planete na dnu je IZNAD njega, a levo i desno je
+ * pored. Isti podatak se citao na cetiri nacina i nije se videlo sta je sta.
+ *
+ * Sada su stepen i minut jedan red, sa minutom kao indeksom gore-desno.
+ * Smer je uvek isti bez obzira gde je planeta na krugu.
+ *
+ * Cena je sirina: "16 48'" je 23 jedinice, a sam glif ~14. Dva suseda na istom
+ * poluprecniku traze tetivu duzu od toga — otud razmak od 14°, koji na r=102
+ * daje 24.7. I zato se prsten planeta odmice na 125: na dijagonali se ugao
+ * glifa i ugao bloka priblizavaju, pa je na blizim poluprecnicima Venera
+ * zakacala svoj broj.
+ *
+ * Svaki put kad se `minSize` promeni, blok se siri i OVA TRI BROJA se menjaju
+ * zajedno. Preveri `npm run check:sky`, sekcija 10.
+ *
+ * Izmereno na stvarnoj karti, 42 okvira: nijedno preklapanje, blok najblize
+ * centru na r=89.3 (unutrasnji prsten je na 88), najveci pomak simbola od
+ * pravog ugla 8.8° (check-natal dozvoljava 20°).
+ */
+
+/**
+ * Ispod koje velicine prikaza se stepeni gase.
+ *
+ * ViewBox je sirok 420 jedinica, pa je jedna jedinica `size / 420` tacaka na
+ * ekranu. Minut se crta sa 7 jedinica; na 340 tacaka to je ~5.7 tacaka —
+ * donja granica citljivosti za indeks. Ispod toga brojevi postaju sum.
+ */
+const DEGREES_MIN_SIZE = 340;
 
 const COLORS = {
   ink: '#141414',
   line: '#D8D8D8',
   faint: '#ECECEC',
   muted: '#8A8A8A',
+  /** Brojevi kuca kad se crtaju i stepeni — svetliji, da se dve grupe cifara ne mesaju. */
+  houseNum: '#B4B4B4',
   gold: '#A7731B',
   /** Napeti aspekti — kvadrat, opozicija. */
   tense: '#C4453A',
@@ -47,11 +109,25 @@ type Simbol = {
   izvedena?: boolean;
 };
 
+/** Stepen i minut u znaku — isti brojevi koje ispisuje lista ispod tocka. */
+function stepenMinut(longitude: number): { deg: number; min: string } {
+  const p = signFromLongitude(longitude);
+  return { deg: p.deg, min: String(p.min).padStart(2, '0') };
+}
+
 type Props = {
   chart: NatalChart;
   size?: number;
   /** Sakrij linije aspekata (citljivije na malom prikazu). */
   showAspects?: boolean;
+  /**
+   * Stepen i lucni minut u dva reda ispod svakog simbola.
+   *
+   * Bez vrednosti se odlucuje po `size`: ispod `DEGREES_MIN_SIZE` brojevi su
+   * sitniji od granice citljivosti, pa se gase sami. Eksplicitna vrednost
+   * nadjacava tu procenu.
+   */
+  showDegrees?: boolean;
   /**
    * Izvedene tacke uz planete — cvor, Lilit, Tacka srece.
    *
@@ -62,10 +138,14 @@ type Props = {
   points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[];
 };
 
-export function NatalWheel({ chart, size = 360, showAspects = true, points }: Props) {
+export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points }: Props) {
   const cx = 180;
   const cy = 180;
   const asc = chart.houses.ascendant;
+  const degrees = showDegrees ?? size >= DEGREES_MIN_SIZE;
+  // Brojevi kuca bi upali u drugi red brojeva, pa se sklanjaju unutar prstena.
+  const houseNumR = degrees ? R.houseNumIn : R.houseNum;
+  const planetR = degrees ? R.planetUp : R.planet;
 
   /** Ekliptička longituda -> ugao na ekranu. ASC levo, longituda raste suprotno od kazaljke. */
   const angleOf = (lon: number) => chartAngle(lon, asc);
@@ -85,9 +165,20 @@ export function NatalWheel({ chart, size = 360, showAspects = true, points }: Pr
 
   // Razmaknute pozicije simbola. Sa vise od deset simbola razmak mora da se
   // smanji, inace relaksacija gurne ceo klaster u stranu.
+  //
+  // Sa stepenima razmak mora da poraste: glif staje u 9.5°, ali blok "16 48'"
+  // ispod njega je sirok 23 jedinice, sto na poluprecniku 102 trazi 13.1°.
+  // Uzeto je 14° za rezervu. Cena je da simbol stoji dalje od svog stvarnog
+  // stepena — zato crtica koja vodi do prstena postaje obavezna, a ne ukras.
+  const minSep = degrees ? LABEL_SEP : (simboli.length > 11 ? 8.5 : 9.5);
   const symbolAngles = React.useMemo(
-    () => spreadAngles(simboli.map((s) => angleOf(s.longitude)), simboli.length > 11 ? 8.5 : 9.5),
-    [simboli]
+    () => spreadAngles(simboli.map((s) => angleOf(s.longitude)), minSep),
+    [simboli, minSep]
+  );
+
+  const ticks = React.useMemo(
+    () => degreeTickPaths(cx, cy, asc, R.zodiacIn, degrees ? TICK : { ...TICK, d5: 4 }),
+    [asc, degrees]
   );
 
   const aspects = React.useMemo(
@@ -102,18 +193,20 @@ export function NatalWheel({ chart, size = 360, showAspects = true, points }: Pr
       <Circle cx={cx} cy={cy} r={R.zodiacIn} stroke={COLORS.line} strokeWidth={1} fill="none" />
       <Circle cx={cx} cy={cy} r={R.houseRing} stroke={COLORS.line} strokeWidth={1} fill="none" />
 
-      {/* --- crtice za stepene: svakih 5°, duze svakih 10° --- */}
+      {/* --- crtice za stepene --- */}
       <G>
-        {Array.from({ length: 72 }, (_, i) => {
-          const lon = i * 5;
-          const long = i % 2 === 0;
-          const a = at(lon, R.zodiacIn);
-          const b = at(lon, long ? R.tick : R.tick + 4);
-          return (
-            <Line key={`t${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                  stroke={COLORS.faint} strokeWidth={long ? 1 : 0.6} />
-          );
-        })}
+        {degrees && (
+          <Path d={ticks.d1} stroke={TICK_STYLE.fine.d1.color}
+                strokeWidth={TICK_STYLE.fine.d1.width} fill="none" />
+        )}
+        <Path d={ticks.d5}
+              stroke={(degrees ? TICK_STYLE.fine : TICK_STYLE.plain).d5.color}
+              strokeWidth={(degrees ? TICK_STYLE.fine : TICK_STYLE.plain).d5.width}
+              fill="none" />
+        <Path d={ticks.d10}
+              stroke={(degrees ? TICK_STYLE.fine : TICK_STYLE.plain).d10.color}
+              strokeWidth={(degrees ? TICK_STYLE.fine : TICK_STYLE.plain).d10.width}
+              fill="none" />
       </G>
 
       {/* --- granice znakova + simboli --- */}
@@ -147,13 +240,18 @@ export function NatalWheel({ chart, size = 360, showAspects = true, points }: Pr
           // Broj kuce ide na sredinu izmedju ove i sledece kuspide.
           const next = chart.houses.cusps[(i + 1) % 12];
           const midLon = cusp + norm360(next - cusp) / 2;
-          const n = at(midLon, R.houseNum);
+          const n = at(midLon, houseNumR);
           return (
             <G key={`h${i}`}>
               <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y}
                     stroke={isAngle ? COLORS.ink : COLORS.line}
                     strokeWidth={isAngle ? 1.4 : 0.8} />
-              <SvgText x={n.x} y={n.y + 3.5} fontSize={9.5} fill={COLORS.muted} textAnchor="middle">
+              {/* Uz stepene ovo su druge cifre na ekranu — sitnije i svetlije,
+                  da se broj kuce ne procita kao stepen planete. */}
+              <SvgText x={n.x} y={n.y + 3.5}
+                       fontSize={degrees ? 8.5 : 9.5}
+                       fill={degrees ? COLORS.houseNum : COLORS.muted}
+                       textAnchor="middle">
                 {i + 1}
               </SvgText>
             </G>
@@ -184,12 +282,12 @@ export function NatalWheel({ chart, size = 360, showAspects = true, points }: Pr
       <G>
         {simboli.map((p, i) => {
           const spread = symbolAngles[i];
-          const pos = atAngle(spread, R.planet);
+          const pos = atAngle(spread, planetR);
           const boja = p.izvedena ? COLORS.muted : COLORS.ink;
           // Crtica koja povezuje simbol sa STVARNIM stepenom na prstenu.
           const trueOuter = at(p.longitude, R.zodiacIn);
           const trueInner = at(p.longitude, R.zodiacIn - 7);
-          const leadFrom = atAngle(spread, R.planet + 11);
+          const leadFrom = atAngle(spread, planetR + 6);
           return (
             <G key={p.key}>
               <Line x1={trueOuter.x} y1={trueOuter.y} x2={trueInner.x} y2={trueInner.y}
@@ -202,11 +300,58 @@ export function NatalWheel({ chart, size = 360, showAspects = true, points }: Pr
                 textAnchor="middle">
                 {p.glyph}
               </SvgText>
-              {p.retrograde && (
-                <SvgText x={pos.x + 11} y={pos.y + 10} fontSize={8} fill={COLORS.muted} textAnchor="middle">
-                  R
-                </SvgText>
-              )}
+              {p.retrograde && (() => {
+                // Bez stepena "R" stoji kao indeks uz glif — pomak je EKRANSKI
+                // (desno-dole) i to je u redu jer ispod glifa nema niceg.
+                // Sa stepenima taj isti pomak kod planeta na levoj strani
+                // tocka pada tacno u red sa brojevima, jer je tamo "desno"
+                // ujedno i "ka centru". Zato se uz stepene "R" sklanja
+                // RADIJALNO — po luku u stranu i malo ka spolja, gde brojeva
+                // nema ni na jednoj strani kruga.
+                const r = degrees ? atAngle(spread - 5.5, planetR + 2) : { x: pos.x + 11, y: pos.y + 10 };
+                return (
+                  <SvgText x={r.x} y={degrees ? r.y + 2.4 : r.y}
+                           fontSize={degrees ? 7 : 8} fill={COLORS.muted} textAnchor="middle">
+                    R
+                  </SvgText>
+                );
+              })()}
+              {degrees && (() => {
+                const { deg, min } = stepenMinut(p.longitude);
+                const degSize = p.izvedena ? NUM.degSizeIzv : NUM.degSize;
+                const minSize = p.izvedena ? NUM.minSizeIzv : NUM.minSize;
+                const c = atAngle(spread, R.number);
+
+                // Minut visi desno i gore od stepena — U EKRANSKIM koordinatama,
+                // isto za svaku planetu bez obzira gde je na krugu.
+                //
+                // Zbog toga je blok NESIMETRICAN: siri je udesno nego ulevo.
+                // Da je stepen postavljen tacno na radijalnu liniju, blok bi na
+                // jednoj polovini tocka udarao u svoj glif. Zato se ceo blok
+                // pomera za pola minutove sirine ulevo, pa je CENTAR BLOKA na
+                // liniji, a ne stepen.
+                const degW = String(deg).length * degSize * NUM.digit;
+                const minW = `${min}'`.length * minSize * NUM.digitMin;
+                const degX = c.x - (minW + NUM.gap) / 2;
+                const base = c.y + degSize * 0.36;
+
+                return (
+                  <>
+                    {/* Bez `fontFamily` — AstroGlyphs nema cifre, sistem bi ih
+                        crtao rezervnim fontom i visina reda bi odskakala. */}
+                    <SvgText x={degX} y={base}
+                             fontSize={degSize} fontWeight="700"
+                             fill={boja} textAnchor="middle">
+                      {deg}
+                    </SvgText>
+                    <SvgText x={degX + degW / 2 + NUM.gap} y={base - NUM.rise}
+                             fontSize={minSize} fontWeight="400"
+                             fill={COLORS.muted} textAnchor="start">
+                      {min}'
+                    </SvgText>
+                  </>
+                );
+              })()}
             </G>
           );
         })}

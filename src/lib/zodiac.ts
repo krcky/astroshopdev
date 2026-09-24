@@ -38,9 +38,27 @@ export type SignPosition = {
   sign: ZodiacSign;
   /** Stepen unutar znaka, 0—29.99… */
   degree: number;
+  /**
+   * Ceo stepen i lucni minut, ISTI oni koji stoje u `formatted`.
+   *
+   * Postoje kao brojevi zato sto ih natalni tocak crta u dva reda ispod
+   * simbola, pa ne moze da uzme gotov string. Racunaju se iz iste zaokruzene
+   * vrednosti kao `formatted` — da se tocak i lista ispod njega nikad ne
+   * raziju za jedan minut.
+   */
+  deg: number;
+  min: number;
   /** Za prikaz: "12° 34' Bik" — minuti ZAOKRUZENI. */
   formatted: string;
-  /** Za proveru sa astroloskim softverom: "12° 34' 56\" Bik". */
+  /**
+   * Za proveru sa astroloskim softverom: "12° 34' 56\" Bik".
+   *
+   * NEMA POZIVAOCA U UI-ju i tako treba da ostane. Stajao je u listama ispod
+   * tocka, ali tocak crta ZAOKRUZEN minut a ovo SKRACUJE sekunde, pa je isto
+   * Sunce bilo "24 09'" na tocku i "24° 08' 57\"" u listi. Korisnik ne treba da
+   * vidi dva broja za istu planetu. Ostaje kao alat: kad se proverava protiv
+   * astro.com-a ili astro-seek-a, ovo je oblik koji se poredi cifru po cifru.
+   */
   formattedPrecise: string;
 };
 
@@ -64,10 +82,15 @@ export function signFromLongitude(longitude: number): SignPosition {
   const pm = Math.floor((rawDeg - pd) * 60);
   const ps = Math.round((rawDeg - pd - pm / 60) * 3600);
 
+  const deg = Math.floor(within / 60);
+  const min = within % 60;
+
   return {
     sign,
     degree: lon - rawIndex * 30,
-    formatted: `${Math.floor(within / 60)}° ${String(within % 60).padStart(2, '0')}' ${sign.name}`,
+    deg,
+    min,
+    formatted: `${deg}° ${String(min).padStart(2, '0')}' ${sign.name}`,
     formattedPrecise: `${pd}° ${String(pm).padStart(2, '0')}' ${String(ps).padStart(2, '0')}" ${SIGNS[rawIndex].name}`,
   };
 }

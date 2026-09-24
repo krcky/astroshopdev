@@ -165,9 +165,9 @@ export default function Sky() {
           <View className="mx-5 mt-7 rounded-xl border border-border">
             <RowHead>Uglovi nad mestom {grad.name}</RowHead>
             <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
-                 value={chart.ascendantSign.formattedPrecise} />
+                 value={chart.ascendantSign.formatted} />
             <Row glyph={chart.midheavenSign.sign.glyph} name="Medium Coeli"
-                 value={chart.midheavenSign.formattedPrecise} last />
+                 value={chart.midheavenSign.formatted} last />
           </View>
 
           {/* Planete */}
@@ -180,7 +180,7 @@ export default function Sky() {
                 key={p.key}
                 glyph={p.glyph}
                 name={p.name}
-                value={p.position.formattedPrecise}
+                value={p.position.formatted}
                 extra={`${p.house}. kuća`}
                 retro={p.retrograde}
                 last={i === chart.planets.length - 1}
@@ -196,7 +196,7 @@ export default function Sky() {
                 key={t.key}
                 glyph={t.glyph}
                 name={t.name}
-                value={t.position.formattedPrecise}
+                value={t.position.formatted}
                 extra={t.house ? `${t.house}. kuća` : undefined}
                 retro={t.retrograde}
                 last={i === points.length - 1}

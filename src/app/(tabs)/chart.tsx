@@ -86,9 +86,9 @@ export default function ChartScreen() {
           <View className="mx-5 mt-7 rounded-xl border border-border">
             <RowHead>Uglovi</RowHead>
             <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
-                 value={chart.ascendantSign.formattedPrecise} muted={timeUnknown} />
+                 value={chart.ascendantSign.formatted} muted={timeUnknown} />
             <Row glyph={chart.midheavenSign.sign.glyph} name="Medium Coeli"
-                 value={chart.midheavenSign.formattedPrecise} muted={timeUnknown} last />
+                 value={chart.midheavenSign.formatted} muted={timeUnknown} last />
           </View>
 
           {/* Planete */}
@@ -101,7 +101,7 @@ export default function ChartScreen() {
                 key={p.key}
                 glyph={p.glyph}
                 name={p.name}
-                value={p.position.formattedPrecise}
+                value={p.position.formatted}
                 extra={`${p.house}. kuća`}
                 retro={p.retrograde}
                 last={i === chart.planets.length - 1}
