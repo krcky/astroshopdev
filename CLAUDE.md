@@ -24,6 +24,7 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
+    moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
   theme/
@@ -32,6 +33,7 @@ src/
     screen.tsx           okvir ekrana — preliv, zamucena traka, skrol, siva pozadina
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
+    moon-disc.tsx        crtez Meseca u trenutnoj fazi (crno-belo, ne lila)
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
     ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
@@ -47,6 +49,7 @@ src/
     transits.ts      tranziti na natalnu kartu  <- personalizacija
     points.ts        cvor, Lilit, Tacka srece   <- nema ih u engine-u
     sky.ts           stanje neba SADA nad gradom iz profila
+    moon.ts          procenat, oblik faze, lunarni dan, mlad/pun, element i deo biljke
     sky-events.ts    sledeci ulazak u znak / promena smera + kuca od podznaka
     timezone.ts      lokalno vreme -> UTC
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
@@ -338,6 +341,13 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       kuca OD PODZNAKA (Whole Sign), jer tada ulazak u znak = ulazak u kucu; bez vremena
       rodjenja kuce nema. Bez Meseca. Tekstova "planeta u kuci" nema (120, ceka
       astrologa) — redovi ne vode nigde. Testovi: `check:natal`, deo 9f.
+- [x] Mesec, drugi krug (27.9.2026): na pocetnoj crtez faze + procenat + znak, bez
+      kruzica sa podacima (Ivan); red "Ljubav danas" se pojavi kad stignu saveti.
+      Ekran Mesec (`app/moon.tsx`): veliki crtez, lunarni dan, do kad je u znaku,
+      sledeci mlad/pun, cetiri podatka (Mesec %, znak, deo biljke, element), tabovi
+      Ljubav/Zdravlje/Karijera/Kuca/Basta, svi Mesecevi tranziti dana. Deo biljke po
+      elementu (biodinamicki: vatra plod, zemlja koren, vazduh cvet, voda list) —
+      CEKA POTVRDU ASTROLOGA. Testovi: `check:natal`, deo 9g.
 - [ ] Tekstovi za karticu Mesec — tekstova
       za Mesec kao tranzitnu planetu nema (0/50), a tekstovi lunarnog kalendara
       (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti

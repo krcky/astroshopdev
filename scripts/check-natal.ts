@@ -8,6 +8,7 @@ import { norm360, SIGNS, SIGN_CASES } from '../src/lib/zodiac';
 const SIGNS_IDX = (key: string) => SIGNS.findIndex((s) => s.key === key);
 import { bodyLongitude } from '../src/lib/astro';
 import { upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
+import { moonState, moonLitPath, formatIllumination, PLANT_PART, moonSignAt } from '../src/lib/moon';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
@@ -428,6 +429,38 @@ console.log('\n=== 9f. Promene na nebu (ulazak u znak, retrogradnost) ===');
   ok(redom && razlicite && bezMeseca, 'tri razlicite planete, po datumu, bez Meseca');
   ok(kuce, 'kuca od podznaka; bez vremena rodjenja nema kuce');
   ok(ms < 300, 'racuna se brzo', `${ms.toFixed(0)} ms/dan (sa proverom)`);
+}
+
+// --- 9g. Mesec: procenat, crtez, lunarni dan ---
+console.log('\n=== 9g. Mesec: procenat, crtez, lunarni dan ===');
+{
+  // Pun Mesec 26.9.2026. oko 16:49 UTC.
+  const pre = moonState(new Date(Date.UTC(2026, 8, 20, 12)));
+  ok(pre.nextFull.getUTCMonth() === 8 && pre.nextFull.getUTCDate() === 26, 'pun Mesec 26. septembra 2026.', pre.nextFull.toISOString());
+  const pun = moonState(pre.nextFull);
+  ok(pun.illumination > 0.99, 'na punom Mesecu osvetljeno > 99%', formatIllumination(pun.illumination));
+  const mlad = moonState(new Date(pre.nextNew.getTime() + 3_600_000));
+  ok(mlad.illumination < 0.01 && mlad.lunarDay === 1, 'sat posle mladog: < 1% i 1. lunarni dan', `${(mlad.illumination * 100).toFixed(2)}%, dan ${mlad.lunarDay}`);
+  ok(pre.waxing && !moonState(new Date(pre.nextFull.getTime() + 86_400_000)).waxing, 'raste pre punog, opada posle');
+  let dani = true, prev = 0;
+  for (let i = 0; i < 29; i++) {
+    const st = moonState(new Date(mlad.nextNew.getTime() + 3_600_000 + i * 86_400_000));
+    if (st.lunarDay !== i + 1 || st.lunarDay <= prev) dani = false;
+    prev = st.lunarDay;
+  }
+  ok(dani, 'lunarni dan raste 1, 2, 3… kroz ceo ciklus');
+  ok(formatIllumination(0.9996) === '99%' && formatIllumination(0.003) === '1%' && formatIllumination(1) === '100%', 'procenat ne tvrdi 0 ni 100 kad nije');
+  ok(Object.keys(PLANT_PART).length === 4, 'deo biljke za sva cetiri elementa');
+  // Crtez: mlad prazan, pun ceo krug, cetvrt ravna linija (rx 0), srp desno dok raste.
+  ok(moonLitPath(0, 10) === '' && moonLitPath(180, 10).includes('0 1 1'), 'mlad bez crteza, pun ceo disk');
+  ok(moonLitPath(90, 10).includes('A 0.000 10'), 'prva cetvrt: terminator je prava linija');
+  ok(moonLitPath(45, 10).includes('0 0 1 10 20') && moonLitPath(45, 10).endsWith('0 0 0 10 0 Z'), 'mladi srp: svetlo desno, terminator ka desno');
+  ok(moonLitPath(315, 10).includes('0 0 0 10 20') && moonLitPath(315, 10).endsWith('0 0 1 10 0 Z'), 'stari srp: svetlo levo, terminator ka levo');
+  const md = moonDay(chart, new Date(2026, 8, 26, 12));
+  if (md.ingress) {
+    ok(moonSignAt(md, new Date(md.ingress.at.getTime() - 60_000)).key === md.sign.key &&
+       moonSignAt(md, new Date(md.ingress.at.getTime() + 60_000)).key === md.ingress.sign.key, 'znak u trenutku: pre i posle prelaska');
+  }
 }
 
 console.log('\n  planete kroz natalne kuce:');

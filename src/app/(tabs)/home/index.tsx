@@ -13,7 +13,8 @@ import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
-import { Glyph } from '@/components/ui/glyph';
+import { MoonDisc } from '@/components/moon-disc';
+import { moonState, moonSignAt, formatIllumination, LUNAR_AREAS, type LunarArea } from '@/lib/moon';
 import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
@@ -114,7 +115,7 @@ export default function Home() {
       <Brief daily={daily} texts={texts} isToday={offset === 0} />
 
       {/* Mesec — faza, znak, najjaci Mesecev tranzit dana. Posle sazetka (Ivan, 27.9.2026). */}
-      <MoonCard daily={daily} texts={texts} />
+      <MoonCard daily={daily} texts={texts} date={date} offset={offset} />
 
       {/* Sledece promene na nebu i kuca u koju ulaze (Ivanov plan). */}
       <SkyEvents daily={daily} today={date} />
@@ -356,34 +357,76 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
 }
 
 /**
- * Kartica Mesec: faza i znak, pa "sta to za tebe znaci" — najjaci Mesecev
- * tranzit dana (`moonDay` u `transits.ts`), sa satom kad je egzaktan.
+ * Kartica Mesec: crtez Meseca kakav je sada, faza, procenat i znak; ispod pet
+ * oblasti lunarnog kalendara kao tabovi (emoji) i jedna recenica izabrane, pa najjaci Mesecev tranzit dana (`moonDay` u
+ * `transits.ts`) sa satom. Gornji deo otvara ekran Mesec (`app/moon.tsx`) gde je
+ * sve ostalo: element, deo biljke, lunarni dan, oblasti, svi Mesecevi tranziti.
+ * Bez kruzica sa podacima na pocetnoj (Ivan, 27.9.2026).
  *
  * Tekstova za Mesec kao tranzitnu planetu jos NEMA (0/50, ceka astrologa), a ni
- * za faze. Zato kartica pokazuje samo ono sto se racuna: ime tranzita i sat.
- * Kad tekst stigne u bazu, pojavi se sam (naslov i dva reda) i red postane
- * dodir ka tumacenju — do tada ne vodi nigde, jer bi vodio na praznu stranu.
+ * lunarnog kalendara (ceka aktuelne fajlove). Red tranzita postaje dodir ka
+ * tumacenju tek kad tekst postoji; umesto saveta stoji da jos nisu stigli.
  */
-function MoonCard({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
+function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts: Texts; date: Date; offset: number }) {
   const { moon, moonDay } = daily;
   const t = moonDay.strongest;
   const tekst = t ? texts.get(t.contentKey) : undefined;
   const ime = t ? `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}` : '';
-  const znak = moonDay.ingress
-    ? `Mesec u znaku ${moonDay.sign.name}, od ${formatTime(moonDay.ingress.at)} u znaku ${moonDay.ingress.sign.name}`
-    : `Mesec u znaku ${moonDay.sign.name}`;
+  const stanje = React.useMemo(() => moonState(date), [date]);
+  const znak = moonSignAt(moonDay, date);
+  const [oblast, setOblast] = React.useState<LunarArea>('ljubav');
+  // Saveti stizu iz baze kad Ivan posalje aktuelni lunarni kalendar; do tada nema recenice.
+  const recenica: string | null = null;
+  const otvori = () => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } });
+  const izabrana = LUNAR_AREAS.find((a) => a.key === oblast)!;
 
   return (
     <View className="mt-9">
       <Text variant="label" className="mb-3">Mesec</Text>
       <View className={CARD_SURFACE}>
-        <View className="flex-row items-center gap-4 p-5">
-          {/* Glif je znak u trenutku gledanja — na dan prelaska se menja sa satom. */}
-          <Glyph size={28} className="text-foreground">{moon.glyph}</Glyph>
+        <Pressable
+          onPress={otvori}
+          accessibilityRole="button"
+          accessibilityLabel={`${moon.phase}, ${formatIllumination(stanje.illumination)} osvetljen, u ${SIGN_CASES[znak.key].loc}. Otvori Mesec`}
+          className="flex-row items-center gap-4 p-5 active:opacity-60">
+          <MoonDisc angle={stanje.angle} size={56} />
           <View className="flex-1">
             <Text variant="h3">{moon.phase}</Text>
-            <Text variant="muted">{znak}</Text>
+            <Text variant="muted">{formatIllumination(stanje.illumination)} osvetljen · u {SIGN_CASES[znak.key].loc}</Text>
           </View>
+          <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
+        </Pressable>
+
+        {/* Oblasti kao tabovi: ikonica menja recenicu ispod (Ivan, 27.9.2026). Prva je
+            Ljubav. Ekran Mesec se otvara na izabranoj oblasti. */}
+        <View className="h-px bg-border" />
+        <View className="px-5 pt-4">
+          <View className="flex-row justify-between">
+            {LUNAR_AREAS.map((a) => {
+              const aktivna = a.key === oblast;
+              return (
+                <Pressable
+                  key={a.key}
+                  onPress={() => setOblast(a.key)}
+                  accessibilityRole="tab"
+                  accessibilityLabel={a.name}
+                  accessibilityState={{ selected: aktivna }}
+                  hitSlop={6}
+                  className={cn('h-11 w-11 items-center justify-center rounded-full', aktivna ? 'bg-fill' : 'opacity-40')}>
+                  <Text className="text-[22px] leading-[28px]">{a.emoji}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+        {/* Recenica se samo cita — ekran Mesec otvara jedino gornji deo (Ivan, 27.9.2026). */}
+        <View className="px-5 pb-5 pt-3">
+          <Text variant="caption">{izabrana.name} danas</Text>
+          {recenica ? (
+            <Text variant="default" className="mt-1">{recenica}</Text>
+          ) : (
+            <Text variant="muted" className="mt-1">Saveti iz lunarnog kalendara još nisu stigli.</Text>
+          )}
         </View>
         {t && (
           <>
