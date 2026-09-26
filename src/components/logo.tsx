@@ -48,6 +48,16 @@ const FULL_ASPECT = FULL_W / FULL_H;
 const FULL_SIZE = 58;
 const FULL_SHIFT_X = -((FULL_CX - FULL_W / 2) / FULL_H) * FULL_SIZE;
 
+/**
+ * Brend indigo kruga — ista boja koja stoji u `logo-krug.json`.
+ *
+ * Preboja ide UVEK, i kad je krug u svojoj boji. Na iOS-u `lottie-react-native`
+ * prazan `colorFilters` ne vraca boju iz fajla nego zadrzi prethodnu, a Fabric
+ * reciklira Lottie poglede izmedju ekrana: krug sa crnog taba je tako stigao na
+ * "Danas" i "Natalnu kartu" crn (iOS 26, Ivan 27.9.2026).
+ */
+const KRUG_INDIGO = '#403F98';
+
 /** Imena slojeva kruga sa oblicima (iz logo-krug.json) — na njih ide preboja. */
 const KRUG_SLOJEVI = [
   'Prsten', 'Lice', 'Zraci',
@@ -58,7 +68,7 @@ const KRUG_SLOJEVI = [
  * `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis.
  * `full` — PUN logo (ASTRO, krug, SHOP) iz `logo-full.json`, centriran u traci.
  * `color` — preboja kruga (npr. `ink` na ekranima ciji preliv nije ljubicast,
- * Ivan 26.9.2026); bez nje krug je brend indigo iz fajla. Ide kroz Lottie
+ * Ivan 26.9.2026); bez nje krug je brend indigo (`KRUG_INDIGO`). Ide kroz Lottie
  * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
 export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
@@ -113,7 +123,7 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
         loop
         resizeMode="contain"
         onLayout={pusti}
-        colorFilters={color ? KRUG_SLOJEVI.map((keypath) => ({ keypath, color })) : undefined}
+        colorFilters={KRUG_SLOJEVI.map((keypath) => ({ keypath, color: color ?? KRUG_INDIGO }))}
         style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
       />
       <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
