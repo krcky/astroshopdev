@@ -47,7 +47,7 @@ export default function Daily() {
   const locked = !isPremium;
 
   return (
-    <Screen label="Tranziti">
+    <Screen label="Tranziti" tint="gold">
       <View className="pb-6 pt-6">
         <Text variant="display">Tvoji tranziti danas</Text>
       </View>

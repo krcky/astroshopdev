@@ -1,18 +1,21 @@
 import * as React from 'react';
-import { Platform, View, type ScrollViewProps } from 'react-native';
+import { Animated as RNAnimated, Platform, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedProps,
   useAnimatedScrollHandler,
+  useReducedMotion,
   useSharedValue,
 } from 'react-native-reanimated';
+import { useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView, BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Logo } from '@/components/logo';
-import { backdrop, headerBar, space } from '@/theme/tokens';
+import { backdrop, headerBar, space, type BackdropTint } from '@/theme/tokens';
+import { useBackdropStore } from '@/store/backdrop';
 
 /**
  * Zajednicki okvir ekrana — preliv na vrhu, zamucena traka, sadrzaj koji klizi
@@ -103,6 +106,8 @@ type ScreenProps = {
   left?: React.ReactNode;
   /** Sadrzaj desne strane trake (dugme, ikona). Opciono. */
   right?: React.ReactNode;
+  /** Nijansa preliva na vrhu; podrazumevano referentna ljubicasta. */
+  tint?: BackdropTint;
   /**
    * Da li sadrzaj dobija bocnu marginu ekrana (20pt).
    *
@@ -125,6 +130,7 @@ export function Screen({
   right,
   padded = true,
   tabBarSpace = true,
+  tint = 'purple',
   children,
   ...scrollProps
 }: ScreenProps) {
@@ -186,7 +192,7 @@ export function Screen({
       />
 
       {/* 3. preliv */}
-      <ScreenBackdrop />
+      <ScreenBackdrop tint={tint} />
 
       {/* 4. natpis */}
       <View
@@ -214,14 +220,89 @@ export function Screen({
  * dno, pa zamucenje nema sta da zamuti; preliv je jedino sto ide.
  *
  * Ide kao POSLEDNJE dete korenskog `View`-a, da se crta preko sadrzaja.
+ *
+ * PRETAPANJE NIJANSI (Ivan, 26.9.2026): kad ekran dodje u fokus, preliv krene
+ * u nijansi PRETHODNOG ekrana i za pola sekunde pretopi u svoju. Native tabovi
+ * menjaju ekran trenutno, pa je ovo jedini nacin da promena boje bude mekana:
+ * dva preliva jedan preko drugog, gornji (svoj) ide 0 -> 1 providnosti. Boje
+ * se ne animiraju direktno — `LinearGradient` ih pretvara u brojeve pri
+ * renderu, pa animirane string boje ne bi stigle do native sloja.
  */
-export function ScreenBackdrop() {
+export function ScreenBackdrop({ tint = 'purple' }: { tint?: BackdropTint }) {
+  const bezPokreta = useReducedMotion();
+  /** Nijansa koju je poslednji fokusirani ekran ostavio — prati je svaki ekran u pozadini. */
+  const globalna = useBackdropStore((s) => s.last);
+  /*
+   * Stanje preliva:
+   *   - u pozadini (`aktivan` false): crta GLOBALNU nijansu, tj. boju ekrana koji
+   *     je trenutno na ekranu. Tako ekran koji dolazi u fokus vec ima pravu
+   *     pocetnu boju — snimak 26.9.2026 je pokazao dva kadra sopstvene boje pre
+   *     pretapanja, jer se ekran u pozadini crtao u svojoj boji;
+   *   - pri fokusu: `prelaz` = prethodna nijansa, stari sloj se gasi dok se
+   *     novi pali (pravo pretapanje boje);
+   *   - mirno u fokusu: sopstvena nijansa.
+   * Prvi prikaz taba (lenjo montiranje u fokusu) krece isto: iz globalne.
+   */
+  const [prelaz, setPrelaz] = React.useState<BackdropTint | null>(() => {
+    const pocetna = useBackdropStore.getState().last;
+    return pocetna !== tint ? pocetna : null;
+  });
+  const [aktivan, setAktivan] = React.useState(true);
+  // RN Animated, ne Reanimated: vrednost se menja pozivom metode (setValue/timing),
+  // sto pravilo React kompajlera dozvoljava; u state-u, jer se ref ne cita u renderu.
+  // Pocinje od 0 ako vec pri montiranju ima sta da se pretapa.
+  const [udeo] = React.useState(() => new RNAnimated.Value(prelaz ? 0 : 1));
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const prethodna = useBackdropStore.getState().last;
+      useBackdropStore.getState().setLast(tint);
+      // Providnost novog na nulu PRE nego sto React iscrta stanje sa oba sloja —
+      // inace bi jedan kadar pokazao novi sloj pun (vrednost ostala 1 od proslog puta).
+      const pretapa = prethodna !== tint && !bezPokreta;
+      if (pretapa) udeo.setValue(0);
+      setPrelaz(pretapa ? prethodna : null);
+      setAktivan(true);
+      let anim: RNAnimated.CompositeAnimation | null = null;
+      if (pretapa) {
+        anim = RNAnimated.timing(udeo, { toValue: 1, duration: 500, useNativeDriver: true });
+        anim.start(({ finished }) => { if (finished) setPrelaz(null); });
+      } else {
+        udeo.setValue(1);
+      }
+      return () => {
+        anim?.stop();
+        // U pozadini: bez prelaza, prati globalnu nijansu.
+        setPrelaz(null);
+        setAktivan(false);
+      };
+    }, [tint, bezPokreta, udeo])
+  );
+
+  /*
+   * Stari sloj se GASI dok se novi pali. Da bi ukupna providnost bila stalna
+   * (prelivi su providni, ~0,40 na vrhu), stari ne ide linearno nego po krivoj
+   * o(t) = (1 - t) / (1 - a t), a = 0,40, ovde u pet tacaka — inace se boje na
+   * sredini sabiraju u jacu.
+   */
+  const stariUdeo = udeo.interpolate({ inputRange: [0, 0.25, 0.5, 0.75, 1], outputRange: [1, 0.833, 0.625, 0.357, 0] });
+  const sloj = { position: 'absolute' as const, top: 0, left: 0, right: 0, height: backdrop.height };
+  const mirna: BackdropTint = aktivan ? tint : globalna;
+
   return (
-    <LinearGradient
-      pointerEvents="none"
-      colors={backdrop.colors}
-      locations={backdrop.locations}
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, height: backdrop.height }}
-    />
+    <View pointerEvents="none" style={sloj}>
+      {prelaz ? (
+        <>
+          <RNAnimated.View style={[StyleSheet.absoluteFill, { opacity: stariUdeo }]}>
+            <LinearGradient colors={backdrop.tints[prelaz]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+          </RNAnimated.View>
+          <RNAnimated.View style={[StyleSheet.absoluteFill, { opacity: udeo }]}>
+            <LinearGradient colors={backdrop.tints[tint]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+          </RNAnimated.View>
+        </>
+      ) : (
+        <LinearGradient colors={backdrop.tints[mirna]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+      )}
+    </View>
   );
 }

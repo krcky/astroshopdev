@@ -68,7 +68,7 @@ export default function ProfileTab() {
   };
 
   return (
-    <Screen label="Profil">
+    <Screen label="Profil" tint="pink">
       <View className="pb-7 pt-6">
         <Text variant="display">{profile.name}</Text>
         {user?.email && <Text variant="muted" className="mt-1.5">{user.email}</Text>}

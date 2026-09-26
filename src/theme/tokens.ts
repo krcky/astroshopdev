@@ -277,7 +277,27 @@ export const backdrop = {
   colors: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
   /** Polozaji zaustavljanja: vrh, sredina, dno. */
   locations: [0, 0.5, 1],
+  /**
+   * Nijanse preliva po ekranu (Ivan, 26.9.2026): `purple` je izmerena referentna
+   * (isto sto i `colors`), ostale su NASE, izvedene iz akcenata sa istim
+   * providnostima 0,40 / 0,21 / 0 da se ponasaju isto nad karticama.
+   * Ekran bira nijansu kroz `<Screen tint="gold">`; pri promeni ekrana preliv
+   * se pretapa iz prethodne nijanse u svoju (`ScreenBackdrop`).
+   */
+  tints: {
+    purple: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
+    /** Tranziti: zlatno-zuta, iz `accent.yellow` ka toplijoj sredini. */
+    gold: ['rgba(244, 200, 68, 0.40)', 'rgba(245, 158, 11, 0.21)', 'rgba(198, 160, 95, 0)'],
+    /** Natalna karta ("Ti"): zelena iz `accent.green` ka tirkizu — ono sto je tvoje i ne menja se. */
+    green: ['rgba(110, 207, 111, 0.40)', 'rgba(20, 184, 166, 0.21)', 'rgba(65, 195, 138, 0)'],
+    /** Nebo: plava iz `accent.blue` ka nocnoj. */
+    blue: ['rgba(66, 124, 246, 0.40)', 'rgba(30, 64, 175, 0.21)', 'rgba(48, 94, 210, 0)'],
+    /** Profil: roze iz `accent.pink` ka svetlijoj — licno, toplo. */
+    pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
+  },
 } as const;
+
+export type BackdropTint = keyof typeof backdrop.tints;
 
 /**
  * Traka na vrhu ekrana — zamucuje ono sto klizi ispod nje.
