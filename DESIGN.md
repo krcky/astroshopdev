@@ -323,7 +323,8 @@ stil, i do njega se drugacije ne stize:
 - `expo-blur` bas zato izvozi `getAnimatableRef()`. Provereno: `intensity` 20
   daje `blur(4px)`.
 
-Visoka **53** ispod statusne trake — razmak na vrhu sadrzaja je
+Visoka **70** ispod statusne trake (referenca ima 53; podignuto 26.9.2026 zbog loga od
+47pt u traci) — razmak na vrhu sadrzaja je
 `insets.top + headerBar.height`, i racuna se na jednom mestu. Da ga svaki ekran
 sam sabira, prvi naslov bi se na jednom podvukao pod traku a na drugom odlepio,
 i to bi se videlo tek na telefonu sa zarezom.
@@ -341,16 +342,16 @@ neprovidna povrsina.
 Odozdo nagore, prepisano iz reference:
 
 1. sadrzaj (`ScrollView`) — bez svojih umetaka na vrhu
-2. zamucenje — visoko `insets.top + 53`, ostro se zavrsava
+2. zamucenje — visoko `insets.top + headerBar.height`, ostro se zavrsava
 3. **preliv** — visok 180, PREKO zamucenja
 4. natpis trake
 
 U referenci je preliv dete trake koja nosi `backdrop-filter`, pa se crta posle
 zamucenja i nastavlja ispod njega jos ~127px. Ako preliv ode iznad zamucenja,
-gornjih 53pt izgubi boju i traka izgleda kao siva pruga.
+gornji deo u visini trake izgubi boju i traka izgleda kao siva pruga.
 
 Sva tri sloja su **direktna deca** korenskog `View`-a. Kad su preliv i natpis
-uvuceni u zajednicki omotac visine trake, Android odsece preliv na 53pt jer
+uvuceni u zajednicki omotac visine trake, Android odsece preliv na visinu trake jer
 podrazumevano secka ono sto izadje iz roditelja — a iOS ne secka, pa bi se
 razlika videla tek na drugom telefonu.
 

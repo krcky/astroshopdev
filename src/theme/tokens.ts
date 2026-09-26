@@ -282,8 +282,9 @@ export const backdrop = {
 /**
  * Traka na vrhu ekrana — zamucuje ono sto klizi ispod nje.
  *
- * Visina je iz reference (53). Statusna traka se dodaje na nju, ne racuna se
- * u nju: `insets.top + headerBar.height`.
+ * Visina je bila iz reference (53). Podignuta na 70 (Ivan, 26.9.2026) kad je u
+ * traku usao logo: krug od 47pt u 53 ima po 3pt vazduha, u 70 po 11,5. Statusna
+ * traka se dodaje na nju, ne racuna se u nju: `insets.top + headerBar.height`.
  *
  * `intensity` NIJE prepis CSS-ovog `blur(16px)`. Na iOS-u `expo-blur` bira
  * sistemski materijal i `intensity` je udeo tog materijala (1-100), a ne
@@ -296,7 +297,7 @@ export const backdrop = {
  */
 export const headerBar = {
   /** Visina trake ISPOD statusne trake. */
-  height: 53,
+  height: 70,
   /** Poluprecnik zamucenja u referenci — cuva se radi traga, ne koristi se direktno. */
   cssBlur: 16,
   /** Udeo sistemskog materijala na iOS-u (1-100), kad je traka puna. */

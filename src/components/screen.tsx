@@ -33,18 +33,18 @@ import { backdrop, headerBar, space } from '@/theme/tokens';
  * REDOSLED SLOJEVA (odozdo nagore) — prepisan iz reference, ne izmisljen:
  *
  *   1. sadrzaj (ScrollView)   ide ispod svega, bez svojih umetaka na vrhu
- *   2. zamucenje              visoko `insets.top + 53`, ostro se zavrsava
+ *   2. zamucenje              visoko `insets.top + headerBar.height`, ostro se zavrsava
  *   3. preliv                 visok 180 od vrha ekrana, PREKO zamucenja
  *   4. natpis trake           preko svega
  *
  * U referenci je preliv dete trake koja nosi `backdrop-filter`, pa se crta
  * POSLE zamucenja i nastavlja ispod njega jos ~127px. Ovde je to isti redosled
- * pisanja u JSX-u. Ako preliv ode iznad zamucenja, gornjih 53pt izgubi boju i
+ * pisanja u JSX-u. Ako preliv ode iznad zamucenja, gornji deo u visini trake izgubi boju i
  * traka pocne da izgleda kao siva pruga.
  *
  * Sva tri sloja su DIREKTNA deca korenskog `View`-a, namerno. Kad su preliv i
  * natpis uvuceni u zajednicki omotac visine trake, Android odsece preliv na
- * 53pt jer podrazumevano secka ono sto izadje iz roditelja — a iOS ne secka,
+ * visinu trake jer podrazumevano secka ono sto izadje iz roditelja — a iOS ne secka,
  * pa bi se razlika videla tek na drugom telefonu.
  *
  * ---------------------------------------------------------------------------
