@@ -234,7 +234,16 @@ ANDROID TIHO OSTANE BEZ ZAMUCENJA. `ExpoBlurView.kt` radi
 providna traka. Zato je sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide
 traci. Na iOS-u je `BlurTargetView` obican `View` i ne kosta nista.
 
+UNUTRASNJE STRANE (`pushed`: profil, tumacenje, Mesec, mesto, izmena) imaju svoje
+zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
+BEZ loga i BEZ preliva (izuzetak: Mesec ima ljubicasti, `tint="purple"`). Strelicu
+crta `Screen` sam — ekran je ne salje.
+
 Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
+
+**17b. `docs/ASTRO-LOGIKA.md` je opis SVE astroloske logike za astrologa.**
+Svaka promena pravila, orbisa, tezina ili izbora (Hero, sazetak, Mesec, kuce) se
+upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 
 **18. Tranzit dana se bira waterfall-om prioriteta, ne po skoru.**
 `pickHero` u `lib/transits.ts` (specifikacija 26.9.2026): 1) jak aspekt (orb <= 1,5°,
@@ -247,8 +256,11 @@ svih prioriteta. Vladar znaka je `SIGNS[].rulerKey`.
 
 MESEC NE ULAZI U HERO — ima svoju karticu. PAUZA OD 7 DANA (`HERO_PAUSE_DAYS`):
 tranzit prikazan u poslednjih 7 dana se preskace i pusta se sledeci po istom
-redosledu, osim na vrhuncu (orb < 0,3°, `PEAK_ORB`). Kljuc prikazan DANAS nikad nije na
-pauzi. Dnevnik je `store/hero-log.ts`, LOKALNO u AsyncStorage-u — telefon i web mogu
+redosledu, osim na DAN EGZAKTNOSTI (`exactDayKeys`: orbis nije veci nego dan pre ni dan
+posle, i <= 1,5°). Do 27.9.2026 pauzu je probijao svaki dan sa orb < 0,3°, pa je spor
+Saturn bio Hero nedelju dana zaredom (Ivan). Kljuc prikazan DANAS nikad nije na
+pauzi. PREGLED DRUGIH DANA (dan-meni) koristi `heroHistoryFor`: dnevnik se odigra kao
+da je aplikacija otvarana svaki dan, inace bi juce/sutra ponavljali danasnji Hero. Dnevnik je `store/hero-log.ts`, LOKALNO u AsyncStorage-u — telefon i web mogu
 istog dana da pokazu razlicit Hero; ako zasmeta, dnevnik ide u bazu, oblik ostaje.
 Testovi: `npm run check:natal`, deo 9.
 
@@ -294,6 +306,8 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       tekstovi u `transit_texts`. Popunjeno 433/600 kratkih i 443/600 dugih.
 - [ ] MESEC — nema nijedan tekst, a jedini menja ton svakog dana. 50 po verziji.
       CEKA astrologa. Spisak: `python3 scripts/korpus/izvestaj.py`
+      Predlog "Mesecev naslov dana" (Co-Star analiza, oblik teksta, varijante):
+      `docs/ASTRO-LOGIKA.md`, poglavlje 10.
 - [ ] Ascendent i MC kao meta — 100 tekstova po verziji. ODLUCENO 23.9.2026:
       ostaju u proracunu, ocekuju se tekstovi. Ako ne stignu, izbaciti ih iz
       `transits.ts`. Dotle nije kvar — `daily.tsx` tranzit bez teksta prikazuje

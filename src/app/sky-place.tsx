@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
-import { Check, ChevronLeft } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
@@ -42,10 +42,6 @@ export default function SkyPlace() {
   return (
     <Screen
       label="Odakle gledaš"
-      left={<Pressable onPress={() => router.back()} hitSlop={14}
-                   accessibilityRole="button" accessibilityLabel="Nazad">
-          <ChevronLeft size={26} color={neutral.ink} />
-        </Pressable>}
       tabBarSpace={false}
       pushed
       keyboardShouldPersistTaps="handled">

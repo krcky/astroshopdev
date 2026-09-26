@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Lock } from 'lucide-react-native';
+import { Lock } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
@@ -13,7 +13,6 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
 import { findTransits } from '@/lib/transits';
-import { neutral } from '@/theme/tokens';
 
 const GOLD = '#A7731B';
 
@@ -47,10 +46,6 @@ export default function TransitDetail() {
   return (
     <Screen
       label="Tumačenje"
-      left={<Pressable onPress={() => router.back()} hitSlop={14}
-                   accessibilityRole="button" accessibilityLabel="Nazad">
-          <ChevronLeft size={26} color={neutral.ink} />
-        </Pressable>}
       tabBarSpace={false}
       pushed>
           {tranzit && (

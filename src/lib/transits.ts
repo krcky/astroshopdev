@@ -152,9 +152,13 @@ export function daysToSolarReturn(chart: NatalChart, date: Date = new Date()): n
  * PAUZA OD 7 DANA. Spor tranzit u orbisu stoji nedeljama i bez pauze bi bio
  * Hero svaki dan (simulacija na test karti: 50 od 60 dana isti Uran). Tranzit
  * prikazan u poslednjih 7 dana se preskace i pusta se sledeci kandidat po
- * istom redosledu — OSIM ako je danas na vrhuncu (orb < 0,3°): vrhunac spore
- * planete je dogadjaj koji se ne precutkuje. Ista simulacija sa pauzom: 46
- * promena u 60 dana, nijedan dan bez Hero-a.
+ * istom redosledu — OSIM na DAN EGZAKTNOSTI: dan kad je orbis manji nego dan
+ * pre i dan posle. Vrhunac spore planete je dogadjaj koji se ne precutkuje.
+ *
+ * Ranije je pauzu probijao svaki dan sa orbisom ispod 0,3°. Spor Saturn je
+ * ispod tog praga nedelju dana, pa je Hero bio isti ceo taj period (Ivanova
+ * karta, Saturn kvadrat Mesec, 25—29.9.2026). Od 27.9.2026 (Ivan) probija
+ * samo jedan dan; na istoj karti 13 razlicitih Hero-a u 15 dana.
  *
  * Racuna se za LOKALNU PONOC tog dana, ne za sadasnji trenutak: Hero mora da
  * bude isti ceo dan. Kljuc prikazan DANAS nikad nije "na pauzi" — inace bi se
@@ -171,8 +175,12 @@ export const STRONG_ORB = 1.5;
 /** Koliko dana tranzit ceka posle prikaza pre nego sto sme ponovo u Hero. */
 export const HERO_PAUSE_DAYS = 7;
 
-/** Orbis ispod kog je tranzit "na vrhuncu" i probija pauzu. */
-export const PEAK_ORB = 0.3;
+/**
+ * Najveci orbis na kom dan egzaktnosti jos probija pauzu. Lokalni minimum
+ * orbisa postoji i kad planeta stane (stacionarna) daleko od tacnog aspekta —
+ * to nije vrhunac i ne sme da ukine pauzu.
+ */
+export const EXACT_DAY_MAX_ORB = STRONG_ORB;
 
 /** Kljucne tacke karte za drugi prioritet. */
 const KEY_POINTS = ['ascendant', 'midheaven', 'sun', 'moon'] as const;
@@ -248,13 +256,36 @@ function mostExact(list: Transit[]): Transit | undefined {
   )[0];
 }
 
-/** Da li je tranzit na pauzi: prikazan pre 1—7 dana, a nije na vrhuncu. */
-function paused(t: Transit, history: HeroHistory, today: Date): boolean {
+/** Da li je tranzit na pauzi: prikazan pre 1—7 dana, a danas mu nije dan egzaktnosti. */
+function paused(t: Transit, history: HeroHistory, today: Date, exactToday: ReadonlySet<string>): boolean {
   const shown = history[t.contentKey];
   if (!shown) return false;
   const days = daysBetween(shown, today);
   if (days <= 0) return false; // prikazan danas — mora ostati isti ceo dan
-  return days <= HERO_PAUSE_DAYS && t.orb >= PEAK_ORB;
+  return days <= HERO_PAUSE_DAYS && !exactToday.has(t.contentKey);
+}
+
+/**
+ * Kljucevi tranzita kojima je `date` DAN EGZAKTNOSTI: orbis u lokalnu ponoc
+ * nije veci nego dan pre ni dan posle (i nije veci od `EXACT_DAY_MAX_ORB`).
+ * Tranzit kog dan pre ili dan posle nema u orbisu je na ivici, ne na vrhuncu.
+ */
+export function exactDayKeys(chart: NatalChart, date: Date, today: Transit[]): Set<string> {
+  const orbs = (d: Date) => {
+    const m = new Map<string, number>();
+    for (const t of findTransits(chart, localMidnight(d))) m.set(t.contentKey, t.orb);
+    return m;
+  };
+  const dan = (o: number) => { const d = localMidnight(date); d.setDate(d.getDate() + o); return d; };
+  const juce = orbs(dan(-1));
+  const sutra = orbs(dan(1));
+  const out = new Set<string>();
+  for (const t of today) {
+    const a = juce.get(t.contentKey);
+    const b = sutra.get(t.contentKey);
+    if (a !== undefined && b !== undefined && t.orb <= a && t.orb <= b && t.orb <= EXACT_DAY_MAX_ORB) out.add(t.contentKey);
+  }
+  return out;
 }
 
 /**
@@ -266,7 +297,9 @@ export function pickHeroFrom(
   rulers: { key: string; reason: string }[],
   timeUnknown = false,
   history: HeroHistory = {},
-  today: Date = new Date()
+  today: Date = new Date(),
+  /** Kljucevi kojima je `today` dan egzaktnosti (`exactDayKeys`) — oni probijaju pauzu. */
+  exactToday: ReadonlySet<string> = new Set()
 ): HeroPick {
   const usable = transits.filter(
     (t) =>
@@ -275,7 +308,7 @@ export function pickHeroFrom(
       // Bez vremena rodjenja ASC i MC otpadaju iz SVIH prioriteta — bolje
       // priznati nego staviti u Hero tranzit na tacku koja mozda nije tu.
       !(timeUnknown && (TIME_DEPENDENT as readonly string[]).includes(t.natal.key)) &&
-      !paused(t, history, today)
+      !paused(t, history, today, exactToday)
   );
 
   // 1. vladar, samo jak aspekt
@@ -307,13 +340,45 @@ export function pickHero(
   timeUnknown = false,
   history: HeroHistory = {}
 ): HeroPick {
-  return pickHeroFrom(
-    findTransits(chart, localMidnight(date)),
-    heroRulers(chart, timeUnknown),
-    timeUnknown,
-    history,
-    date
-  );
+  const transits = findTransits(chart, localMidnight(date));
+  // Susedni dani se racunaju samo ako ima sta da se probije — dnevnik prazan
+  // (prvi dan, test) ne trazi jos dva prolaza kroz efemeride.
+  const exact = Object.keys(history).length ? exactDayKeys(chart, date, transits) : new Set<string>();
+  return pickHeroFrom(transits, heroRulers(chart, timeUnknown), timeUnknown, history, date, exact);
+}
+
+/**
+ * Dnevnik kakav bi bio na dan `target` da je korisnik otvarao aplikaciju svaki
+ * dan — za pregled drugih dana (dan-meni na pocetnoj).
+ *
+ * Bez ovoga bi pregled koristio DANASNJI dnevnik: sutra bi znalo samo za
+ * danasnji Hero, prekosutra ne bi znalo za sutrasnji i ponovilo bi ga, a juce
+ * bi videlo danasnji kao "prikazan kasnije" i pokazalo isti.
+ *
+ *   - danas: stvarni dnevnik, nepromenjen
+ *   - buducnost: stvarni dnevnik, pa redom od sutra do dana pre `target` svaki
+ *     dan bira Hero i upisuje ga — isto ono sto ce se desiti kad ti dani dodju
+ *   - proslost: stvarni dnevnik ne pamti sta je tada bilo (kljuc cuva samo
+ *     poslednji prikaz), pa se nedelja pre `target` odigra iz pocetka
+ */
+export function heroHistoryFor(
+  chart: NatalChart,
+  target: Date,
+  history: HeroHistory,
+  timeUnknown = false,
+  today: Date = new Date()
+): HeroHistory {
+  const offset = daysBetween(dayKey(today), target);
+  if (offset === 0) return history;
+  const pocetak = offset > 0 ? 1 : offset - HERO_PAUSE_DAYS;
+  const sim: HeroHistory = offset > 0 ? { ...history } : {};
+  for (let o = pocetak; o < offset; o++) {
+    const d = localMidnight(today);
+    d.setDate(d.getDate() + o);
+    const p = pickHero(chart, d, timeUnknown, sim);
+    if (p.transit) sim[p.transit.contentKey] = dayKey(d);
+  }
+  return sim;
 }
 
 /* ------------------------------------------------------------------------- *

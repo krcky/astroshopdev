@@ -19,8 +19,10 @@ import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { useHeroLog } from '@/store/hero-log';
-import { dayKey, briefBucket, type BriefBucket, type Transit } from '@/lib/transits';
+import { dayKey, briefBucket, heroHistoryFor, type BriefBucket, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
+import { STARI_IOS } from '@/lib/platform';
+import { NativeDayMenu } from '@/components/native-day-menu';
 import { SIGN_CASES } from '@/lib/zodiac';
 
 /** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Tranziti". */
@@ -36,9 +38,13 @@ export default function Home() {
     const d = new Date(today); d.setDate(today.getDate() + offset); return d;
   }, [today, offset]);
   const heroHistory = useHeroLog((s) => s.shown);
+  // Za drugi dan dnevnik se odigra kao da je aplikacija otvarana svaki dan
+  // (`heroHistoryFor`) — inace bi pregled juce/sutra ponavljao danasnji Hero.
   const daily = React.useMemo(
-    () => (resolved ? buildPersonalDaily(resolved, date, heroHistory) : null),
-    [resolved, date, heroHistory]
+    () => (resolved
+      ? buildPersonalDaily(resolved, date, heroHistoryFor(resolved.chart, date, heroHistory, resolved.timeUnknown, today))
+      : null),
+    [resolved, date, heroHistory, today]
   );
 
   // Jedan upit za tekstove svih danasnjih tranzita — Hero, sazetak i liste
@@ -64,8 +70,25 @@ export default function Home() {
       // (`unstable_headerRightItems` dole): UIMenu sa zamucenjem na dodir,
       // Liquid Glass dugmad (Ivan, 26.9.2026). Android nema tu traku, pa dobija
       // nas meni i stakleni krug.
+      // iOS pre 26: native stavke stoje u traci od 44pt, pa su ~5pt iznad loga i
+      // ne mogu da se spuste. Zato tamo crtamo svoje — goli natpis i ikona u
+      // `ZAGLAVLJE_STARI_IOS`, centrirani u nasem redu; meni dana je ipak
+      // sistemski UIMenu (`NativeDayMenu`) (Ivan, 27.9.2026).
       right={
-        Platform.OS === 'ios' ? undefined : (
+        STARI_IOS ? (
+          <View className="flex-row items-center gap-4" style={{ transform: [{ translateY: -5 }] }}>
+            <NativeDayMenu
+              label={dayLabel(today, offset)}
+              color={ZAGLAVLJE_STARI_IOS}
+              options={DAY_OFFSETS.map((o) => ({ value: o, title: RELATIVE[o] }))}
+              selected={offset}
+              onChange={setOffset}
+            />
+            <Pressable onPress={() => router.push('/profile')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Profil" className="active:opacity-60">
+              <UserRound size={24} color={ZAGLAVLJE_STARI_IOS} />
+            </Pressable>
+          </View>
+        ) : Platform.OS === 'ios' ? undefined : (
           <View className="flex-row items-center gap-2" style={{ transform: [{ translateY: -5 }] }}>
             <DayMenu today={today} offset={offset} onChange={setOffset} />
             <GlassIconButton onPress={() => router.push('/profile')} accessibilityLabel="Profil">
@@ -74,7 +97,7 @@ export default function Home() {
           </View>
         )
       }>
-      {Platform.OS === 'ios' && (
+      {Platform.OS === 'ios' && !STARI_IOS && (
         <Stack.Screen
           options={{
             unstable_headerRightItems: () => [
@@ -147,6 +170,9 @@ const DAY_OFFSETS = [-DAY_RANGE, -1, 0, 1, DAY_RANGE];
 const dayAt = (today: Date, o: number) => { const d = new Date(today); d.setDate(today.getDate() + o); return d; };
 /** Natpis na dugmetu: "Danas", ili skracenica dana kad je izabran drugi. */
 const dayLabel = (today: Date, offset: number) => (offset === 0 ? 'Danas' : DANI_KRATKO[dayAt(today, offset).getDay()]);
+
+/** Boja natpisa dana i ikone profila u zaglavlju na iOS-u pre 26 (Ivan, 27.9.2026). */
+const ZAGLAVLJE_STARI_IOS = '#403F98';
 
 /**
  * ANDROID varijanta dan-menija (iOS ima native UIMenu u traci, vidi gore).

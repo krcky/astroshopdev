@@ -1,5 +1,6 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
+import { STARI_IOS } from '@/lib/platform';
 import { neutral } from '@/theme/tokens';
 
 /*
@@ -18,6 +19,14 @@ import { neutral } from '@/theme/tokens';
  * Razmak na dnu ekrana ispod trake pravi `TabBarSpacer` u `Screen` — nas
  * skrol ne dozvoljava sistemu da mu sam podesi umetke (vidi tamo).
  */
+/**
+ * iOS 18 i stariji: klasicna traka je na "ivici skrola" potpuno PROVIDNA (UIKit
+ * `scrollEdgeAppearance`), a nas skrol ima `contentInsetAdjustmentBehavior="never"`,
+ * pa UIKit misli da je sadrzaj uvek na dnu — traka ostane providna i tekst ide
+ * kroz ikone (iOS 18.6 simulator, Ivan 27.9.2026). Ovim traka uvek nosi belu
+ * podlogu. Na iOS-u 26 je traka staklo i ovo ne treba.
+ */
+
 export default function TabsLayout() {
   return (
     <NativeTabs
@@ -28,9 +37,10 @@ export default function TabsLayout() {
       labelStyle={{ default: { color: neutral.inkSubtle }, selected: { color: neutral.ink } }}
       // iOS 26: traka se sazme pri skrolu nadole.
       minimizeBehavior="onScrollDown"
-      // Android (Material 3 traka): bela podloga, siva kapsula iza izabrane ikone i
-      // siv talas na dodir — iste boje kao nasa nekadasnja traka. iOS ovo ignorise.
+      // Bela podloga: Android (Material 3) i iOS 18 i stariji (vidi `STARI_IOS`).
+      // Siva kapsula iza izabrane ikone i siv talas na dodir su samo Android.
       backgroundColor={neutral.white}
+      disableTransparentOnScrollEdge={STARI_IOS}
       indicatorColor={neutral.fillStrong}
       rippleColor={neutral.fill}
       // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).

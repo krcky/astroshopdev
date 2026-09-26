@@ -12,7 +12,7 @@ import { moonState, moonLitPath, formatIllumination, PLANT_PART, moonSignAt } fr
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
-  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, splitBySpeed, transitEnd, moonDay, type Transit,
+  STRONG_ORB, HERO_PAUSE_DAYS, EXACT_DAY_MAX_ORB, exactDayKeys, heroHistoryFor, briefBucket, pickBrief, splitBySpeed, transitEnd, moonDay, type Transit,
 } from '../src/lib/transits';
 import { spreadAngles, chartAngle } from '../src/lib/wheel';
 
@@ -210,9 +210,11 @@ console.log('\n=== 9. Tranzit dana (waterfall) ===');
     ok(h.priority === 1, `prikazan pre ${HERO_PAUSE_DAYS + 1} dana -> sme ponovo`);
     h = pickHeroFrom(lista, vladari, false, { 'transit.saturn.x.natal.mars': pre(0) }, danas);
     ok(h.priority === 1, 'prikazan DANAS -> ostaje isti ceo dan');
-    const vrh = [mk('mars', PEAK_ORB - 0.05, 0.7, 'saturn'), mk('sun', 0.5, 1, 'venus')];
+    const vrh = [mk('mars', 0.05, 0.7, 'saturn'), mk('sun', 0.5, 1, 'venus')];
     h = pickHeroFrom(vrh, vladari, false, { 'transit.saturn.x.natal.mars': pre(2) }, danas);
-    ok(h.priority === 1, 'vrhunac (orb < 0,3) probija pauzu');
+    ok(h.priority === 2, 'blizu vrhunca, ali nije dan egzaktnosti -> i dalje na pauzi');
+    h = pickHeroFrom(vrh, vladari, false, { 'transit.saturn.x.natal.mars': pre(2) }, danas, new Set(['transit.saturn.x.natal.mars']));
+    ok(h.priority === 1, 'dan egzaktnosti probija pauzu');
     const svePauza = { 'transit.saturn.x.natal.mars': pre(1), 'transit.venus.x.natal.sun': pre(3), 'transit.mercury.x.natal.jupiter': pre(5) };
     h = pickHeroFrom(lista, vladari, false, svePauza, danas);
     ok(h.priority === 4, 'sve na pauzi -> Hero-a nema');
@@ -230,6 +232,25 @@ console.log('\n=== 9. Tranzit dana (waterfall) ===');
   const a = pickHero(chart, new Date(2026, 8, 26, 8, 0));
   const b = pickHero(chart, new Date(2026, 8, 26, 23, 0));
   ok(a.priority === b.priority && a.transit?.contentKey === b.transit?.contentKey, 'isti Hero ujutru i uvece istog dana');
+  // Dan egzaktnosti na stvarnoj karti: orbis nije veci od suseda ni od praga.
+  const d0 = new Date(2026, 8, 26);
+  const lista0 = findTransits(chart, d0);
+  const ex = exactDayKeys(chart, d0, lista0);
+  ok([...ex].every((k) => (lista0.find((t) => t.contentKey === k)?.orb ?? 99) <= EXACT_DAY_MAX_ORB), 'dan egzaktnosti: orbis <= prag');
+
+  // Pregled drugih dana: simulirani dnevnik.
+  const stvarni = { 'transit.x': dayKey(d0) };
+  ok(heroHistoryFor(chart, d0, stvarni, false, d0) === stvarni, 'danas: stvarni dnevnik, nepromenjen');
+  const za3 = new Date(2026, 8, 29);
+  const sim = heroHistoryFor(chart, za3, stvarni, false, d0);
+  ok(sim['transit.x'] === dayKey(d0) && Object.keys(sim).length >= 2, 'buducnost: stvarni dnevnik + odigrani dani izmedju');
+  // Pet uzastopnih dana, svaki sa svojim dnevnikom — ne sme biti isti Hero svih pet.
+  const pet = [-2, -1, 0, 1, 2].map((o) => {
+    const d = new Date(2026, 8, 26 + o);
+    return pickHero(chart, d, false, heroHistoryFor(chart, d, {}, false, d0)).transit?.contentKey;
+  });
+  ok(new Set(pet).size > 1, 'pregled pet dana: Hero se menja', pet.join(', '));
+
   const danas = pickHero(chart);
   console.log(`  danas: P${danas.priority}  ${danas.transit ? danas.transit.contentKey : 'faza Meseca'}  (${danas.reason})`);
 }

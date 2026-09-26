@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Animated as RNAnimated, Platform, StyleSheet, View, type ScrollViewProps } from 'react-native';
+import { Animated as RNAnimated, Platform, Pressable, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -8,14 +8,17 @@ import Animated, {
   useReducedMotion,
   useSharedValue,
 } from 'react-native-reanimated';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView, BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ChevronLeft } from 'lucide-react-native';
 
 import { Logo } from '@/components/logo';
+import { Text } from '@/components/ui/text';
 import { backdrop, headerBar, neutral, space, type BackdropTint } from '@/theme/tokens';
 import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
+import { STARI_IOS } from '@/lib/platform';
 
 /**
  * Zajednicki okvir ekrana — preliv na vrhu, zamucena traka, sadrzaj koji klizi
@@ -81,6 +84,24 @@ import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 /**
+ * Koliko ekran koji ODLAZI jos drzi svoju boju i pozadinu.
+ *
+ * iOS pre 26: UITabBarController sam pretapa ekrane pri promeni taba (~0,15 s)
+ * i za to vreme se VIDI i ekran koji odlazi. Da on odmah predje na zajednicku
+ * nijansu (kao sto ekrani u pozadini rade), bljesnuo bi u boji novog taba —
+ * snimljeno na iOS 18.6, Ivan 27.9.2026. Zato ceka da sistemsko pretapanje
+ * prodje, pa tek onda prati zajednicku nijansu. iOS 26 ne pretapa: odmah.
+ */
+const ODLAZAK_MS = STARI_IOS ? 300 : 0;
+
+/** Pozove `fn` posle `ODLAZAK_MS` (odmah ako je 0); vraca funkciju koja otkazuje. */
+function posleOdlaska(fn: () => void): () => void {
+  if (ODLAZAK_MS === 0) { fn(); return () => {}; }
+  const t = setTimeout(fn, ODLAZAK_MS);
+  return () => clearTimeout(t);
+}
+
+/**
  * Koliko prostora ekran ostavlja na dnu da native traka tabova ne prekrije
  * sadrzaj. Nas skrol ima `contentInsetAdjustmentBehavior="never"` (zbog vrha),
  * pa sistem ne moze sam da doda donji umetak. Broj je visina trake plus
@@ -102,11 +123,17 @@ function TabBarSpacer() {
 type ScreenProps = {
   /** Ime strane u traci, pored kruga loga; ili gotov element umesto toga. */
   label: React.ReactNode;
-  /** Levo od natpisa: strelica nazad na ekranima koji se otvaraju preko taba. */
+  /**
+   * Levo od natpisa. Gurnut ekran (`pushed`) sam dobija strelicu nazad — ovo je
+   * samo za izuzetke.
+   */
   left?: React.ReactNode;
   /** Sadrzaj desne strane trake (dugme, ikona). Opciono. */
   right?: React.ReactNode;
-  /** Nijansa preliva na vrhu; podrazumevano referentna ljubicasta. `none` = bez preliva. */
+  /**
+   * Nijansa preliva na vrhu; podrazumevano referentna ljubicasta, a na gurnutom
+   * ekranu `none` (bez preliva, Ivan 27.9.2026).
+   */
   tint?: BackdropTint;
   /**
    * Pozadina ekrana. Podrazumevano SIVA (`grouped`) — uslov da se preliv vidi na
@@ -146,7 +173,7 @@ export function Screen({
   right,
   padded = true,
   tabBarSpace = true,
-  tint = 'purple',
+  tint: tintProp,
   background = 'grouped',
   pushed = false,
   children,
@@ -154,6 +181,8 @@ export function Screen({
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
   const cilj = React.useRef<View>(null);
+  // Unutrasnje strane (gurnute preko tabova) su bez preliva (Ivan, 27.9.2026).
+  const tint: BackdropTint = tintProp ?? (pushed ? 'none' : 'purple');
 
   /*
    * Pozadina se PRETAPA kao i preliv (Ivan, 26.9.2026: prelaz sa bele Natalne
@@ -166,9 +195,12 @@ export function Screen({
   const bgGlobalna = useBackdropStore((s) => s.lastBg);
   const [bgAktivan, setBgAktivan] = React.useState(pushed);
   const [belina] = React.useState(() => new RNAnimated.Value(pushed && background === 'white' ? 1 : 0));
+  // Otkazivanje odlozenog "u pozadini" (vidi `ODLAZAK_MS`) — ako se ekran vrati pre isteka.
+  const [odlazak] = React.useState(() => ({ otkazi: () => {} }));
   useFocusEffect(
     React.useCallback(() => {
       if (pushed) return; // gurnut ekran: svoje odmah, zajednicko stanje ne dira
+      odlazak.otkazi();
       const prethodna = useBackdropStore.getState().lastBg;
       useBackdropStore.getState().setLastBg(background);
       const cilj = background === 'white' ? 1 : 0;
@@ -181,8 +213,8 @@ export function Screen({
         belina.setValue(cilj);
       }
       setBgAktivan(true);
-      return () => { anim?.stop(); setBgAktivan(false); };
-    }, [background, bezPokreta, belina, pushed])
+      return () => { anim?.stop(); odlazak.otkazi = posleOdlaska(() => setBgAktivan(false)); };
+    }, [background, bezPokreta, belina, pushed, odlazak])
   );
   React.useEffect(() => {
     if (!bgAktivan) belina.setValue(bgGlobalna === 'white' ? 1 : 0);
@@ -254,15 +286,36 @@ export function Screen({
         pointerEvents="box-none"
         className="absolute inset-x-0 top-0 flex-row items-center gap-2 px-screen"
         style={{ height: traka, paddingTop: insets.top }}>
-        {left}
+        {left ?? (pushed ? <BackButton /> : null)}
         <View className="flex-1">
-          {/* Ime strane ide u isto zaglavlje kao na pocetnom ekranu: krug + tekst (Ivan, 26.9.2026). */}
-          {/* Krug je brend indigo nad ljubicastim prelivom i na beloj bez preliva; nad ostalim bojama je crn (Ivan, 26.9.2026). */}
-          {typeof label === 'string' ? <Logo title={label} color={tint === 'purple' || tint === 'none' ? undefined : neutral.ink} /> : label}
+          {/* UNUTRASNJA STRANA (gurnuta, sa "nazad"): bez loga, samo ime strane u istoj
+              liniji sa strelicom — `items-center` na traci ih centrira jedno prema
+              drugom (Ivan, 27.9.2026). Tabovi zadrzavaju zaglavlje sa logom: krug +
+              tekst; krug je brend indigo nad ljubicastim prelivom i na beloj bez
+              preliva, nad ostalim bojama crn (Ivan, 26.9.2026). */}
+          {typeof label !== 'string' ? label
+            : pushed ? <Text variant="nav" accessibilityRole="header" numberOfLines={1}>{label}</Text>
+            : <Logo title={label} color={tint === 'purple' || tint === 'none' ? undefined : neutral.ink} />}
         </View>
         {right}
       </View>
     </View>
+  );
+}
+
+/**
+ * Strelica nazad na unutrasnjim stranama. Dodirna povrsina 44pt (iOS minimum);
+ * `-ml-3` vraca samu strelicu na marginu ekrana, da ne odskoci od sadrzaja.
+ */
+function BackButton() {
+  return (
+    <Pressable
+      onPress={() => router.back()}
+      accessibilityRole="button"
+      accessibilityLabel="Nazad"
+      className="-ml-3 h-11 w-11 items-center justify-center active:opacity-60">
+      <ChevronLeft size={26} color={neutral.ink} />
+    </Pressable>
   );
 }
 
@@ -307,10 +360,12 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
   // RN Animated, ne Reanimated: vrednost se menja pozivom metode (setValue/timing),
   // sto pravilo React kompajlera dozvoljava; u state-u, jer se ref ne cita u renderu.
   const [udeo] = React.useState(() => new RNAnimated.Value(1));
+  const [odlazak] = React.useState(() => ({ otkazi: () => {} }));
 
   useFocusEffect(
     React.useCallback(() => {
       if (pushed) return; // svoje odmah, zajednicko stanje ne dira
+      odlazak.otkazi();
       const prethodna = useBackdropStore.getState().last;
       useBackdropStore.getState().setLast(tint);
       // Providnost novog na nulu PRE nego sto React iscrta stanje sa oba sloja —
@@ -328,11 +383,11 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
       }
       return () => {
         anim?.stop();
-        // U pozadini: bez prelaza, prati globalnu nijansu.
-        setPrelaz(null);
-        setAktivan(false);
+        // U pozadini: bez prelaza, prati globalnu nijansu — ali tek kad
+        // sistemsko pretapanje prodje (vidi `ODLAZAK_MS`).
+        odlazak.otkazi = posleOdlaska(() => { setPrelaz(null); setAktivan(false); });
       };
-    }, [tint, bezPokreta, udeo, pushed])
+    }, [tint, bezPokreta, udeo, pushed, odlazak])
   );
 
   /*

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Pressable, View } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import {
-  Apple, Briefcase, Carrot, ChevronLeft, ChevronRight, Droplet, Flame, Flower2,
+  Apple, Briefcase, Carrot, ChevronRight, Droplet, Flame, Flower2,
   Heart, HeartPulse, House, Leaf, Mountain, Sprout, Wind,
 } from 'lucide-react-native';
 
@@ -79,10 +79,8 @@ export default function MoonScreen() {
   return (
     <Screen
       label="Mesec"
-      left={<Pressable onPress={() => router.back()} hitSlop={14}
-                   accessibilityRole="button" accessibilityLabel="Nazad">
-          <ChevronLeft size={26} color={neutral.ink} />
-        </Pressable>}
+      // Izuzetak od unutrasnjih strana: Mesec zadrzava ljubicasti preliv (Ivan, 27.9.2026).
+      tint="purple"
       tabBarSpace={false}
       pushed>
       <View className="items-center pt-4">
