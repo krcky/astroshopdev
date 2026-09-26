@@ -32,7 +32,10 @@ export default function TabsLayout() {
       // siv talas na dodir — iste boje kao nasa nekadasnja traka. iOS ovo ignorise.
       backgroundColor={neutral.white}
       indicatorColor={neutral.fillStrong}
-      rippleColor={neutral.fill}>
+      rippleColor={neutral.fill}
+      // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).
+      // Material podrazumevano ("auto") sa 4+ tabova prikaze samo izabrani.
+      labelVisibilityMode="labeled">
       <NativeTabs.Trigger name="home">
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
         <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>

@@ -5,7 +5,7 @@ import { Redirect, Stack, router } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
 import { Button } from '@/components/ui/button';
-import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
+import { GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
 import { buildPersonalDaily, formatDate, formatTime, formatUntil, MESECI_KRATKO, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
@@ -165,16 +165,17 @@ function DayMenu({ today, offset, onChange }: { today: Date; offset: number; onC
 
   return (
     <>
-      <GlassBubble>
-        <Pressable
-          onPress={() => setOtvoren(true)}
-          accessibilityRole="button"
-          accessibilityLabel={`Izabran dan: ${natpis}. Promeni dan`}
-          className="h-header-button flex-row items-center gap-1 pl-4 pr-3 active:opacity-60">
-          <Text variant="chip">{natpis}</Text>
-          <ChevronDown size={16} color={neutral.inkMuted} strokeWidth={2.4} />
-        </Pressable>
-      </GlassBubble>
+      {/* Goli natpis, bez mehura (Ivan, 27.9.2026). Visina ostaje kao kod dugmeta
+          zaglavlja, da dodirna povrsina ne spadne ispod 40pt. */}
+      <Pressable
+        onPress={() => setOtvoren(true)}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={`Izabran dan: ${natpis}. Promeni dan`}
+        className="h-header-button flex-row items-center gap-1 px-1 active:opacity-60">
+        <Text variant="chip">{natpis}</Text>
+        <ChevronDown size={16} color={neutral.inkMuted} strokeWidth={2.4} />
+      </Pressable>
 
       <Modal visible={otvoren} transparent animationType="fade" onRequestClose={() => setOtvoren(false)}>
         {/* Providna pozadina: dodir bilo gde zatvara meni. */}
