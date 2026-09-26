@@ -17,7 +17,8 @@ const GAP = 12;
 const FULL_ASPECT = 621 / 168;
 
 /** `title` — ime strane; `full` — pun logo iz brend PNG-a (staticno na vebu). */
-export function Logo({ title = 'Astro Shop', full = false }: { title?: string; full?: boolean }) {
+/** `color` — preboja kruga (PNG je indigo na providnom, pa `tintColor` radi). */
+export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
   if (full) {
     return (
       <View className="flex-1 items-center" style={{ transform: [{ translateX: -((338 - 621 / 2) / 168) * 58 }, { translateY: 4 }] }} accessibilityRole="header" accessibilityLabel="Astro Shop">
@@ -41,6 +42,7 @@ export function Logo({ title = 'Astro Shop', full = false }: { title?: string; f
         source={require('@/assets/images/logo-krug.png')}
         style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
         contentFit="contain"
+        tintColor={color}
       />
       <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
     </View>

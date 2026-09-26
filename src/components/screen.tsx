@@ -14,8 +14,8 @@ import { BlurTargetView, BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Logo } from '@/components/logo';
-import { backdrop, headerBar, space, type BackdropTint } from '@/theme/tokens';
-import { useBackdropStore } from '@/store/backdrop';
+import { backdrop, headerBar, neutral, space, type BackdropTint } from '@/theme/tokens';
+import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
 
 /**
  * Zajednicki okvir ekrana — preliv na vrhu, zamucena traka, sadrzaj koji klizi
@@ -106,8 +106,15 @@ type ScreenProps = {
   left?: React.ReactNode;
   /** Sadrzaj desne strane trake (dugme, ikona). Opciono. */
   right?: React.ReactNode;
-  /** Nijansa preliva na vrhu; podrazumevano referentna ljubicasta. */
+  /** Nijansa preliva na vrhu; podrazumevano referentna ljubicasta. `none` = bez preliva. */
   tint?: BackdropTint;
+  /**
+   * Pozadina ekrana. Podrazumevano SIVA (`grouped`) — uslov da se preliv vidi na
+   * belim karticama (DESIGN.md, poglavlje 5). `white` je izuzetak za ekran BEZ
+   * preliva (Natalna karta, Ivan 26.9.2026); kartice na njemu moraju imati
+   * ivicu (`border-border`), inace se ne vide.
+   */
+  background?: ScreenBackground;
   /**
    * Da li sadrzaj dobija bocnu marginu ekrana (20pt).
    *
@@ -131,11 +138,44 @@ export function Screen({
   padded = true,
   tabBarSpace = true,
   tint = 'purple',
+  background = 'grouped',
   children,
   ...scrollProps
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
   const cilj = React.useRef<View>(null);
+
+  /*
+   * Pozadina se PRETAPA kao i preliv (Ivan, 26.9.2026: prelaz sa bele Natalne
+   * karte na sivi ekran je bljeskao — native tabovi menjaju ekran trenutno).
+   * Koren je uvek siv, a preko njega beli sloj cija providnost ide 0 <-> 1;
+   * u pozadini prati pozadinu aktivnog ekrana, da prvi kadar posle fokusa
+   * bude isti kao poslednji pre njega.
+   */
+  const bezPokreta = useReducedMotion();
+  const bgGlobalna = useBackdropStore((s) => s.lastBg);
+  const [bgAktivan, setBgAktivan] = React.useState(false);
+  const [belina] = React.useState(() => new RNAnimated.Value(0));
+  useFocusEffect(
+    React.useCallback(() => {
+      const prethodna = useBackdropStore.getState().lastBg;
+      useBackdropStore.getState().setLastBg(background);
+      const cilj = background === 'white' ? 1 : 0;
+      let anim: RNAnimated.CompositeAnimation | null = null;
+      if (prethodna !== background && !bezPokreta) {
+        belina.setValue(prethodna === 'white' ? 1 : 0);
+        anim = RNAnimated.timing(belina, { toValue: cilj, duration: 500, useNativeDriver: true });
+        anim.start();
+      } else {
+        belina.setValue(cilj);
+      }
+      setBgAktivan(true);
+      return () => { anim?.stop(); setBgAktivan(false); };
+    }, [background, bezPokreta, belina])
+  );
+  React.useEffect(() => {
+    if (!bgAktivan) belina.setValue(bgGlobalna === 'white' ? 1 : 0);
+  }, [bgAktivan, bgGlobalna, belina]);
 
   /** Visina trake zajedno sa statusnom trakom — jedini broj koji se racuna. */
   const traka = insets.top + headerBar.height;
@@ -155,6 +195,8 @@ export function Screen({
 
   return (
     <View className="flex-1 bg-grouped">
+      {/* 0. bela pozadina, providnost se pretapa (vidi gore) */}
+      <RNAnimated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: neutral.white, opacity: belina }]} />
       {/* 1. sadrzaj */}
       <BlurTargetView ref={cilj} style={{ flex: 1 }}>
         <Animated.ScrollView
@@ -204,7 +246,8 @@ export function Screen({
         {left}
         <View className="flex-1">
           {/* Ime strane ide u isto zaglavlje kao na pocetnom ekranu: krug + tekst (Ivan, 26.9.2026). */}
-          {typeof label === 'string' ? <Logo title={label} /> : label}
+          {/* Krug je brend indigo nad ljubicastim prelivom i na beloj bez preliva; nad ostalim bojama je crn (Ivan, 26.9.2026). */}
+          {typeof label === 'string' ? <Logo title={label} color={tint === 'purple' || tint === 'none' ? undefined : neutral.ink} /> : label}
         </View>
         {right}
       </View>
@@ -241,17 +284,17 @@ export function ScreenBackdrop({ tint = 'purple' }: { tint?: BackdropTint }) {
    *   - pri fokusu: `prelaz` = prethodna nijansa, stari sloj se gasi dok se
    *     novi pali (pravo pretapanje boje);
    *   - mirno u fokusu: sopstvena nijansa.
-   * Prvi prikaz taba (lenjo montiranje u fokusu) krece isto: iz globalne.
+   * Pri montiranju ekran NISTA ne pretpostavlja: krece kao "u pozadini" (prati
+   * globalnu) i tek fokus odlucuje. Native tabovi montiraju sve ekrane odmah,
+   * pa bi pocetni "prelaz iz trenutne nijanse" ostao zamrznut u pozadini i pri
+   * prvom fokusu pokazao POGRESNU staru boju (snimljeno 26.9.2026: sa Tranzita
+   * na Natalnu kartu — dva kadra ljubicaste, skok na zlatnu, pa pretapanje).
    */
-  const [prelaz, setPrelaz] = React.useState<BackdropTint | null>(() => {
-    const pocetna = useBackdropStore.getState().last;
-    return pocetna !== tint ? pocetna : null;
-  });
-  const [aktivan, setAktivan] = React.useState(true);
+  const [prelaz, setPrelaz] = React.useState<BackdropTint | null>(null);
+  const [aktivan, setAktivan] = React.useState(false);
   // RN Animated, ne Reanimated: vrednost se menja pozivom metode (setValue/timing),
   // sto pravilo React kompajlera dozvoljava; u state-u, jer se ref ne cita u renderu.
-  // Pocinje od 0 ako vec pri montiranju ima sta da se pretapa.
-  const [udeo] = React.useState(() => new RNAnimated.Value(prelaz ? 0 : 1));
+  const [udeo] = React.useState(() => new RNAnimated.Value(1));
 
   useFocusEffect(
     React.useCallback(() => {

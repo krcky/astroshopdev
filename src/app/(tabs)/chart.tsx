@@ -4,12 +4,15 @@ import { Redirect } from 'expo-router';
 
 import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
-import { CARD_SURFACE } from '@/components/ui/card';
+
 import { cn } from '@/lib/utils';
 import { Screen } from '@/components/screen';
 import { AspectRow, Row, RowHead } from '@/components/ui/row';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { findAspects } from '@/lib/astro';
+
+/** Ekran je na BELOJ pozadini bez preliva (Ivan, 26.9.2026), pa kartica mora imati ivicu — `CARD_SURFACE` bi se stopio sa pozadinom. */
+const KARTICA = 'rounded-lg border border-border bg-background';
 
 const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
 
@@ -32,7 +35,7 @@ export default function ChartScreen() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label="Natalna karta" padded={false} tint="green">
+    <Screen label="Natalna karta" padded={false} tint="none" background="white">
       <View className="px-5 pb-5 pt-6">
         <Text variant="display">{profile.name}</Text>
         <Text variant="muted" className="mt-1.5">
@@ -43,7 +46,7 @@ export default function ChartScreen() {
       </View>
 
       {zoneUnreliable ? (
-        <View className={cn(CARD_SURFACE, 'mx-5 border-destructive/40 p-5')}>
+        <View className={cn(KARTICA, 'mx-5 border-destructive/40 p-5')}>
           <Text variant="h3">Karta ne može da se izračuna</Text>
           <Text variant="muted" className="mt-2">
             Ne možemo pouzdano da utvrdimo koliko je sati bilo po UTC-u u
@@ -62,7 +65,7 @@ export default function ChartScreen() {
       )}
 
       {timeUnknown && (
-        <View className={cn(CARD_SURFACE, 'mx-5 mt-4 p-4')}>
+        <View className={cn(KARTICA, 'mx-5 mt-4 p-4')}>
           <Text variant="muted">
             Vreme rođenja nije uneto, pa su ascendent i kuće samo procena.
             Pozicije planeta su tačne — osim Meseca, koji za 12 sati pređe i do 7°.
@@ -78,7 +81,7 @@ export default function ChartScreen() {
       </View>
 
       {/* Uglovi */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-7')}>
+      <View className={cn(KARTICA, 'mx-5 mt-7')}>
         <RowHead>Uglovi</RowHead>
         <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
              value={chart.ascendantSign.formatted} muted={timeUnknown} />
@@ -87,7 +90,7 @@ export default function ChartScreen() {
       </View>
 
       {/* Planete */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-4')}>
+      <View className={cn(KARTICA, 'mx-5 mt-4')}>
         <RowHead>
           Planete · {chart.houses.system === 'placidus' ? 'Placidus kuće' : 'Whole Sign kuće'}
         </RowHead>
@@ -105,7 +108,7 @@ export default function ChartScreen() {
       </View>
 
       {/* Aspekti */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-4')}>
+      <View className={cn(KARTICA, 'mx-5 mt-4')}>
         <RowHead>Aspekti · {aspects.length}</RowHead>
         {aspects.map((a, i) => (
           <AspectRow

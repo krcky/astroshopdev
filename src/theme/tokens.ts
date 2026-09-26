@@ -288,10 +288,16 @@ export const backdrop = {
     purple: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
     /** Tranziti: zlatno-zuta, iz `accent.yellow` ka toplijoj sredini. */
     gold: ['rgba(244, 200, 68, 0.40)', 'rgba(245, 158, 11, 0.21)', 'rgba(198, 160, 95, 0)'],
-    /** Natalna karta ("Ti"): zelena iz `accent.green` ka tirkizu — ono sto je tvoje i ne menja se. */
-    green: ['rgba(110, 207, 111, 0.40)', 'rgba(20, 184, 166, 0.21)', 'rgba(65, 195, 138, 0)'],
-    /** Nebo: plava iz `accent.blue` ka nocnoj. */
-    blue: ['rgba(66, 124, 246, 0.40)', 'rgba(30, 64, 175, 0.21)', 'rgba(48, 94, 210, 0)'],
+    /**
+     * Natalna karta ("Ti"): crna/grafitna (Ivan, 26.9.2026: zelena se nije
+     * uklapala). Providnosti su NIZE od ostalih (0,30 / 0,14): crna na 0,40 bi
+     * dala tesku sivu prugu preko bele kartice.
+     */
+    ink: ['rgba(20, 23, 27, 0.30)', 'rgba(60, 60, 70, 0.14)', 'rgba(60, 60, 70, 0)'],
+    /** Nebo: svetla nebesko-plava, bliza ljubicastoj po tonu (Ivan: tamna se previse razlikovala). */
+    blue: ['rgba(125, 211, 252, 0.40)', 'rgba(56, 189, 248, 0.21)', 'rgba(96, 165, 250, 0)'],
+    /** Bez preliva — providno. Natalna karta na BELOJ pozadini (Ivan, 26.9.2026); pretapa se kao i ostale. */
+    none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
     /** Profil: roze iz `accent.pink` ka svetlijoj — licno, toplo. */
     pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
   },

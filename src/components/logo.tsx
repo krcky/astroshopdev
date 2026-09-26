@@ -48,12 +48,20 @@ const FULL_ASPECT = FULL_W / FULL_H;
 const FULL_SIZE = 58;
 const FULL_SHIFT_X = -((FULL_CX - FULL_W / 2) / FULL_H) * FULL_SIZE;
 
+/** Imena slojeva kruga sa oblicima (iz logo-krug.json) — na njih ide preboja. */
+const KRUG_SLOJEVI = [
+  'Prsten', 'Lice', 'Zraci',
+  ...['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'].map((z) => `znak ${z}`),
+];
+
 /**
  * `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis.
- * `full` — PUN logo (ASTRO, krug, SHOP) iz `logo-full.json`, centriran u traci;
- * pocetni ekran (Ivan, 26.9.2026). Ostali ekrani ostaju krug + ime.
+ * `full` — PUN logo (ASTRO, krug, SHOP) iz `logo-full.json`, centriran u traci.
+ * `color` — preboja kruga (npr. `ink` na ekranima ciji preliv nije ljubicast,
+ * Ivan 26.9.2026); bez nje krug je brend indigo iz fajla. Ide kroz Lottie
+ * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
-export function Logo({ title = 'Astro Shop', full = false }: { title?: string; full?: boolean }) {
+export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
   const krug = React.useRef<LottieView>(null);
   const pusti = React.useCallback(() => krug.current?.play(), []);
   React.useEffect(() => { pusti(); }, [pusti]);
@@ -105,6 +113,7 @@ export function Logo({ title = 'Astro Shop', full = false }: { title?: string; f
         loop
         resizeMode="contain"
         onLayout={pusti}
+        colorFilters={color ? KRUG_SLOJEVI.map((keypath) => ({ keypath, color })) : undefined}
         style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
       />
       <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
