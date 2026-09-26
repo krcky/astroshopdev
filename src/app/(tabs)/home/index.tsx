@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
-import { buildPersonalDaily, formatDate, formatDay, formatTime, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
+import { buildPersonalDaily, formatDate, formatTime, formatUntil, MESECI_KRATKO, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
@@ -20,6 +20,7 @@ import { useAuthStore } from '@/store/auth';
 import { useHeroLog } from '@/store/hero-log';
 import { dayKey, briefBucket, type BriefBucket, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
+import { SIGN_CASES } from '@/lib/zodiac';
 
 /** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Tranziti". */
 export default function Home() {
@@ -416,8 +417,8 @@ function MoonCard({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
  * od podznaka; bez vremena rodjenja se izostavlja.
  *
  * Tekstova "planeta u kuci" jos nema (ceka astrologa), pa redovi ne vode
- * nigde — samo datumi i kuca. Imena znakova su u nominativu ("u znaku
- * Skorpija"), kao i na kartici Mesec: padeza za znakove u kodu nema.
+ * nigde — samo datumi i kuca. Znakovi idu u padezu (`SIGN_CASES`): "Mars
+ * ulazi u Lava", "Retrogradna Venera u Skorpiji" (Ivan, 27.9.2026).
  */
 function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
   if (daily.skyEvents.length === 0) return null;
@@ -428,27 +429,37 @@ function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
         {daily.skyEvents.map((e) => {
           // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad).
           const zenski = e.planet.key === 'venus';
+          const znak = SIGN_CASES[e.sign.key];
           const naslov =
-            e.kind === 'ingress' ? `${e.planet.name} u znaku ${e.sign.name}`
-            : e.kind === 'retrograde' ? `${e.planet.name} ${zenski ? 'retrogradna' : 'retrogradan'} u znaku ${e.sign.name}`
-            : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u znaku ${e.sign.name}`;
+            e.kind === 'ingress' ? `${e.planet.name} ulazi u ${znak.acc}`
+            : e.kind === 'retrograde' ? `${zenski ? 'Retrogradna' : 'Retrogradni'} ${e.planet.name} u ${znak.loc}`
+            : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u ${znak.loc}`;
+          // Direktno kretanje nema kraj — tu stoji samo kuca.
+          const trajanje = e.kind === 'direct' ? null
+            : e.until ? `Traje ${formatUntil(e.until, today)}` : 'Traje godinama';
           const kuca = e.house === null ? null
             : e.kind === 'ingress' ? `ulazi u tvoju ${e.house}. kuću` : `u tvojoj ${e.house}. kući`;
-          // Direktno kretanje nema kraj — samo dan kad pocinje.
-          const trajanje =
-            e.kind === 'direct' ? `od ${formatDay(e.at, today)}`
-            : e.until ? `od ${formatDay(e.at, today)} ${formatUntil(e.until, today)}`
-            : `od ${formatDay(e.at, today)}, godinama`;
+          const podnaslov = [trajanje, kuca].filter(Boolean).join(' · ');
           return (
             <ListRow
               key={e.planet.key}
-              leading={<Glyph size={22} className="w-7 text-center text-foreground">{e.planet.glyph}</Glyph>}
+              leading={<CalendarDay date={e.at} />}
               title={naslov}
-              subtitle={[trajanje, kuca].filter(Boolean).join(' · ')}
+              subtitle={podnaslov ? podnaslov.charAt(0).toUpperCase() + podnaslov.slice(1) : undefined}
             />
           );
         })}
       </Group>
+    </View>
+  );
+}
+
+/** Kalendarski listic levo od reda: krupan dan, ispod skracen mesec (Ivan, 27.9.2026). */
+function CalendarDay({ date }: { date: Date }) {
+  return (
+    <View className="w-11 items-center">
+      <Text className="text-[26px] leading-[30px] font-semibold tracking-[-0.3px]">{date.getDate()}</Text>
+      <Text variant="caption">{MESECI_KRATKO[date.getMonth()]}</Text>
     </View>
   );
 }

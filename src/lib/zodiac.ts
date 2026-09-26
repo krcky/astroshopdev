@@ -35,6 +35,26 @@ export const SIGNS: ZodiacSign[] = [
   { key: 'pisces',      name: 'Ribe',      glyph: '♓\uFE0E', element: 'voda',   ruler: 'Neptun',  rulerKey: 'neptune',  dates: '19.2 — 20.3' },
 ];
 
+/**
+ * Padezi imena znakova, za recenice: "Mars ulazi u Lava" (akuzativ),
+ * "Retrogradna Venera u Skorpiji" (lokativ). Kljuc je `ZodiacSign.key`.
+ * Odvojeno od `SIGNS` da se nominativ nigde ne pomesa sa padezom.
+ */
+export const SIGN_CASES: Record<string, { acc: string; loc: string }> = {
+  aries:       { acc: 'Ovna',      loc: 'Ovnu' },
+  taurus:      { acc: 'Bika',      loc: 'Biku' },
+  gemini:      { acc: 'Blizance',  loc: 'Blizancima' },
+  cancer:      { acc: 'Raka',      loc: 'Raku' },
+  leo:         { acc: 'Lava',      loc: 'Lavu' },
+  virgo:       { acc: 'Devicu',    loc: 'Devici' },
+  libra:       { acc: 'Vagu',      loc: 'Vagi' },
+  scorpio:     { acc: 'Škorpiju',  loc: 'Škorpiji' },
+  sagittarius: { acc: 'Strelca',   loc: 'Strelcu' },
+  capricorn:   { acc: 'Jarca',     loc: 'Jarcu' },
+  aquarius:    { acc: 'Vodoliju',  loc: 'Vodoliji' },
+  pisces:      { acc: 'Ribe',      loc: 'Ribama' },
+};
+
 /** Normalizuje ugao u [0, 360). */
 export function norm360(deg: number): number {
   return ((deg % 360) + 360) % 360;

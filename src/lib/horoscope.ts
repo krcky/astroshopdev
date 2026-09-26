@@ -38,6 +38,9 @@ export function formatDay(day: Date, today: Date = new Date()): string {
   const godina = day.getFullYear() === today.getFullYear() ? '' : ` ${day.getFullYear()}.`;
   return `${day.getDate()}. ${MESECI_GEN[day.getMonth()]}${godina}`;
 }
+/** Skracena imena meseci, za kalendarski listic: "okt". */
+export const MESECI_KRATKO = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
+
 /** "14:05" po lokalnom vremenu uredjaja. */
 export function formatTime(date: Date): string {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;

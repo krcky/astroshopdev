@@ -4,7 +4,7 @@ import {
   ascendant, midheaven, obliquity, rightAscensionMC,
   computeHouses, buildNatalChart, houseOf,
 } from '../src/lib/natal';
-import { norm360, SIGNS } from '../src/lib/zodiac';
+import { norm360, SIGNS, SIGN_CASES } from '../src/lib/zodiac';
 const SIGNS_IDX = (key: string) => SIGNS.findIndex((s) => s.key === key);
 import { bodyLongitude } from '../src/lib/astro';
 import { upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
@@ -390,6 +390,8 @@ console.log('\n=== 9f. Promene na nebu (ulazak u znak, retrogradnost) ===');
   const vDir = nov.find((e) => e.planet.key === 'venus');
   ok(mDir?.kind === 'direct' && mDir.at.getUTCMonth() === 10 && Math.abs(mDir.at.getUTCDate() - 13.5) <= 1, 'Merkur ponovo direktan oko 13—14. novembra', mDir?.at.toISOString());
   ok(vDir?.kind === 'direct' && vDir.until === null && Math.abs(vDir.at.getTime() - (venera?.until?.getTime() ?? 0)) < 60_000, 'Venera direktna tacno kad se retrogradnost zavrsava', vDir?.at.toISOString());
+
+  ok(SIGNS.every((z) => SIGN_CASES[z.key]?.acc && SIGN_CASES[z.key]?.loc), 'svaki znak ima akuzativ i lokativ');
 
   let tacno = true, redom = true, razlicite = true, bezMeseca = true, kuce = true, prvi = true;
   const t0 = performance.now();
