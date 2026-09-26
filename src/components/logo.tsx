@@ -33,8 +33,27 @@ import { Text } from '@/components/ui/text';
 export const LOGO_SIZE = 52;
 const GAP = 12;
 
-/** `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis (Ivan, 26.9.2026). */
-export function Logo({ title = 'Astro Shop' }: { title?: string }) {
+/** Kompozicija punog loga (logo-full.json): sirina, visina i x centra kruga. */
+const FULL_W = 1511;
+const FULL_H = 400;
+const FULL_CX = 809;
+const FULL_ASPECT = FULL_W / FULL_H;
+/**
+ * Krug u punom logu nije na sredini kompozicije (ASTRO je sire od SHOP), pa se
+ * ceo logo pomera ulevo za toliko da KRUG bude na sredini strane (Ivan, 26.9.2026).
+ */
+/** Visina punog loga = precnik kruga u njemu. Po meri je isti kao LOGO_SIZE (kompozicija
+ *  je visoka tacno koliko krug), ali na oku deluje manji pored sitnih slova, pa je
+ *  malo veci (Ivan, 26.9.2026). */
+const FULL_SIZE = 58;
+const FULL_SHIFT_X = -((FULL_CX - FULL_W / 2) / FULL_H) * FULL_SIZE;
+
+/**
+ * `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis.
+ * `full` — PUN logo (ASTRO, krug, SHOP) iz `logo-full.json`, centriran u traci;
+ * pocetni ekran (Ivan, 26.9.2026). Ostali ekrani ostaju krug + ime.
+ */
+export function Logo({ title = 'Astro Shop', full = false }: { title?: string; full?: boolean }) {
   const krug = React.useRef<LottieView>(null);
   const pusti = React.useCallback(() => krug.current?.play(), []);
   React.useEffect(() => { pusti(); }, [pusti]);
@@ -48,6 +67,28 @@ export function Logo({ title = 'Astro Shop' }: { title?: string }) {
       krug.current?.play();
     }, [])
   );
+
+  if (full) {
+    return (
+      <View
+        className="flex-1 items-center"
+        // Pun logo ide 4pt NIZE od sredine trake (Ivan, 26.9.2026), i ulevo
+        // koliko treba da krug bude na sredini strane.
+        style={{ transform: [{ translateX: FULL_SHIFT_X }, { translateY: 4 }] }}
+        accessibilityRole="header"
+        accessibilityLabel="Astro Shop">
+        <LottieView
+          ref={krug}
+          source={require('@/assets/lottie/logo-full.json')}
+          autoPlay
+          loop
+          resizeMode="contain"
+          onLayout={pusti}
+          style={{ width: FULL_SIZE * FULL_ASPECT, height: FULL_SIZE }}
+        />
+      </View>
+    );
+  }
 
   return (
     <View

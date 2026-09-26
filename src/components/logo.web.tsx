@@ -14,8 +14,21 @@ import { Text } from '@/components/ui/text';
 export const LOGO_SIZE = 52;
 const GAP = 12;
 
-/** `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis (Ivan, 26.9.2026). */
-export function Logo({ title = 'Astro Shop' }: { title?: string }) {
+const FULL_ASPECT = 621 / 168;
+
+/** `title` — ime strane; `full` — pun logo iz brend PNG-a (staticno na vebu). */
+export function Logo({ title = 'Astro Shop', full = false }: { title?: string; full?: boolean }) {
+  if (full) {
+    return (
+      <View className="flex-1 items-center" style={{ transform: [{ translateX: -((338 - 621 / 2) / 168) * 58 }, { translateY: 4 }] }} accessibilityRole="header" accessibilityLabel="Astro Shop">
+        <Image
+          source={require('@/assets/images/logo-full.png')}
+          style={{ width: 58 * FULL_ASPECT, height: 58 }}
+          contentFit="contain"
+        />
+      </View>
+    );
+  }
   return (
     <View
       className="flex-row items-center"

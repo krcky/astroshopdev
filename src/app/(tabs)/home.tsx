@@ -49,10 +49,9 @@ export default function Home() {
   if (!resolved || !daily) return <Redirect href="/" />;
 
   return (
-    <Screen label={<Logo />}>
-      <View className="pb-5 pt-6">
-        <Text variant="display">Tvoj dan na dlanu</Text>
-      </View>
+    <Screen label={<Logo full />}>
+      {/* Bez naslova (Ivan, 26.9.2026): ekran pocinje datumom, blizu trake. */}
+      <View className="pt-2" />
 
       <DateRow date={date} offset={offset} onChange={setOffset} />
 
