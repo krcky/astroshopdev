@@ -23,7 +23,7 @@ import { neutral } from '@/theme/tokens';
  *
  * Nista se ne tumaci. Ekran prikazuje IZRACUNATO stanje — znak, stepen, kucu,
  * retrogradnost — a ne tekst astrologa. Tumacenja tranzita na licnu kartu su
- * i dalje u tabu "Horoskop", jer se tamo placaju.
+ * i dalje u tabu "Tranziti", jer se tamo placaju.
  */
 export default function Sky() {
   const hydrated = useProfileStore((s) => s.hydrated);

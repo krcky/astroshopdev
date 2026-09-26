@@ -18,7 +18,7 @@ import { dayKey, briefBucket, type BriefBucket, type Transit } from '@/lib/trans
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 
-/** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Horoskop". */
+/** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Tranziti". */
 export default function Home() {
   const hydrated = useProfileStore((s) => s.hydrated);
   const authLoading = useAuthStore((s) => s.loading);
@@ -247,7 +247,7 @@ function Grupa({ naslov, redovi }: { naslov: string; redovi: { t: Transit; recen
   );
 }
 
-/** Koliko redova stane na pocetni ekran pre nego sto lista uputi u tab "Horoskop". */
+/** Koliko redova stane na pocetni ekran pre nego sto lista uputi u tab "Tranziti". */
 const MAX_ROWS = 5;
 
 /** Da li red nosi i kraj tranzita (samo spori ga imaju). */
@@ -283,7 +283,7 @@ function TransitList({ naslov, list, texts, today }: {
         })}
         {ostalo > 0 && (
           <ListRow
-            title={`Još ${ostalo} u Horoskopu`}
+            title={`Još ${ostalo} u Tranzitima`}
             onPress={() => router.push('/daily')}
           />
         )}

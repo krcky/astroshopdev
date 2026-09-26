@@ -3,6 +3,11 @@ import { CircleDot, House, Orbit, Sparkles, UserRound } from 'lucide-react-nativ
 
 import { FloatingTabBar } from '@/components/floating-tab-bar';
 
+/*
+ * Imena tabova (26.9.2026): Danas · Tranziti · Ti · Nebo · Profil.
+ * "Ti" je natalna karta — ono sto se ne menja; "Nebo" je stanje neba sada.
+ * Ekrani u kodu zadrzavaju stara imena fajlova (daily, chart, sky).
+ */
 export default function TabsLayout() {
   return (
     <Tabs
@@ -16,15 +21,15 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="daily"
-        options={{ title: 'Horoskop', tabBarIcon: ({ color, size }) => <Sparkles size={size} color={color} /> }}
+        options={{ title: 'Tranziti', tabBarIcon: ({ color, size }) => <Sparkles size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="chart"
-        options={{ title: 'Karta', tabBarIcon: ({ color, size }) => <CircleDot size={size} color={color} /> }}
+        options={{ title: 'Ti', tabBarIcon: ({ color, size }) => <CircleDot size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="sky"
-        options={{ title: 'Trenutno', tabBarIcon: ({ color, size }) => <Orbit size={size} color={color} /> }}
+        options={{ title: 'Nebo', tabBarIcon: ({ color, size }) => <Orbit size={size} color={color} /> }}
       />
       <Tabs.Screen
         name="profile"

@@ -24,7 +24,7 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
-    (tabs)/          home (pregled dana), daily, chart, sky, profile
+    (tabs)/          home (Danas), daily (Tranziti), chart (Ti), sky (Nebo), profile (Profil)
   theme/
     tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
   components/
@@ -236,7 +236,7 @@ Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 `STRONG_ORB`) na VLADARA Ascendenta ili Sunca -> 2) tranzit na Ascendent, MC, Sunce
 ili Mesec -> 3) najegzaktniji tranzit na bilo koju natalnu planetu -> 4) Hero se ne
 prikazuje. Unutar prioriteta pobedjuje NAJMANJI ORBIS (skor iz `findTransits` mesa
-tesnocu sa tezinama i ostaje samo za redosled liste u tabu "Horoskop"). Racuna se za
+tesnocu sa tezinama i ostaje samo za redosled liste u tabu "Tranziti"). Racuna se za
 LOKALNU PONOC, da Hero bude isti ceo dan. Bez vremena rodjenja ASC i MC otpadaju iz
 svih prioriteta. Vladar znaka je `SIGNS[].rulerKey`.
 

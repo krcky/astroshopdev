@@ -49,7 +49,7 @@ export default function Daily() {
   return (
     <Screen label={formatDate(today)}>
       <View className="pb-6 pt-6">
-        <Text variant="display">Dnevni horoskop</Text>
+        <Text variant="display">Tvoji tranziti danas</Text>
       </View>
 
       <View className={cn(CARD_SURFACE, 'mb-6 self-start rounded-full px-4 py-2')}>
@@ -58,7 +58,7 @@ export default function Daily() {
 
       <View>
         <View className="mb-3 flex-row items-baseline justify-between">
-          <Text variant="label">Tvoji tranziti danas</Text>
+          <Text variant="label">Po jačini</Text>
           <Text variant="muted" className="text-xs">{daily.entries.length}</Text>
         </View>
 
