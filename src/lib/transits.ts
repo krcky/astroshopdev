@@ -128,3 +128,190 @@ export function daysToSolarReturn(chart: NatalChart, date: Date = new Date()): n
   const degreesToGo = norm360(natalSun - currentSun);
   return Math.round(degreesToGo / 0.9856); // Sunce prelazi ~0.9856°/dan
 }
+
+/* ------------------------------------------------------------------------- *
+ * TRANZIT DANA — izbor onoga sto ide u Hero na pocetnom ekranu.
+ *
+ * Sistem prioriteta (waterfall), Ivanova specifikacija od 26.9.2026. Ide se
+ * redom i staje na prvom prioritetu koji ima pogodak:
+ *
+ *   1. tranzit na VLADARA Ascendenta ili Sunca, ali samo JAK (orb <= 1,5°)
+ *   2. tranzit na Ascendent, MC, Sunce ili Mesec
+ *   3. najegzaktniji tranzit na bilo koju natalnu planetu
+ *   4. nista od toga -> Hero se ne prikazuje
+ *
+ * Unutar prioriteta pobedjuje NAJMANJI ORBIS, ne skor iz `findTransits`.
+ * Skor mesa tesnocu sa tezinama tela, pa bi Saturn na ivici orbisa pobedio
+ * Veneru tacno na uglu; specifikacija trazi egzaktnost. Izjednacenje resava
+ * sporija planeta (redji dogadjaj).
+ *
+ * MESEC NE ULAZI U HERO. Ima svoju karticu na pocetnom ekranu (faza, znak,
+ * njegov najjaci tranzit), pa bi se ponavljao. Uz to, Mesecev tranzit traje
+ * ~11 sati i tacno na uglu bi tukao sve u prvom prioritetu.
+ *
+ * PAUZA OD 7 DANA. Spor tranzit u orbisu stoji nedeljama i bez pauze bi bio
+ * Hero svaki dan (simulacija na test karti: 50 od 60 dana isti Uran). Tranzit
+ * prikazan u poslednjih 7 dana se preskace i pusta se sledeci kandidat po
+ * istom redosledu — OSIM ako je danas na vrhuncu (orb < 0,3°): vrhunac spore
+ * planete je dogadjaj koji se ne precutkuje. Ista simulacija sa pauzom: 46
+ * promena u 60 dana, nijedan dan bez Hero-a.
+ *
+ * Racuna se za LOKALNU PONOC tog dana, ne za sadasnji trenutak: Hero mora da
+ * bude isti ceo dan. Kljuc prikazan DANAS nikad nije "na pauzi" — inace bi se
+ * posle upisa u dnevnik Hero promenio pred ocima korisnika.
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Prag "jakog" aspekta za prvi prioritet — polovina tranzitnog orbisa.
+ * Bez praga bi vladar skoro uvek imao neki aspekt i nizi prioriteti ne bi
+ * dolazili na red. Odluceno 26.9.2026: 1,5°.
+ */
+export const STRONG_ORB = 1.5;
+
+/** Koliko dana tranzit ceka posle prikaza pre nego sto sme ponovo u Hero. */
+export const HERO_PAUSE_DAYS = 7;
+
+/** Orbis ispod kog je tranzit "na vrhuncu" i probija pauzu. */
+export const PEAK_ORB = 0.3;
+
+/** Kljucne tacke karte za drugi prioritet. */
+const KEY_POINTS = ['ascendant', 'midheaven', 'sun', 'moon'] as const;
+
+/** Mete koje zavise od vremena rodjenja — bez njega nisu pouzdane. */
+const TIME_DEPENDENT = ['ascendant', 'midheaven'] as const;
+
+export type HeroPriority = 1 | 2 | 3 | 4;
+
+export type HeroPick =
+  | {
+      priority: 1 | 2 | 3;
+      transit: Transit;
+      /** Zasto bas ovaj — za prikaz i za dnevnik. Npr. "vladar Ascendenta (Ovan) je Mars". */
+      reason: string;
+    }
+  | { priority: 4; transit: null; reason: string };
+
+/**
+ * Dnevnik prikazanih Hero-a: contentKey -> dan prikaza (`dayKey`).
+ * Zivi u `store/hero-log.ts`; ovde je samo oblik, da izbor ostane cista funkcija.
+ */
+export type HeroHistory = Record<string, string>;
+
+/** Ponoc tog dana po lokalnom vremenu uredjaja. */
+export function localMidnight(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/** "2026-09-26" po lokalnom vremenu — kljuc dana u dnevniku. */
+export function dayKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Ceo broj dana od `from` do `to`, po lokalnim ponocima (0 = isti dan). */
+export function daysBetween(from: string, to: Date): number {
+  const [y, m, d] = from.split('-').map(Number);
+  const a = new Date(y, m - 1, d).getTime();
+  const b = localMidnight(to).getTime();
+  return Math.round((b - a) / 86_400_000);
+}
+
+/**
+ * Vladari koji ulaze u prvi prioritet, sa objasnjenjem.
+ *
+ * Bez vremena rodjenja Ascendent nije pouzdan, pa se gleda samo vladar Sunca.
+ * Vladar moze biti isto telo kao Sunce ili Mesec (Lav -> Sunce, Rak -> Mesec);
+ * tada se prvi i drugi prioritet preklapaju i pobedjuje prvi, sto je u redu.
+ */
+export function heroRulers(
+  chart: NatalChart,
+  timeUnknown = false
+): { key: string; reason: string }[] {
+  const out: { key: string; reason: string }[] = [];
+  if (!timeUnknown) {
+    const s = chart.ascendantSign.sign;
+    out.push({ key: s.rulerKey, reason: `vladar Ascendenta (${s.name}) je ${s.ruler}` });
+  }
+  const sun = chart.planets.find((p) => p.key === 'sun')!.position.sign;
+  if (!out.some((r) => r.key === sun.rulerKey)) {
+    out.push({ key: sun.rulerKey, reason: `vladar Sunca (${sun.name}) je ${sun.ruler}` });
+  }
+  return out;
+}
+
+/** Najmanji orbis; pri izjednacenju sporija tranzitna planeta. */
+function mostExact(list: Transit[]): Transit | undefined {
+  return [...list].sort(
+    (a, b) => a.orb - b.orb || Math.abs(a.transiting.speed) - Math.abs(b.transiting.speed)
+  )[0];
+}
+
+/** Da li je tranzit na pauzi: prikazan pre 1—7 dana, a nije na vrhuncu. */
+function paused(t: Transit, history: HeroHistory, today: Date): boolean {
+  const shown = history[t.contentKey];
+  if (!shown) return false;
+  const days = daysBetween(shown, today);
+  if (days <= 0) return false; // prikazan danas — mora ostati isti ceo dan
+  return days <= HERO_PAUSE_DAYS && t.orb >= PEAK_ORB;
+}
+
+/**
+ * Cist izbor iz vec izracunate liste — bez efemerida i bez store-a, da moze u test.
+ * `transits` je ono sto vrati `findTransits` za lokalnu ponoc.
+ */
+export function pickHeroFrom(
+  transits: Transit[],
+  rulers: { key: string; reason: string }[],
+  timeUnknown = false,
+  history: HeroHistory = {},
+  today: Date = new Date()
+): HeroPick {
+  const usable = transits.filter(
+    (t) =>
+      // Mesec ima svoju karticu.
+      t.transiting.key !== 'moon' &&
+      // Bez vremena rodjenja ASC i MC otpadaju iz SVIH prioriteta — bolje
+      // priznati nego staviti u Hero tranzit na tacku koja mozda nije tu.
+      !(timeUnknown && (TIME_DEPENDENT as readonly string[]).includes(t.natal.key)) &&
+      !paused(t, history, today)
+  );
+
+  // 1. vladar, samo jak aspekt
+  const naVladara = usable.filter(
+    (t) => t.orb <= STRONG_ORB && rulers.some((r) => r.key === t.natal.key)
+  );
+  const p1 = mostExact(naVladara);
+  if (p1) {
+    const r = rulers.find((r) => r.key === p1.natal.key)!;
+    return { priority: 1, transit: p1, reason: r.reason };
+  }
+
+  // 2. Ascendent, MC, Sunce, Mesec
+  const p2 = mostExact(usable.filter((t) => (KEY_POINTS as readonly string[]).includes(t.natal.key)));
+  if (p2) return { priority: 2, transit: p2, reason: `tranzit na natalni ${p2.natal.name}` };
+
+  // 3. najegzaktniji na bilo koju natalnu planetu
+  const p3 = mostExact(usable);
+  if (p3) return { priority: 3, transit: p3, reason: `najegzaktniji tranzit dana, orb ${p3.orb.toFixed(1)}°` };
+
+  // 4. nista — Hero se ne prikazuje
+  return { priority: 4, transit: null, reason: 'nema licnih tranzita u orbisu' };
+}
+
+/** Tranzit dana za datu kartu. `date` se svodi na lokalnu ponoc. */
+export function pickHero(
+  chart: NatalChart,
+  date: Date = new Date(),
+  timeUnknown = false,
+  history: HeroHistory = {}
+): HeroPick {
+  return pickHeroFrom(
+    findTransits(chart, localMidnight(date)),
+    heroRulers(chart, timeUnknown),
+    timeUnknown,
+    history,
+    date
+  );
+}

@@ -8,25 +8,31 @@ export type ZodiacSign = {
   name: string;
   glyph: string;
   element: Element;
-  /** Vladar znaka (tradicionalni/moderni). */
+  /** Vladar znaka (tradicionalni/moderni), za prikaz. */
   ruler: string;
+  /**
+   * Isti vladar kao kljuc planete iz `astro.ts` (`PlanetKey`). Tip je string da
+   * `zodiac.ts` ne uvozi `astro.ts` (koji uvozi ovaj fajl). Koristi ga izbor
+   * tranzita dana: vladar Ascendenta i Sunca su natalne mete prvog prioriteta.
+   */
+  rulerKey: string;
   /** Priblizan opseg datuma, samo za prikaz u onboardingu. */
   dates: string;
 };
 
 export const SIGNS: ZodiacSign[] = [
-  { key: 'aries',       name: 'Ovan',      glyph: '♈\uFE0E', element: 'vatra',  ruler: 'Mars',    dates: '21.3 — 19.4' },
-  { key: 'taurus',      name: 'Bik',       glyph: '♉\uFE0E', element: 'zemlja', ruler: 'Venera',  dates: '20.4 — 20.5' },
-  { key: 'gemini',      name: 'Blizanci',  glyph: '♊\uFE0E', element: 'vazduh', ruler: 'Merkur',  dates: '21.5 — 20.6' },
-  { key: 'cancer',      name: 'Rak',       glyph: '♋\uFE0E', element: 'voda',   ruler: 'Mesec',   dates: '21.6 — 22.7' },
-  { key: 'leo',         name: 'Lav',       glyph: '♌\uFE0E', element: 'vatra',  ruler: 'Sunce',   dates: '23.7 — 22.8' },
-  { key: 'virgo',       name: 'Devica',    glyph: '♍\uFE0E', element: 'zemlja', ruler: 'Merkur',  dates: '23.8 — 22.9' },
-  { key: 'libra',       name: 'Vaga',      glyph: '♎\uFE0E', element: 'vazduh', ruler: 'Venera',  dates: '23.9 — 22.10' },
-  { key: 'scorpio',     name: 'Škorpija',  glyph: '♏\uFE0E', element: 'voda',   ruler: 'Pluton',  dates: '23.10 — 21.11' },
-  { key: 'sagittarius', name: 'Strelac',   glyph: '♐\uFE0E', element: 'vatra',  ruler: 'Jupiter', dates: '22.11 — 21.12' },
-  { key: 'capricorn',   name: 'Jarac',     glyph: '♑\uFE0E', element: 'zemlja', ruler: 'Saturn',  dates: '22.12 — 19.1' },
-  { key: 'aquarius',    name: 'Vodolija',  glyph: '♒\uFE0E', element: 'vazduh', ruler: 'Uran',    dates: '20.1 — 18.2' },
-  { key: 'pisces',      name: 'Ribe',      glyph: '♓\uFE0E', element: 'voda',   ruler: 'Neptun',  dates: '19.2 — 20.3' },
+  { key: 'aries',       name: 'Ovan',      glyph: '♈\uFE0E', element: 'vatra',  ruler: 'Mars',    rulerKey: 'mars',     dates: '21.3 — 19.4' },
+  { key: 'taurus',      name: 'Bik',       glyph: '♉\uFE0E', element: 'zemlja', ruler: 'Venera',  rulerKey: 'venus',    dates: '20.4 — 20.5' },
+  { key: 'gemini',      name: 'Blizanci',  glyph: '♊\uFE0E', element: 'vazduh', ruler: 'Merkur',  rulerKey: 'mercury',  dates: '21.5 — 20.6' },
+  { key: 'cancer',      name: 'Rak',       glyph: '♋\uFE0E', element: 'voda',   ruler: 'Mesec',   rulerKey: 'moon',     dates: '21.6 — 22.7' },
+  { key: 'leo',         name: 'Lav',       glyph: '♌\uFE0E', element: 'vatra',  ruler: 'Sunce',   rulerKey: 'sun',      dates: '23.7 — 22.8' },
+  { key: 'virgo',       name: 'Devica',    glyph: '♍\uFE0E', element: 'zemlja', ruler: 'Merkur',  rulerKey: 'mercury',  dates: '23.8 — 22.9' },
+  { key: 'libra',       name: 'Vaga',      glyph: '♎\uFE0E', element: 'vazduh', ruler: 'Venera',  rulerKey: 'venus',    dates: '23.9 — 22.10' },
+  { key: 'scorpio',     name: 'Škorpija',  glyph: '♏\uFE0E', element: 'voda',   ruler: 'Pluton',  rulerKey: 'pluto',    dates: '23.10 — 21.11' },
+  { key: 'sagittarius', name: 'Strelac',   glyph: '♐\uFE0E', element: 'vatra',  ruler: 'Jupiter', rulerKey: 'jupiter',  dates: '22.11 — 21.12' },
+  { key: 'capricorn',   name: 'Jarac',     glyph: '♑\uFE0E', element: 'zemlja', ruler: 'Saturn',  rulerKey: 'saturn',   dates: '22.12 — 19.1' },
+  { key: 'aquarius',    name: 'Vodolija',  glyph: '♒\uFE0E', element: 'vazduh', ruler: 'Uran',    rulerKey: 'uranus',   dates: '20.1 — 18.2' },
+  { key: 'pisces',      name: 'Ribe',      glyph: '♓\uFE0E', element: 'voda',   ruler: 'Neptun',  rulerKey: 'neptune',  dates: '19.2 — 20.3' },
 ];
 
 /** Normalizuje ugao u [0, 360). */

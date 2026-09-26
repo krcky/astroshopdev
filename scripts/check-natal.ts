@@ -5,7 +5,11 @@ import {
   computeHouses, buildNatalChart, houseOf,
 } from '../src/lib/natal';
 import { norm360 } from '../src/lib/zodiac';
-import { findTransits, findHouseTransits, daysToSolarReturn } from '../src/lib/transits';
+import {
+  findTransits, findHouseTransits, daysToSolarReturn,
+  pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
+  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, type Transit,
+} from '../src/lib/transits';
 import { spreadAngles, chartAngle } from '../src/lib/wheel';
 
 let fail = 0;
@@ -136,14 +140,104 @@ for (const t of transits.slice(0, 6)) {
   console.log(`   ${t.transiting.glyph}${t.aspect.glyph}${t.natal.glyph}  ${(t.transiting.name + ' ' + t.aspect.name + ' natalni ' + t.natal.name).padEnd(42)} orb ${t.orb.toFixed(2)}°  ${t.score.toFixed(2)}  ${t.applying ? 'jaca' : 'slabi'}`);
   console.log(`        ${t.contentKey}`);
 }
+// --- 9. Tranzit dana: waterfall prioriteta ---
+console.log('\n=== 9. Tranzit dana (waterfall) ===');
+{
+  const t0 = transits[0];
+  const ok0 = Boolean(t0);
+  ok(ok0, 'postoji bar jedan tranzit za sintetiku', ok0 ? '' : 'preskacem waterfall testove');
+  if (t0) {
+    // Sinteticki tranzit: kopija stvarnog sa promenjenom metom, orbisom i brzinom.
+    const mk = (natal: string, orb: number, speed = 1, transiting = 'mars'): Transit => ({
+      ...t0,
+      orb,
+      transiting: { ...t0.transiting, key: transiting as any, speed },
+      natal: { ...t0.natal, key: natal, name: natal },
+      contentKey: `transit.${transiting}.x.natal.${natal}`,
+    });
+    const vladari = [{ key: 'mars', reason: 'vladar Ascendenta (Ovan) je Mars' }];
+
+    // P1 pobedjuje P2 iako je P2 egzaktniji.
+    let h = pickHeroFrom([mk('sun', 0.1), mk('mars', 1.2)], vladari);
+    ok(h.priority === 1 && h.transit?.natal.key === 'mars', 'P1: vladar sa jakim aspektom pobedjuje egzaktnije Sunce');
+    ok(h.priority === 1 && h.reason.includes('Mars'), 'P1: razlog imenuje vladara');
+
+    // Vladar slabog aspekta (orb > 1,5) NE okida P1 -> pada na P2.
+    h = pickHeroFrom([mk('sun', 2.0), mk('mars', STRONG_ORB + 0.01)], vladari);
+    ok(h.priority === 2 && h.transit?.natal.key === 'sun', 'P1 trazi orb <= 1,5°; inace P2');
+
+    // P2: medju kljucnim tackama pobedjuje najmanji orbis, ne skor.
+    h = pickHeroFrom([mk('ascendant', 2.5), mk('moon', 0.4), mk('venus', 0.0)], vladari);
+    ok(h.priority === 2 && h.transit?.natal.key === 'moon', 'P2: najegzaktnija kljucna tacka, pre bilo koje planete');
+
+    // P3: nema vladara ni kljucnih tacaka -> najmanji orbis.
+    h = pickHeroFrom([mk('venus', 1.0), mk('jupiter', 0.3)], vladari);
+    ok(h.priority === 3 && h.transit?.natal.key === 'jupiter', 'P3: najegzaktniji licni tranzit');
+
+    // Izjednacenje: sporija tranzitna planeta.
+    h = pickHeroFrom([mk('venus', 0.5, 1.2), mk('jupiter', 0.5, 0.08)], vladari);
+    ok(h.transit?.natal.key === 'jupiter', 'izjednacen orbis: pobedjuje sporija planeta');
+
+    // Nepoznato vreme: ASC i MC otpadaju iz svih prioriteta.
+    h = pickHeroFrom([mk('ascendant', 0.0), mk('midheaven', 0.1), mk('venus', 2.0)], vladari, true);
+    ok(h.priority === 3 && h.transit?.natal.key === 'venus', 'timeUnknown: ASC i MC se ne uzimaju');
+
+    // P4: prazno.
+    h = pickHeroFrom([], vladari);
+    ok(h.priority === 4 && h.transit === null, 'P4: bez tranzita -> Hero-a nema');
+
+    // Mesec ne ulazi u Hero, ni kad je tacno na vladaru.
+    h = pickHeroFrom([mk('mars', 0.0, 13, 'moon'), mk('venus', 1.0)], vladari);
+    ok(h.transit?.transiting.key !== 'moon' && h.transit?.natal.key === 'venus', 'Mesec kao tranzitna planeta se preskace');
+    h = pickHeroFrom([mk('mars', 0.0, 13, 'moon')], vladari);
+    ok(h.priority === 4, 'samo Mesecevi tranziti -> Hero-a nema');
+
+    // Pauza od 7 dana.
+    const danas = new Date(2026, 8, 26);
+    const pre = (n: number) => dayKey(new Date(2026, 8, 26 - n));
+    const lista = [mk('mars', 1.0, 0.7, 'saturn'), mk('sun', 0.5, 1, 'venus'), mk('jupiter', 0.4, 1.2, 'mercury')];
+    h = pickHeroFrom(lista, vladari, false, {}, danas);
+    ok(h.transit?.contentKey === 'transit.saturn.x.natal.mars', 'bez dnevnika: P1 vladar');
+    h = pickHeroFrom(lista, vladari, false, { 'transit.saturn.x.natal.mars': pre(1) }, danas);
+    ok(h.priority === 2 && h.transit?.contentKey === 'transit.venus.x.natal.sun', 'prikazan juce -> na pauzi, pusta P2');
+    h = pickHeroFrom(lista, vladari, false, { 'transit.saturn.x.natal.mars': pre(HERO_PAUSE_DAYS) }, danas);
+    ok(h.priority === 2, `prikazan pre ${HERO_PAUSE_DAYS} dana -> jos na pauzi`);
+    h = pickHeroFrom(lista, vladari, false, { 'transit.saturn.x.natal.mars': pre(HERO_PAUSE_DAYS + 1) }, danas);
+    ok(h.priority === 1, `prikazan pre ${HERO_PAUSE_DAYS + 1} dana -> sme ponovo`);
+    h = pickHeroFrom(lista, vladari, false, { 'transit.saturn.x.natal.mars': pre(0) }, danas);
+    ok(h.priority === 1, 'prikazan DANAS -> ostaje isti ceo dan');
+    const vrh = [mk('mars', PEAK_ORB - 0.05, 0.7, 'saturn'), mk('sun', 0.5, 1, 'venus')];
+    h = pickHeroFrom(vrh, vladari, false, { 'transit.saturn.x.natal.mars': pre(2) }, danas);
+    ok(h.priority === 1, 'vrhunac (orb < 0,3) probija pauzu');
+    const svePauza = { 'transit.saturn.x.natal.mars': pre(1), 'transit.venus.x.natal.sun': pre(3), 'transit.mercury.x.natal.jupiter': pre(5) };
+    h = pickHeroFrom(lista, vladari, false, svePauza, danas);
+    ok(h.priority === 4, 'sve na pauzi -> Hero-a nema');
+    ok(daysBetween(pre(3), danas) === 3 && daysBetween(dayKey(danas), new Date(2026, 8, 26, 23, 59)) === 0, 'daysBetween racuna po lokalnim ponocima');
+  }
+
+  // Vladari iz stvarne karte.
+  const r = heroRulers(chart);
+  ok(r.length >= 1 && r.length <= 2 && r.every((x) => /^[a-z]+$/.test(x.key)), 'vladari ASC i Sunca imaju kljuc planete', r.map((x) => x.reason).join('; '));
+  ok(heroRulers(chart, true).length === 1 && heroRulers(chart, true)[0].reason.startsWith('vladar Sunca'), 'timeUnknown: samo vladar Sunca');
+
+  // Ponoc i stabilnost tokom dana.
+  const podne = new Date(2026, 8, 26, 12, 0);
+  ok(localMidnight(podne).getHours() === 0 && localMidnight(podne).getDate() === 26, 'localMidnight daje 00:00 istog dana');
+  const a = pickHero(chart, new Date(2026, 8, 26, 8, 0));
+  const b = pickHero(chart, new Date(2026, 8, 26, 23, 0));
+  ok(a.priority === b.priority && a.transit?.contentKey === b.transit?.contentKey, 'isti Hero ujutru i uvece istog dana');
+  const danas = pickHero(chart);
+  console.log(`  danas: P${danas.priority}  ${danas.transit ? danas.transit.contentKey : 'faza Meseca'}  (${danas.reason})`);
+}
+
 console.log('\n  planete kroz natalne kuce:');
 for (const t of houseTransits.slice(0, 4)) {
   console.log(`   ${t.transiting.glyph} ${t.transiting.name.padEnd(8)} -> ${t.house}. kuca   ${t.contentKey}`);
 }
 
-// --- 9. Razmicanje simbola na tocku ---
+// --- 10. Razmicanje simbola na tocku ---
 // Planete u istom stepenu bi se preklopile; spreadAngles ih gura razdvojeno.
-console.log('\n=== 9. Razmicanje simbola planeta na tocku ===');
+console.log('\n=== 10. Razmicanje simbola planeta na tocku ===');
 const minGap = (a: number[]) => {
   const sorted = [...a].sort((x, y) => x - y);
   let m = 360;

@@ -10,7 +10,7 @@
  * da je glas astrologa.
  */
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
-import { findTransits, findHouseTransits, type Transit } from '@/lib/transits';
+import { findTransits, findHouseTransits, pickHero, type HeroHistory, type HeroPick, type Transit } from '@/lib/transits';
 import type { ResolvedProfile } from '@/store/profile';
 
 const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
@@ -53,13 +53,24 @@ export type PersonalDaily = {
   skyline: string;
   /** Tranziti na licnu kartu, poredjani po jacini. */
   entries: PersonalEntry[];
+  /**
+   * Sta ide u Hero na pocetnom ekranu — waterfall prioriteta iz `transits.ts`
+   * (vladar -> kljucne tacke -> najegzaktniji), bez Meseca, sa pauzom od 7
+   * dana. Racuna se za lokalnu ponoc, pa je isti ceo dan. Prioritet 4 znaci
+   * da Hero-a danas nema.
+   */
+  hero: HeroPick;
+  /** Faza i znak Meseca danas — za karticu Mesec. */
+  moon: { phase: string; sign: string; glyph: string };
   /** Kroz koje natalne kuce prolaze spore planete danas. */
   houseHighlights: { house: number; planetName: string; glyph: string; contentKey: string }[];
 };
 
 export function buildPersonalDaily(
   resolved: ResolvedProfile,
-  date: Date = new Date()
+  date: Date = new Date(),
+  /** Dnevnik prikazanih Hero-a (`store/hero-log.ts`) — bez njega nema pauze. */
+  heroHistory: HeroHistory = {}
 ): PersonalDaily {
   // Tekstovi se NE spajaju ovde — dolaze sa servera, jer korpus ne sme u
   // aplikaciju. Ovde se samo bira KOJI tranziti ulaze u danasnji horoskop.
@@ -84,9 +95,13 @@ export function buildPersonalDaily(
   const moon = nebo.find((p) => p.key === 'moon')!;
   const retro = nebo.filter((p) => p.retrograde);
 
+  const hero = pickHero(resolved.chart, date, resolved.timeUnknown, heroHistory);
+
   return {
     date,
     name: resolved.profile.name,
+    hero,
+    moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
     skyline:
       `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +
       (retro.length ? ` · retrogradni: ${retro.map((r) => r.name).join(', ')}` : ''),
