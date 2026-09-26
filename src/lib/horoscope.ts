@@ -10,7 +10,10 @@
  * da je glas astrologa.
  */
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
-import { findTransits, findHouseTransits, pickHero, type HeroHistory, type HeroPick, type Transit } from '@/lib/transits';
+import {
+  findTransits, findHouseTransits, pickHero, pickBrief,
+  type Brief, type HeroHistory, type HeroPick, type Transit,
+} from '@/lib/transits';
 import type { ResolvedProfile } from '@/store/profile';
 
 const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
@@ -62,6 +65,8 @@ export type PersonalDaily = {
   hero: HeroPick;
   /** Faza i znak Meseca danas — za karticu Mesec. */
   moon: { phase: string; sign: string; glyph: string };
+  /** "Danas ukratko": ide ti / koci te, bez Hero-a i bez Meseca, po orbisu. */
+  brief: Brief;
   /** Kroz koje natalne kuce prolaze spore planete danas. */
   houseHighlights: { house: number; planetName: string; glyph: string; contentKey: string }[];
 };
@@ -96,11 +101,13 @@ export function buildPersonalDaily(
   const retro = nebo.filter((p) => p.retrograde);
 
   const hero = pickHero(resolved.chart, date, resolved.timeUnknown, heroHistory);
+  const brief = pickBrief(entries.map((e) => e.transit), hero.transit?.contentKey ?? null);
 
   return {
     date,
     name: resolved.profile.name,
     hero,
+    brief,
     moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
     skyline:
       `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +

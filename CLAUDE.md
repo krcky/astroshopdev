@@ -247,6 +247,12 @@ pauzi. Dnevnik je `store/hero-log.ts`, LOKALNO u AsyncStorage-u — telefon i we
 istog dana da pokazu razlicit Hero; ako zasmeta, dnevnik ide u bazu, oblik ostaje.
 Testovi: `npm run check:natal`, deo 9.
 
+"DANAS UKRATKO" (`pickBrief`, `briefBucket`): ide ti / koci te po ASPEKTU — trigon i
+sekstil skladni, kvadrat i opozicija napeti, konjunkciju deli tranzitna planeta
+(Sunce, Merkur, Venera, Jupiter -> ide ti; ostale -> koci te; PRAVILO CEKA POTVRDU
+ASTROLOGA). Prikazuje `positive` odnosno `challenge` recenicu kratkog teksta, bez
+Hero-a i bez Meseca, po orbisu; tranzit bez teksta se preskace. Testovi: deo 9b.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.

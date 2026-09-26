@@ -8,7 +8,7 @@ import { norm360 } from '../src/lib/zodiac';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
-  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, type Transit,
+  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, type Transit,
 } from '../src/lib/transits';
 import { spreadAngles, chartAngle } from '../src/lib/wheel';
 
@@ -228,6 +228,44 @@ console.log('\n=== 9. Tranzit dana (waterfall) ===');
   ok(a.priority === b.priority && a.transit?.contentKey === b.transit?.contentKey, 'isti Hero ujutru i uvece istog dana');
   const danas = pickHero(chart);
   console.log(`  danas: P${danas.priority}  ${danas.transit ? danas.transit.contentKey : 'faza Meseca'}  (${danas.reason})`);
+}
+
+// --- 9b. Danas ukratko ---
+console.log('\n=== 9b. Danas ukratko (ide ti / koci te) ===');
+{
+  const t0 = transits[0];
+  if (t0) {
+    const asp = (key: string) => ({ ...t0.aspect, key });
+    const mk = (transiting: string, aspect: string, natal: string, orb: number): Transit => ({
+      ...t0, orb,
+      transiting: { ...t0.transiting, key: transiting as any, speed: 1 },
+      aspect: asp(aspect),
+      natal: { ...t0.natal, key: natal, name: natal },
+      contentKey: `transit.${transiting}.${aspect}.natal.${natal}`,
+    });
+    ok(briefBucket(mk('mars', 'trine', 'sun', 1)) === 'ide', 'trigon -> ide ti');
+    ok(briefBucket(mk('venus', 'sextile', 'sun', 1)) === 'ide', 'sekstil -> ide ti');
+    ok(briefBucket(mk('venus', 'square', 'sun', 1)) === 'koci', 'kvadrat -> koci te, i kad je Venera');
+    ok(briefBucket(mk('jupiter', 'opposition', 'sun', 1)) === 'koci', 'opozicija -> koci te');
+    ok(briefBucket(mk('venus', 'conjunction', 'sun', 1)) === 'ide', 'konjunkcija Venere -> ide ti');
+    ok(briefBucket(mk('saturn', 'conjunction', 'sun', 1)) === 'koci', 'konjunkcija Saturna -> koci te');
+
+    const lista = [
+      mk('saturn', 'square', 'moon', 0.5),     // hero, mora ispasti
+      mk('moon', 'trine', 'sun', 0.1),         // Mesec, mora ispasti
+      mk('venus', 'trine', 'mars', 1.2),
+      mk('jupiter', 'sextile', 'venus', 0.3),
+      mk('mars', 'opposition', 'mercury', 0.9),
+      mk('uranus', 'conjunction', 'jupiter', 2.0),
+      ...[1, 2, 3, 4, 5, 6].map((i) => mk('sun', 'trine', `p${i}`, 2 + i * 0.1)),
+    ];
+    const b = pickBrief(lista, 'transit.saturn.square.natal.moon');
+    ok(!b.koci.some((t) => t.contentKey === 'transit.saturn.square.natal.moon'), 'Hero se ne ponavlja u sazetku');
+    ok(![...b.ide, ...b.koci].some((t) => t.transiting.key === 'moon'), 'Mesec ne ulazi u sazetak');
+    ok(b.ide[0]?.natal.key === 'venus' && b.ide[1]?.natal.key === 'mars', 'ide ti: po orbisu (Jupiter 0,3 pre Venere 1,2)');
+    ok(b.koci[0]?.natal.key === 'mercury' && b.koci[1]?.natal.key === 'jupiter', 'koci te: po orbisu');
+    ok(b.ide.length === 5, 'najvise 5 po grupi (rezerva za tranzite bez teksta)', `ide=${b.ide.length}`);
+  }
 }
 
 console.log('\n  planete kroz natalne kuce:');

@@ -315,3 +315,58 @@ export function pickHero(
     date
   );
 }
+
+/* ------------------------------------------------------------------------- *
+ * DANAS UKRATKO — "ide ti" i "koci te", po tri kratke recenice.
+ *
+ * Korpus ne deli tranzite na dobre i lose: svaki tekst ima i `positive` i
+ * `challenge` recenicu. Podela je zato po ASPEKTU (astroloska konvencija, list
+ * "4 Aspekti" u brief tabeli): trigon i sekstil su skladni, kvadrat i opozicija
+ * napeti. Konjunkcija je "najjaca mesavina" i sama po sebi nije ni jedno ni
+ * drugo, pa je deli TRANZITNA planeta: Sunce, Merkur, Venera i Jupiter idu u
+ * "ide ti", Mars, Saturn, Uran, Neptun i Pluton u "koci te".
+ *
+ * PRAVILO ZA KONJUNKCIJU CEKA POTVRDU ASTROLOGA (26.9.2026). Ako ga promeni,
+ * menja se samo `BENEFIC` ispod.
+ *
+ * Mesec ne ulazi (ima svoju karticu, a tekstova za njega jos nema). Hero se
+ * izostavlja da se isti tranzit ne pojavi dvaput na ekranu. Unutar grupe
+ * redosled je po egzaktnosti, kao i Hero.
+ * ------------------------------------------------------------------------- */
+
+export type BriefBucket = 'ide' | 'koci';
+
+/** Tranzitne planete cija konjunkcija ide u "ide ti". */
+const BENEFIC: readonly PlanetKey[] = ['sun', 'mercury', 'venus', 'jupiter'];
+
+/** U koju grupu sazetka ide tranzit. */
+export function briefBucket(t: Transit): BriefBucket {
+  switch (t.aspect.key) {
+    case 'trine':
+    case 'sextile':
+      return 'ide';
+    case 'square':
+    case 'opposition':
+      return 'koci';
+    default:
+      return BENEFIC.includes(t.transiting.key) ? 'ide' : 'koci';
+  }
+}
+
+export type Brief = { ide: Transit[]; koci: Transit[] };
+
+/**
+ * Kandidati za sazetak, do `limit` po grupi, poredjani po orbisu.
+ *
+ * Vraca se vise od tri jer neki tranziti nemaju tekst (ASC, MC, rupe u
+ * korpusu); ekran prikaze prva tri KOJA IMAJU tekst.
+ */
+export function pickBrief(transits: Transit[], excludeKey: string | null = null, limit = 5): Brief {
+  const cand = transits
+    .filter((t) => t.transiting.key !== 'moon' && t.contentKey !== excludeKey)
+    .sort((a, b) => a.orb - b.orb || Math.abs(a.transiting.speed) - Math.abs(b.transiting.speed));
+  return {
+    ide: cand.filter((t) => briefBucket(t) === 'ide').slice(0, limit),
+    koci: cand.filter((t) => briefBucket(t) === 'koci').slice(0, limit),
+  };
+}

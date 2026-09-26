@@ -8,12 +8,12 @@ import { Screen } from '@/components/screen';
 import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { buildPersonalDaily, formatDate, type PersonalDaily } from '@/lib/horoscope';
-import { useTransitTexts } from '@/lib/transit-texts';
+import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { traitsForSign } from '@/lib/traits';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { useHeroLog } from '@/store/hero-log';
-import { dayKey } from '@/lib/transits';
+import { dayKey, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 
@@ -29,6 +29,15 @@ export default function Home() {
     () => (resolved ? buildPersonalDaily(resolved, today, heroHistory) : null),
     [resolved, today, heroHistory]
   );
+
+  // Jedan upit za tekstove Hero-a i sazetka zajedno, ne dva.
+  const kljucevi = React.useMemo(() => {
+    if (!daily) return [];
+    const k = [...daily.brief.ide, ...daily.brief.koci].map((t) => t.contentKey);
+    if (daily.hero.transit) k.unshift(daily.hero.transit.contentKey);
+    return k;
+  }, [daily]);
+  const { texts, loading: textsLoading } = useTransitTexts(kljucevi);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved || !daily) return <Redirect href="/" />;
@@ -72,7 +81,10 @@ export default function Home() {
       </View>
 
       {/* Tranzit dana — Hero. Sta ulazi bira waterfall u `transits.ts`. */}
-      <Hero daily={daily} today={today} />
+      <Hero daily={daily} today={today} texts={texts} loading={textsLoading} />
+
+      {/* Danas ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`. */}
+      <Brief daily={daily} texts={texts} />
     </Screen>
   );
 }
@@ -94,7 +106,9 @@ const HERO_LABEL: Record<1 | 2 | 3, string> = {
   3: 'Lični tranzit dana',
 };
 
-function Hero({ daily, today }: { daily: PersonalDaily; today: Date }) {
+type Texts = Map<string, TransitText>;
+
+function Hero({ daily, today, texts, loading }: { daily: PersonalDaily; today: Date; texts: Texts; loading: boolean }) {
   const { hero } = daily;
   const t = hero.transit;
   const record = useHeroLog((s) => s.record);
@@ -103,9 +117,6 @@ function Hero({ daily, today }: { daily: PersonalDaily; today: Date }) {
   React.useEffect(() => {
     if (t) record(t.contentKey, dayKey(today));
   }, [t, record, today]);
-
-  const kljucevi = React.useMemo(() => (t ? [t.contentKey] : []), [t]);
-  const { texts, loading } = useTransitTexts(kljucevi);
 
   // Bez tranzita u orbisu Hero-a nema. Mesec ima svoju karticu i ne ulazi ovde.
   if (hero.priority === 4 || !t) return null;
@@ -141,5 +152,55 @@ function Hero({ daily, today }: { daily: PersonalDaily; today: Date }) {
       ) : null}
       <Text variant="caption" className="mt-3">{hero.reason}</Text>
     </Pressable>
+  );
+}
+
+/** Do tri reda koja IMAJU tekst; tranziti bez teksta se preskacu, ne izmisljaju. */
+function saTekstom(list: Transit[], texts: Texts, polje: 'positive' | 'challenge') {
+  const out: { t: Transit; recenica: string }[] = [];
+  for (const t of list) {
+    const recenica = texts.get(t.contentKey)?.[polje];
+    if (recenica) out.push({ t, recenica });
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+function Brief({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
+  const ide = saTekstom(daily.brief.ide, texts, 'positive');
+  const koci = saTekstom(daily.brief.koci, texts, 'challenge');
+  if (ide.length === 0 && koci.length === 0) return null;
+
+  return (
+    <View className="mt-9">
+      <Text variant="label" className="mb-3">Danas ukratko</Text>
+      <Pressable
+        onPress={() => router.push('/daily')}
+        accessibilityRole="button"
+        className={cn(CARD_SURFACE, 'active:opacity-60')}>
+        {ide.length > 0 && <Grupa naslov="Ide ti" redovi={ide} />}
+        {ide.length > 0 && koci.length > 0 && <View className="mx-5 h-px bg-border" />}
+        {koci.length > 0 && <Grupa naslov="Koči te" redovi={koci} />}
+      </Pressable>
+    </View>
+  );
+}
+
+function Grupa({ naslov, redovi }: { naslov: string; redovi: { t: Transit; recenica: string }[] }) {
+  return (
+    <View className="p-5">
+      <Text variant="h3" className="mb-2">{naslov}</Text>
+      {redovi.map(({ t, recenica }) => (
+        <View key={t.contentKey} className="flex-row gap-3 py-2">
+          <Glyph size={14} className="mt-[3px] text-muted-foreground">
+            {`${t.transiting.glyph}${t.aspect.glyph}${t.natal.glyph}`}
+          </Glyph>
+          <View className="flex-1">
+            <Text variant="default">{recenica}</Text>
+            <Text variant="caption">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
+          </View>
+        </View>
+      ))}
+    </View>
   );
 }
