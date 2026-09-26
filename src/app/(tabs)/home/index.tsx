@@ -378,7 +378,6 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
   // Saveti stizu iz baze kad Ivan posalje aktuelni lunarni kalendar; do tada nema recenice.
   const recenica: string | null = null;
   const otvori = () => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } });
-  const izabrana = LUNAR_AREAS.find((a) => a.key === oblast)!;
 
   return (
     <View className="mt-9">
@@ -421,11 +420,10 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
         </View>
         {/* Recenica se samo cita — ekran Mesec otvara jedino gornji deo (Ivan, 27.9.2026). */}
         <View className="px-5 pb-5 pt-3">
-          <Text variant="caption">{izabrana.name} danas</Text>
           {recenica ? (
-            <Text variant="default" className="mt-1">{recenica}</Text>
+            <Text variant="default">{recenica}</Text>
           ) : (
-            <Text variant="muted" className="mt-1">Saveti iz lunarnog kalendara još nisu stigli.</Text>
+            <Text variant="muted">Saveti iz lunarnog kalendara još nisu stigli.</Text>
           )}
         </View>
         {t && (
