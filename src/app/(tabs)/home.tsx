@@ -49,7 +49,8 @@ export default function Home() {
   if (!resolved || !daily) return <Redirect href="/" />;
 
   return (
-    <Screen label={<Logo full />}>
+    // Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`.
+    <Screen label={<Logo />}>
       {/* Bez naslova (Ivan, 26.9.2026): ekran pocinje datumom, blizu trake. */}
       <View className="pt-2" />
 
