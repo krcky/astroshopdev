@@ -1,16 +1,19 @@
 import * as React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, View } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, Lock } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { Screen } from '@/components/screen';
+import { CARD_SURFACE } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { Glyph } from '@/components/ui/glyph';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
 import { findTransits } from '@/lib/transits';
+import { neutral } from '@/theme/tokens';
 
 const GOLD = '#A7731B';
 
@@ -42,17 +45,13 @@ export default function TransitDetail() {
   const sazeta = kratka.get(String(key));
 
   return (
-    <View className="flex-1 bg-background">
-      <SafeAreaView className="flex-1" edges={['top']}>
-        <View className="flex-row items-center gap-2 px-5 pb-2 pt-2">
-          <Pressable onPress={() => router.back()} hitSlop={14}
-                     accessibilityRole="button" accessibilityLabel="Nazad">
-            <ChevronLeft size={26} color="#141414" />
-          </Pressable>
-          <Text variant="label">Tumačenje</Text>
-        </View>
-
-        <ScrollView contentContainerClassName="px-5 pb-16" showsVerticalScrollIndicator={false}>
+    <Screen
+      label="Tumačenje"
+      left={<Pressable onPress={() => router.back()} hitSlop={14}
+                   accessibilityRole="button" accessibilityLabel="Nazad">
+          <ChevronLeft size={26} color={neutral.ink} />
+        </Pressable>}
+      tabBarSpace={false}>
           {tranzit && (
             <View className="flex-row items-center gap-2 pb-1 pt-2">
               <Glyph size={17} className="text-foreground">
@@ -92,7 +91,7 @@ export default function TransitDetail() {
                   Tumačenje za ovaj tranzit još nije napisano.
                 </Text>
               ) : (
-                <View className="mt-8 rounded-xl border border-gold/40 bg-secondary/40 p-6">
+                <View className={cn(CARD_SURFACE, 'mt-8 border-gold/40 p-6')}>
                   <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-gold/10">
                     <Lock size={20} color={GOLD} />
                   </View>
@@ -108,8 +107,6 @@ export default function TransitDetail() {
               )}
             </>
           )}
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+    </Screen>
   );
 }

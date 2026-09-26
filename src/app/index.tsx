@@ -18,7 +18,7 @@ export default function Gate() {
   const profile = useProfileStore((s) => s.profile);
 
   // Prazan ekran dok se ne zna stanje — inace bi kratko bljesnuo pogresan ekran.
-  if (authLoading || !hydrated) return <View className="flex-1 bg-background" />;
+  if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
 
   if (!user) return <Redirect href="/welcome" />;
   if (!profile) return <Redirect href="/date" />;

@@ -1,15 +1,17 @@
 import * as React from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, TextInput, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { Check, ChevronLeft } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { Screen } from '@/components/screen';
+import { CARD_SURFACE } from '@/components/ui/card';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
 import { cn } from '@/lib/utils';
+import { neutral } from '@/theme/tokens';
 
 /**
  * Izbor mesta odakle se gleda nebo.
@@ -38,18 +40,14 @@ export default function SkyPlace() {
   };
 
   return (
-    <View className="flex-1 bg-background">
-      <SafeAreaView className="flex-1" edges={['top']}>
-        <View className="flex-row items-center gap-2 px-5 pb-2 pt-2">
-          <Pressable onPress={() => router.back()} hitSlop={14}
-                     accessibilityRole="button" accessibilityLabel="Nazad">
-            <ChevronLeft size={26} color="#141414" />
-          </Pressable>
-          <Text variant="label">Odakle gledaš</Text>
-        </View>
-
-        <ScrollView contentContainerClassName="px-5 pb-16" keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}>
+    <Screen
+      label="Odakle gledaš"
+      left={<Pressable onPress={() => router.back()} hitSlop={14}
+                   accessibilityRole="button" accessibilityLabel="Nazad">
+          <ChevronLeft size={26} color={neutral.ink} />
+        </Pressable>}
+      tabBarSpace={false}
+      keyboardShouldPersistTaps="handled">
           <Text variant="display" className="pb-1 pt-2">{aktivan.name}</Text>
           <Text variant="muted" className="mb-6">
             Kuće i ascendent zavise od mesta — nebo iznad Beograda i iznad
@@ -60,9 +58,9 @@ export default function SkyPlace() {
             value={query}
             onChangeText={setQuery}
             placeholder="traži grad"
-            placeholderTextColor="#9A9A9A"
+            placeholderTextColor={neutral.inkSubtle}
             autoCorrect={false}
-            className="border-b border-border pb-3 text-2xl text-foreground"
+            className="border-b border-fill-strong pb-3 text-2xl text-foreground"
           />
 
           <View className="mt-4">
@@ -101,7 +99,7 @@ export default function SkyPlace() {
             <Pressable
               onPress={() => izaberi(null)}
               accessibilityRole="button"
-              className="mt-6 self-start rounded-full border border-border px-5 py-2.5 active:opacity-60">
+              className={cn(CARD_SURFACE, 'mt-6 self-start rounded-full px-5 py-2.5 active:opacity-60')}>
               <Text variant="label" className="text-xs">Vrati na {rodni.name}</Text>
             </Pressable>
           )}
@@ -110,9 +108,7 @@ export default function SkyPlace() {
             Ovim se menja samo ekran „Trenutno na nebu". Tvoja natalna karta
             ostaje računata za mesto rođenja — ono se menja u profilu.
           </Text>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+    </Screen>
   );
 }
 
@@ -125,12 +121,12 @@ function Izbor({ naslov, opis, aktivno, onPress }: {
       accessibilityRole="button"
       accessibilityState={aktivno ? { selected: true } : {}}
       accessibilityLabel={`${naslov}, ${opis}`}
-      className="flex-row items-center justify-between border-b border-border py-3.5 active:opacity-60">
+      className="flex-row items-center justify-between border-b border-fill-strong py-3.5 active:opacity-60">
       <View className="flex-1">
         <Text className={cn('text-base', aktivno && 'font-semibold')}>{naslov}</Text>
         <Text variant="muted" className="text-xs">{opis}</Text>
       </View>
-      {aktivno && <Check size={17} color="#141414" />}
+      {aktivno && <Check size={17} color={neutral.ink} />}
     </Pressable>
   );
 }

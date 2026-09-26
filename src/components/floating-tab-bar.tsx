@@ -15,17 +15,20 @@ import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 
 import { Text } from '@/components/ui/text';
+import { neutral, shadow } from '@/theme/tokens';
 
-const INK = '#141414';
-const MUTED = '#9A9A9A';
+const INK = neutral.ink;
+const MUTED = neutral.inkSubtle;
 
 /**
- * Boja aktivne kapsule — `--secondary` iz global.css, ispisana kao broj.
+ * Boja aktivne kapsule. Izmerena sa snimka referentne aplikacije: #EBEBEB —
+ * korak tamnije od ispune polja, taman toliko da se kapsula vidi ispod ikone
+ * a da ne izgleda kao zasebno dugme.
  *
  * NativeWind klase ne hvataju `Animated.View` pouzdano, a tema je zakljucana
  * na svetlu (pravilo 2), pa je konstanta ovde tacna i necе se razici sa temom.
  */
-const KAPSULA = '#F5F5F5';
+const KAPSULA = neutral.fillStrong;
 
 /**
  * Opruga za klizanje kapsule.
@@ -62,14 +65,11 @@ const pilula = {
 
 /** Dodatak za rezervnu, neprovidnu traku — senka daje dubinu koju staklo ima samo po sebi. */
 const rezerva = {
-  backgroundColor: '#FFFFFF',
+  backgroundColor: neutral.white,
   borderWidth: 1,
-  borderColor: '#E6E6E6',
-  shadowColor: '#000',
-  shadowOpacity: 0.12,
-  shadowRadius: 18,
-  shadowOffset: { width: 0, height: 6 },
-  elevation: Platform.OS === 'android' ? 8 : 0,
+  borderColor: neutral.separator,
+  ...shadow.floating,
+  elevation: Platform.OS === 'android' ? shadow.floating.elevation : 0,
 } as const;
 
 /**
@@ -161,7 +161,7 @@ function Stavka({
           Ista zamka kao kod `GlassView` nize. */}
       <Animated.View style={[stil, { alignItems: 'center', gap: 2 }]}>
         {ikona}
-        <Text numberOfLines={1} style={{ color: boja }} className="text-[10px] tracking-[0.4px]">
+        <Text numberOfLines={1} variant="tab" style={{ color: boja }}>
           {naslov}
         </Text>
       </Animated.View>

@@ -5,9 +5,12 @@ import { router } from 'expo-router';
 import { OnboardingStep } from '@/components/onboarding-step';
 import { useTurnstile } from '@/components/turnstile';
 import { Text } from '@/components/ui/text';
+import { CARD_SURFACE } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { AUTH_MODE } from '@/lib/auth-mode';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
+import { neutral } from '@/theme/tokens';
 
 export default function Account() {
   const [email, setEmail] = React.useState('');
@@ -106,13 +109,13 @@ export default function Account() {
           value={email}
           onChangeText={(t) => { setEmail(t); setError(null); }}
           placeholder="email@primer.com"
-          placeholderTextColor="#9A9A9A"
+          placeholderTextColor={neutral.inkSubtle}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
           autoComplete="email"
           autoFocus
-          className="w-full border-b border-border pb-3 text-center text-2xl text-foreground"
+          className="w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground"
         />
 
         {AUTH_MODE === 'password' && (
@@ -120,11 +123,11 @@ export default function Account() {
             value={password}
             onChangeText={(t) => { setPassword(t); setError(null); }}
             placeholder="lozinka (bar 6 znakova)"
-            placeholderTextColor="#9A9A9A"
+            placeholderTextColor={neutral.inkSubtle}
             secureTextEntry
             autoCapitalize="none"
             autoComplete="new-password"
-            className="mt-6 w-full border-b border-border pb-3 text-center text-2xl text-foreground"
+            className="mt-6 w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground"
           />
         )}
 
@@ -155,7 +158,7 @@ function SocialButton({ label, onPress }: { label: string; onPress: () => void }
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`Nastavi preko ${label} naloga`}
-      className="h-14 w-28 items-center justify-center rounded-lg border border-border active:opacity-60">
+      className={cn(CARD_SURFACE, 'h-14 w-28 items-center justify-center active:opacity-60')}>
       <Text variant="label" className="text-foreground">{label}</Text>
     </Pressable>
   );

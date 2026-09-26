@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { useDraft } from '@/store/draft';
+import { neutral } from '@/theme/tokens';
 
 export default function BirthPlace() {
   const draft = useDraft();
@@ -32,10 +33,10 @@ export default function BirthPlace() {
         value={city ? `${city.name}, ${city.country}` : query}
         onChangeText={(t) => { setQuery(t); setCity(null); }}
         placeholder="grad"
-        placeholderTextColor="#9A9A9A"
+        placeholderTextColor={neutral.inkSubtle}
         autoFocus
         autoCorrect={false}
-        className="border-b border-border pb-3 text-center text-3xl text-foreground"
+        className="border-b border-fill-strong pb-3 text-center text-3xl text-foreground"
       />
 
       <View className="mt-4">
@@ -43,7 +44,7 @@ export default function BirthPlace() {
           <Pressable
             key={`${c.name}-${c.country}`}
             onPress={() => { setCity(c); setQuery(''); }}
-            className="flex-row items-center justify-between border-b border-border py-3.5 active:opacity-60">
+            className="flex-row items-center justify-between border-b border-fill-strong py-3.5 active:opacity-60">
             <Text className="text-base">{c.name}</Text>
             <Text variant="muted">{c.country}</Text>
           </Pressable>

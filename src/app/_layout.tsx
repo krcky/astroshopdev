@@ -7,8 +7,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { colorScheme } from 'nativewind';
-
 import { useAuthListener } from '@/store/auth';
+import { neutral } from '@/theme/tokens';
 
 // Astroshop je light-first. Tamna tema ostaje definisana u global.css
 // (.dark:root) ako je ikad budemo ponudili kao opciju.
@@ -32,6 +32,9 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   useAuthListener();
 
+  // Pismo se NE ucitava: interfejs stoji na sistemskom (SF Pro na iOS-u,
+  // Roboto na Androidu). Vidi `src/theme/tokens.ts` za merenja koja su
+  // dovela do te odluke.
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
@@ -40,7 +43,9 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: { backgroundColor: '#FFFFFF' },
+              // Siva, ne bela — ista pozadina koju crta `Screen`. Sa belom
+              // svaki prelaz izmedju ekrana kratko bljesne svetlije.
+              contentStyle: { backgroundColor: neutral.grouped },
               // iOS home indikator mora da ostane vidljiv — tako izgleda svaka
               // druga aplikacija. Podrazumevana vrednost bi trebalo da bude
               // false, ali je postavljamo izricito jer se u Expo Go ponasalo
