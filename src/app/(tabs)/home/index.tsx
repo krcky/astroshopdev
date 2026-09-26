@@ -98,12 +98,8 @@ export default function Home() {
           }}
         />
       )}
-      {/* Bez naslova (Ivan, 26.9.2026): ekran pocinje datumom, blizu trake. */}
-      <View className="pt-2" />
-
-      <View className="mb-6 flex-row">
-        <DateRow date={date} offset={offset} onChange={setOffset} />
-      </View>
+      {/* Bez naslova i bez datuma (Ivan, 26.9.2026): dan se vidi i bira u zaglavlju. */}
+      <View className="pt-4" />
 
       {/* Tranzit dana — Hero. Sta ulazi bira waterfall u `transits.ts`. */}
       <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} />
@@ -199,22 +195,6 @@ function DayMenu({ today, offset, onChange }: { today: Date; offset: number; onC
   );
 }
 
-/** Datum, poravnat levo; ispod rec za dan. Kad nije danas, dodir vraca na danas. */
-function DateRow({ date, offset, onChange }: { date: Date; offset: number; onChange: (o: number) => void }) {
-  return (
-    <Pressable
-      onPress={() => onChange(0)}
-      disabled={offset === 0}
-      accessibilityRole="button"
-      accessibilityLabel={offset === 0 ? formatDate(date) : 'Vrati na danas'}
-      className="active:opacity-60">
-      <Text variant="row">{formatDate(date)}</Text>
-      <Text variant="caption" className={cn(offset !== 0 && 'text-foreground')}>
-        {offset === 0 ? RELATIVE[0] : `${RELATIVE[offset]} · vrati na danas`}
-      </Text>
-    </Pressable>
-  );
-}
 
 /** Naslov Hero kartice — van skale iz tokens.ts, po Ivanovoj meri. */
 const HERO_TITLE = 'text-[24px] leading-[30px] font-semibold tracking-[-0.3px]';

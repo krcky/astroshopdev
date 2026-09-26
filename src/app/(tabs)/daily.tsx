@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
+import { ProfileButton } from '@/components/profile-button';
 import { Glyph } from '@/components/ui/glyph';
 import { buildPersonalDaily } from '@/lib/horoscope';
 import { useTransitTexts } from '@/lib/transit-texts';
@@ -47,7 +48,7 @@ export default function Daily() {
   const locked = !isPremium;
 
   return (
-    <Screen label="Tranziti" tint="gold">
+    <Screen label="Tranziti" tint="gold" right={<ProfileButton />}>
       <View className="pb-6 pt-6">
         <Text variant="display">Tvoji tranziti danas</Text>
       </View>

@@ -7,9 +7,11 @@ import { neutral } from '@/theme/tokens';
  * Material na Androidu) umesto rucno crtane lebdece trake (Ivan, 26.9.2026).
  * Sistem sam crta staklo, animacije i skrivanje na skrol.
  *
- * Imena tabova: Danas · Tranziti · Ti · Nebo · Profil. "Ti" je natalna karta —
- * ono sto se ne menja; "Nebo" je stanje neba sada. Ekrani u kodu zadrzavaju
- * stara imena fajlova (daily, chart, sky). Ikone: SF Symbols na iOS-u (obicna
+ * Tabovi (Ivan, 26.9.2026): Danas · Tranziti · Pitaj · Ti · Nebo. "Ti" je
+ * natalna karta — ono sto se ne menja; "Nebo" je stanje neba sada; "Pitaj" je
+ * pitanje astrologu. Profil NIJE tab — otvara se dugmetom gore desno
+ * (`app/profile.tsx`, u korenskom Stack-u). Ekrani u kodu zadrzavaju stara
+ * imena fajlova (daily, chart, sky). Ikone: SF Symbols na iOS-u (obicna
  * kad tab nije izabran, ispunjena kad jeste), Material ikone (`md`) na Androidu —
  * bez `md` Android ostaje BEZ ikona.
  *
@@ -39,6 +41,10 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
         <NativeTabs.Trigger.Label>Tranziti</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="ask">
+        <NativeTabs.Trigger.Icon sf={{ default: 'bubble.left', selected: 'bubble.left.fill' }} md="chat_bubble" />
+        <NativeTabs.Trigger.Label>Pitaj</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chart">
         <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
         <NativeTabs.Trigger.Label>Ti</NativeTabs.Trigger.Label>
@@ -46,10 +52,6 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="sky">
         <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
         <NativeTabs.Trigger.Label>Nebo</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf={{ default: 'person', selected: 'person.fill' }} md="person" />
-        <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 
 import { cn } from '@/lib/utils';
 import { Screen } from '@/components/screen';
+import { ProfileButton } from '@/components/profile-button';
 import { AspectRow, Row, RowHead } from '@/components/ui/row';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { findAspects } from '@/lib/astro';
@@ -35,7 +36,7 @@ export default function ChartScreen() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label="Natalna karta" padded={false} tint="none" background="white">
+    <Screen label="Natalna karta" padded={false} tint="none" background="white" right={<ProfileButton />}>
       <View className="px-5 pb-5 pt-6">
         <Text variant="display">{profile.name}</Text>
         <Text variant="muted" className="mt-1.5">

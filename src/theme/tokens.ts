@@ -294,10 +294,12 @@ export const backdrop = {
      * dala tesku sivu prugu preko bele kartice.
      */
     ink: ['rgba(20, 23, 27, 0.30)', 'rgba(60, 60, 70, 0.14)', 'rgba(60, 60, 70, 0)'],
-    /** Nebo: svetla nebesko-plava, bliza ljubicastoj po tonu (Ivan: tamna se previse razlikovala). */
+    /** Pitaj astrologa: svetla nebesko-plava (Ivan, 26.9.2026; ranije Nebo). */
     blue: ['rgba(125, 211, 252, 0.40)', 'rgba(56, 189, 248, 0.21)', 'rgba(96, 165, 250, 0)'],
     /** Bez preliva — providno. Natalna karta na BELOJ pozadini (Ivan, 26.9.2026); pretapa se kao i ostale. */
     none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
+    /** Nebo: crvena iz `accent.red` (Ivan, 26.9.2026; ranije Pitaj). */
+    red: ['rgba(235, 71, 67, 0.40)', 'rgba(220, 38, 38, 0.21)', 'rgba(230, 60, 60, 0)'],
     /** Profil: roze iz `accent.pink` ka svetlijoj — licno, toplo. */
     pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
   },

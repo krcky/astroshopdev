@@ -24,7 +24,8 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
-    (tabs)/          home (Danas), daily (Tranziti), chart (Ti), sky (Nebo), profile (Profil)
+    profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
+    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
   theme/
     tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
   components/

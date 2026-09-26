@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Alert, Pressable, Switch, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, UserRound } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
@@ -11,7 +11,7 @@ import { deleteAccount, signOut, useAuthStore, useEntitlement } from '@/store/au
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
 import { cn } from '@/lib/utils';
-import { neutral } from '@/theme/tokens';
+import { neutral, shadow } from '@/theme/tokens';
 
 const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -68,7 +68,32 @@ export default function ProfileTab() {
   };
 
   return (
-    <Screen label="Profil" tint="pink">
+    <Screen
+      // Profil nije tab (Ivan, 26.9.2026): otvara se dugmetom gore desno, ima
+      // nazad gore levo, sivu pozadinu kao pocetna, ali BEZ preliva. Umesto
+      // loga: ikona korisnika u belom krugu (48pt kao krug loga) + "Profil".
+      // Strelica nazad, krug i tekst dele isti pomeraj navise (-5), da budu u
+      // jednoj liniji.
+      label={
+        <View className="flex-row items-center" style={{ gap: 12, transform: [{ translateY: -5 }] }} accessibilityRole="header">
+          <View className="h-12 w-12 items-center justify-center rounded-pill bg-background" style={shadow.soft}>
+            <UserRound size={22} color={neutral.ink} />
+          </View>
+          <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]">Profil</Text>
+        </View>
+      }
+      tint="none"
+      tabBarSpace={false}
+      left={
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={14}
+          accessibilityRole="button"
+          accessibilityLabel="Nazad"
+          style={{ transform: [{ translateY: -5 }] }}>
+          <ChevronLeft size={26} color={neutral.ink} />
+        </Pressable>
+      }>
       <View className="pb-7 pt-6">
         <Text variant="display">{profile.name}</Text>
         {user?.email && <Text variant="muted" className="mt-1.5">{user.email}</Text>}

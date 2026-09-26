@@ -7,6 +7,7 @@ import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
+import { ProfileButton } from '@/components/profile-button';
 import { AspectRow, Row, RowHead } from '@/components/ui/row';
 import { buildSky, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
 import { formatDate } from '@/lib/horoscope';
@@ -82,7 +83,7 @@ export default function Sky() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label="Trenutno na nebu" padded={false} tint="blue">
+    <Screen label="Trenutno na nebu" padded={false} tint="red" right={<ProfileButton />}>
       <View className="px-5 pb-5 pt-6">
         <Text variant="display">{zoneClock(now, grad.tz)}</Text>
         <Pressable
