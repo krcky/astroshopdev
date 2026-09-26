@@ -485,7 +485,8 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
  * od podznaka; bez vremena rodjenja se izostavlja.
  *
  * Tekstova "planeta u kuci" jos nema (ceka astrologa), pa redovi ne vode
- * nigde — samo datumi i kuca. Znakovi idu u padezu (`SIGN_CASES`): "Mars
+ * nigde — samo datumi i kuca. Strelica ipak stoji na svakom (Ivan, 27.9.2026):
+ * odrediste se dodaje kad stignu tekstovi. Znakovi idu u padezu (`SIGN_CASES`): "Mars
  * ulazi u Lava", "Retrogradna Venera u Skorpiji" (Ivan, 27.9.2026).
  */
 function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
@@ -514,6 +515,7 @@ function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
               leading={<CalendarDay date={e.at} />}
               title={naslov}
               subtitle={podnaslov ? podnaslov.charAt(0).toUpperCase() + podnaslov.slice(1) : undefined}
+              chevron
             />
           );
         })}

@@ -49,19 +49,9 @@ export default function Daily() {
 
   return (
     <Screen label="Tranziti" tint="gold" right={<ProfileButton />}>
-      <View className="pb-6 pt-6">
-        <Text variant="display">Tvoji tranziti danas</Text>
-      </View>
-
-      <View className={cn(CARD_SURFACE, 'mb-6 self-start rounded-full px-4 py-2')}>
-        <Text className="text-xs text-muted-foreground">{daily.skyline}</Text>
-      </View>
-
-      <View>
-        <View className="mb-3 flex-row items-baseline justify-between">
-          <Text variant="label">Po jačini</Text>
-          <Text variant="muted" className="text-xs">{daily.entries.length}</Text>
-        </View>
+      {/* Bez naslova, trake sa planetama i oznake "Po jacini" — lista odmah
+          pocinje karticama (Ivan, 27.9.2026). Redosled je i dalje po jacini. */}
+      <View className="pt-6">
 
         {daily.entries.map((e) => {
           const t = e.transit;
