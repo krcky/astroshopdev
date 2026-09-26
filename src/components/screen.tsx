@@ -116,6 +116,15 @@ type ScreenProps = {
    */
   background?: ScreenBackground;
   /**
+   * Ekran GURNUT preko tabova (profil, tumacenje, izmena, mesto): klizi preko
+   * taba koji ostaje vidljiv ispod. Zato NE dira zajednicku nijansu/pozadinu i
+   * ne pretapa — crta svoje odmah. Bez ovoga tab ispod "pomisli" da je u
+   * pozadini, preuzme boju gurnutog ekrana i preliv mu nestane u trenutku
+   * (bljesak pri odlasku na profil, Ivan 26.9.2026), a pri povratku se vrati
+   * tek posle klizanja.
+   */
+  pushed?: boolean;
+  /**
    * Da li sadrzaj dobija bocnu marginu ekrana (20pt).
    *
    * Ekrani koji svaku sekciju sami uvlace (`mx-5`) — karta i nebo — salju
@@ -139,6 +148,7 @@ export function Screen({
   tabBarSpace = true,
   tint = 'purple',
   background = 'grouped',
+  pushed = false,
   children,
   ...scrollProps
 }: ScreenProps) {
@@ -154,10 +164,11 @@ export function Screen({
    */
   const bezPokreta = useReducedMotion();
   const bgGlobalna = useBackdropStore((s) => s.lastBg);
-  const [bgAktivan, setBgAktivan] = React.useState(false);
-  const [belina] = React.useState(() => new RNAnimated.Value(0));
+  const [bgAktivan, setBgAktivan] = React.useState(pushed);
+  const [belina] = React.useState(() => new RNAnimated.Value(pushed && background === 'white' ? 1 : 0));
   useFocusEffect(
     React.useCallback(() => {
+      if (pushed) return; // gurnut ekran: svoje odmah, zajednicko stanje ne dira
       const prethodna = useBackdropStore.getState().lastBg;
       useBackdropStore.getState().setLastBg(background);
       const cilj = background === 'white' ? 1 : 0;
@@ -171,7 +182,7 @@ export function Screen({
       }
       setBgAktivan(true);
       return () => { anim?.stop(); setBgAktivan(false); };
-    }, [background, bezPokreta, belina])
+    }, [background, bezPokreta, belina, pushed])
   );
   React.useEffect(() => {
     if (!bgAktivan) belina.setValue(bgGlobalna === 'white' ? 1 : 0);
@@ -234,7 +245,7 @@ export function Screen({
       />
 
       {/* 3. preliv */}
-      <ScreenBackdrop tint={tint} />
+      <ScreenBackdrop tint={tint} pushed={pushed} />
 
       {/* 4. natpis */}
       <View
@@ -271,7 +282,7 @@ export function Screen({
  * se ne animiraju direktno — `LinearGradient` ih pretvara u brojeve pri
  * renderu, pa animirane string boje ne bi stigle do native sloja.
  */
-export function ScreenBackdrop({ tint = 'purple' }: { tint?: BackdropTint }) {
+export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: BackdropTint; pushed?: boolean }) {
   const bezPokreta = useReducedMotion();
   /** Nijansa koju je poslednji fokusirani ekran ostavio — prati je svaki ekran u pozadini. */
   const globalna = useBackdropStore((s) => s.last);
@@ -291,13 +302,15 @@ export function ScreenBackdrop({ tint = 'purple' }: { tint?: BackdropTint }) {
    * na Natalnu kartu — dva kadra ljubicaste, skok na zlatnu, pa pretapanje).
    */
   const [prelaz, setPrelaz] = React.useState<BackdropTint | null>(null);
-  const [aktivan, setAktivan] = React.useState(false);
+  // Gurnut ekran (vidi `pushed` u ScreenProps) je aktivan od pocetka i ostaje.
+  const [aktivan, setAktivan] = React.useState(pushed);
   // RN Animated, ne Reanimated: vrednost se menja pozivom metode (setValue/timing),
   // sto pravilo React kompajlera dozvoljava; u state-u, jer se ref ne cita u renderu.
   const [udeo] = React.useState(() => new RNAnimated.Value(1));
 
   useFocusEffect(
     React.useCallback(() => {
+      if (pushed) return; // svoje odmah, zajednicko stanje ne dira
       const prethodna = useBackdropStore.getState().last;
       useBackdropStore.getState().setLast(tint);
       // Providnost novog na nulu PRE nego sto React iscrta stanje sa oba sloja —
@@ -319,7 +332,7 @@ export function ScreenBackdrop({ tint = 'purple' }: { tint?: BackdropTint }) {
         setPrelaz(null);
         setAktivan(false);
       };
-    }, [tint, bezPokreta, udeo])
+    }, [tint, bezPokreta, udeo, pushed])
   );
 
   /*

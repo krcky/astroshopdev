@@ -47,6 +47,7 @@ export default function SkyPlace() {
           <ChevronLeft size={26} color={neutral.ink} />
         </Pressable>}
       tabBarSpace={false}
+      pushed
       keyboardShouldPersistTaps="handled">
           <Text variant="display" className="pb-1 pt-2">{aktivan.name}</Text>
           <Text variant="muted" className="mb-6">

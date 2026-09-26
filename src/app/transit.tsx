@@ -51,7 +51,8 @@ export default function TransitDetail() {
                    accessibilityRole="button" accessibilityLabel="Nazad">
           <ChevronLeft size={26} color={neutral.ink} />
         </Pressable>}
-      tabBarSpace={false}>
+      tabBarSpace={false}
+      pushed>
           {tranzit && (
             <View className="flex-row items-center gap-2 pb-1 pt-2">
               <Glyph size={17} className="text-foreground">

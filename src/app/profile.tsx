@@ -84,6 +84,7 @@ export default function ProfileTab() {
       }
       tint="none"
       tabBarSpace={false}
+      pushed
       left={
         <Pressable
           onPress={() => router.back()}

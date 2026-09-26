@@ -69,6 +69,7 @@ export default function EditBirthData() {
           <ChevronLeft size={26} color={neutral.ink} />
         </Pressable>}
       tabBarSpace={false}
+      pushed
       keyboardShouldPersistTaps="handled">
           <Section title="Ime">
             <TextInput
