@@ -47,6 +47,7 @@ src/
     transits.ts      tranziti na natalnu kartu  <- personalizacija
     points.ts        cvor, Lilit, Tacka srece   <- nema ih u engine-u
     sky.ts           stanje neba SADA nad gradom iz profila
+    sky-events.ts    sledeci ulazak u znak / promena smera + kuca od podznaka
     timezone.ts      lokalno vreme -> UTC
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
@@ -330,6 +331,13 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       kvadrat > trigon > sekstil), pa raniji sat — MOJ IZBOR, ceka astrologa. Na
       0—9 dana godisnje nema nijednog egzaktnog aspekta; tada samo faza i znak.
       Red vodi na tumacenje tek kad tekst postoji. Testovi: `check:natal`, deo 9e.
+- [x] "Promene na nebu" na pocetnoj, posle kartice Mesec (`lib/sky-events.ts`): do tri
+      planete, svaka sa PRVIM sledecim dogadjajem — ulazak u znak, postaje retrogradna ili
+      ponovo direktna — po datumu, sa trajanjem (do izlaska iz znaka / do stanice
+      direktno; direktno kretanje nema kraj). Licni deo je
+      kuca OD PODZNAKA (Whole Sign), jer tada ulazak u znak = ulazak u kucu; bez vremena
+      rodjenja kuce nema. Bez Meseca. Tekstova "planeta u kuci" nema (120, ceka
+      astrologa) — redovi ne vode nigde. Testovi: `check:natal`, deo 9f.
 - [ ] Tekstovi za karticu Mesec — tekstova
       za Mesec kao tranzitnu planetu nema (0/50), a tekstovi lunarnog kalendara
       (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti

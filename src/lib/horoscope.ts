@@ -14,6 +14,7 @@ import {
   findTransits, findHouseTransits, pickHero, pickBrief, splitBySpeed, transitEnd, moonDay,
   type Brief, type MoonDay, type HeroHistory, type HeroPick, type Transit,
 } from '@/lib/transits';
+import { upcomingSkyEvents, type SkyEvent } from '@/lib/sky-events';
 import type { ResolvedProfile } from '@/store/profile';
 
 const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
@@ -29,8 +30,13 @@ const MESECI_GEN = [
  */
 export function formatUntil(end: Date | null, today: Date = new Date()): string {
   if (!end) return 'još godinama';
-  const godina = end.getFullYear() === today.getFullYear() ? '' : ` ${end.getFullYear()}.`;
-  return `do ${end.getDate()}. ${MESECI_GEN[end.getMonth()]}${godina}`;
+  return `do ${formatDay(end, today)}`;
+}
+
+/** "14. novembra", a druge godine "3. marta 2027." — genitiv, za "od" i "do". */
+export function formatDay(day: Date, today: Date = new Date()): string {
+  const godina = day.getFullYear() === today.getFullYear() ? '' : ` ${day.getFullYear()}.`;
+  return `${day.getDate()}. ${MESECI_GEN[day.getMonth()]}${godina}`;
 }
 /** "14:05" po lokalnom vremenu uredjaja. */
 export function formatTime(date: Date): string {
@@ -92,6 +98,8 @@ export type PersonalDaily = {
    * koji postaju egzaktni tog dana, sa najjacim. Isti ceo dan.
    */
   moonDay: MoonDay;
+  /** Sledece promene na nebu: ulazak u znak ili u retrogradnost, do tri planete, po datumu. */
+  skyEvents: SkyEvent[];
   /** "Danas ukratko": ide ti / koci te, bez Hero-a i bez Meseca, po orbisu. */
   brief: Brief;
   /** Svi danasnji tranziti podeljeni na brze i spore planete, po orbisu. */
@@ -149,6 +157,7 @@ export function buildPersonalDaily(
     brief,
     bySpeed,
     moonDay: moonDay(resolved.chart, date, resolved.timeUnknown),
+    skyEvents: upcomingSkyEvents(resolved.chart, date, resolved.timeUnknown),
     moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
     skyline:
       `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +

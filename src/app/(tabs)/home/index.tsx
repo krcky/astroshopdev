@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
-import { buildPersonalDaily, formatDate, formatTime, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
+import { buildPersonalDaily, formatDate, formatDay, formatTime, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
@@ -114,6 +114,9 @@ export default function Home() {
 
       {/* Mesec — faza, znak, najjaci Mesecev tranzit dana. Posle sazetka (Ivan, 27.9.2026). */}
       <MoonCard daily={daily} texts={texts} />
+
+      {/* Sledece promene na nebu i kuca u koju ulaze (Ivanov plan). */}
+      <SkyEvents daily={daily} today={date} />
 
       {/* Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
           (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
@@ -403,6 +406,49 @@ function MoonCard({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
           </>
         )}
       </View>
+    </View>
+  );
+}
+
+/**
+ * Promene na nebu: do tri planete, svaka sa prvim sledecim dogadjajem —
+ * ulazak u znak, postaje retrogradna ili ponovo direktna (`lib/sky-events.ts`). Licni deo je kuca
+ * od podznaka; bez vremena rodjenja se izostavlja.
+ *
+ * Tekstova "planeta u kuci" jos nema (ceka astrologa), pa redovi ne vode
+ * nigde — samo datumi i kuca. Imena znakova su u nominativu ("u znaku
+ * Skorpija"), kao i na kartici Mesec: padeza za znakove u kodu nema.
+ */
+function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
+  if (daily.skyEvents.length === 0) return null;
+  return (
+    <View className="mt-9">
+      <Text variant="label" className="mb-3">Promene na nebu</Text>
+      <Group className="mx-0" inset={false}>
+        {daily.skyEvents.map((e) => {
+          // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad).
+          const zenski = e.planet.key === 'venus';
+          const naslov =
+            e.kind === 'ingress' ? `${e.planet.name} u znaku ${e.sign.name}`
+            : e.kind === 'retrograde' ? `${e.planet.name} ${zenski ? 'retrogradna' : 'retrogradan'} u znaku ${e.sign.name}`
+            : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u znaku ${e.sign.name}`;
+          const kuca = e.house === null ? null
+            : e.kind === 'ingress' ? `ulazi u tvoju ${e.house}. kuću` : `u tvojoj ${e.house}. kući`;
+          // Direktno kretanje nema kraj — samo dan kad pocinje.
+          const trajanje =
+            e.kind === 'direct' ? `od ${formatDay(e.at, today)}`
+            : e.until ? `od ${formatDay(e.at, today)} ${formatUntil(e.until, today)}`
+            : `od ${formatDay(e.at, today)}, godinama`;
+          return (
+            <ListRow
+              key={e.planet.key}
+              leading={<Glyph size={22} className="w-7 text-center text-foreground">{e.planet.glyph}</Glyph>}
+              title={naslov}
+              subtitle={[trajanje, kuca].filter(Boolean).join(' · ')}
+            />
+          );
+        })}
+      </Group>
     </View>
   );
 }

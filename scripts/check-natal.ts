@@ -4,8 +4,10 @@ import {
   ascendant, midheaven, obliquity, rightAscensionMC,
   computeHouses, buildNatalChart, houseOf,
 } from '../src/lib/natal';
-import { norm360 } from '../src/lib/zodiac';
+import { norm360, SIGNS } from '../src/lib/zodiac';
+const SIGNS_IDX = (key: string) => SIGNS.findIndex((s) => s.key === key);
 import { bodyLongitude } from '../src/lib/astro';
+import { upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
@@ -360,6 +362,70 @@ console.log('\n=== 9e. Kartica Mesec (Mesecevi aspekti egzaktni tog dana) ===');
     'bez vremena rodjenja nema ASC i MC');
   const d = md[25];
   console.log(`   ${dayKey(dani[25])}: ${d.sign.name}${d.ingress ? ` -> ${d.ingress.sign.name}` : ''}, najjaci ${d.strongest?.contentKey}`);
+}
+
+// --- 9f. Promene na nebu ---
+console.log('\n=== 9f. Promene na nebu (ulazak u znak, retrogradnost) ===');
+{
+  const lonAt = (k: any, t: number) => bodyLongitude(k, new Date(t));
+  const sgn = (l: number) => Math.floor(norm360(l) / 30);
+  const vel = (k: any, t: number) => {
+    let d = lonAt(k, t + 3_600_000) - lonAt(k, t - 3_600_000);
+    if (d > 180) d -= 360; if (d < -180) d += 360; return d;
+  };
+  // Poznati datumi 2026. (efemeride): Venera Rx 3.10., Merkur Rx 24.10., Sunce u Skorpiji 23.10.
+  const okt = upcomingSkyEvents(chart, new Date(2026, 8, 30, 12));
+  const nadji = (k: string, kind: string) => okt.find((e) => e.planet.key === k && e.kind === kind);
+  const venera = nadji('venus', 'retrograde');
+  ok(!!venera && venera.at.getUTCMonth() === 9 && venera.at.getUTCDate() === 3, 'Venera postaje retrogradna 3. oktobra 2026.', venera?.at.toISOString());
+  ok(!!venera?.until && venera.until.getUTCMonth() === 10 && Math.abs(venera.until.getUTCDate() - 13.5) <= 1, 'Venera direktna oko 13—14. novembra', venera?.until?.toISOString());
+  const okt2 = upcomingSkyEvents(chart, new Date(2026, 9, 20, 12));
+  const sunce = okt2.find((e) => e.planet.key === 'sun');
+  ok(!!sunce && sunce.sign.key === 'scorpio' && sunce.at.getUTCDate() === 23, 'Sunce ulazi u Skorpiju 23. oktobra', sunce?.at.toISOString());
+  const merkur = okt2.find((e) => e.planet.key === 'mercury');
+  ok(!!merkur && merkur.kind === 'retrograde' && merkur.at.getUTCDate() === 24, 'Merkur postaje retrogradan 24. oktobra', merkur?.at.toISOString());
+
+  const nov = upcomingSkyEvents(chart, new Date(2026, 10, 1, 12));
+  const mDir = nov.find((e) => e.planet.key === 'mercury');
+  const vDir = nov.find((e) => e.planet.key === 'venus');
+  ok(mDir?.kind === 'direct' && mDir.at.getUTCMonth() === 10 && Math.abs(mDir.at.getUTCDate() - 13.5) <= 1, 'Merkur ponovo direktan oko 13—14. novembra', mDir?.at.toISOString());
+  ok(vDir?.kind === 'direct' && vDir.until === null && Math.abs(vDir.at.getTime() - (venera?.until?.getTime() ?? 0)) < 60_000, 'Venera direktna tacno kad se retrogradnost zavrsava', vDir?.at.toISOString());
+
+  let tacno = true, redom = true, razlicite = true, bezMeseca = true, kuce = true, prvi = true;
+  const t0 = performance.now();
+  const dani = Array.from({ length: 24 }, (_, i) => new Date(2026, 0, 1 + i * 15, 12));
+  for (const d of dani) {
+    const ev = upcomingSkyEvents(chart, d);
+    const start = localMidnight(d).getTime();
+    if (ev.length !== 3) tacno = false;
+    for (let i = 1; i < ev.length; i++) if (ev[i - 1].at > ev[i].at) redom = false;
+    if (new Set(ev.map((e) => e.planet.key)).size !== ev.length) razlicite = false;
+    if (ev.some((e) => e.planet.key === 'moon')) bezMeseca = false;
+    for (const e of ev) {
+      const t = e.at.getTime(), k = e.planet.key;
+      if (e.kind === 'ingress') {
+        if (sgn(lonAt(k, t - 60_000)) === sgn(lonAt(k, t + 60_000)) || sgn(lonAt(k, t + 60_000)) !== SIGNS_IDX(e.sign.key)) tacno = false;
+        if (e.until && sgn(lonAt(k, e.until.getTime() + 60_000)) === SIGNS_IDX(e.sign.key)) tacno = false;
+      } else if (e.kind === 'direct') {
+        if (!(vel(k, t - 600_000) < 0 && vel(k, t + 600_000) >= 0)) tacno = false;
+      } else {
+        if (!(vel(k, t - 600_000) > 0 && vel(k, t + 600_000) <= 0)) tacno = false;
+        if (e.until && !(vel(k, e.until.getTime() + 600_000) > 0)) tacno = false;
+      }
+      if (e.house !== wholeSignHouse(chart, SIGNS_IDX(e.sign.key)) || e.house! < 1 || e.house! > 12) kuce = false;
+      // Nijedna planeta nema raniji dogadjaj od prijavljenog (provera na svakih 6 sati).
+      for (let x = start + 21_600_000; x < t - 21_600_000; x += 21_600_000) {
+        if (sgn(lonAt(k, x)) !== sgn(lonAt(k, start)) || Math.sign(vel(k, start + 3_600_000)) !== Math.sign(vel(k, x))) { prvi = false; break; }
+      }
+    }
+    if (upcomingSkyEvents(chart, d, true).some((e) => e.house !== null)) kuce = false;
+  }
+  const ms = (performance.now() - t0) / dani.length;
+  ok(tacno, 'svaki dogadjaj je tacan trenutak (znak / stanica)');
+  ok(prvi, 'svaki je PRVI sledeci za svoju planetu');
+  ok(redom && razlicite && bezMeseca, 'tri razlicite planete, po datumu, bez Meseca');
+  ok(kuce, 'kuca od podznaka; bez vremena rodjenja nema kuce');
+  ok(ms < 300, 'racuna se brzo', `${ms.toFixed(0)} ms/dan (sa proverom)`);
 }
 
 console.log('\n  planete kroz natalne kuce:');
