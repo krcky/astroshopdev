@@ -3,15 +3,15 @@ import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
 import { Button } from '@/components/ui/button';
-import { size } from '@/theme/tokens';
+import { neutral, shadow, size } from '@/theme/tokens';
 
 /**
  * Kruzno dugme sa ikonom u Liquid Glass mehuru (iOS 26+), 40pt kao dugme u
  * zaglavlju. Gde stakla nema — Android, stariji iOS, veb — pada na `Button`
  * varijante `soft`: belo sa mekom senkom, isto sto koristi i zaglavlje ekrana.
  *
- * Isti pristup kao `FloatingTabBar`: pravo staklo gde postoji, a ne lazno
- * poluprovidno belo, koje nad sarenim sadrzajem izgleda prljavo.
+ * Pravo staklo gde postoji, a ne lazno poluprovidno belo, koje nad sarenim
+ * sadrzajem izgleda prljavo.
  *
  * `GlassView` je nativna komponenta i NativeWind je ne poznaje — sve ide kroz
  * `style`, ne `className` (klase bi tiho nestale).
@@ -59,5 +59,26 @@ export function GlassIconButton({ onPress, disabled, accessibilityLabel, childre
         <View>{children}</View>
       </GlassView>
     </Pressable>
+  );
+}
+
+/**
+ * Mehur proizvoljne sirine, visine dugmeta zaglavlja (40pt), za vise kontrola
+ * u jednom staklu — npr. strelice za dan. Gde stakla nema: bela pilula sa
+ * ivicom i mekom senkom.
+ */
+export function GlassBubble({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+  const pilula: ViewStyle = { height: D, borderRadius: D / 2, overflow: 'hidden', flexDirection: 'row', alignItems: 'center' };
+  if (!isLiquidGlassAvailable()) {
+    return (
+      <View style={[pilula, { backgroundColor: neutral.white, borderWidth: 1, borderColor: neutral.separator, ...shadow.soft }, style]}>
+        {children}
+      </View>
+    );
+  }
+  return (
+    <GlassView glassEffectStyle="regular" colorScheme="light" isInteractive style={[pilula, style]}>
+      {children}
+    </GlassView>
   );
 }

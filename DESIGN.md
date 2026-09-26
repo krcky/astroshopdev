@@ -141,7 +141,7 @@ se pisu kao kapsula da se ne razidju kad se visina promeni.
 | `h-chip` | 40 |
 | `h-header-button` / `w-header-button` | 40 |
 | `h-tile` / `w-tile` | 28 |
-| lebdeca traka | 65 |
+| traka tabova | native (`NativeTabs`), razmak ispod: `TabBarSpacer` u `screen.tsx` |
 
 ### Razmaci
 
@@ -156,7 +156,7 @@ Referentna aplikacija ih koristi stedljivo:
 - `shadow.soft` — belo dugme na beloj pozadini (zaglavlje, "Skip", neaktivno
   dugme). Ta dugmad **nemaju ivicu**: skeniranje piksela poprecno kroz dugme ne
   pokazuje skok u boji, nego mek prelaz sa `#FFFFFF` na `#F9F8F9` ka sredini.
-- `shadow.floating` — lebdeca traka na dnu.
+- `shadow.floating` — plutajuci paneli (meni dana na Androidu); traka tabova je native.
 - Kartice na sivoj pozadini **nemaju nijednu senku**. Razdvaja ih razlika u
   boji.
 
@@ -172,7 +172,6 @@ Referentna aplikacija ih koristi stedljivo:
 | `Card` | `src/components/ui/card.tsx` |
 | `Group`, `GroupHeader`, `ListRow`, `IconTile` | `src/components/ui/list.tsx` |
 | `Chip` | `src/components/ui/chip.tsx` |
-| `FloatingTabBar` | `src/components/floating-tab-bar.tsx` |
 | `Screen` | `src/components/screen.tsx` |
 
 ### Dugme
@@ -323,8 +322,7 @@ stil, i do njega se drugacije ne stize:
 - `expo-blur` bas zato izvozi `getAnimatableRef()`. Provereno: `intensity` 20
   daje `blur(4px)`.
 
-Visoka **70** ispod statusne trake (referenca ima 53; podignuto 26.9.2026 zbog loga od
-47pt u traci) — razmak na vrhu sadrzaja je
+Visoka **53** ispod statusne trake — razmak na vrhu sadrzaja je
 `insets.top + headerBar.height`, i racuna se na jednom mestu. Da ga svaki ekran
 sam sabira, prvi naslov bi se na jednom podvukao pod traku a na drugom odlepio,
 i to bi se videlo tek na telefonu sa zarezom.

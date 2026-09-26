@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, type ScrollViewProps } from 'react-native';
+import { Platform, View, type ScrollViewProps } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -12,7 +12,6 @@ import { BlurTargetView, BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Logo } from '@/components/logo';
-import { TabBarSpacer } from '@/components/floating-tab-bar';
 import { backdrop, headerBar, space } from '@/theme/tokens';
 
 /**
@@ -77,6 +76,25 @@ import { backdrop, headerBar, space } from '@/theme/tokens';
  */
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+
+/**
+ * Koliko prostora ekran ostavlja na dnu da native traka tabova ne prekrije
+ * sadrzaj. Nas skrol ima `contentInsetAdjustmentBehavior="never"` (zbog vrha),
+ * pa sistem ne moze sam da doda donji umetak. Broj je visina trake plus
+ * vazduh; donji safe-area umetak se dodaje posebno jer zavisi od uredjaja.
+ * iOS 26: plutajuca traka ~50pt iznad umetka. Android: Material traka 80pt.
+ */
+const TAB_BAR_SPACE = Platform.select({ ios: 62, default: 80 });
+
+/**
+ * Prazan prostor na dnu ekrana ispod trake — ide kao POSLEDNJE dete ScrollView-a.
+ * Spacer, a ne `pb-*`: fiksan broj bi na telefonu sa zarezom sekao sadrzaj, a
+ * na starijem ostavljao rupu.
+ */
+function TabBarSpacer() {
+  const insets = useSafeAreaInsets();
+  return <View style={{ height: TAB_BAR_SPACE + insets.bottom }} />;
+}
 
 type ScreenProps = {
   /** Ime strane u traci, pored kruga loga; ili gotov element umesto toga. */

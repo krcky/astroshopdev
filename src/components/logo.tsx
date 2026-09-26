@@ -16,7 +16,7 @@ import { Text } from '@/components/ui/text';
  *
  * Natpis je OBICAN TEKST "Astro Shop", 24/30 polucrn (Ivan, 26.9.2026),
  * sistemsko pismo, ne SVG wordmark iz brend fajla.
- * Krug je 52 (Ivan: +30% pa +10% na 36), razmak 12; red ima `items-center`,
+ * Krug je 48 (Ivan, 26.9.2026), centar u liniji sa native dugmadima; razmak 12; red ima `items-center`,
  * pa je tekst na sredini kruga.
  *
  * Na vebu `lottie-react-native` trazi dodatni paket, pa `logo.web.tsx` crta
@@ -30,7 +30,7 @@ import { Text } from '@/components/ui/text';
  * je jedva pokret, a logo je jedina animacija na ekranu. Ako se doda jos
  * pokreta, ovo je mesto gde se `useReducedMotion` vraca.
  */
-export const LOGO_SIZE = 52;
+export const LOGO_SIZE = 48;
 const GAP = 12;
 
 /** Kompozicija punog loga (logo-full.json): sirina, visina i x centra kruga. */
@@ -93,8 +93,8 @@ export function Logo({ title = 'Astro Shop', full = false }: { title?: string; f
   return (
     <View
       className="flex-row items-center"
-      // Traka centrira natpis po sredini svojih 70pt; logo ide 5pt vise, blize
-      // statusnoj traci (Ivan, 26.9.2026): krug od 52 tada ima 4pt do vrha trake.
+      // Traka je 53pt (centar 26,5); logo ide 5pt vise da mu centar bude na 22pt
+      // ispod statusne trake, u liniji sa native dugmadima iOS trake (44pt).
       style={{ gap: GAP, transform: [{ translateY: -5 }] }}
       accessibilityRole="header"
       accessibilityLabel={title}>

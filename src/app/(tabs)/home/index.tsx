@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { Modal, Platform, Pressable, View } from 'react-native';
+import { Redirect, Stack, router } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
 import { Button } from '@/components/ui/button';
-import { GlassIconButton } from '@/components/ui/glass-button';
+import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
 import { buildPersonalDaily, formatDate, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
-import { ChevronLeft, ChevronRight, Minus, Plus } from 'lucide-react-native';
-import { neutral } from '@/theme/tokens';
+import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { headerBar, neutral, shadow, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
 import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
@@ -50,11 +51,59 @@ export default function Home() {
 
   return (
     // Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`.
-    <Screen label={<Logo />}>
+    <Screen
+      label={<Logo />}
+      // Gore desno: dan-meni i profil. Na iOS-u su to NATIVE stavke trake
+      // (`unstable_headerRightItems` dole): UIMenu sa zamucenjem na dodir,
+      // Liquid Glass dugmad (Ivan, 26.9.2026). Android nema tu traku, pa dobija
+      // nas meni i stakleni krug.
+      right={
+        Platform.OS === 'ios' ? undefined : (
+          <View className="flex-row items-center gap-2" style={{ transform: [{ translateY: -5 }] }}>
+            <DayMenu today={today} offset={offset} onChange={setOffset} />
+            <GlassIconButton onPress={() => router.push('/profile')} accessibilityLabel="Profil">
+              <UserRound size={20} color={neutral.ink} />
+            </GlassIconButton>
+          </View>
+        )
+      }>
+      {Platform.OS === 'ios' && (
+        <Stack.Screen
+          options={{
+            unstable_headerRightItems: () => [
+              {
+                type: 'menu',
+                label: dayLabel(today, offset),
+                icon: { type: 'sfSymbol', name: 'chevron.down' },
+                changesSelectionAsPrimaryAction: true,
+                menu: {
+                  title: 'Dan',
+                  items: DAY_OFFSETS.map((o) => ({
+                    type: 'action' as const,
+                    label: RELATIVE[o],
+                    description: formatDate(dayAt(today, o)),
+                    state: o === offset ? ('on' as const) : ('off' as const),
+                    onPress: () => setOffset(o),
+                  })),
+                },
+              },
+              {
+                type: 'button',
+                label: 'Profil',
+                icon: { type: 'sfSymbol', name: 'person' },
+                accessibilityLabel: 'Profil',
+                onPress: () => router.push('/profile'),
+              },
+            ],
+          }}
+        />
+      )}
       {/* Bez naslova (Ivan, 26.9.2026): ekran pocinje datumom, blizu trake. */}
       <View className="pt-2" />
 
-      <DateRow date={date} offset={offset} onChange={setOffset} />
+      <View className="mb-6 flex-row">
+        <DateRow date={date} offset={offset} onChange={setOffset} />
+      </View>
 
       {/* Tranzit dana — Hero. Sta ulazi bira waterfall u `transits.ts`. */}
       <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} />
@@ -86,34 +135,84 @@ type Texts = Map<string, TransitText>;
 const DAY_RANGE = 2;
 const RELATIVE: Record<number, string> = { [-2]: 'Prekjuče', [-1]: 'Juče', 0: 'Danas', 1: 'Sutra', 2: 'Prekosutra' };
 
+/** Skracena imena dana, kao u iOS kalendaru. */
+const DANI_KRATKO = ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'];
+/** Ponudjeni dani: dva pre, danas, dva posle. */
+const DAY_OFFSETS = [-DAY_RANGE, -1, 0, 1, DAY_RANGE];
+const dayAt = (today: Date, o: number) => { const d = new Date(today); d.setDate(today.getDate() + o); return d; };
+/** Natpis na dugmetu: "Danas", ili skracenica dana kad je izabran drugi. */
+const dayLabel = (today: Date, offset: number) => (offset === 0 ? 'Danas' : DANI_KRATKO[dayAt(today, offset).getDay()]);
+
 /**
- * Datum sa strelicama: dva dana unazad i dva unapred (Ivan, 26.9.2026).
- * Strelice su u Liquid Glass mehuru gde ga sistem ima, inace belo dugme.
- * Ispod datuma stoji rec za dan; kad nije danas, dodir na nju vraca na danas.
+ * ANDROID varijanta dan-menija (iOS ima native UIMenu u traci, vidi gore).
+ * Mehur sa danom: "Danas", ili skracenica dana (Pon, Uto…) kad je izabran
+ * drugi dan. Dodir otvara meni ispod trake sa pet dana: dva pre, danas, dva posle.
+ *
+ * Meni je Modal, ne apsolutni panel u traci: traka je visoka 70pt i na iOS-u
+ * dodir van roditelja ne stize do deteta, pa bi panel ispod trake bio mrtav.
  */
-function DateRow({ date, offset, onChange }: { date: Date; offset: number; onChange: (o: number) => void }) {
-  const naPocetku = offset <= -DAY_RANGE;
-  const naKraju = offset >= DAY_RANGE;
+function DayMenu({ today, offset, onChange }: { today: Date; offset: number; onChange: (o: number) => void }) {
+  const [otvoren, setOtvoren] = React.useState(false);
+  const insets = useSafeAreaInsets();
+  const dan = (o: number) => dayAt(today, o);
+  const natpis = dayLabel(today, offset);
+  const ponude = DAY_OFFSETS;
+
   return (
-    <View className="mb-6 flex-row items-center justify-between">
-      <GlassIconButton disabled={naPocetku} onPress={() => onChange(offset - 1)} accessibilityLabel="Dan unazad">
-        <ChevronLeft size={22} color={naPocetku ? neutral.inkSubtle : neutral.ink} />
-      </GlassIconButton>
-      <Pressable
-        onPress={() => onChange(0)}
-        disabled={offset === 0}
-        accessibilityRole="button"
-        accessibilityLabel={offset === 0 ? formatDate(date) : 'Vrati na danas'}
-        className="items-center active:opacity-60">
-        <Text variant="row">{formatDate(date)}</Text>
-        <Text variant="caption" className={cn(offset !== 0 && 'text-foreground')}>
-          {offset === 0 ? RELATIVE[0] : `${RELATIVE[offset]} · vrati na danas`}
-        </Text>
-      </Pressable>
-      <GlassIconButton disabled={naKraju} onPress={() => onChange(offset + 1)} accessibilityLabel="Dan unapred">
-        <ChevronRight size={22} color={naKraju ? neutral.inkSubtle : neutral.ink} />
-      </GlassIconButton>
-    </View>
+    <>
+      <GlassBubble>
+        <Pressable
+          onPress={() => setOtvoren(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Izabran dan: ${natpis}. Promeni dan`}
+          className="h-header-button flex-row items-center gap-1 pl-4 pr-3 active:opacity-60">
+          <Text variant="chip">{natpis}</Text>
+          <ChevronDown size={16} color={neutral.inkMuted} strokeWidth={2.4} />
+        </Pressable>
+      </GlassBubble>
+
+      <Modal visible={otvoren} transparent animationType="fade" onRequestClose={() => setOtvoren(false)}>
+        {/* Providna pozadina: dodir bilo gde zatvara meni. */}
+        <Pressable className="flex-1" onPress={() => setOtvoren(false)} accessibilityLabel="Zatvori meni" />
+        <View
+          className="absolute overflow-hidden rounded-lg bg-background"
+          style={{ top: insets.top + headerBar.height - 4, right: space.screen, width: 260, ...shadow.floating }}>
+          {ponude.map((o, i) => (
+            <React.Fragment key={o}>
+              {i > 0 && <View className="h-px bg-border" />}
+              <Pressable
+                onPress={() => { onChange(o); setOtvoren(false); }}
+                accessibilityRole="button"
+                accessibilityState={o === offset ? { selected: true } : undefined}
+                className="min-h-row flex-row items-center gap-3 px-gutter py-3 active:bg-fill">
+                <View className="flex-1">
+                  <Text variant="row">{RELATIVE[o]}</Text>
+                  <Text variant="caption">{formatDate(dan(o))}</Text>
+                </View>
+                {o === offset && <Check size={18} color={neutral.ink} strokeWidth={2.4} />}
+              </Pressable>
+            </React.Fragment>
+          ))}
+        </View>
+      </Modal>
+    </>
+  );
+}
+
+/** Datum, poravnat levo; ispod rec za dan. Kad nije danas, dodir vraca na danas. */
+function DateRow({ date, offset, onChange }: { date: Date; offset: number; onChange: (o: number) => void }) {
+  return (
+    <Pressable
+      onPress={() => onChange(0)}
+      disabled={offset === 0}
+      accessibilityRole="button"
+      accessibilityLabel={offset === 0 ? formatDate(date) : 'Vrati na danas'}
+      className="active:opacity-60">
+      <Text variant="row">{formatDate(date)}</Text>
+      <Text variant="caption" className={cn(offset !== 0 && 'text-foreground')}>
+        {offset === 0 ? RELATIVE[0] : `${RELATIVE[offset]} · vrati na danas`}
+      </Text>
+    </Pressable>
   );
 }
 

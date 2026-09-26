@@ -191,7 +191,7 @@ export const size = {
   headerButton: 40,
   /** Kapsula kategorije. */
   chip: 40,
-  /** Lebdeca traka na dnu. */
+  /** Lebdeca traka na dnu — izmerena u referenci; od 26.9.2026. traka je NATIVE (`NativeTabs`), broj ostaje kao trag. */
   tabBar: 65,
   /** Debljina svake linije razdvajanja. */
   hairline: 1,
@@ -282,9 +282,10 @@ export const backdrop = {
 /**
  * Traka na vrhu ekrana — zamucuje ono sto klizi ispod nje.
  *
- * Visina je bila iz reference (53). Podignuta na 70 (Ivan, 26.9.2026) kad je u
- * traku usao logo: krug od 47pt u 53 ima po 3pt vazduha, u 70 po 11,5. Statusna
- * traka se dodaje na nju, ne racuna se u nju: `insets.top + headerBar.height`.
+ * Visina je iz reference (53). Bila je privremeno 70 zbog loga, pa vracena na 53
+ * (Ivan, 26.9.2026: "prevelika"); logo od 48pt se pomera navise da mu centar bude
+ * na 22pt ispod statusne trake, kao native dugmad iOS trake. Statusna traka se
+ * dodaje na nju, ne racuna se u nju: `insets.top + headerBar.height`.
  *
  * `intensity` NIJE prepis CSS-ovog `blur(16px)`. Na iOS-u `expo-blur` bira
  * sistemski materijal i `intensity` je udeo tog materijala (1-100), a ne
@@ -297,7 +298,7 @@ export const backdrop = {
  */
 export const headerBar = {
   /** Visina trake ISPOD statusne trake. */
-  height: 70,
+  height: 53,
   /** Poluprecnik zamucenja u referenci — cuva se radi traga, ne koristi se direktno. */
   cssBlur: 16,
   /** Udeo sistemskog materijala na iOS-u (1-100), kad je traka puna. */

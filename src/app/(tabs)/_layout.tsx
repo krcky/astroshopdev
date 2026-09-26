@@ -1,40 +1,56 @@
-import { Tabs } from 'expo-router';
-import { CircleDot, House, Orbit, Sparkles, UserRound } from 'lucide-react-native';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { FloatingTabBar } from '@/components/floating-tab-bar';
+import { neutral } from '@/theme/tokens';
 
 /*
- * Imena tabova (26.9.2026): Danas · Tranziti · Ti · Nebo · Profil.
- * "Ti" je natalna karta — ono sto se ne menja; "Nebo" je stanje neba sada.
- * Ekrani u kodu zadrzavaju stara imena fajlova (daily, chart, sky).
+ * NATIVE traka tabova (UITabBarController na iOS-u, Liquid Glass na iOS-u 26;
+ * Material na Androidu) umesto rucno crtane lebdece trake (Ivan, 26.9.2026).
+ * Sistem sam crta staklo, animacije i skrivanje na skrol.
+ *
+ * Imena tabova: Danas · Tranziti · Ti · Nebo · Profil. "Ti" je natalna karta —
+ * ono sto se ne menja; "Nebo" je stanje neba sada. Ekrani u kodu zadrzavaju
+ * stara imena fajlova (daily, chart, sky). Ikone: SF Symbols na iOS-u (obicna
+ * kad tab nije izabran, ispunjena kad jeste), Material ikone (`md`) na Androidu —
+ * bez `md` Android ostaje BEZ ikona.
+ *
+ * Razmak na dnu ekrana ispod trake pravi `TabBarSpacer` u `Screen` — nas
+ * skrol ne dozvoljava sistemu da mu sam podesi umetke (vidi tamo).
  */
 export default function TabsLayout() {
   return (
-    <Tabs
-      // Traka lebdi iznad sadrzaja, pa se crta rucno. Ekrani zato moraju da
-      // ostave `TAB_BAR_SPACE` praznog prostora na dnu.
-      tabBar={(props) => <FloatingTabBar {...props} />}
-      screenOptions={{ headerShown: false }}>
-      <Tabs.Screen
-        name="home"
-        options={{ title: 'Danas', tabBarIcon: ({ color, size }) => <House size={size} color={color} /> }}
-      />
-      <Tabs.Screen
-        name="daily"
-        options={{ title: 'Tranziti', tabBarIcon: ({ color, size }) => <Sparkles size={size} color={color} /> }}
-      />
-      <Tabs.Screen
-        name="chart"
-        options={{ title: 'Ti', tabBarIcon: ({ color, size }) => <CircleDot size={size} color={color} /> }}
-      />
-      <Tabs.Screen
-        name="sky"
-        options={{ title: 'Nebo', tabBarIcon: ({ color, size }) => <Orbit size={size} color={color} /> }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{ title: 'Profil', tabBarIcon: ({ color, size }) => <UserRound size={size} color={color} /> }}
-      />
-    </Tabs>
+    <NativeTabs
+      // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
+      // (#9C9C9D, `inkSubtle`), izabrani u `ink` (Ivan, 26.9.2026). `tintColor` bi na
+      // nivou UITabBar-a mogao da preboji i neaktivne, pa ga nema.
+      iconColor={{ default: neutral.inkSubtle, selected: neutral.ink }}
+      labelStyle={{ default: { color: neutral.inkSubtle }, selected: { color: neutral.ink } }}
+      // iOS 26: traka se sazme pri skrolu nadole.
+      minimizeBehavior="onScrollDown"
+      // Android (Material 3 traka): bela podloga, siva kapsula iza izabrane ikone i
+      // siv talas na dodir — iste boje kao nasa nekadasnja traka. iOS ovo ignorise.
+      backgroundColor={neutral.white}
+      indicatorColor={neutral.fillStrong}
+      rippleColor={neutral.fill}>
+      <NativeTabs.Trigger name="home">
+        <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
+        <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="daily">
+        <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
+        <NativeTabs.Trigger.Label>Tranziti</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="chart">
+        <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
+        <NativeTabs.Trigger.Label>Ti</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="sky">
+        <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
+        <NativeTabs.Trigger.Label>Nebo</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile">
+        <NativeTabs.Trigger.Icon sf={{ default: 'person', selected: 'person.fill' }} md="person" />
+        <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
