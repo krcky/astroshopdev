@@ -11,12 +11,27 @@
  */
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
 import {
-  findTransits, findHouseTransits, pickHero, pickBrief,
+  findTransits, findHouseTransits, pickHero, pickBrief, splitBySpeed, transitEnd,
   type Brief, type HeroHistory, type HeroPick, type Transit,
 } from '@/lib/transits';
 import type { ResolvedProfile } from '@/store/profile';
 
 const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
+/** Genitiv, za "do 14. novembra". */
+const MESECI_GEN = [
+  'januara', 'februara', 'marta', 'aprila', 'maja', 'juna',
+  'jula', 'avgusta', 'septembra', 'oktobra', 'novembra', 'decembra',
+];
+
+/**
+ * "do 14. novembra", a ako je druge godine "do 3. marta 2027." — kad tranzit
+ * traje. `null` (iza horizonta od ~3 godine) daje "još godinama".
+ */
+export function formatUntil(end: Date | null, today: Date = new Date()): string {
+  if (!end) return 'još godinama';
+  const godina = end.getFullYear() === today.getFullYear() ? '' : ` ${end.getFullYear()}.`;
+  return `do ${end.getDate()}. ${MESECI_GEN[end.getMonth()]}${godina}`;
+}
 const MESECI = [
   'januar', 'februar', 'mart', 'april', 'maj', 'jun',
   'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar',
@@ -49,6 +64,8 @@ export type PersonalEntry = {
   transit: Transit;
 };
 
+export type SlowTransit = Transit & { endsOn: Date | null };
+
 export type PersonalDaily = {
   date: Date;
   name: string;
@@ -67,6 +84,12 @@ export type PersonalDaily = {
   moon: { phase: string; sign: string; glyph: string };
   /** "Danas ukratko": ide ti / koci te, bez Hero-a i bez Meseca, po orbisu. */
   brief: Brief;
+  /** Svi danasnji tranziti podeljeni na brze i spore planete, po orbisu. */
+  bySpeed: {
+    fast: Transit[];
+    /** Spori nose i dokle traju — prvi izlazak iz orbisa, `null` iza ~3 godine. */
+    slow: SlowTransit[];
+  };
   /** Kroz koje natalne kuce prolaze spore planete danas. */
   houseHighlights: { house: number; planetName: string; glyph: string; contentKey: string }[];
 };
@@ -102,12 +125,19 @@ export function buildPersonalDaily(
 
   const hero = pickHero(resolved.chart, date, resolved.timeUnknown, heroHistory);
   const brief = pickBrief(entries.map((e) => e.transit), hero.transit?.contentKey ?? null);
+  const podeljeno = splitBySpeed(entries.map((e) => e.transit));
+  const bySpeed = {
+    fast: podeljeno.fast,
+    // Kraj se racuna samo sporima — brzi prodju za nekoliko dana i to nikog ne zanima.
+    slow: podeljeno.slow.map((t) => ({ ...t, endsOn: transitEnd(t, date) })),
+  };
 
   return {
     date,
     name: resolved.profile.name,
     hero,
     brief,
+    bySpeed,
     moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
     skyline:
       `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +

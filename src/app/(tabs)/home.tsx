@@ -7,13 +7,14 @@ import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
 import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { buildPersonalDaily, formatDate, type PersonalDaily } from '@/lib/horoscope';
+import { Group, ListRow } from '@/components/ui/list';
+import { buildPersonalDaily, formatDate, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { traitsForSign } from '@/lib/traits';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { useHeroLog } from '@/store/hero-log';
-import { dayKey, type Transit } from '@/lib/transits';
+import { dayKey, briefBucket, type BriefBucket, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 
@@ -30,13 +31,12 @@ export default function Home() {
     [resolved, today, heroHistory]
   );
 
-  // Jedan upit za tekstove Hero-a i sazetka zajedno, ne dva.
-  const kljucevi = React.useMemo(() => {
-    if (!daily) return [];
-    const k = [...daily.brief.ide, ...daily.brief.koci].map((t) => t.contentKey);
-    if (daily.hero.transit) k.unshift(daily.hero.transit.contentKey);
-    return k;
-  }, [daily]);
+  // Jedan upit za tekstove svih danasnjih tranzita — Hero, sazetak i liste
+  // su podskupovi iste liste.
+  const kljucevi = React.useMemo(
+    () => (daily ? daily.entries.map((e) => e.transit.contentKey) : []),
+    [daily]
+  );
   const { texts, loading: textsLoading } = useTransitTexts(kljucevi);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
@@ -85,6 +85,20 @@ export default function Home() {
 
       {/* Danas ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`. */}
       <Brief daily={daily} texts={texts} />
+
+      {/* Svi danasnji tranziti, podeljeni po brzini planete. */}
+      <TransitList
+        naslov="Ovih dana"
+        list={daily.bySpeed.fast}
+        texts={texts}
+        today={today}
+      />
+      <TransitList
+        naslov="Tema perioda"
+        list={daily.bySpeed.slow}
+        texts={texts}
+        today={today}
+      />
     </Screen>
   );
 }
@@ -155,20 +169,44 @@ function Hero({ daily, today, texts, loading }: { daily: PersonalDaily; today: D
   );
 }
 
-/** Do tri reda koja IMAJU tekst; tranziti bez teksta se preskacu, ne izmisljaju. */
+/**
+ * Do tri reda koja IMAJU tekst; tranziti bez teksta se preskacu, ne izmisljaju.
+ * Ako nijedan nema tekst a kandidata ima, vracaju se prva tri BEZ recenice —
+ * grupa tada pokazuje sta je napeto (ili skladno) i priznaje da tumacenja nema,
+ * umesto da nestane sa ekrana.
+ */
 function saTekstom(list: Transit[], texts: Texts, polje: 'positive' | 'challenge') {
-  const out: { t: Transit; recenica: string }[] = [];
+  const out: { t: Transit; recenica: string | null }[] = [];
   for (const t of list) {
     const recenica = texts.get(t.contentKey)?.[polje];
     if (recenica) out.push({ t, recenica });
     if (out.length === 3) break;
   }
+  if (out.length === 0) return list.slice(0, 3).map((t) => ({ t, recenica: null }));
   return out;
 }
 
+/**
+ * Rezerva na Hero: kad grupa ostane bez ijedne recenice (kao kad je jedini
+ * napet tranzit dana otisao u Hero, a ostali su na ASC/MC bez teksta), uzme se
+ * recenica Hero tranzita ako pripada toj grupi. Jeste ponavljanje, ali kratko i
+ * samo u takvim danima. Redovi bez teksta ostaju ispod, do tri ukupno.
+ */
+function grupaSaRezervom(
+  list: Transit[], polje: 'positive' | 'challenge', bucket: BriefBucket,
+  hero: Transit | null, texts: Texts
+) {
+  const redovi = saTekstom(list, texts, polje);
+  if (redovi.some((r) => r.recenica)) return redovi;
+  const recenica = hero && briefBucket(hero) === bucket ? texts.get(hero.contentKey)?.[polje] : undefined;
+  if (!recenica) return redovi;
+  return [{ t: hero!, recenica }, ...redovi].slice(0, 3);
+}
+
 function Brief({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
-  const ide = saTekstom(daily.brief.ide, texts, 'positive');
-  const koci = saTekstom(daily.brief.koci, texts, 'challenge');
+  const hero = daily.hero.transit;
+  const ide = grupaSaRezervom(daily.brief.ide, 'positive', 'ide', hero, texts);
+  const koci = grupaSaRezervom(daily.brief.koci, 'challenge', 'koci', hero, texts);
   if (ide.length === 0 && koci.length === 0) return null;
 
   return (
@@ -179,28 +217,77 @@ function Brief({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
         accessibilityRole="button"
         className={cn(CARD_SURFACE, 'active:opacity-60')}>
         {ide.length > 0 && <Grupa naslov="Ide ti" redovi={ide} />}
-        {ide.length > 0 && koci.length > 0 && <View className="mx-5 h-px bg-border" />}
+        {ide.length > 0 && koci.length > 0 && <View className="h-px bg-border" />}
         {koci.length > 0 && <Grupa naslov="Koči te" redovi={koci} />}
       </Pressable>
     </View>
   );
 }
 
-function Grupa({ naslov, redovi }: { naslov: string; redovi: { t: Transit; recenica: string }[] }) {
+function Grupa({ naslov, redovi }: { naslov: string; redovi: { t: Transit; recenica: string | null }[] }) {
   return (
     <View className="p-5">
       <Text variant="h3" className="mb-2">{naslov}</Text>
       {redovi.map(({ t, recenica }) => (
-        <View key={t.contentKey} className="flex-row gap-3 py-2">
-          <Glyph size={14} className="mt-[3px] text-muted-foreground">
-            {`${t.transiting.glyph}${t.aspect.glyph}${t.natal.glyph}`}
-          </Glyph>
-          <View className="flex-1">
-            <Text variant="default">{recenica}</Text>
-            <Text variant="caption">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
-          </View>
+        <View key={t.contentKey} className="py-2">
+          {recenica ? (
+            <>
+              <Text variant="default">{recenica}</Text>
+              <Text variant="caption">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
+            </>
+          ) : (
+            <>
+              <Text variant="default">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
+              <Text variant="caption">Tumačenje još nije napisano.</Text>
+            </>
+          )}
         </View>
       ))}
+    </View>
+  );
+}
+
+/** Koliko redova stane na pocetni ekran pre nego sto lista uputi u tab "Horoskop". */
+const MAX_ROWS = 5;
+
+/** Da li red nosi i kraj tranzita (samo spori ga imaju). */
+const imaKraj = (t: Transit | SlowTransit): t is SlowTransit => 'endsOn' in t;
+
+function TransitList({ naslov, list, texts, today }: {
+  naslov: string; list: (Transit | SlowTransit)[]; texts: Texts; today: Date;
+}) {
+  if (list.length === 0) return null;
+  const prikaz = list.slice(0, MAX_ROWS);
+  const ostalo = list.length - prikaz.length;
+
+  return (
+    <View className="mt-9">
+      <Text variant="label" className="mb-3">{naslov}</Text>
+      {/* Group nosi mx-screen, a ekran vec ima marginu — ponistava se. Redovi nemaju ikonu, linija ide od ivice do ivice. */}
+      <Group className="mx-0" inset={false}>
+        {prikaz.map((t) => {
+          // Velikim: naslov tumacenja. Malim: sam tranzit, i dokle traje ako je spor.
+          // Bez teksta se ne izmislja — tranzit ide u naslov, podnaslov ostaje kraj.
+          const ime = `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`;
+          const naslovTeksta = texts.get(t.contentKey)?.title;
+          const kraj = imaKraj(t) ? formatUntil(t.endsOn, today) : null;
+          const podnaslov = [naslovTeksta ? ime : null, kraj].filter(Boolean).join(' · ');
+          return (
+            <ListRow
+              key={t.contentKey}
+              title={naslovTeksta || ime}
+              subtitle={podnaslov || undefined}
+              onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+            />
+          );
+        })}
+        {ostalo > 0 && (
+          <ListRow
+            title={`Još ${ostalo} u Horoskopu`}
+            onPress={() => router.push('/daily')}
+          />
+        )}
+      </Group>
     </View>
   );
 }

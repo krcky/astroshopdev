@@ -8,7 +8,7 @@ import { norm360 } from '../src/lib/zodiac';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
-  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, type Transit,
+  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, splitBySpeed, transitEnd, type Transit,
 } from '../src/lib/transits';
 import { spreadAngles, chartAngle } from '../src/lib/wheel';
 
@@ -264,7 +264,44 @@ console.log('\n=== 9b. Danas ukratko (ide ti / koci te) ===');
     ok(![...b.ide, ...b.koci].some((t) => t.transiting.key === 'moon'), 'Mesec ne ulazi u sazetak');
     ok(b.ide[0]?.natal.key === 'venus' && b.ide[1]?.natal.key === 'mars', 'ide ti: po orbisu (Jupiter 0,3 pre Venere 1,2)');
     ok(b.koci[0]?.natal.key === 'mercury' && b.koci[1]?.natal.key === 'jupiter', 'koci te: po orbisu');
-    ok(b.ide.length === 5, 'najvise 5 po grupi (rezerva za tranzite bez teksta)', `ide=${b.ide.length}`);
+    ok(b.ide.length === 8, 'nema ogranicenja po grupi — ekran bira prva tri sa tekstom', `ide=${b.ide.length}`);
+  }
+}
+
+// --- 9c. Brzi i spori ---
+{
+  const sp = splitBySpeed(transits);
+  const FAST = ['moon', 'sun', 'mercury', 'venus', 'mars'];
+  ok(sp.fast.every((t) => FAST.includes(t.transiting.key)) && sp.slow.every((t) => !FAST.includes(t.transiting.key)), 'brzi/spori: podela po tranzitnoj planeti');
+  ok(sp.fast.length + sp.slow.length === transits.length, 'brzi + spori = svi tranziti');
+  const rastuce = (l: Transit[]) => l.every((t, i) => i === 0 || l[i - 1].orb <= t.orb);
+  ok(rastuce(sp.fast) && rastuce(sp.slow), 'unutar grupe redosled po orbisu');
+}
+
+// --- 9d. Dokle tranzit traje ---
+console.log('\n=== 9d. Dokle spori tranzit traje ===');
+{
+  const sp = splitBySpeed(transits);
+  const danas = new Date();
+  const t0 = performance.now();
+  const krajevi = sp.slow.map((t) => ({ t, end: transitEnd(t, danas) }));
+  const ms = performance.now() - t0;
+  ok(ms < 1500, `kraj za ${sp.slow.length} sporih izracunat brzo`, `${ms.toFixed(0)} ms`);
+  for (const { t, end } of krajevi) {
+    const ime = `${t.transiting.name} ${t.aspect.name} ${t.natal.name}`.padEnd(30);
+    if (!end) { console.log(`   ${ime} traje jos godinama`); continue; }
+    // Dan posle kraja mora biti van orbisa, a sam kraj unutra: proveri ponovnim racunom.
+    const posle = new Date(end); posle.setDate(end.getDate() + 1);
+    const orbNa = (d: Date) => {
+      const lon = findTransits(chart, d).find((x) => x.contentKey === t.contentKey);
+      return lon ? lon.orb : Infinity;
+    };
+    ok(orbNa(end) !== Infinity && orbNa(posle) === Infinity, `${ime.trim()}: kraj je tacan dan`, `do ${end.toLocaleDateString('sr-RS')}`);
+  }
+  const brzi = sp.fast[0];
+  if (brzi) {
+    const end = transitEnd(brzi, danas);
+    ok(end !== null && (end.getTime() - danas.getTime()) / 86_400_000 < 60, 'brz tranzit se zavrsi za manje od 60 dana');
   }
 }
 

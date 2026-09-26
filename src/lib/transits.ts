@@ -9,7 +9,7 @@
  * podnosi 6—8 stepeni; tranzit treba da opise JEDAN dan, pa preko ~3 stepena
  * prestaje da bude dogadjaj i postaje pozadina.
  */
-import { planetPositions, ASPECTS, type PlanetPosition, type PlanetKey, type AspectDef } from '@/lib/astro';
+import { planetPositions, bodyLongitude, ASPECTS, type PlanetPosition, type PlanetKey, type AspectDef } from '@/lib/astro';
 import { houseOf, type NatalChart } from '@/lib/natal';
 import { norm360 } from '@/lib/zodiac';
 
@@ -356,17 +356,84 @@ export function briefBucket(t: Transit): BriefBucket {
 export type Brief = { ide: Transit[]; koci: Transit[] };
 
 /**
- * Kandidati za sazetak, do `limit` po grupi, poredjani po orbisu.
+ * Kandidati za sazetak, poredjani po orbisu — SVI, ne prvih nekoliko.
  *
- * Vraca se vise od tri jer neki tranziti nemaju tekst (ASC, MC, rupe u
- * korpusu); ekran prikaze prva tri KOJA IMAJU tekst.
+ * Ekran prikaze prva tri KOJA IMAJU tekst. Ogranicenje na pet kandidata je
+ * jednom ostavilo "koci te" prazno: pet najegzaktnijih su bili tranziti na
+ * ASC i MC, za koje tekstova nema.
  */
-export function pickBrief(transits: Transit[], excludeKey: string | null = null, limit = 5): Brief {
+export function pickBrief(transits: Transit[], excludeKey: string | null = null): Brief {
   const cand = transits
     .filter((t) => t.transiting.key !== 'moon' && t.contentKey !== excludeKey)
     .sort((a, b) => a.orb - b.orb || Math.abs(a.transiting.speed) - Math.abs(b.transiting.speed));
   return {
-    ide: cand.filter((t) => briefBucket(t) === 'ide').slice(0, limit),
-    koci: cand.filter((t) => briefBucket(t) === 'koci').slice(0, limit),
+    ide: cand.filter((t) => briefBucket(t) === 'ide'),
+    koci: cand.filter((t) => briefBucket(t) === 'koci'),
   };
+}
+
+/* ------------------------------------------------------------------------- *
+ * BRZI I SPORI — dve liste na pocetnom ekranu.
+ *
+ * Brze planete (Mesec, Sunce, Merkur, Venera, Mars) menjaju se iz dana u dan;
+ * spore (Jupiter, Saturn, Uran, Neptun, Pluton) drze temu mesecima. Podela je
+ * Ivanova specifikacija pocetnog ekrana (26.9.2026). Redosled unutar grupe je
+ * po egzaktnosti, isto kao Hero i sazetak.
+ * ------------------------------------------------------------------------- */
+
+const FAST: readonly PlanetKey[] = ['moon', 'sun', 'mercury', 'venus', 'mars'];
+
+export type BySpeed = { fast: Transit[]; slow: Transit[] };
+
+export function splitBySpeed(transits: Transit[]): BySpeed {
+  const byOrb = [...transits].sort(
+    (a, b) => a.orb - b.orb || Math.abs(a.transiting.speed) - Math.abs(b.transiting.speed)
+  );
+  return {
+    fast: byOrb.filter((t) => FAST.includes(t.transiting.key)),
+    slow: byOrb.filter((t) => !FAST.includes(t.transiting.key)),
+  };
+}
+
+/* ------------------------------------------------------------------------- *
+ * DOKLE TRANZIT TRAJE.
+ *
+ * Natalna tacka miruje, pa se gleda samo tranzitna planeta: kog dana joj orbis
+ * prvi put predje dozvoljeni. Korak je 5 dana, pa se poslednji prozor prodje
+ * dan po dan — 10 puta manje racuna nego dan po dan od pocetka, a rezultat je
+ * isti dan.
+ *
+ * Retrogradnost: spora planeta ume da izadje iz orbisa, vrati se i izadje
+ * ponovo. Ovde se vraca PRVI izlazak — "dokle traje ovaj prolaz", ne "kad se
+ * zauvek zavrsava". Horizont je ~3 godine; iza njega je `null` (Pluton na
+ * konjunkciji ume da stoji i duze).
+ * ------------------------------------------------------------------------- */
+
+/** Dokle unapred se trazi kraj, u danima. */
+const END_HORIZON_DAYS = 1100;
+const END_STEP_DAYS = 5;
+
+/** Poslednji dan (lokalna ponoc) u kom je tranzit jos u orbisu, ili null ako je iza horizonta. */
+export function transitEnd(t: Transit, from: Date = new Date()): Date | null {
+  const maxOrb = TRANSIT_ORB[t.aspect.key];
+  const start = localMidnight(from);
+  const orbOn = (days: number) => {
+    const d = new Date(start); d.setDate(start.getDate() + days);
+    const sep = Math.abs(angleDelta(bodyLongitude(t.transiting.key, d), t.natal.longitude));
+    return Math.abs(sep - t.aspect.angle);
+  };
+  let lastIn = 0;
+  for (let d = END_STEP_DAYS; d <= END_HORIZON_DAYS; d += END_STEP_DAYS) {
+    if (orbOn(d) > maxOrb) {
+      // Izasao negde u poslednjih 5 dana — nadji tacan dan.
+      for (let k = lastIn + 1; k < d; k++) {
+        if (orbOn(k) > maxOrb) break;
+        lastIn = k;
+      }
+      const out = new Date(start); out.setDate(start.getDate() + lastIn);
+      return out;
+    }
+    lastIn = d;
+  }
+  return null;
 }
