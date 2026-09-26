@@ -48,22 +48,20 @@ export type SignPosition = {
    * Ceo stepen i lucni minut, ISTI oni koji stoje u `formatted`.
    *
    * Postoje kao brojevi zato sto ih natalni tocak crta u dva reda ispod
-   * simbola, pa ne moze da uzme gotov string. Racunaju se iz iste zaokruzene
+   * simbola, pa ne moze da uzme gotov string. Racunaju se iz iste odsecene
    * vrednosti kao `formatted` — da se tocak i lista ispod njega nikad ne
    * raziju za jedan minut.
    */
   deg: number;
   min: number;
-  /** Za prikaz: "12° 34' Bik" — minuti ZAOKRUZENI. */
+  /** Za prikaz: "12° 34' Bik" — minuti ODSECENI, kao na astro.com i astro-seek. */
   formatted: string;
   /**
    * Za proveru sa astroloskim softverom: "12° 34' 56\" Bik".
    *
-   * NEMA POZIVAOCA U UI-ju i tako treba da ostane. Stajao je u listama ispod
-   * tocka, ali tocak crta ZAOKRUZEN minut a ovo SKRACUJE sekunde, pa je isto
-   * Sunce bilo "24 09'" na tocku i "24° 08' 57\"" u listi. Korisnik ne treba da
-   * vidi dva broja za istu planetu. Ostaje kao alat: kad se proverava protiv
-   * astro.com-a ili astro-seek-a, ovo je oblik koji se poredi cifru po cifru.
+   * NEMA POZIVAOCA U UI-ju i tako treba da ostane — korisnik vidi samo minute.
+   * Stepen i minut su isti kao u `formatted`, sekunde su visak za poredjenje
+   * cifru po cifru sa astro.com-om ili astro-seek-om.
    */
   formattedPrecise: string;
 };
@@ -72,32 +70,28 @@ export type SignPosition = {
 export function signFromLongitude(longitude: number): SignPosition {
   const lon = norm360(longitude);
 
-  // Zaokruzivanje na najblizi lucni minut radi se nad APSOLUTNOM longitudom,
-  // pre odredjivanja znaka. Inace bi 29° 59.7' ostalo prikazano kao 29° 60'
-  // u prethodnom znaku, umesto kao 0° sledeceg.
-  const totalMin = Math.round(lon * 60) % (360 * 60);
+  // Minuti se ODSECAJU, ne zaokruzuju: tako rade astro.com i astro-seek, pa
+  // korisnik koji poredi ne vidi razliku od 1' (test: scripts/check-sky.ts,
+  // odeljak 9). Radi se nad APSOLUTNOM
+  // longitudom, pre odredjivanja znaka; epsilon pokriva 12.999999… iz
+  // floating pointa, koji bi inace pao minut nize.
+  const totalSec = Math.floor(lon * 3600 + 1e-6) % (360 * 3600);
+  const totalMin = Math.floor(totalSec / 60);
   const index = Math.floor(totalMin / 1800);
   const within = totalMin - index * 1800;
   const sign = SIGNS[index];
 
-  // Precizan oblik zadrzava sekunde i NE zaokruzuje minute — tako pise i
-  // astro.com za planete, pa se vrednosti mogu porediti cifru po cifru.
-  const rawIndex = Math.floor(lon / 30);
-  const rawDeg = lon - rawIndex * 30;
-  const pd = Math.floor(rawDeg);
-  const pm = Math.floor((rawDeg - pd) * 60);
-  const ps = Math.round((rawDeg - pd - pm / 60) * 3600);
-
   const deg = Math.floor(within / 60);
   const min = within % 60;
+  const sec = totalSec % 60;
 
   return {
     sign,
-    degree: lon - rawIndex * 30,
+    degree: lon - Math.floor(lon / 30) * 30,
     deg,
     min,
     formatted: `${deg}° ${String(min).padStart(2, '0')}' ${sign.name}`,
-    formattedPrecise: `${pd}° ${String(pm).padStart(2, '0')}' ${String(ps).padStart(2, '0')}" ${SIGNS[rawIndex].name}`,
+    formattedPrecise: `${deg}° ${String(min).padStart(2, '0')}' ${String(sec).padStart(2, '0')}" ${sign.name}`,
   };
 }
 

@@ -237,9 +237,9 @@ ok(najgoriKraj < 0.02, 'sve crtice imaju duzinu svog nivoa', `odstupanje ${najgo
 
 console.log('\n=== 9. Tocak i lista ispod njega govore isto ===');
 // Tocak crta `deg` i `min` kao dva odvojena broja, lista ispisuje `formatted`.
-// Oba izlaze iz istog zaokruzivanja u `signFromLongitude`, ali to mora da se
-// drzi: ranije je lista koristila `formattedPrecise`, koji SKRACUJE sekunde
-// umesto da zaokruzuje, pa je isto Sunce bilo "24 09'" gore i "24° 08' 57\""
+// Oba izlaze iz istog odsecanja u `signFromLongitude`, ali to mora da se
+// drzi: ranije je lista koristila `formattedPrecise`, koji je SKRACIVAO dok je
+// tocak zaokruzivao, pa je isto Sunce bilo "24 09'" gore i "24° 08' 57\""
 // dole. Ova provera pada cim se dva prikaza raziju.
 let razislo = 0;
 let primer = '';
@@ -253,13 +253,24 @@ for (const p of [...sky.chart.planets, ...sky.points]) {
 }
 ok(razislo === 0, 'svih 13 pozicija se poklapa', primer || 'tocak i lista daju isti minut');
 
-// I obrnuto: precizan oblik SME da se razlikuje, to mu je i svrha. Ako se nikad
-// ne razlikuje, znaci da neko od njih vise ne racuna ono sto misli da racuna.
-const razlicit = [...sky.chart.planets, ...sky.points].some((p) => {
+// Minuti se ODSECAJU kao na astro.com i astro-seek. Vrednosti ispod su
+// astro-seek za Nis 30.6.1988. 03:30 CEST (proverano 26.9.2026.); sa
+// zaokruzivanjem bi prve dve bile minut vise.
+const ODSECANJE: Array<[number, string]> = [
+  [77.2317, "17° 13' Blizanci"],   // ASC 17°13.9'
+  [74.3325, "14° 19' Blizanci"],   // Venera 14°19.95'
+  [29.9999, "29° 59' Ovan"],       // ne sme da preskoci u Bika
+  [12 + 34 / 60, "12° 34' Ovan"],  // tacan minut ne sme da padne na 33'
+];
+for (const [lon, ocekivano] of ODSECANJE) {
+  const f = signFromLongitude(lon).formatted;
+  ok(f === ocekivano, `odseca minute: ${ocekivano}`, f);
+}
+const precizanIsti = [...sky.chart.planets, ...sky.points].every((p) => {
   const q = signFromLongitude(p.longitude);
-  return !q.formattedPrecise.startsWith(`${q.deg}° ${String(q.min).padStart(2, '0')}'`);
+  return q.formattedPrecise.startsWith(`${q.deg}° ${String(q.min).padStart(2, '0')}'`);
 });
-ok(razlicit, 'precizan oblik i dalje skracuje, ne zaokruzuje');
+ok(precizanIsti, 'precizan oblik ima isti stepen i minut kao prikaz');
 
 console.log('\n=== 10. Blok sa stepenom staje tamo gde treba ===');
 // Ovo pada cim neko digne `LABEL.minSize` a ne prosiri razmak. Blok je uvek
