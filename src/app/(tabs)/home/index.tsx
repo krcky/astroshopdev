@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
-import { buildPersonalDaily, formatDate, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
+import { buildPersonalDaily, formatDate, formatTime, formatUntil, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
+import { Glyph } from '@/components/ui/glyph';
 import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
@@ -40,10 +41,14 @@ export default function Home() {
 
   // Jedan upit za tekstove svih danasnjih tranzita — Hero, sazetak i liste
   // su podskupovi iste liste.
-  const kljucevi = React.useMemo(
-    () => (daily ? daily.entries.map((e) => e.transit.contentKey) : []),
-    [daily]
-  );
+  // Mesecev tranzit kartice ne mora biti u `entries`: egzaktan je negde tokom
+  // dana, a `entries` su za trenutak otvaranja — zato se dodaje posebno.
+  const kljucevi = React.useMemo(() => {
+    if (!daily) return [];
+    const k = daily.entries.map((e) => e.transit.contentKey);
+    const mesec = daily.moonDay.strongest?.contentKey;
+    return mesec && !k.includes(mesec) ? [...k, mesec] : k;
+  }, [daily]);
   const { texts, loading: textsLoading } = useTransitTexts(kljucevi);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
@@ -107,13 +112,12 @@ export default function Home() {
       {/* Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`. */}
       <Brief daily={daily} texts={texts} isToday={offset === 0} />
 
-      {/* Svi danasnji tranziti, podeljeni po brzini planete. */}
-      <TransitList
-        naslov="Ovih dana"
-        list={daily.bySpeed.fast}
-        texts={texts}
-        today={date}
-      />
+      {/* Mesec — faza, znak, najjaci Mesecev tranzit dana. Posle sazetka (Ivan, 27.9.2026). */}
+      <MoonCard daily={daily} texts={texts} />
+
+      {/* Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
+          (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
+          Svi brzi tranziti ostaju u tabu "Tranziti". */}
       <TransitList
         naslov="Tema perioda"
         list={daily.bySpeed.slow}
@@ -343,6 +347,62 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
           <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
         </Pressable>
       ))}
+    </View>
+  );
+}
+
+/**
+ * Kartica Mesec: faza i znak, pa "sta to za tebe znaci" — najjaci Mesecev
+ * tranzit dana (`moonDay` u `transits.ts`), sa satom kad je egzaktan.
+ *
+ * Tekstova za Mesec kao tranzitnu planetu jos NEMA (0/50, ceka astrologa), a ni
+ * za faze. Zato kartica pokazuje samo ono sto se racuna: ime tranzita i sat.
+ * Kad tekst stigne u bazu, pojavi se sam (naslov i dva reda) i red postane
+ * dodir ka tumacenju — do tada ne vodi nigde, jer bi vodio na praznu stranu.
+ */
+function MoonCard({ daily, texts }: { daily: PersonalDaily; texts: Texts }) {
+  const { moon, moonDay } = daily;
+  const t = moonDay.strongest;
+  const tekst = t ? texts.get(t.contentKey) : undefined;
+  const ime = t ? `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}` : '';
+  const znak = moonDay.ingress
+    ? `Mesec u znaku ${moonDay.sign.name}, od ${formatTime(moonDay.ingress.at)} u znaku ${moonDay.ingress.sign.name}`
+    : `Mesec u znaku ${moonDay.sign.name}`;
+
+  return (
+    <View className="mt-9">
+      <Text variant="label" className="mb-3">Mesec</Text>
+      <View className={CARD_SURFACE}>
+        <View className="flex-row items-center gap-4 p-5">
+          {/* Glif je znak u trenutku gledanja — na dan prelaska se menja sa satom. */}
+          <Glyph size={28} className="text-foreground">{moon.glyph}</Glyph>
+          <View className="flex-1">
+            <Text variant="h3">{moon.phase}</Text>
+            <Text variant="muted">{znak}</Text>
+          </View>
+        </View>
+        {t && (
+          <>
+            <View className="h-px bg-border" />
+            <Pressable
+              disabled={!tekst}
+              onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+              accessibilityRole={tekst ? 'button' : undefined}
+              accessibilityLabel={`${tekst?.title ?? ''} ${ime}, tačan u ${formatTime(t.exactAt)}`.trim()}
+              className="flex-row items-center gap-3 p-5 active:opacity-60">
+              <View className="flex-1">
+                <Text variant="caption">Za tebe danas</Text>
+                <Text variant="row" className="mt-1">{tekst?.title || ime}</Text>
+                {!!tekst?.body && <Text variant="body" className="mt-1" numberOfLines={2}>{tekst.body}</Text>}
+                <Text variant="muted" className="mt-1">
+                  {[tekst?.title ? ime : null, `tačan u ${formatTime(t.exactAt)}`].filter(Boolean).join(' · ')}
+                </Text>
+              </View>
+              {tekst && <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />}
+            </Pressable>
+          </>
+        )}
+      </View>
     </View>
   );
 }

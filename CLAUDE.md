@@ -323,8 +323,14 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
-- [ ] Kartica MESEC na pocetnom ekranu (faza, znak, najjaci Mesecev tranzit) — logika
-      jos nije napisana; `buildPersonalDaily` vec vraca `moon` (faza + znak). Tekstova
+- [x] Kartica MESEC na pocetnom ekranu, posle "Danas ukratko" — faza, znak (i sat
+      prelaska u sledeci), najjaci Mesecev tranzit DANA: `moonDay` u `transits.ts`
+      trazi aspekte koji postaju egzaktni izmedju dve lokalne ponoci, pa je kartica
+      ista ceo dan. "Najjaci" = tezina natalne mete, pa aspekt (konj. > opoz. >
+      kvadrat > trigon > sekstil), pa raniji sat — MOJ IZBOR, ceka astrologa. Na
+      0—9 dana godisnje nema nijednog egzaktnog aspekta; tada samo faza i znak.
+      Red vodi na tumacenje tek kad tekst postoji. Testovi: `check:natal`, deo 9e.
+- [ ] Tekstovi za karticu Mesec — tekstova
       za Mesec kao tranzitnu planetu nema (0/50), a tekstovi lunarnog kalendara
       (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti
       dok Ivan ne posalje aktuelne.

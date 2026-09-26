@@ -11,8 +11,8 @@
  */
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
 import {
-  findTransits, findHouseTransits, pickHero, pickBrief, splitBySpeed, transitEnd,
-  type Brief, type HeroHistory, type HeroPick, type Transit,
+  findTransits, findHouseTransits, pickHero, pickBrief, splitBySpeed, transitEnd, moonDay,
+  type Brief, type MoonDay, type HeroHistory, type HeroPick, type Transit,
 } from '@/lib/transits';
 import type { ResolvedProfile } from '@/store/profile';
 
@@ -32,6 +32,11 @@ export function formatUntil(end: Date | null, today: Date = new Date()): string 
   const godina = end.getFullYear() === today.getFullYear() ? '' : ` ${end.getFullYear()}.`;
   return `do ${end.getDate()}. ${MESECI_GEN[end.getMonth()]}${godina}`;
 }
+/** "14:05" po lokalnom vremenu uredjaja. */
+export function formatTime(date: Date): string {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 const MESECI = [
   'januar', 'februar', 'mart', 'april', 'maj', 'jun',
   'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar',
@@ -82,6 +87,11 @@ export type PersonalDaily = {
   hero: HeroPick;
   /** Faza i znak Meseca danas — za karticu Mesec. */
   moon: { phase: string; sign: string; glyph: string };
+  /**
+   * Kartica Mesec: znak na pocetku dana, prelazak u sledeci i Mesecevi aspekti
+   * koji postaju egzaktni tog dana, sa najjacim. Isti ceo dan.
+   */
+  moonDay: MoonDay;
   /** "Danas ukratko": ide ti / koci te, bez Hero-a i bez Meseca, po orbisu. */
   brief: Brief;
   /** Svi danasnji tranziti podeljeni na brze i spore planete, po orbisu. */
@@ -138,6 +148,7 @@ export function buildPersonalDaily(
     hero,
     brief,
     bySpeed,
+    moonDay: moonDay(resolved.chart, date, resolved.timeUnknown),
     moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
     skyline:
       `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +

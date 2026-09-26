@@ -11,7 +11,7 @@
  */
 import { planetPositions, bodyLongitude, ASPECTS, type PlanetPosition, type PlanetKey, type AspectDef } from '@/lib/astro';
 import { houseOf, type NatalChart } from '@/lib/natal';
-import { norm360 } from '@/lib/zodiac';
+import { norm360, SIGNS, type ZodiacSign } from '@/lib/zodiac';
 
 /** Koliko je vazno da BAS TA planeta tranzitira. Spore planete = redji, jaci dogadjaji. */
 const TRANSIT_WEIGHT: Record<PlanetKey, number> = {
@@ -436,4 +436,108 @@ export function transitEnd(t: Transit, from: Date = new Date()): Date | null {
     lastIn = d;
   }
   return null;
+}
+
+/* ------------------------------------------------------------------------- *
+ * KARTICA MESEC — faza, znak i najjaci Mesecev tranzit DANA.
+ *
+ * Mesec obidje ceo zodijak za ~27 dana (12—15° na dan), pa njegov tranzit u
+ * orbisu traje ~11 sati. Trenutak u kom se gleda bi zato odlucivao sta kartica
+ * pokazuje: ujutru jedno, uvece drugo. Umesto toga se traze aspekti koji
+ * postaju EGZAKTNI tokom tog lokalnog dana (ponoc—ponoc), sa satom — kartica je
+ * ista ceo dan, kao i Hero.
+ *
+ * "Najjaci" (moj izbor, 27.9.2026, ceka potvrdu astrologa): prvo tezina natalne
+ * mete (`NATAL_WEIGHT` — Sunce, Mesec, ASC pre ostalih), pa jacina aspekta
+ * (`MOON_ASPECT_RANK`), pa raniji sat. Orbis ovde ne odlucuje: svi su egzaktni.
+ *
+ * Mesec je uvek direktan, pa je racun jednostavan: tacka aspekta P se pogodi
+ * tog dana ako je Mesecu do nje ostalo manje nego sto ce preci do ponoci.
+ * ------------------------------------------------------------------------- */
+
+/** Jacina aspekta kad se mete izjednace po tezini: manji broj = jaci. */
+const MOON_ASPECT_RANK: Record<string, number> = {
+  conjunction: 0, opposition: 1, square: 2, trine: 3, sextile: 4,
+};
+
+export type MoonHit = Transit & { exactAt: Date };
+
+export type MoonDay = {
+  /** Znak u kom je Mesec u ponoc na pocetku dana. */
+  sign: ZodiacSign;
+  /** Prelazak u sledeci znak tokom dana, ako ga ima (Mesec menja znak na ~2,5 dana). */
+  ingress: { at: Date; sign: ZodiacSign } | null;
+  /** Svi Mesecevi aspekti na natalnu kartu koji postaju egzaktni tog dana, po satu. */
+  hits: MoonHit[];
+  /** Najjaci od njih, ili null ako tog dana nijedan ne postaje egzaktan. */
+  strongest: MoonHit | null;
+};
+
+/**
+ * Trenutak u [start, end) kad Mesec prede `delta` stepeni od `from`.
+ * Polovljenje intervala: 20 koraka daje manje od desetinke sekunde.
+ */
+function moonAdvance(start: Date, end: Date, from: number, delta: number): Date {
+  let lo = start.getTime();
+  let hi = end.getTime();
+  for (let i = 0; i < 20; i++) {
+    const mid = (lo + hi) / 2;
+    if (norm360(bodyLongitude('moon', new Date(mid)) - from) < delta) lo = mid;
+    else hi = mid;
+  }
+  return new Date((lo + hi) / 2);
+}
+
+/** Mesec tog lokalnog dana prema natalnoj karti. `date` se svodi na lokalnu ponoc. */
+export function moonDay(chart: NatalChart, date: Date = new Date(), timeUnknown = false): MoonDay {
+  const start = localMidnight(date);
+  // Sledeca ponoc preko kalendara, ne +24h — dan promene sata ima 23 ili 25 sati.
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
+  const from = bodyLongitude('moon', start);
+  const travel = norm360(bodyLongitude('moon', end) - from);
+
+  const signIndex = Math.floor(from / 30);
+  const toBoundary = norm360((signIndex + 1) * 30 - from);
+  const ingress = toBoundary < travel
+    ? { at: moonAdvance(start, end, from, toBoundary), sign: SIGNS[(signIndex + 1) % 12] }
+    : null;
+
+  const targets = natalTargets(chart).filter(
+    (n) => !(timeUnknown && (TIME_DEPENDENT as readonly string[]).includes(n.key))
+  );
+  const hits: MoonHit[] = [];
+  for (const n of targets) {
+    for (const aspect of ASPECTS) {
+      // Svaki aspekt osim konjunkcije i opozicije ima dve tacke: ispred i iza mete.
+      const points = aspect.angle === 0 || aspect.angle === 180
+        ? [n.longitude + aspect.angle]
+        : [n.longitude + aspect.angle, n.longitude - aspect.angle];
+      for (const p of points) {
+        const delta = norm360(p - from);
+        if (delta >= travel) continue;
+        const exactAt = moonAdvance(start, end, from, delta);
+        const moon = planetPositions(exactAt).find((x) => x.key === 'moon')!;
+        hits.push({
+          transiting: moon,
+          natal: n,
+          aspect,
+          orb: Math.abs(Math.abs(angleDelta(moon.longitude, n.longitude)) - aspect.angle),
+          applying: false,
+          score: TRANSIT_WEIGHT.moon * (NATAL_WEIGHT[n.key] ?? 0.3),
+          contentKey: `transit.moon.${aspect.key}.natal.${n.key}`,
+          exactAt,
+        });
+      }
+    }
+  }
+  hits.sort((a, b) => a.exactAt.getTime() - b.exactAt.getTime());
+
+  const strongest = [...hits].sort(
+    (a, b) =>
+      b.score - a.score ||
+      MOON_ASPECT_RANK[a.aspect.key] - MOON_ASPECT_RANK[b.aspect.key] ||
+      a.exactAt.getTime() - b.exactAt.getTime()
+  )[0] ?? null;
+
+  return { sign: SIGNS[signIndex], ingress, hits, strongest };
 }

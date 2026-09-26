@@ -5,10 +5,11 @@ import {
   computeHouses, buildNatalChart, houseOf,
 } from '../src/lib/natal';
 import { norm360 } from '../src/lib/zodiac';
+import { bodyLongitude } from '../src/lib/astro';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
-  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, splitBySpeed, transitEnd, type Transit,
+  STRONG_ORB, HERO_PAUSE_DAYS, PEAK_ORB, briefBucket, pickBrief, splitBySpeed, transitEnd, moonDay, type Transit,
 } from '../src/lib/transits';
 import { spreadAngles, chartAngle } from '../src/lib/wheel';
 
@@ -303,6 +304,62 @@ console.log('\n=== 9d. Dokle spori tranzit traje ===');
     const end = transitEnd(brzi, danas);
     ok(end !== null && (end.getTime() - danas.getTime()) / 86_400_000 < 60, 'brz tranzit se zavrsi za manje od 60 dana');
   }
+}
+
+// --- 9e. Kartica Mesec ---
+console.log('\n=== 9e. Kartica Mesec (Mesecevi aspekti egzaktni tog dana) ===');
+{
+  const WEIGHT: Record<string, number> = { sun: 1, moon: 1, ascendant: 1, midheaven: 0.9, mercury: 0.7, venus: 0.7, mars: 0.7 };
+  const w = (k: string) => WEIGHT[k] ?? (['jupiter', 'saturn'].includes(k) ? 0.5 : 0.3);
+  const t0 = performance.now();
+  const dani = Array.from({ length: 30 }, (_, i) => new Date(2026, 8, 1 + i, 15, 0));
+  const md = dani.map((d) => moonDay(chart, d));
+  const ms = performance.now() - t0;
+  ok(ms / dani.length < 150, 'jedan dan se racuna brzo', `${(ms / dani.length).toFixed(0)} ms/dan`);
+
+  let sviTacni = true, uDanu = true, potpuno = true, najjaci = true, ulazak = true;
+  md.forEach((m, i) => {
+    const start = localMidnight(dani[i]);
+    const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
+    for (const h of m.hits) {
+      if (h.orb > 0.01) sviTacni = false;
+      if (h.exactAt < start || h.exactAt >= end) uDanu = false;
+    }
+    // Nezavisno: prolaz na svakih 10 minuta, prebroji prelaske preko tacaka aspekata.
+    let broj = 0;
+    for (const n of [...chart.planets.map((p) => p.longitude), chart.houses.ascendant, chart.houses.midheaven]) {
+      for (const off of [0, 60, -60, 90, -90, 120, -120, 180]) {
+        let prev = bodyLongitude('moon', start);
+        for (let t = start.getTime() + 600_000; t <= end.getTime(); t += 600_000) {
+          const cur = bodyLongitude('moon', new Date(Math.min(t, end.getTime() - 1)));
+          if (norm360(n + off - prev) < norm360(cur - prev)) broj++;
+          prev = cur;
+        }
+      }
+    }
+    if (broj !== m.hits.length) { potpuno = false; console.log(`   ${dayKey(start)}: nadjeno ${m.hits.length}, prolazom ${broj}`); }
+    const s = m.strongest;
+    if (m.hits.length && (!s || m.hits.some((h) => w(h.natal.key) > w(s.natal.key)))) najjaci = false;
+    if (m.ingress) {
+      const pre = Math.floor(bodyLongitude('moon', new Date(m.ingress.at.getTime() - 60_000)) / 30);
+      const posle = Math.floor(bodyLongitude('moon', new Date(m.ingress.at.getTime() + 60_000)) / 30);
+      if (pre === posle || m.ingress.at < start || m.ingress.at >= end) ulazak = false;
+    }
+  });
+  ok(sviTacni, 'sat svakog aspekta je egzaktan (orb < 0,01°)');
+  ok(uDanu, 'svi egzaktni trenuci su unutar lokalnog dana');
+  ok(potpuno, 'nijedan aspekt nije propusten (provera prolazom od 10 min)');
+  ok(najjaci, 'najjaci ima najvecu tezinu natalne mete');
+  const ulazaka = md.filter((m) => m.ingress).length;
+  ok(ulazak && ulazaka >= 10 && ulazaka <= 14, 'prelazak u znak: tacan i ~12 puta za 30 dana', `${ulazaka}`);
+  // Ne mora svaki dan: na tri karte kroz 2026. bez ijednog egzaktnog aspekta je 0—9
+  // dana od 365. Kartica tada pokazuje samo fazu i znak.
+  const prazni = md.filter((m) => m.hits.length === 0).length;
+  ok(prazni <= 3, 'dan bez Mesecevog tranzita je retkost', `${prazni} od ${md.length}`);
+  ok(md.every((m, i) => moonDay(chart, dani[i], true).hits.every((h) => !['ascendant', 'midheaven'].includes(h.natal.key))),
+    'bez vremena rodjenja nema ASC i MC');
+  const d = md[25];
+  console.log(`   ${dayKey(dani[25])}: ${d.sign.name}${d.ingress ? ` -> ${d.ingress.sign.name}` : ''}, najjaci ${d.strongest?.contentKey}`);
 }
 
 console.log('\n  planete kroz natalne kuce:');
