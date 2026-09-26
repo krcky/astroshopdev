@@ -8,7 +8,7 @@ import { Card, CardContent, CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
 import { Glyph } from '@/components/ui/glyph';
-import { buildPersonalDaily, formatDate } from '@/lib/horoscope';
+import { buildPersonalDaily } from '@/lib/horoscope';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore, useEntitlement } from '@/store/auth';
@@ -47,7 +47,7 @@ export default function Daily() {
   const locked = !isPremium;
 
   return (
-    <Screen label={formatDate(today)}>
+    <Screen label="Tranziti">
       <View className="pb-6 pt-6">
         <Text variant="display">Tvoji tranziti danas</Text>
       </View>

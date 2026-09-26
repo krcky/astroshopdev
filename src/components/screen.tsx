@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView, BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Text } from '@/components/ui/text';
+import { Logo } from '@/components/logo';
 import { TabBarSpacer } from '@/components/floating-tab-bar';
 import { backdrop, headerBar, space } from '@/theme/tokens';
 
@@ -79,7 +79,7 @@ import { backdrop, headerBar, space } from '@/theme/tokens';
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 type ScreenProps = {
-  /** Sitan natpis u traci — ono sto je ranije stajalo iznad velikog naslova. */
+  /** Ime strane u traci, pored kruga loga; ili gotov element umesto toga. */
   label: React.ReactNode;
   /** Levo od natpisa: strelica nazad na ekranima koji se otvaraju preko taba. */
   left?: React.ReactNode;
@@ -179,7 +179,8 @@ export function Screen({
         style={{ height: traka, paddingTop: insets.top }}>
         {left}
         <View className="flex-1">
-          {typeof label === 'string' ? <Text variant="label">{label}</Text> : label}
+          {/* Ime strane ide u isto zaglavlje kao na pocetnom ekranu: krug + tekst (Ivan, 26.9.2026). */}
+          {typeof label === 'string' ? <Logo title={label} /> : label}
         </View>
         {right}
       </View>

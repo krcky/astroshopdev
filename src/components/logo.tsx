@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
+import { useFocusEffect } from 'expo-router';
 
-import { Wordmark } from '@/components/wordmark';
+import { Text } from '@/components/ui/text';
 
 /*
  * Logo u traci na vrhu ekrana: animirani krug + natpis ASTROSHOP.
@@ -13,11 +14,10 @@ import { Wordmark } from '@/components/wordmark';
  * uvodni okret od dve sekunde, zatim jedan krug u minut; lice miruje, zraci se
  * okrecu, znakovi kruze i ostaju uspravni.
  *
- * Proporcije su iz `Logo/Logo.png`: natpis je 0,27 visine kruga, razmak 0,25.
- * Mere: krug 52 (Ivan 26.9.2026: +30% pa +10% na 36), natpis 11 (+10%), razmak 12.
- * Traka je 53pt, krug staje. Natpis je vertikalno na sredini kruga: red ima
- * `items-center`, a glifovi u `woodmark.svg` popunjavaju ceo viewBox (y 0-12),
- * pa nema skrivene margine koja bi ga pomerila.
+ * Natpis je OBICAN TEKST "Astro Shop", 24/30 polucrn (Ivan, 26.9.2026),
+ * sistemsko pismo, ne SVG wordmark iz brend fajla.
+ * Krug je 52 (Ivan: +30% pa +10% na 36), razmak 12; red ima `items-center`,
+ * pa je tekst na sredini kruga.
  *
  * Na vebu `lottie-react-native` trazi dodatni paket, pa `logo.web.tsx` crta
  * staticni krug — vidi tamo.
@@ -31,13 +31,23 @@ import { Wordmark } from '@/components/wordmark';
  * pokreta, ovo je mesto gde se `useReducedMotion` vraca.
  */
 export const LOGO_SIZE = 52;
-const WORDMARK_HEIGHT = 11;
 const GAP = 12;
 
-export function Logo() {
+/** `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis (Ivan, 26.9.2026). */
+export function Logo({ title = 'Astro Shop' }: { title?: string }) {
   const krug = React.useRef<LottieView>(null);
   const pusti = React.useCallback(() => krug.current?.play(), []);
   React.useEffect(() => { pusti(); }, [pusti]);
+
+  // Svaki put kad ekran dodje u fokus (promena taba, povratak sa drugog ekrana)
+  // krug krece ISPOCETKA, sa uvodnim okretom (Ivan, 26.9.2026). Tabovi ostaju
+  // montirani, pa bez ovoga animacija samo nastavlja gde je bila.
+  useFocusEffect(
+    React.useCallback(() => {
+      krug.current?.reset();
+      krug.current?.play();
+    }, [])
+  );
 
   return (
     <View
@@ -46,7 +56,7 @@ export function Logo() {
       // statusnoj traci (Ivan, 26.9.2026): krug od 52 tada ima 4pt do vrha trake.
       style={{ gap: GAP, transform: [{ translateY: -5 }] }}
       accessibilityRole="header"
-      accessibilityLabel="Astroshop">
+      accessibilityLabel={title}>
       <LottieView
         ref={krug}
         source={require('@/assets/lottie/logo-krug.json')}
@@ -56,7 +66,7 @@ export function Logo() {
         onLayout={pusti}
         style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
       />
-      <Wordmark height={WORDMARK_HEIGHT} />
+      <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
     </View>
   );
 }

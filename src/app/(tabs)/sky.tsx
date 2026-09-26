@@ -82,7 +82,7 @@ export default function Sky() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label={izabran ? 'Nebo u izabranom trenutku' : 'Trenutno na nebu'} padded={false}>
+    <Screen label="Trenutno na nebu" padded={false}>
       <View className="px-5 pb-5 pt-6">
         <Text variant="display">{zoneClock(now, grad.tz)}</Text>
         <Pressable
