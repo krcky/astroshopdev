@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 import { useProfileStore } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
+import { neutral } from '@/theme/tokens';
 
 export default function Name() {
   const profile = useProfileStore((s) => s.profile);
@@ -39,13 +40,13 @@ export default function Name() {
           value={name}
           onChangeText={setName}
           placeholder="tvoje ime"
-          placeholderTextColor="#9A9A9A"
+          placeholderTextColor={neutral.inkSubtle}
           autoCapitalize="words"
           autoCorrect={false}
           autoFocus
           selectTextOnFocus
           maxLength={60}
-          className="w-full border-b border-border pb-3 text-center text-3xl text-foreground"
+          className="w-full border-b border-fill-strong pb-3 text-center text-3xl text-foreground"
         />
       </View>
     </OnboardingStep>

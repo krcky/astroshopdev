@@ -2,51 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Boje su izmerene iz snimaka referentne aplikacije — vidi `src/theme/tokens.ts`,
+ * koji je izvor istine. Ovde stoje kao HSL trojke jer NativeWind tako ume da ih
+ * ubaci u Tailwind klase (`hsl(var(--x))`). Uz svaku je hex iz kog je izvedena,
+ * da se prepis moze proveriti bez racunanja.
+ */
+
 @layer base {
   :root {
-    /* Svetla tema — cisto belo, crn tekst. Primarna tema aplikacije. */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    /* --- neutralna osnova ------------------------------------------- */
+    --background: 0 0% 100%;              /* #FFFFFF */
+    --foreground: 0 0% 8.2%;                /* #151515 — namerno nije cisto crno */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 100%;                    /* #FFFFFF */
+    --card-foreground: 0 0% 8.2%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 0 0% 8.2%;
 
-    /* Primarna akcija je crna — najbolji kontrast i najcistiji izgled na belom. */
-    --primary: 0 0% 9%;
+    /* Primarna akcija je crna na belom — isto kao u referentnoj aplikaciji. */
+    --primary: 0 0% 8.2%;                   /* #151515 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 8%;
+    --secondary: 0 0% 96%;                /* #F5F5F5 */
+    --secondary-foreground: 0 0% 8.2%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 42%;
+    --muted: 0 0% 96%;                    /* #F5F5F5 */
+    --muted-foreground: 240 0.4% 44.9%;     /* #727273 — opisi i meta podaci */
 
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 8%;
+    --accent: 0 0% 92%;                   /* #EBEBEB */
+    --accent-foreground: 0 0% 8.2%;
 
-    --destructive: 0 72% 45%;
+    --destructive: 1.4 80.8% 59.2%;             /* #EB4743 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 88%;
-    --ring: 0 0% 9%;
+    --border: 0 0% 94%;                   /* #F0F0F0 — linija je 1pt, jedva vidljiva */
+    --input: 0 0% 96%;                    /* #F5F5F5 — polje je ISPUNJENO, ne ocrtano */
+    --ring: 0 0% 8.2%;
 
-    --cosmos-deep: 0 0% 100%;
-    --cosmos-mid: 0 0% 100%;
-    --cosmos-glow: 0 0% 100%;
+    /* --- dopune referentnog sistema --------------------------------- */
+    /* Pozadina ekrana sa grupisanim karticama (Podesavanja). Kartice su BELE na njoj. */
+    --grouped: 210 12% 97%;               /* #F6F7F8 */
+    /* Ispuna polja, kruznih ikona, neaktivnih povrsina. */
+    --fill: 0 0% 96%;                     /* #F5F5F5 */
+    /* Jaca ispuna — aktivna kapsula u traci, sekundarno dugme. */
+    --fill-strong: 0 0% 92%;              /* #EBEBEB */
+    /* Tercijarni tekst: placeholder, naslov grupe, neaktivan tab. */
+    --subtle: 240 0.5% 61.4%;                 /* #9C9C9D */
 
-    /* Zlatna se zadrzava SAMO kao akcenat na placenom sadrzaju.
+    /* --- akcenti ----------------------------------------------------- */
+    /* Iskljucivo na ikonama i mehuricu poruke. Nikad kao pozadina ekrana. */
+    --tint-blue: 220.7 90.9% 61.2%;             /* #427CF6 */
+    --tint-blue-icon: 221.2 91.4% 59%;        /* #3773F6 */
+    --tint-purple: 256.5 91.2% 60%;           /* #6F3CF6 */
+    --tint-red: 1.4 80.8% 59.2%;                /* #EB4743 */
+    --tint-green: 121 50% 62%;            /* #6ECF6F */
+    --tint-pink: 334.6 81.4% 57.8%;             /* #EB3C86 */
+    --tint-yellow: 45 88.9% 61.2%;            /* #F4C844 */
+    --tint-gray: 200 1.5% 61%;            /* #9A9C9D */
+    --tint-black: 214.3 14.9% 9.2%;             /* #14171B */
+
+    /* Zlatna se zadrzava SAMO kao akcenat na placenom sadrzaju (pravilo 2).
        Zatamnjena na 38% svetline da bude citljiva na belom (kontrast ~5.2:1). */
     --gold: 38 72% 38%;
 
-    --radius: 1rem;
+    /* Referentna aplikacija ima samo dve mere: 24 za povrsine i punu kapsulu
+       za sve sto je nisko. 24 je ovde osnova, kapsula ide kroz `rounded-pill`. */
+    --radius: 24px;
   }
 
+  /*
+   * Tamna tema je i dalje definisana (pravilo 2 u CLAUDE.md), ali je aplikacija
+   * zakljucana na svetlu. Referentna aplikacija je nema, pa su ove vrednosti
+   * nase — dovoljno da se nista ne raspadne ako se tema ikad ponudi.
+   */
   .dark:root {
-    /* Tamna tema — primarna. Duboko nocno nebo. */
     --background: 250 45% 7%;
     --foreground: 45 25% 94%;
 
@@ -56,7 +87,6 @@
     --popover: 250 40% 10%;
     --popover-foreground: 45 25% 94%;
 
-    /* Zlatna svetli na tamnom — glavni akcenat */
     --primary: 43 74% 62%;
     --primary-foreground: 250 45% 8%;
 
@@ -76,10 +106,21 @@
     --input: 252 24% 22%;
     --ring: 43 74% 62%;
 
-    /* Gradijent stops za nocno nebo */
-    --cosmos-deep: 250 50% 5%;
-    --cosmos-mid: 262 42% 13%;
-    --cosmos-glow: 280 45% 22%;
+    --grouped: 250 45% 9%;
+    --fill: 252 25% 15%;
+    --fill-strong: 255 28% 20%;
+    --subtle: 250 10% 52%;
+
+    --tint-blue: 221 91% 66%;
+    --tint-blue-icon: 221 91% 64%;
+    --tint-purple: 256 91% 68%;
+    --tint-red: 1 81% 64%;
+    --tint-green: 121 50% 62%;
+    --tint-pink: 335 81% 64%;
+    --tint-yellow: 45 89% 61%;
+    --tint-gray: 200 6% 55%;
+    --tint-black: 214 15% 82%;
+
     --gold: 43 74% 62%;
   }
 }

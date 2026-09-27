@@ -5,6 +5,8 @@ import { ChevronLeft } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { ScreenBackdrop } from '@/components/screen';
+import { neutral } from '@/theme/tokens';
 
 /**
  * Zajednicki okvir svih koraka onboardinga.
@@ -36,7 +38,7 @@ export function OnboardingStep({
   exit, question, children, note = PRIVACY_NOTE, primary, secondary, center = true,
 }: Props) {
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-grouped">
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <KeyboardAvoidingView
           className="flex-1"
@@ -52,7 +54,7 @@ export function OnboardingStep({
                 className="self-start active:opacity-60">
                 {exit.kind === 'cancel'
                   ? <Text variant="label" className="text-foreground">Odustani</Text>
-                  : <ChevronLeft size={26} color="#141414" />}
+                  : <ChevronLeft size={26} color={neutral.ink} />}
               </Pressable>
             )}
           </View>
@@ -90,6 +92,11 @@ export function OnboardingStep({
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+      {/* Samo preliv: sadrzaj ovde ne klizi ispod trake (dugme je prikovano za
+          dno), pa zamucenje nema sta da zamuti. Bez ovoga bi se pri prelasku sa
+          pocetnog ekrana boja na vrhu iskljucila i korak bi izgledao kao druga
+          aplikacija. */}
+      <ScreenBackdrop />
     </View>
   );
 }

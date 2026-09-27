@@ -141,7 +141,13 @@ export function useTurnstile() {
         ? { zIndex: 1000, elevation: 1000 }
         : { left: -10_000, top: 0, width: 320, height: 90, opacity: 0, zIndex: -1 }}
       pointerEvents={visible ? 'auto' : 'none'}>
-      <View className={visible ? 'items-center rounded-2xl border border-border bg-background px-6 py-5 shadow-lg' : ''}>
+      {/* Klase kartice stoje UVEK, i dok je kapija skrivena (tada je ionako van
+          ekrana i providna). Prelaz '' -> klase sa CSS promenljivama
+          (`bg-background`, `border-border`) tera NativeWind da "unapredi"
+          komponentu u letu; u dev rezimu to pise upozorenje koje serijalizuje
+          props, naleti na navigacioni kontekst i obori ekran ("Couldn't find a
+          navigation context", iOS 18 simulator, 27.9.2026). */}
+      <View className="items-center rounded-2xl border border-border bg-background px-6 py-5 shadow-lg">
         {visible && (
           <Text variant="muted" className="mb-4 text-center text-sm">
             Samo da potvrdimo da nisi robot.

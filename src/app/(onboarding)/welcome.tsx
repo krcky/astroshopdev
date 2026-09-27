@@ -5,6 +5,9 @@ import { router } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { ScreenBackdrop } from '@/components/screen';
+import { CARD_SURFACE } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { Glyph } from '@/components/ui/glyph';
 import { moonPhase, planetPositions } from '@/lib/astro';
 import { useDraft } from '@/store/draft';
@@ -22,7 +25,7 @@ export default function Welcome() {
   const start = () => { reset(); router.push('/date'); };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-grouped">
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
         <View className="flex-1 px-5">
 
@@ -32,7 +35,7 @@ export default function Welcome() {
           </View>
 
           <View className="flex-1 justify-center">
-            <View className="rounded-xl border border-border p-6">
+            <View className={cn(CARD_SURFACE, 'p-6')}>
               <Text variant="label" className="text-center">Tvoj dan ukratko</Text>
 
               <Text variant="display" className="mt-4 text-center text-3xl">
@@ -79,6 +82,7 @@ export default function Welcome() {
           </View>
         </View>
       </SafeAreaView>
+      <ScreenBackdrop />
     </View>
   );
 }

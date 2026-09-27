@@ -12,6 +12,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "~57.0.19",
+    "expo-blur": "~57.0.3",
     "expo-constants": "~57.0.17",
     "expo-dev-client": "~57.0.18",
     "expo-device": "~57.0.1",
@@ -28,6 +29,7 @@
     "expo-symbols": "~57.0.2",
     "expo-system-ui": "~57.0.3",
     "expo-web-browser": "~57.0.2",
+    "lottie-react-native": "~7.3.8",
     "lucide-react-native": "^1.40.0",
     "nativewind": "^4.2.6",
     "react": "19.2.3",
@@ -48,6 +50,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.2",
     "tsx": "^4.23.13",
     "typescript": "~6.0.3"
   },
@@ -64,7 +68,8 @@
     "check:timezone": "tsx scripts/check-timezone.ts",
     "check:sky": "tsx scripts/check-sky.ts",
     "check:cities": "tsx scripts/check-cities.ts",
-    "check": "npm run typecheck && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities"
+    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities",
+    "check:tokens": "tsx scripts/check-tokens.ts"
   },
   "private": true
 }

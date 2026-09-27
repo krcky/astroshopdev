@@ -24,13 +24,19 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
-    (tabs)/          home (pregled dana), daily, chart, sky, profile
+    moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
+    profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
+    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
+  theme/
+    tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
   components/
+    screen.tsx           okvir ekrana — preliv, zamucena traka, skrol, siva pozadina
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
+    moon-disc.tsx        crtez Meseca u trenutnoj fazi (crno-belo, ne lila)
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
-    ui/                  text, button, card, input, glyph, row, wheel-picker
+    ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
     profile.ts       podaci o rodjenju, kes servera
@@ -43,6 +49,8 @@ src/
     transits.ts      tranziti na natalnu kartu  <- personalizacija
     points.ts        cvor, Lilit, Tacka srece   <- nema ih u engine-u
     sky.ts           stanje neba SADA nad gradom iz profila
+    moon.ts          procenat, oblik faze, lunarni dan, mlad/pun, element i deo biljke
+    sky-events.ts    sledeci ulazak u znak / promena smera + kuca od podznaka
     timezone.ts      lokalno vreme -> UTC
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
@@ -65,12 +73,23 @@ on vraca J2000 koordinate, sto danas odstupa ~0.36 stepeni zbog precesije i
 pomerilo bi svaku poziciju u aplikaciji. Provera: `npm run check:ephemeris`
 (Sunce mora biti na 0/90/180/270 na ravnodnevicama i solsticijima).
 
-**2. Tema je bela sa crnim tekstom.**
-Sve boje su CSS varijable u `global.css` pod `:root`. Zlatna (`--gold`) se
-koristi ISKLJUCIVO kao akcenat na placenom sadrzaju — nigde drugde, da paywall
-ostane jedina stvar koja "svetli" na stranici. Tamna tema je i dalje definisana
-pod `.dark:root` ako je ikad budemo ponudili kao opciju; `_layout.tsx` je
-zakljucan na `colorScheme.set('light')`.
+**2. Tema je svetla: SIVA pozadina, BELE kartice, crn tekst. Dizajn sistem je u `DESIGN.md`.**
+Pozadina ekrana je `bg-grouped` (#F6F7F8), povrsine su bele i poluprovidne
+(`CARD_SURFACE` u `ui/card.tsx`). Obrnuto ne radi — vidi pravilo 17.
+Sve boje su CSS varijable u `global.css` pod `:root`, a njihov izvor je
+`src/theme/tokens.ts` — vrednosti su IZMERENE sa snimaka referentne aplikacije,
+ne izabrane. Pismo je SISTEMSKO (SF Pro na iOS-u, Roboto na Androidu) —
+`fontFamily` se nigde ne postavlja, debljina ide obicnim `font-semibold` i
+slicnima. Sa snimaka se Inter i SF Pro ne mogu razlikovati (merenja su u
+`DESIGN.md`); presudilo je to sto je referenca nativna iOS aplikacija i sto
+izvedene velicine padaju tacno na iOS-ovu lestvicu. Zlatna (`--gold`) se koristi ISKLJUCIVO kao akcenat na placenom sadrzaju
+— nigde drugde, da paywall ostane jedina stvar koja "svetli" na stranici. Tamna
+tema je i dalje definisana pod `.dark:root` ako je ikad budemo ponudili kao
+opciju; `_layout.tsx` je zakljucan na `colorScheme.set('light')`.
+
+Svaki kljuc dodat u `tailwind.config.js` MORA da se pojavi i u spisku u
+`src/lib/utils.ts`. Bez toga `tailwind-merge` svrsta klasu u pogresnu grupu —
+`text-button` prodje kao boja teksta i pojede belu na crnom dugmetu.
 
 **3. Simboli idu iskljucivo kroz `<Glyph>`.**
 Unicode astroloski znaci (♈ ♃ ☽) imaju podrazumevanu EMOJI prezentaciju i
@@ -173,6 +192,84 @@ Konvencije su izabrane i proverene, ne pretpostavljene: cvor je PRAVI
 RACUNA — pravi cvor po nekoliko dana mesecno ide napred. Sve troje drzi
 `npm run check:sky`, prema vrednostima sa astro-seek-a.
 
+**17. Vrh ekrana ide kroz `Screen`, i redosled slojeva se ne menja.**
+`components/screen.tsx` crta preliv, zamucenu traku, skrol i sivu pozadinu;
+ekran to ne sklapa sam. Ekrani sa svojim rasporedom (pocetni, koraci
+onboardinga) uzimaju samo `ScreenBackdrop` — tamo sadrzaj ne klizi ispod trake
+pa zamucenje nema sta da zamuti, ali boja na vrhu mora da ostane ista da se tok
+ne prelomi. Razmak na vrhu sadrzaja je `insets.top + headerBar.height` i
+racuna se na jednom mestu — da ga svaki ekran sam sabira, prvi naslov bi se na
+jednom podvukao pod traku a na drugom odlepio, i videlo bi se tek na telefonu
+sa zarezom.
+
+TRI stvari koje izgledaju kao sitnica a nisu:
+
+POZADINA MORA BITI SIVA. Bela kartica na beloj pozadini je ista boja, a preliv
+koji stoji iznad oboji i nju i pozadinu podjednako — kartica koja prolazi kroz
+preliv se tada uopste ne vidi kao kartica i od celog efekta ne ostane nista.
+Otuda `bg-grouped` na ekranu i `bg-card/80` na povrsini. Tanke linije koje
+stoje DIREKTNO na sivom idu na `border-fill-strong`; `border-border` (#F0F0F0)
+na #F6F7F8 ima sest nivoa razlike umesto petnaest koliko je imao na belom, pa
+podvlake polja skoro nestanu. Unutar bele kartice `border-border` ostaje.
+
+PRELIV JE IZNAD SADRZAJA, NE POZADINA. Sve tri boje su providne, pa kartice
+prolaze ispod njega i primaju nijansu. Cim postane pozadina, kartice ostanu
+bele i efekta nema. Mora da nosi `pointerEvents="none"` — inace pokrije gornjih
+180pt liste i tamo nista ne moze da se pritisne. Crta se POSLE zamucenja: ako
+ode iznad, gornjih 53pt izgubi boju i traka izgleda kao siva pruga. Sva tri
+sloja su direktna deca korenskog `View`-a jer Android secka ono sto izadje iz
+roditelja, a iOS ne — razlika bi se videla tek na drugom telefonu.
+
+ZAMUCENJE IDE PREKO `animatedProps`, NE PREKO RN-ovog `Animated`. Pali se tek
+kad sadrzaj predje `headerBar.blurAt` — na vrhu liste nema sta da se zamuti,
+pa bi traka samo posvetlela prazan prostor i procitala se kao siva pruga.
+`intensity` je obican prop, a `BlurView` je klasna komponenta bez
+`setNativeProps`: animirana providnost preko RN-ovog `Animated` NE STIGNE do
+ekrana (provereno — traka ostane na nuli i kad je stanje upaljeno). `expo-blur`
+zato izvozi `getAnimatableRef()` za Reanimated; provereno, `intensity` 20 daje
+`blur(4px)`.
+
+ANDROID TIHO OSTANE BEZ ZAMUCENJA. `ExpoBlurView.kt` radi
+`if (blurTarget != null) method else BlurMethod.NONE` — nema greske, samo
+providna traka. Zato je sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide
+traci. Na iOS-u je `BlurTargetView` obican `View` i ne kosta nista.
+
+UNUTRASNJE STRANE (`pushed`: profil, tumacenje, Mesec, mesto, izmena) imaju svoje
+zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
+BEZ loga i BEZ preliva (izuzetak: Mesec ima ljubicasti, `tint="purple"`). Strelicu
+crta `Screen` sam — ekran je ne salje.
+
+Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
+
+**17b. `docs/ASTRO-LOGIKA.md` je opis SVE astroloske logike za astrologa.**
+Svaka promena pravila, orbisa, tezina ili izbora (Hero, sazetak, Mesec, kuce) se
+upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
+
+**18. Tranzit dana se bira waterfall-om prioriteta, ne po skoru.**
+`pickHero` u `lib/transits.ts` (specifikacija 26.9.2026): 1) jak aspekt (orb <= 1,5°,
+`STRONG_ORB`) na VLADARA Ascendenta ili Sunca -> 2) tranzit na Ascendent, MC, Sunce
+ili Mesec -> 3) najegzaktniji tranzit na bilo koju natalnu planetu -> 4) Hero se ne
+prikazuje. Unutar prioriteta pobedjuje NAJMANJI ORBIS (skor iz `findTransits` mesa
+tesnocu sa tezinama i ostaje samo za redosled liste u tabu "Tranziti"). Racuna se za
+LOKALNU PONOC, da Hero bude isti ceo dan. Bez vremena rodjenja ASC i MC otpadaju iz
+svih prioriteta. Vladar znaka je `SIGNS[].rulerKey`.
+
+MESEC NE ULAZI U HERO — ima svoju karticu. PAUZA OD 7 DANA (`HERO_PAUSE_DAYS`):
+tranzit prikazan u poslednjih 7 dana se preskace i pusta se sledeci po istom
+redosledu, osim na DAN EGZAKTNOSTI (`exactDayKeys`: orbis nije veci nego dan pre ni dan
+posle, i <= 1,5°). Do 27.9.2026 pauzu je probijao svaki dan sa orb < 0,3°, pa je spor
+Saturn bio Hero nedelju dana zaredom (Ivan). Kljuc prikazan DANAS nikad nije na
+pauzi. PREGLED DRUGIH DANA (dan-meni) koristi `heroHistoryFor`: dnevnik se odigra kao
+da je aplikacija otvarana svaki dan, inace bi juce/sutra ponavljali danasnji Hero. Dnevnik je `store/hero-log.ts`, LOKALNO u AsyncStorage-u — telefon i web mogu
+istog dana da pokazu razlicit Hero; ako zasmeta, dnevnik ide u bazu, oblik ostaje.
+Testovi: `npm run check:natal`, deo 9.
+
+"DANAS UKRATKO" (`pickBrief`, `briefBucket`): ide ti / koci te po ASPEKTU — trigon i
+sekstil skladni, kvadrat i opozicija napeti, konjunkciju deli tranzitna planeta
+(Sunce, Merkur, Venera, Jupiter -> ide ti; ostale -> koci te; PRAVILO CEKA POTVRDU
+ASTROLOGA). Prikazuje `positive` odnosno `challenge` recenicu kratkog teksta, bez
+Hero-a i bez Meseca, po orbisu; tranzit bez teksta se preskace. Testovi: deo 9b.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -187,6 +284,7 @@ npm start                 dev server (Expo Go / dev client)
 npm run web               web verzija (react-native-web)
 npm run check             SVE provere odjednom  <- pusti ovo pre commita
 npm run typecheck         TypeScript
+npm run check:tokens      global.css se nije razisao sa theme/tokens.ts
 npm run check:ephemeris   pozicije planeta
 npm run check:natal       ascendent, MC, Placidus kuce, tranziti
 npm run check:timezone    vreme rodjenja -> UTC
@@ -208,6 +306,8 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       tekstovi u `transit_texts`. Popunjeno 433/600 kratkih i 443/600 dugih.
 - [ ] MESEC — nema nijedan tekst, a jedini menja ton svakog dana. 50 po verziji.
       CEKA astrologa. Spisak: `python3 scripts/korpus/izvestaj.py`
+      Predlog "Mesecev naslov dana" (Co-Star analiza, oblik teksta, varijante):
+      `docs/ASTRO-LOGIKA.md`, poglavlje 10.
 - [ ] Ascendent i MC kao meta — 100 tekstova po verziji. ODLUCENO 23.9.2026:
       ostaju u proracunu, ocekuju se tekstovi. Ako ne stignu, izbaciti ih iz
       `transits.ts`. Dotle nije kvar — `daily.tsx` tranzit bez teksta prikazuje
@@ -241,6 +341,31 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
+- [x] Kartica MESEC na pocetnom ekranu, posle "Danas ukratko" — faza, znak (i sat
+      prelaska u sledeci), najjaci Mesecev tranzit DANA: `moonDay` u `transits.ts`
+      trazi aspekte koji postaju egzaktni izmedju dve lokalne ponoci, pa je kartica
+      ista ceo dan. "Najjaci" = tezina natalne mete, pa aspekt (konj. > opoz. >
+      kvadrat > trigon > sekstil), pa raniji sat — MOJ IZBOR, ceka astrologa. Na
+      0—9 dana godisnje nema nijednog egzaktnog aspekta; tada samo faza i znak.
+      Red vodi na tumacenje tek kad tekst postoji. Testovi: `check:natal`, deo 9e.
+- [x] "Promene na nebu" na pocetnoj, posle kartice Mesec (`lib/sky-events.ts`): do tri
+      planete, svaka sa PRVIM sledecim dogadjajem — ulazak u znak, postaje retrogradna ili
+      ponovo direktna — po datumu, sa trajanjem (do izlaska iz znaka / do stanice
+      direktno; direktno kretanje nema kraj). Licni deo je
+      kuca OD PODZNAKA (Whole Sign), jer tada ulazak u znak = ulazak u kucu; bez vremena
+      rodjenja kuce nema. Bez Meseca. Tekstova "planeta u kuci" nema (120, ceka
+      astrologa) — redovi ne vode nigde. Testovi: `check:natal`, deo 9f.
+- [x] Mesec, drugi krug (27.9.2026): na pocetnoj crtez faze + procenat + znak, bez
+      kruzica sa podacima (Ivan); red "Ljubav danas" se pojavi kad stignu saveti.
+      Ekran Mesec (`app/moon.tsx`): veliki crtez, lunarni dan, do kad je u znaku,
+      sledeci mlad/pun, cetiri podatka (Mesec %, znak, deo biljke, element), tabovi
+      Ljubav/Zdravlje/Karijera/Kuca/Basta, svi Mesecevi tranziti dana. Deo biljke po
+      elementu (biodinamicki: vatra plod, zemlja koren, vazduh cvet, voda list) —
+      CEKA POTVRDU ASTROLOGA. Testovi: `check:natal`, deo 9g.
+- [ ] Tekstovi za karticu Mesec — tekstova
+      za Mesec kao tranzitnu planetu nema (0/50), a tekstovi lunarnog kalendara
+      (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti
+      dok Ivan ne posalje aktuelne.
 - [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,6 KB), 30 znakova iz tri
       Noto izvora. Sklapa ga `scripts/font/build-astroglyphs.py`, koji spisak znakova
       cita IZ KODA. Ako se doda novo telo, font se MORA presloziti — novog znaka u

@@ -1,17 +1,19 @@
 import * as React from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, TextInput, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { Screen } from '@/components/screen';
+import { CARD_SURFACE } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { WheelPicker } from '@/components/ui/wheel-picker';
 import { cityById, cityByName, type City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { placeFields, useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
+import { neutral } from '@/theme/tokens';
 
 /**
  * Izmena podataka o rodjenju — SVE na jednom ekranu, ne kroz cetiri koraka.
@@ -59,23 +61,17 @@ export default function EditBirthData() {
   };
 
   return (
-    <View className="flex-1 bg-background">
-      <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-        <View className="flex-row items-center gap-3 px-5 pb-2 pt-2">
-          <Pressable onPress={() => router.back()} hitSlop={14}
-                     accessibilityRole="button" accessibilityLabel="Nazad">
-            <ChevronLeft size={26} color="#141414" />
-          </Pressable>
-          <Text variant="label">Podaci o rođenju</Text>
-        </View>
-
-        <ScrollView contentContainerClassName="px-5 pb-8" keyboardShouldPersistTaps="handled">
+    <Screen
+      label="Podaci o rođenju"
+      tabBarSpace={false}
+      pushed
+      keyboardShouldPersistTaps="handled">
           <Section title="Ime">
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder="tvoje ime"
-              placeholderTextColor="#9A9A9A"
+              placeholderTextColor={neutral.inkSubtle}
               autoCapitalize="words"
               maxLength={60}
               className="border-b border-border pb-2 text-center text-2xl text-foreground"
@@ -109,7 +105,7 @@ export default function EditBirthData() {
               value={city ? `${city.name}, ${city.country}` : query}
               onChangeText={(t) => { setQuery(t); setCity(null); }}
               placeholder="grad"
-              placeholderTextColor="#9A9A9A"
+              placeholderTextColor={neutral.inkSubtle}
               autoCorrect={false}
               className="border-b border-border pb-2 text-center text-2xl text-foreground"
             />
@@ -134,9 +130,7 @@ export default function EditBirthData() {
           <Button className="mt-8" size="lg" disabled={!valid || busy} onPress={save}>
             <Text>{busy ? 'Čuvam…' : 'Sačuvaj'}</Text>
           </Button>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+    </Screen>
   );
 }
 
@@ -144,7 +138,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <View className="mt-7">
       <Text variant="label" className="mb-3">{title}</Text>
-      {children}
+      {/* Sadrzaj sekcije ide na BELU karticu. Na sivoj pozadini podvlaka polja
+          (#F0F0F0) skoro nestane — razlika prema #F6F7F8 je sest nivoa. */}
+      <View className={cn(CARD_SURFACE, 'px-4 py-4')}>{children}</View>
     </View>
   );
 }

@@ -82,7 +82,7 @@ export default function Code() {
           textContentType="oneTimeCode"
           autoFocus
           maxLength={LENGTH}
-          className="w-64 border-b border-border pb-3 text-center text-4xl tracking-[10px] text-foreground"
+          className="w-64 border-b border-fill-strong pb-3 text-center text-4xl tracking-[10px] text-foreground"
         />
         {error && <Text className="mt-5 text-center text-sm text-destructive">{error}</Text>}
         {resentAt && !error && (

@@ -15,7 +15,10 @@ import { planetPositions } from '../src/lib/astro';
 import { buildSky, shiftDays, zoneClock, zoneShift } from '../src/lib/sky';
 import { formatDate } from '../src/lib/horoscope';
 import { trueNodeLongitude, meanLilithLongitude, nodeSpeed } from '../src/lib/points';
-import { spreadAngles } from '../src/lib/wheel';
+import {
+  chordAt, degreeTickPaths, labelBlockWidth, spreadAngles,
+  LABEL, LABEL_SEP, WHEEL_R,
+} from '../src/lib/wheel';
 import { signFromLongitude } from '../src/lib/zodiac';
 
 let fail = 0;
@@ -203,6 +206,100 @@ const pomak = Math.max(...svi.map((v, i) => {
   return d;
 }));
 ok(pomak < 20, 'nijedan simbol nije odlutao vise od 20°', `najveci pomak ${pomak.toFixed(1)}°`);
+
+console.log('\n=== 8. Crtice za stepene ===');
+// Tocak crta lenjir po celom krugu: 360 crtica u tri debljine, spojenih u tri
+// SVG putanje. Provera je da su sve tu, da se nijedan stepen ne crta dvaput i
+// da crtica zaista pocinje na ivici prstena.
+const OUTER = 144;
+const LEN = { d1: 2.5, d5: 5, d10: 8 };
+const staze = degreeTickPaths(180, 180, sky.chart.houses.ascendant, OUTER, LEN);
+const broj = (d: string) => (d.match(/M/g) ?? []).length;
+ok(broj(staze.d10) === 36, 'crtica na svakih 10°', String(broj(staze.d10)));
+ok(broj(staze.d5) === 36, 'crtica na svakih 5° (bez onih na 10°)', String(broj(staze.d5)));
+ok(broj(staze.d1) === 288, 'crtica na svaki preostali stepen', String(broj(staze.d1)));
+ok(broj(staze.d1) + broj(staze.d5) + broj(staze.d10) === 360, 'ukupno 360, nijedan stepen dvaput');
+
+// Pocetna tacka svake crtice mora lezati na krugu poluprecnika OUTER,
+// a krajnja tacno za svoju duzinu blize centru.
+let najgoriPocetak = 0;
+let najgoriKraj = 0;
+for (const [tier, d] of Object.entries(staze) as ['d1' | 'd5' | 'd10', string][]) {
+  for (const m of d.matchAll(/M([-\d.]+) ([-\d.]+)L([-\d.]+) ([-\d.]+)/g)) {
+    const r0 = Math.hypot(+m[1] - 180, +m[2] - 180);
+    const r1 = Math.hypot(+m[3] - 180, +m[4] - 180);
+    najgoriPocetak = Math.max(najgoriPocetak, Math.abs(r0 - OUTER));
+    najgoriKraj = Math.max(najgoriKraj, Math.abs(r1 - (OUTER - LEN[tier])));
+  }
+}
+ok(najgoriPocetak < 0.02, 'sve crtice krecu sa ivice prstena', `odstupanje ${najgoriPocetak.toFixed(4)}`);
+ok(najgoriKraj < 0.02, 'sve crtice imaju duzinu svog nivoa', `odstupanje ${najgoriKraj.toFixed(4)}`);
+
+console.log('\n=== 9. Tocak i lista ispod njega govore isto ===');
+// Tocak crta `deg` i `min` kao dva odvojena broja, lista ispisuje `formatted`.
+// Oba izlaze iz istog odsecanja u `signFromLongitude`, ali to mora da se
+// drzi: ranije je lista koristila `formattedPrecise`, koji je SKRACIVAO dok je
+// tocak zaokruzivao, pa je isto Sunce bilo "24 09'" gore i "24° 08' 57\""
+// dole. Ova provera pada cim se dva prikaza raziju.
+let razislo = 0;
+let primer = '';
+for (const p of [...sky.chart.planets, ...sky.points]) {
+  const q = signFromLongitude(p.longitude);
+  const saTocka = `${q.deg}° ${String(q.min).padStart(2, '0')}'`;
+  if (!q.formatted.startsWith(saTocka)) {
+    razislo++;
+    if (!primer) primer = `${p.name}: tocak ${saTocka}, lista ${q.formatted}`;
+  }
+}
+ok(razislo === 0, 'svih 13 pozicija se poklapa', primer || 'tocak i lista daju isti minut');
+
+// Minuti se ODSECAJU kao na astro.com i astro-seek. Vrednosti ispod su
+// astro-seek za Nis 30.6.1988. 03:30 CEST (proverano 26.9.2026.); sa
+// zaokruzivanjem bi prve dve bile minut vise.
+const ODSECANJE: Array<[number, string]> = [
+  [77.2317, "17° 13' Blizanci"],   // ASC 17°13.9'
+  [74.3325, "14° 19' Blizanci"],   // Venera 14°19.95'
+  [29.9999, "29° 59' Ovan"],       // ne sme da preskoci u Bika
+  [12 + 34 / 60, "12° 34' Ovan"],  // tacan minut ne sme da padne na 33'
+];
+for (const [lon, ocekivano] of ODSECANJE) {
+  const f = signFromLongitude(lon).formatted;
+  ok(f === ocekivano, `odseca minute: ${ocekivano}`, f);
+}
+const precizanIsti = [...sky.chart.planets, ...sky.points].every((p) => {
+  const q = signFromLongitude(p.longitude);
+  return q.formattedPrecise.startsWith(`${q.deg}° ${String(q.min).padStart(2, '0')}'`);
+});
+ok(precizanIsti, 'precizan oblik ima isti stepen i minut kao prikaz');
+
+console.log('\n=== 10. Blok sa stepenom staje tamo gde treba ===');
+// Ovo pada cim neko digne `LABEL.minSize` a ne prosiri razmak. Blok je uvek
+// vodoravan, pa istu sirinu trosi u dva smera: po luku prema susednom simbolu,
+// i po poluprecniku prema glifu iznad i prstenu ispod.
+const sirina = labelBlockWidth();
+const tetiva = chordAt(WHEEL_R.number, LABEL_SEP);
+ok(tetiva > sirina + 1, 'dva susedna bloka se ne dodiruju',
+   `tetiva ${tetiva.toFixed(1)} vs sirina ${sirina.toFixed(1)}, rezerva ${(tetiva - sirina).toFixed(1)}`);
+
+// Na 3 i 9 sati glif i blok se sire jedan prema drugom po istoj osi.
+const zazorGlif = (WHEEL_R.planetUp - WHEEL_R.number)
+  - (LABEL.glyphSize * 0.82) / 2 - sirina / 2;
+ok(zazorGlif > 1, 'blok ne naleti na svoj glif', `rezerva ${zazorGlif.toFixed(1)}`);
+
+// A ka centru ne sme da propadne kroz unutrasnji prsten.
+const zazorPrsten = (WHEEL_R.number - sirina / 2) - WHEEL_R.houseRing;
+ok(zazorPrsten > 1, 'blok ostaje iznad unutrasnjeg prstena', `rezerva ${zazorPrsten.toFixed(1)}`);
+
+// Sto je razmak veci, to simbol stoji dalje od svog stvarnog stepena. Crtica
+// do prstena to pokriva, ali samo do granice.
+const razmaknutiStepeni = spreadAngles(svi, LABEL_SEP);
+const pomakSaStepenima = Math.max(...svi.map((v, i) => {
+  let d = Math.abs(razmaknutiStepeni[i] - v);
+  if (d > 180) d = 360 - d;
+  return d;
+}));
+ok(pomakSaStepenima < 20, 'i sa stepenima nijedan simbol ne odluta vise od 20°',
+   `najveci pomak ${pomakSaStepenima.toFixed(1)}°`);
 
 console.log(fail ? `\n${fail} PROVERA PALO\n` : '\nSve provere prosle.\n');
 process.exit(fail ? 1 : 0);

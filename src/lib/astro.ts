@@ -42,6 +42,12 @@ function eclipticLongitude(body: Astronomy.Body, time: Astronomy.AstroTime): num
   return norm360(Astronomy.SphereFromVector(ect).lon);
 }
 
+/** Longituda jednog tela u datom trenutku — za racun dokle tranzit traje. */
+export function bodyLongitude(key: PlanetKey, date: Date): number {
+  const def = BODIES.find((b) => b.key === key)!;
+  return eclipticLongitude(def.body, Astronomy.MakeTime(date));
+}
+
 /** Razlika dva ugla svedena na (-180, 180]. */
 function angleDelta(a: number, b: number): number {
   let d = a - b;
