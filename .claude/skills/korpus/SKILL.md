@@ -59,6 +59,49 @@ Engleska imena u ključu (`sun`, `moon`, …, `pluto`, plus `ascendant` i
 Kad ti treba tačan broj — **pokreni `izvestaj.py`, ne prepisuj ove brojeve.**
 Izveštaj se računa iz samih `.docx` fajlova, pa je uvek tačan.
 
+## Lektura — `ispravke.json`, ne izmena `.docx`
+
+Astrologovi `.docx` fajlovi se NE menjaju. Ispravke stoje u
+`~/Desktop/Astroshop App/Tranziti AstroShop/ispravke.json` (isečci korpusa —
+zato NE u repou) i primenjuje ih `izvoz_csv.py` preko `scripts/korpus/ispravke.py`:
+
+- tačna mesta `{kljuc, verzija, original, ispravka}` — isečak mora da se
+  poklopi kao cela reč, inače "ozitivni efekti" pogodi ispravno "Pozitivni";
+- pravila za ceo korpus (Ivan, 27.9.2026): "vi" malim slovom usred rečenice
+  (posle crte ostaje veliko), "sa Izazovi:ma" → "sa izazovima", dupli razmak;
+- u parseru: podnaslov "Saveti (Završna reč / Zlatna pravila)" → "Saveti",
+  Unicode NFC.
+
+Kad stigne nova pošiljka, izvoz ispiše ispravke čiji original više ne
+postoji — obično znači da je astrolog to već sam ispravio. Ne brisati ih
+naslepo: pogledati da li je tekst ispravljen ili samo drugačije napisan.
+Lektura 27.9.2026: 775 ispravki, izveštaj `Lektura tumacenja 27.9.2026.docx`.
+
+## Nacrti kratkih verzija (27.9.2026) — NISU u bazi
+
+Ivan je tražio da se napišu kratke verzije koje fale. Napisane su kao SAŽETAK
+astrologove duge verzije istog tranzita (njegove reči, naslov doslovno iz duge),
+ne kao nov tekst: `nacrti-kratkih.json` (160) i
+`NACRT kratke verzije - Mesec, ASC, MC.docx` pored `.docx` fajlova.
+Dokument je u obliku astrologovih kratkih fajlova — kad ga pregleda i vrati,
+ide u `Kraci tranziti/` i `parsiraj_kratku` ga čita (provereno: 160/160, polja
+ista). Ivan je odlučio (27.9.2026) da nacrti idu u bazu pre potvrde:
+`izvoz_csv.py` ih dodaje SAMO za ključ bez astrologove kratke verzije, pa
+njegov tekst uvek ima prednost i nacrt sam otpada kad on vrati dokument.
+`pregled.py` ih označava kao NACRT dok su isti kao nacrt. `izvestaj.py` ih
+namerno NE broji — pokazuje šta astrolog još duguje.
+Pluton kvadrat Ascendent nema ni dugu verziju, pa ni nacrt.
+
+## Lunarni kalendar (28.9.2026)
+
+Drugi korpus, isti put: `scripts/korpus/lunarni.py` čita
+`~/Desktop/Astroshop App/Lunarni kalendar/*.docx` (jedan fajl po fazi, faza se
+određuje po BROJU fajla — dva opadajuća imaju skoro isti naslov), primenjuje
+`ispravke.json` iz tog foldera (899) + `ispravke.pravila`, a liste ujednačava
+SAMO u redovima sa bulletom (uvod je pasus). Izlaz `lunar-texts.csv` → tabela
+`lunar_texts` (besplatno za prijavljene). Astrolog piše "u Škorpionu" i ume
+"Kuće" umesto "Kuća" — parser oba prihvata. Pregled ih prikazuje u fascikli ☾.
+
 ## Kad stigne nova pošiljka
 
 1. Fajlove u odgovarajući folder, **ne menjaj imena** — `izvestaj.py` ih traži
@@ -118,6 +161,27 @@ tekst pa kriti u UI-ju (pravilo 8 u `CLAUDE.md`).
 Tranzit bez teksta **nije kvar**. `daily.tsx` ga prikazuje kao sažet red, ne kao
 praznu karticu. Ne dodavati generisan ili popunjavajući tekst — glas u
 aplikaciji je astrologov i ničiji drugi.
+
+## Natalna karta (posiljka 27.9.2026)
+
+`files/` u repou (van gita): `Planete u znakovima natal files`, `Planete u
+kucama natal files`, `Aspekti planeta`. Jedan pasus po tumacenju, bez kratke
+verzije. Sve radi `python3 scripts/korpus/natal.py` — izvestaj, pa
+`files/natal-texts.csv` za tabelu `natal_texts` (`supabase/natal-texts.sql`).
+
+- Kljucevi (Ivan, 28.9.2026): `natal.sun.sign.aries`, `natal.sun.house.1`,
+  `natal.moon.square.sun` (= `'natal.' + contentKey`, Mesec PRE Sunca kao u
+  `BODIES`; Ascendent poslednji). Ne menjati posle uvoza.
+- Besplatno: Sunce, Mesec i podznak U ZNAKU (`free = true`), ostalo placeno.
+- 19 fajlova je stari `.doc` — cita se preko macOS `textutil`, ne zipfile.
+- Svaki kratak red mora biti naslov, ostatak spiska ("Sunce" sam u redu) ili
+  "ne postoji" napomena; inace CSV se NE pravi. Putokazi ("pogledati kod
+  Sunca", "ako treba kopirati") se preskacu i ne smeju imati tekst.
+- Lektura: `files/natal-ispravke.json` (872, 28.9.2026), isti oblik kao
+  `ispravke.json`, `verzija: "natal"`; gadja i `subtitle`. Objasnjenje ispod
+  napomene "…ne postoje" se odbacuje (bilo je zalepljeno na Mesec kvadrat Sunce).
+- Stanje 28.9.2026: znakovi 116/116, kuce 120/120, aspekti 260/260.
+  **Podznak u znaku 0/12** — besplatan je, a nema ga. Nema ni aspekata na MC.
 
 ## Otvoreno
 

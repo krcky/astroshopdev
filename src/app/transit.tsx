@@ -6,6 +6,7 @@ import { Lock } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
+import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Glyph } from '@/components/ui/glyph';
@@ -67,11 +68,11 @@ export default function TransitDetail() {
             <Text variant="muted">Učitavam…</Text>
           ) : puna ? (
             <>
-              {!!puna.body && <Text variant="body">{puna.body}</Text>}
+              {!!puna.body && <TumacenjeTekst tekst={puna.body} />}
               {puna.sections.map((s) => (
                 <View key={s.heading} className="mt-7">
                   <Text variant="label" className="mb-2">{s.heading}</Text>
-                  <Text variant="body">{s.body}</Text>
+                  <TumacenjeTekst tekst={s.body} />
                 </View>
               ))}
             </>

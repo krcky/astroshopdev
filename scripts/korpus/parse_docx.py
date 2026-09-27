@@ -24,6 +24,7 @@ Nepravilnosti koje su vec vidjene i koje parser mora da podnese:
   - omaske u imenu: "Pluto" za Pluton, "Mecec" za Mesec
 """
 import re
+import unicodedata
 import zipfile
 from pathlib import Path
 
@@ -96,6 +97,11 @@ IZAZOV = re.compile(r'Izazov\w*' + RAZDVOJNIK, re.I)
 SAVET = re.compile(r'Savet\w*' + RAZDVOJNIK, re.I)
 
 
+def docx_fajlovi(folder: Path) -> list[Path]:
+    """Svi .docx u folderu, bez Wordove brave ("~$...") dok je dokument otvoren."""
+    return sorted(f for f in folder.glob('*.docx') if not f.name.startswith('~$'))
+
+
 def pasusi(putanja: Path) -> list[dict]:
     """Vraca [{text, bold}] — Word cepa recenice na vise <w:t>, pa se spajaju."""
     with zipfile.ZipFile(putanja) as z:
@@ -114,6 +120,10 @@ def pasusi(putanja: Path) -> list[dict]:
         t = (t.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>')
               .replace('&quot;', '"').replace('&apos;', "'"))
         t = '\n'.join(red.strip() for red in t.split('\n') if red.strip())
+        # NFC: Word ume da zapise "c" + zaseban akcenat umesto jednog "ć" — na
+        # ekranu isto, ali pretraga i poredjenje ne nalaze rec. U+FE0F je
+        # zalutali selektor emoji prikaza, nevidljiv.
+        t = unicodedata.normalize('NFC', t).replace('\ufe0f', '')
         if t:
             out.append({'text': t, 'bold': '<w:b/>' in p or '<w:b ' in p})
     return out
@@ -218,22 +228,57 @@ def parsiraj_kratku(putanja: Path) -> list[dict]:
     return [r for r in out if za_uvoz(r)]
 
 
+# Nazivi odeljaka duge verzije — zatvoren spisak, pa se prepoznaju po imenu.
+PODNASLOV = re.compile(
+    r'^\s*(?:Su[sš]tina|Dugoro[cč]n\w*\s+efekt\w*|Specifi[cč]n\w*\s+(?:sfer|oblast)\w*\s+[zž]ivota'
+    r'|Op[sš]t\w*\s+preporuk\w*|P?ozitiv\w*\s+(?:efekt\w*|dejstv\w*|aspekt\w*)|Izazov\w*|Savet\w*'
+    r'(?:\s*\([^)]*\))?)\s*:?\s*$', re.I)
+
+
+
+def naziv_odeljka(t: str) -> str:
+    """'Saveti:' i 'Saveti (Završna reč / Zlatna pravila)' -> 'Saveti' (Ivan, 27.9.2026)."""
+    return re.sub(r'\s*\([^)]*\)$', '', t.strip().rstrip(':').strip())
+
+
 def parsiraj_dugu(putanja: Path) -> list[dict]:
     out = []
     for b in podeli_na_tranzite(pasusi(putanja)):
         sekcije, tekuca, uvod = [], None, []
         for p in b['paragraphs']:
-            # Kratak podebljan pasus bez tacke na kraju = podnaslov sekcije.
-            je_podnaslov = p['bold'] and len(p['text']) < 60 and not p['text'].rstrip().endswith('.')
-            if je_podnaslov:
-                if tekuca:
-                    sekcije.append(tekuca)
-                # "Saveti:" i "Saveti" — isti podnaslov; dvotacka je nedosledna.
-                tekuca = {'heading': p['text'].rstrip(':').strip(), 'paragraphs': []}
-            elif tekuca:
-                tekuca['paragraphs'].append(p['text'])
-            else:
-                uvod.append(p['text'])
+            # Poznat naziv odeljka je podnaslov gde god stoji: kao zaseban pasus
+            # bez podebljanja, ili kao red unutar pasusa ("Pozitivni efekti:⏎
+            # stavka⏎stavka"). Inace zavrsi kao obican red u tekstu prethodnog
+            # odeljka.
+            delovi, buf = [], []
+            for red in p['text'].split('\n'):
+                if PODNASLOV.match(red):
+                    if buf:
+                        delovi.append(('tekst', '\n'.join(buf)))
+                    delovi.append(('podnaslov', naziv_odeljka(red)))
+                    buf = []
+                else:
+                    buf.append(red)
+            if buf:
+                delovi.append(('tekst', '\n'.join(buf)))
+            # Pasus bez poznatog naziva: kratak podebljan bez tacke na kraju je
+            # takodje podnaslov ("Kako najbolje iskoristiti ovaj tranzit?") — ali
+            # SAMO pre prvog poznatog naziva. Posle njega je to stavka liste:
+            # Neptun pise stavke podebljano i bez tacke, pa je svaka postajala
+            # podnaslov sa praznim odeljkom.
+            u_poznatom = any(PODNASLOV.match(x['heading']) for x in sekcije + [tekuca or {'heading': ''}])
+            if not u_poznatom and delovi == [('tekst', p['text'])] and (
+                    p['bold'] and len(p['text']) < 60 and not p['text'].rstrip().endswith('.')):
+                delovi = [('podnaslov', naziv_odeljka(p['text']))]
+            for vrsta, t in delovi:
+                if vrsta == 'podnaslov':
+                    if tekuca:
+                        sekcije.append(tekuca)
+                    tekuca = {'heading': t, 'paragraphs': []}
+                elif tekuca:
+                    tekuca['paragraphs'].append(t)
+                else:
+                    uvod.append(t)
         if tekuca:
             sekcije.append(tekuca)
         out.append({

@@ -24,6 +24,8 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
+    dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
+    natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
@@ -245,7 +247,16 @@ Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 Svaka promena pravila, orbisa, tezina ili izbora (Hero, sazetak, Mesec, kuce) se
 upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 
-**18. Tranzit dana se bira waterfall-om prioriteta, ne po skoru.**
+**18. Tranzit dana: Premium "Tvoj dan" po SKORU, besplatni Hero waterfall-om.**
+PREMIUM (od 27.9.2026, Ivan): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
+(isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — VAZE SAMO TU, tab
+"Tranziti" i "Danas ukratko" ostaju na 3°. Bodovanje tezina x aspekt x meta (x1,3 za Sunce,
+Mesec, ASC, MC i VLADARA) x blizina x momenat; brze odmor 3 dana, spore samo na dan
+pocetka/egzaktnosti/kraja uz odmor 7, Mesec samo egzaktan. Vladar = TRADICIONALNI vladar
+Ascendenta (`lib/rulers.ts`, `RULER_SYSTEM`). Ton: `lib/tone.ts`. Dnevnik:
+`store/tvoj-dan-log.ts` (dan -> tranzit; broj prikaza bira stavku iz duge verzije).
+Testovi: `npm run check:tvoj-dan`. Pregled sa ASC u Ribama: `/dev-kartice` (samo dev).
+BESPLATNI — staro pravilo, ostaje zapisano ispod:
 `pickHero` u `lib/transits.ts` (specifikacija 26.9.2026): 1) jak aspekt (orb <= 1,5°,
 `STRONG_ORB`) na VLADARA Ascendenta ili Sunca -> 2) tranzit na Ascendent, MC, Sunce
 ili Mesec -> 3) najegzaktniji tranzit na bilo koju natalnu planetu -> 4) Hero se ne
@@ -290,6 +301,7 @@ npm run check:natal       ascendent, MC, Placidus kuce, tranziti
 npm run check:timezone    vreme rodjenja -> UTC
 npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
 npm run check:cities      predlozi gradova + da se pretraga nije suzila
+npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
 ```
 
 ## Jos nije uradjeno
@@ -304,9 +316,11 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
 - [ ] Osobine po znaku od astrologa (`lib/traits.ts`) — 12 x 3 reda, mali posao
 - [x] ETL korpusa — .docx fajlovi parsirani (`scripts/korpus/parse_docx.py`),
       tekstovi u `transit_texts`. Pokrivenost: `python3 scripts/korpus/izvestaj.py`.
-      Duge verzije stigle 27.9.2026 (i Mesec, ASC i MC) — 593/597; NIJE JOS UVEZENO.
-- [ ] MESEC — duga verzija stigla (50/50), KRATKE NEMA NIJEDNE. 50 kratkih
-      CEKA astrologa. Spisak: `python3 scripts/korpus/izvestaj.py`
+      Duge verzije stigle 27.9.2026 (i Mesec, ASC i MC) — 593/597. Uvezeno 27.9.2026:
+      short 596 (od toga 160 NACRTA sazetih iz dugih — Ivan odobrio, cekaju astrologa),
+      long 595. Lektura (775 ispravki) u `ispravke.json` pored .docx, ne u repou.
+- [ ] MESEC — duga 50/50; kratke su NACRTI (sazeti iz dugih, u bazi) dok ih
+      astrolog ne potvrdi. Spisak: `python3 scripts/korpus/izvestaj.py`
       Predlog "Mesecev naslov dana" (Co-Star analiza, oblik teksta, varijante):
       `docs/ASTRO-LOGIKA.md`, poglavlje 10.
 - [ ] Ascendent i MC kao meta — duga 99/100 stigla 27.9.2026, kratka 0/100.
@@ -332,6 +346,11 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
 - [ ] Kiron — jedino telo sa referentnog snimka koje ne prikazujemo. Nema ga u
       `astronomy-engine` (nije ni geometrijska tacka kao cvor), pa mu treba zasebna
       efemerida. Kad stigne: i font se mora presloziti, ⚷ u njemu ne postoji.
+- [ ] Natalna tumacenja (stigla 27.9.2026) — parser `scripts/korpus/natal.py`,
+      tabela `supabase/natal-texts.sql`, CSV `files/natal-texts.csv` (496). Kljucevi
+      `natal.sun.sign.aries` / `natal.sun.house.1` / `natal.moon.square.sun`.
+      Besplatno Sunce, Mesec i podznak u znaku. FALI: podznak 0/12, aspekti na MC.
+      Jos nije: uvoz u bazu, lektura, prikaz u tabu "Ti".
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
 - [x] Brisanje naloga u aplikaciji — Edge Function `delete-account` deplojovana,
       dugme u `profile.tsx`. Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
@@ -363,10 +382,14 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       Ljubav/Zdravlje/Karijera/Kuca/Basta, svi Mesecevi tranziti dana. Deo biljke po
       elementu (biodinamicki: vatra plod, zemlja koren, vazduh cvet, voda list) —
       CEKA POTVRDU ASTROLOGA. Testovi: `check:natal`, deo 9g.
-- [ ] Tekstovi za karticu Mesec — tekstova
-      za Mesec kao tranzitnu planetu ima samo duga verzija (kratka 0/50), a tekstovi lunarnog kalendara
-      (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti
-      dok Ivan ne posalje aktuelne.
+- [x] Lunarni kalendar (28.9.2026) — AKTUELNI tekstovi astrologa u
+      `~/Desktop/Astroshop App/Lunarni kalendar/` (7 faza x 12 znakova x 5 oblasti = 420).
+      Stari `~/Desktop/Astroshop/lunarni/` (2019) se NE uvoze. Kljuc `lunar.<faza>.<znak>.<oblast>`,
+      faza i znak iz `phaseDay()` (moon.ts) — isti izvor za karticu i ekran Mesec. BESPLATNO za
+      prijavljene (`supabase/lunar-texts.sql`), ceo tekst (uvod + "• Naslov – tekst").
+      Parser + lektura (899 ispravki) + CSV: `python3 scripts/korpus/lunarni.py`.
+      Otvoreno za astrologa: Opadajuci u Jarcu/Zdravlje se prekida usred recenice;
+      Opadajuci srp u Lavu pominje "Pun mesec" umesto Mladog.
 - [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,6 KB), 30 znakova iz tri
       Noto izvora. Sklapa ga `scripts/font/build-astroglyphs.py`, koji spisak znakova
       cita IZ KODA. Ako se doda novo telo, font se MORA presloziti — novog znaka u

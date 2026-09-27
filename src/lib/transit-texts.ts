@@ -98,3 +98,34 @@ export function useTransitTexts(keys: string[], version: TransitVersion = 'short
 
   return { texts, loading };
 }
+
+/**
+ * Rucna oznaka tona (`transit_texts.tone`, na KRATKOJ verziji) — kartica
+ * "Tvoj dan" (`lib/tone.ts`). Poseban upit, namerno: dok kolona ne postoji u
+ * bazi (`supabase/transit-tone.sql` nije pokrenut) upit vrati gresku, a ta
+ * greska ne sme da obori tekstove. Bez oznake ton se racuna po pravilu.
+ */
+export async function fetchTransitTones(keys: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!isSupabaseConfigured || keys.length === 0) return out;
+  const { data, error } = await supabase
+    .from('transit_texts')
+    .select('key, tone')
+    .eq('version', 'short')
+    .in('key', keys);
+  if (error || !data) return out;
+  for (const r of data as { key: string; tone: string | null }[]) if (r.tone) out.set(r.key, r.tone);
+  return out;
+}
+
+export function useTransitTone(key: string | null): string | null {
+  const [tone, setTone] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    setTone(null);
+    if (!key) return;
+    let otkazano = false;
+    fetchTransitTones([key]).then((m) => { if (!otkazano) setTone(m.get(key) ?? null); });
+    return () => { otkazano = true; };
+  }, [key]);
+  return tone;
+}

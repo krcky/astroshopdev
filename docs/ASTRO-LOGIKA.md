@@ -37,7 +37,7 @@ Tamo gde je navedena funkcija u kodu (npr. `pickHero`), to je samo putokaz za pr
 - **Ascendent i MC se ne koriste nigde**: ni kao meta tranzita, ni u izboru Hero-a, ni za kuće u „Promenama na nebu".
 - Pozicije planeta ostaju upotrebljive, osim **Meseca**, koji za 12 sati pređe i do 7°. ⏳ Da li u tom slučaju Mesec treba izostaviti iz natalnih meta?
 
-**Natalni aspekti** (između planeta u karti), sa orbisima:
+**Natalni aspekti** (između planeta u karti i na Ascendent; **na MC ne**, odluka 28.9.2026), sa orbisima:
 
 | Aspekt | Ugao | Orbis |
 |---|---|---|
@@ -89,7 +89,63 @@ Tamo gde je navedena funkcija u kodu (npr. `pickHero`), to je samo putokaz za pr
 
 ## 4. Početni ekran
 
-### 4.1 Hero (glavni tranzit dana)
+### 4.0 „Tvoj dan" (Premium, od 27.9.2026) ✅
+
+Za Premium korisnike **zamenjuje Hero** (4.1). Besplatni i dalje vide Hero po starim pravilima, pa 4.1 ostaje zapisan i važi za njih. Pravila su iz `docs/tvoj_dan_simulacija.py`; kod (`src/lib/tvoj-dan.ts`) daje **isti izbor 20 od 20 dana** kao simulacija na njenoj test karti (27.9.–16.10.2026).
+
+**Orbisi** (samo za ovu karticu; tab „Tranziti" i „Danas ukratko" ostaju na 3°):
+
+| Tranzitna planeta | Orbis |
+|---|---|
+| Sunce, Merkur, Venera, Mars, Jupiter, Saturn | 1,5° |
+| Uran, Neptun, Pluton | 1° |
+| Mesec | 0° (samo dan kad je aspekt tačan) |
+
+**Dan** je lokalni kalendarski dan. Tranzit je „aktivan" ako je u orbisu u jednoj od dve ponoći ili ako tokom dana postaje tačan. *Počinje* = juče nije bio aktivan; *završava se* = sutra neće biti.
+
+**Bodovanje:** težina planete × aspekt × meta × blizina × momenat.
+
+| Planeta | Težina | | Aspekt | Množilac |
+|---|---|---|---|---|
+| Pluton | 10 | | konjunkcija | 1,0 |
+| Neptun, Uran | 9 | | opozicija, kvadrat | 0,9 |
+| Saturn | 8 | | trigon | 0,7 |
+| Jupiter | 7 | | sekstil | 0,5 |
+| Mars, Sunce | 5 | | | |
+| Venera, Merkur | 4 | | | |
+| Mesec | 2 | | | |
+
+- **Meta** ×1,3: natalno Sunce, Mesec, Ascendent, MC, **ili je u tranzitu vladar horoskopa** (natalni ili tranzitni).
+- **Blizina**: 1 − 0,3 × (udaljenost / orbis).
+- **Momenat**: tačan danas ×1,5, počinje danas ×1,2.
+
+**Rotacija:**
+- Brze (Sunce, Merkur, Venera, Mars): posle prikaza **odmor 3 dana**, osim na dan tačnosti ako nije prikazan juče.
+- Spore (Jupiter–Pluton): **samo na dan početka, tačnosti ili kraja**, odmor **7 dana**.
+- Mesec: rezerva, samo na dan kad je aspekt tačan.
+- Nijedan kandidat: kartica se ne prikazuje.
+- Kad se isti tranzit vrati, iz svakog odeljka duge verzije („Pozitivni efekti", „Izazovi", „Saveti") ide **sledeća stavka**.
+
+**Vladar horoskopa** = vladar znaka Ascendenta, **tradicionalni** (astrolog, 27.9.2026: „svih 12 znakova ima jednako živ protok dnevnih tekstova"). Moderni i oba su podešavanje u kodu (`RULER_SYSTEM`). Bez vremena rođenja nema Ascendenta, pa ni vladara.
+
+**Ton** (Povoljno / Izazovno / Mešovito): ručna oznaka astrologa ima prednost; bez nje se računa po prirodi obe planete ⏳
+
+| Priroda | Planete |
+|---|---|
+| blaga | Venera, Jupiter |
+| neutralna | Sunce, Mesec, Merkur, Ascendent, MC |
+| dinamična | Mars, Uran, Neptun |
+| teška | Saturn, Pluton |
+
+- trigon, sekstil → Povoljno
+- konjunkcija: ima tešku → Mešovito ako je druga blaga, inače Izazovno; ima dinamičnu → Mešovito; inače Povoljno
+- kvadrat, opozicija: ima blagu a nema tešku → Mešovito, inače Izazovno
+
+**Trajanje** na kartici: od dana ulaska u orbis do poslednjeg dana u orbisu (po orbisima iz tabele gore).
+
+### 4.1 Hero (glavni tranzit dana) — važi za BESPLATNE; arhiva pravila pre 27.9.2026
+
+Do 27.9.2026 ovo je bio izbor za sve. Orbisi i težine koje koristi su u poglavlju 3 (3°, sekstil 2°; težine 0,3–1,0).
 
 Bira se **redom po prioritetima**. Staje se na prvom prioritetu koji ima kandidata: ✅
 
@@ -136,7 +192,18 @@ Podela je **po aspektu**, jer tekstovi korpusa nisu podeljeni na dobre i loše:
 
 ⏳ **Pitanje za astrologa:** da li je ova podela konjunkcija ispravna? Da li Venera na natalni Saturn „ide" ili „koči"?
 
-### 4.3 Kartica Mesec
+### 4.3 Kartica Mesec (besplatni) i „Mesec danas" (Premium)
+
+**„Mesec danas"** (Premium, od 27.9.2026):
+- **Faza dana**: Mlad Mesec, Prva četvrt, Pun Mesec, Poslednja četvrt nose **ceo kalendarski dan** (lokalno vreme) u kom se desi tačan trenutak; ostali dani su Rastući ili Opadajući Mesec. ✅
+- **Znak u naslovu**: za glavnu fazu to je znak u tačnom trenutku faze, inače znak u kom je Mesec sada. ✅
+- **Osvetljenost** u procentima i smer (raste / opada). ✅
+- **Lični deo — „Za tebe, {ime}"** (Ivan, 28.9.2026): kako Mesec danas utiče na tebe. Najjači Mesečev aspekt na natalnu kartu koji postaje tačan tog dana, sa satom (isti izbor kao na staroj kartici Mesec, gore). Ako je baš taj tranzit već u „Tvom danu", ide sledeći najjači. Dana bez ijednog tačnog aspekta nema (0–9 godišnje) i red se ne prikazuje. ✅
+- **Red o lunaciji u kući**: samo na Mlad i Pun Mesec, samo sa vremenom rođenja. Navodi u koju natalnu kuću (**Placidus**) faza pada. Teme kuća su početne vrednosti ⏳. Tekst po kući još ne postoji, pa se red ne prikazuje.
+- **Rečenica faze** je PRIVREMENA (nije astrologova) dok ne stignu tekstovi ⏳.
+- **Oblasti**: tekst lunarnog kalendara po paru faza + znak. Na kartici idu prve tri stavke, a u Bašti „Uradi" i „Izbegavaj" (stavke koje počinju sa „Ne", „Nemojte", „Izbegavajte" ili sadrže „nepovoljn"). Ceo tekst je na ekranu Mesec.
+
+**Kartica Mesec (besplatni):**
 
 - **Faza** (procenat osvetljenosti, raste/opada), **lunarni dan** (1–30, od poslednjeg mladog Meseca), sledeći mlad i pun Mesec. ✅
 - **Znak** u kom je Mesec. Ako tog dana menja znak, prikazuje se i vreme prelaska. ✅
@@ -167,6 +234,19 @@ Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa da
 - **Svi** tranziti u orbisu, poređani po skoru (poglavlje 3). ✅
 - Svaki ima kratko tumačenje. Plaća se dubina (dugo tumačenje), ne pristup. ✅
 - **Planete u kućama:** prikazuju se do 3 spore planete sa kućom kroz koju prolaze. Tekstovi „planeta u kući" **ne postoje** (120 rečenica čeka astrologa). ⏳
+
+## 5b. Tumačenja natalne karte (tab „Ti", od 28.9.2026) ✅
+
+Dodir na planetu, Ascendent ili aspekt otvara tekst astrologa:
+- **Planeta**: tekst za znak („Sunce u Lavu") i za kuću („Sunce u 5. kući"), kuće po Placidusu.
+- **Ascendent**: podznak u znaku.
+- **Aspekt**: između planeta i na Ascendent, natalnim orbisima (poglavlje 2). **Na MC nema aspekata.** MC nema tumačenje.
+- **Besplatno**: Sunce, Mesec i podznak u znaku. Ostalo je uz Premium; provera je u bazi.
+
+**Nepoznato vreme rođenja** (radije priznati nego pogađati):
+- nema podznaka, kuća ni aspekata na Ascendent;
+- **Mesec**: znak se tumači samo ako je Mesec ceo dan rođenja bio u istom znaku. Ako je tog dana prešao u sledeći, aplikacija kaže da ne zna i nudi unos vremena. ⏳
+- **Mesečevi aspekti se ne tumače** (red ostaje u tabeli, bez teksta), jer orbis može da odstupa i do ±7° pa aspekt možda i ne postoji. ⏳ Povezano sa pitanjem 10 u poglavlju 9.
 
 ## 6. Profil: „velika trojka"
 
@@ -203,13 +283,15 @@ Tačan spisak onoga što nedostaje: `python3 scripts/korpus/izvestaj.py`
 1. **Kiron**: da li je potreban?
 2. **Orbisi**: natalni (8/4/6/6/8) i tranzitni (3°, sekstil 2°). Da li su drugačiji za Mesec, Sunce ili spore planete?
 3. **Težine** tranzitnih planeta i natalnih meta (tabela u poglavlju 3).
-4. **Vladari znakova**: sada moderni (Pluton, Uran, Neptun). Da li klasični?
+4. **Vladari znakova**: „Tvoj dan" koristi tradicionalne (odluka 27.9.2026); stari Hero (besplatni) i dalje moderne.
 5. **Konjunkcije u „ide ti / koči te"**: podela po tranzitnoj planeti.
 6. **Najjači Mesečev aspekt dana**: redosled kriterijuma.
 7. **Deo biljke po elementu** (Maria Thun).
 8. **Kuće u „Promenama na nebu"** po Whole Sign-u umesto Placidusa.
 9. **Prag „jakog" aspekta za Hero**: 1,5°. **Pauza**: 7 dana. **Dan egzaktnosti**: najviše 1,5°.
 10. **Nepoznato vreme rođenja**: da li natalni Mesec izostaviti kao metu, jer za 12 sati pređe i do 7°?
+11. **Ton tranzita** (4.0): pravilo po prirodi planeta, dok ne postoji ručna oznaka.
+12. **Teme kuća** za red „Za tebe" (4.3).
 
 ---
 

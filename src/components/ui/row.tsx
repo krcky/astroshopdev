@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 
 import { Glyph } from '@/components/ui/glyph';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
+import { neutral } from '@/theme/tokens';
 
 /**
  * Red u tabeli "simbol — ime — vrednost", i naslov iznad takve tabele.
@@ -32,11 +34,29 @@ type RowProps = {
   /** Podatak koji postoji ali mu se ne veruje (npr. ASC bez vremena rodjenja). */
   muted?: boolean;
   last?: boolean;
+  /** Red vodi na tumacenje; tada dobija strelicu. Bez `onPress` je obican red. */
+  onPress?: () => void;
+  accessibilityLabel?: string;
 };
 
-export function Row({ glyph, name, value, extra, retro, muted, last }: RowProps) {
+/** Okvir reda: `Pressable` sa strelicom kad red nekud vodi, inace obican `View`. */
+function Okvir({ onPress, accessibilityLabel, last, className, children }: {
+  onPress?: () => void; accessibilityLabel?: string; last?: boolean; className: string; children: React.ReactNode;
+}) {
+  const klasa = cn(className, !last && 'border-b border-border');
+  if (!onPress) return <View className={klasa}>{children}</View>;
   return (
-    <View className={cn('flex-row items-center px-4 py-3', !last && 'border-b border-border')}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel}
+      className={cn(klasa, 'active:opacity-60')}>
+      {children}
+      <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} style={{ marginLeft: 8 }} />
+    </Pressable>
+  );
+}
+
+export function Row({ glyph, name, value, extra, retro, muted, last, onPress, accessibilityLabel }: RowProps) {
+  return (
+    <Okvir onPress={onPress} accessibilityLabel={accessibilityLabel} last={last} className="flex-row items-center px-4 py-3">
       <Glyph size={17} className={muted ? 'text-muted-foreground' : 'text-foreground'}>{glyph}</Glyph>
       <Text className={cn('ml-3 flex-1 text-sm', muted && 'text-muted-foreground')}>{name}</Text>
       <View className="items-end">
@@ -45,22 +65,21 @@ export function Row({ glyph, name, value, extra, retro, muted, last }: RowProps)
         </Text>
         {extra && <Text variant="muted" className="text-xs">{extra}</Text>}
       </View>
-    </View>
+    </Okvir>
   );
 }
 
 /** Red u tabeli aspekata: "☉ □ ♂   Sunce kvadrat Mars … 1.4°". */
-export function AspectRow({ glyphs, label, orb, last }: {
-  glyphs: string; label: string; orb: number; last?: boolean;
+export function AspectRow({ glyphs, label, orb, last, onPress }: {
+  glyphs: string; label: string; orb: number; last?: boolean; onPress?: () => void;
 }) {
   return (
-    <View className={cn('flex-row items-center justify-between px-4 py-3',
-                        !last && 'border-b border-border')}>
+    <Okvir onPress={onPress} accessibilityLabel={label} last={last} className="flex-row items-center justify-between px-4 py-3">
       <View className="flex-row items-center gap-2">
         <Glyph size={15} className="text-foreground">{glyphs}</Glyph>
         <Text className="text-sm">{label}</Text>
       </View>
-      <Text variant="muted" className="text-xs">{orb.toFixed(1)}°</Text>
-    </View>
+      <Text variant="muted" className="ml-auto text-xs">{orb.toFixed(1)}°</Text>
+    </Okvir>
   );
 }

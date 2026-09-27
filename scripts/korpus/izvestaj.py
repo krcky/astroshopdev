@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from parse_docx import parsiraj_kratku, parsiraj_dugu, PLANETE, ASPEKTI, NEMOGUCE, NAPOMENE, UGLOVI
+from parse_docx import docx_fajlovi, parsiraj_kratku, parsiraj_dugu, PLANETE, ASPEKTI, NEMOGUCE, NAPOMENE, UGLOVI
 
 IZVOR = Path('/Users/ivankrstic/Desktop/Astroshop App/Tranziti AstroShop')
 SR_P = {v: k.capitalize() for k, v in PLANETE.items()}
@@ -21,7 +21,7 @@ def ucitaj():
     """Vraca (skup (kljuc, verzija), spisak dupliranih [(fajl, kljuc)])."""
     imamo, dupli = set(), []
     for folder, fn in (('Kraci tranziti', parsiraj_kratku), ('Duzi trazniti', parsiraj_dugu)):
-        for f in sorted((IZVOR / folder).glob('*.docx')):
+        for f in docx_fajlovi(IZVOR / folder):
             for r in fn(f):
                 k = (r['key'], r['version'])
                 if k in imamo:

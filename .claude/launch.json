@@ -12,6 +12,20 @@
         "8081"
       ],
       "port": 8081
+    },
+    {
+      "name": "korpus-pregled",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "/Users/ivankrstic/Desktop/Astroshop App/Tranziti AstroShop"
+      ],
+      "port": 8765
     }
   ]
 }

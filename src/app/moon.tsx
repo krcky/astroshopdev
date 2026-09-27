@@ -16,9 +16,11 @@ import { moonPhase } from '@/lib/astro';
 import { moonDay } from '@/lib/transits';
 import { formatDay, formatTime } from '@/lib/horoscope';
 import {
-  moonState, moonSignAt, moonElement, formatIllumination, LUNAR_AREAS, type LunarArea,
+  moonState, moonSignAt, moonElement, formatIllumination, phaseDay, LUNAR_AREAS, type LunarArea,
 } from '@/lib/moon';
-import { SIGN_CASES, type Element } from '@/lib/zodiac';
+import { SIGN_CASES, signFromLongitude, type Element } from '@/lib/zodiac';
+import { useLunarTexts } from '@/lib/lunar-texts';
+import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { neutral } from '@/theme/tokens';
@@ -36,8 +38,10 @@ const AREA_ICON: Record<LunarArea, typeof Apple> = {
  *
  * `day` je pomeraj dana sa pocetne (-2..2), da ekran prati izabrani dan;
  * `area` je oblast izabrana na pocetnoj, da se otvori bas taj tab.
- * Saveta po oblastima jos nema (lunarni kalendar ceka aktuelne fajlove) — tab
- * tada kaze da nisu stigli, umesto da izmisli.
+ * Saveti po oblastima su lunarni kalendar astrologa (`lunar_texts`, 28.9.2026):
+ * faza i znak dolaze iz `phaseDay()`, istog izvora kao kartica na pocetnoj. Na
+ * dan glavne faze znak je onaj iz TRENUTKA faze, pa ekran kaze na sta se tekst
+ * odnosi ("Pun mesec u Biku"). Bez teksta tab to kaze, ne izmislja.
  */
 export default function MoonScreen() {
   const { day, area } = useLocalSearchParams<{ day?: string; area?: string }>();
@@ -59,6 +63,9 @@ export default function MoonScreen() {
   const stanje = React.useMemo(() => moonState(date), [date]);
   const kljucevi = React.useMemo(() => (dan ? dan.hits.map((h) => h.contentKey) : []), [dan]);
   const { texts } = useTransitTexts(kljucevi);
+  const faza = React.useMemo(() => phaseDay(date), [date]);
+  const lunarniZnak = signFromLongitude(faza.moonLongitude).sign;
+  const { texts: lunarni, loading: lunarniLoading } = useLunarTexts(faza.textPhase, lunarniZnak.key);
 
   if (!resolved || !dan) return <Redirect href="/" />;
 
@@ -73,8 +80,7 @@ export default function MoonScreen() {
     { naziv: 'Mlad Mesec', kad: stanje.nextNew },
     { naziv: 'Pun Mesec', kad: stanje.nextFull },
   ].sort((a, b) => a.kad.getTime() - b.kad.getTime());
-  // Saveti stizu iz baze kad Ivan posalje aktuelni lunarni kalendar.
-  const saveti: string[] = [];
+  const savet = lunarni.get(oblast);
 
   return (
     <Screen
@@ -134,15 +140,15 @@ export default function MoonScreen() {
             );
           })}
         </View>
-        {saveti.length > 0 ? (
-          saveti.map((s) => (
-            <View key={s} className="mt-3 flex-row gap-2">
-              <Text variant="body">•</Text>
-              <Text variant="body" className="flex-1">{s}</Text>
-            </View>
-          ))
+        {savet ? (
+          <View className="mt-4 gap-3">
+            <Text variant="caption">{faza.name} u {SIGN_CASES[lunarniZnak.key].loc}</Text>
+            <TumacenjeTekst tekst={savet} />
+          </View>
         ) : (
-          <Text variant="muted" className="mt-4">Saveti za ovu oblast još nisu stigli.</Text>
+          <Text variant="muted" className="mt-4">
+            {lunarniLoading ? 'Učitavam…' : 'Saveti za ovu oblast još nisu stigli.'}
+          </Text>
         )}
       </View>
 

@@ -597,12 +597,19 @@ export function moonDay(chart: NatalChart, date: Date = new Date(), timeUnknown 
   }
   hits.sort((a, b) => a.exactAt.getTime() - b.exactAt.getTime());
 
-  const strongest = [...hits].sort(
+  return { sign: SIGNS[signIndex], ingress, hits, strongest: strongestMoonHit(hits) };
+}
+
+/**
+ * Najjaci Mesecev aspekt dana (kriterijum gore), bez `excludeKey`. Kartica
+ * "Mesec danas" izostavlja tranzit koji je vec u "Tvom danu" — tamo Mesec ulazi
+ * bas na dan tacnog aspekta, pa bi se isti red pojavio dvaput.
+ */
+export function strongestMoonHit(hits: MoonHit[], excludeKey: string | null = null): MoonHit | null {
+  return [...hits].filter((h) => h.contentKey !== excludeKey).sort(
     (a, b) =>
       b.score - a.score ||
       MOON_ASPECT_RANK[a.aspect.key] - MOON_ASPECT_RANK[b.aspect.key] ||
       a.exactAt.getTime() - b.exactAt.getTime()
   )[0] ?? null;
-
-  return { sign: SIGNS[signIndex], ingress, hits, strongest };
 }

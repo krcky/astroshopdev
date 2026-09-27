@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, Platform, Pressable, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { Redirect, Stack, router } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
@@ -17,9 +17,13 @@ import { MoonDisc } from '@/components/moon-disc';
 import { moonState, moonSignAt, formatIllumination, LUNAR_AREAS, type LunarArea } from '@/lib/moon';
 import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore, useEntitlement } from '@/store/auth';
+import { useTvojDanLog } from '@/store/tvoj-dan-log';
+import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
+import { TvojDanCard } from '@/components/tvoj-dan-card';
+import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { useHeroLog } from '@/store/hero-log';
-import { dayKey, briefBucket, heroHistoryFor, type BriefBucket, type Transit } from '@/lib/transits';
+import { dayKey, briefBucket, heroHistoryFor, pickBrief, type BriefBucket, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
@@ -59,8 +63,38 @@ export default function Home() {
   }, [daily]);
   const { texts, loading: textsLoading } = useTransitTexts(kljucevi);
 
+  // PREMIUM: "Tvoj dan" umesto Hero-a i "Mesec danas" umesto kartice Mesec
+  // (`lib/tvoj-dan.ts`, Ivan 27.9.2026). Besplatni vide stari Hero i Mesec.
+  // Pristup je ovde samo izbor prikaza — duge tekstove i dalje salje server
+  // po RLS-u (pravilo 8).
+  const premium = !!useEntitlement()?.active;
+  const tvojDanLog = useTvojDanLog((s) => s.shown);
+  const tvojDan = React.useMemo(
+    () => (premium && resolved
+      ? pickTvojDan(resolved.chart, date, resolved.timeUnknown,
+          tvojDanLogFor(resolved.chart, date, tvojDanLog, resolved.timeUnknown, today))
+      : null),
+    [premium, resolved, date, tvojDanLog, today]
+  );
+  // "Danas ukratko" za Premium izostavlja tranzit iz "Tvog dana", ne stari Hero.
+  const brief = React.useMemo(
+    () => (premium && daily ? pickBrief(daily.entries.map((e) => e.transit), tvojDan?.contentKey ?? null) : daily?.brief ?? null),
+    [premium, daily, tvojDan]
+  );
+
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved || !daily) return <Redirect href="/" />;
+
+  // Grupe sazetka se racunaju ovde, ne u kartici: karusel mora unapred da zna
+  // da li kartica uopste ima sta da pokaze. `hero` je rezerva za praznu grupu
+  // (stari Hero); za Premium je null — tranzit "Tvog dana" nije `Transit` iz
+  // `findTransits`, a njegov tekst je vec gore.
+  const heroRezerva = premium ? null : daily.hero.transit;
+  const b = brief ?? daily.brief;
+  const briefGroups = {
+    ide: grupaSaRezervom(b.ide, 'positive', 'ide', heroRezerva, texts),
+    koci: grupaSaRezervom(b.koci, 'challenge', 'koci', heroRezerva, texts),
+  };
 
   return (
     // Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`.
@@ -131,28 +165,92 @@ export default function Home() {
       {/* Bez naslova i bez datuma (Ivan, 26.9.2026): dan se vidi i bira u zaglavlju. */}
       <View className="pt-4" />
 
-      {/* Tranzit dana — Hero. Sta ulazi bira waterfall u `transits.ts`. */}
-      <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} />
-
-      {/* Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`. */}
-      <Brief daily={daily} texts={texts} isToday={offset === 0} />
-
-      {/* Mesec — faza, znak, najjaci Mesecev tranzit dana. Posle sazetka (Ivan, 27.9.2026). */}
-      <MoonCard daily={daily} texts={texts} date={date} offset={offset} />
-
-      {/* Sledece promene na nebu i kuca u koju ulaze (Ivanov plan). */}
-      <SkyEvents daily={daily} today={date} />
-
-      {/* Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
-          (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
-          Svi brzi tranziti ostaju u tabu "Tranziti". */}
-      <TransitList
-        naslov="Tema perioda"
-        list={daily.bySpeed.slow}
-        texts={texts}
-        today={date}
-      />
+      {/* Sve kartice su karusel, jedna po slajdu (Ivan, 28.9.2026). Redosled je
+          isti kao kad su stajale jedna ispod druge. Kartica bez sadrzaja ne dobija
+          slajd — prazan slajd bi izgledao kao greska. */}
+      <Carousel slides={[
+        // Tranzit dana, prvi slajd, bez kartice i bez naslova iznad (nosi svoj).
+        // Premium: "Tvoj dan" (`lib/tvoj-dan.ts`); ostali: Hero (waterfall u `transits.ts`).
+        // Dan bez ijednog kandidata: slajda nema (Ivan, 27.9.2026).
+        ...(premium
+          ? tvojDan ? [{ key: 'day', node: <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} /> }] : []
+          : daily.hero.transit ? [{ key: 'day', node: <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} /> }] : []),
+        // Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`.
+        ...(briefGroups.ide.length > 0 || briefGroups.koci.length > 0
+          ? [{ key: 'brief', label: offset === 0 ? 'Danas ukratko' : 'Ukratko', node: <Brief {...briefGroups} /> }]
+          : []),
+        // Mesec — posle sazetka (Ivan, 27.9.2026). Premium: "Mesec danas".
+        premium
+          ? { key: 'moon', label: 'Mesec danas', node: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} /> }
+          : { key: 'moon', label: 'Mesec', node: <MoonCard daily={daily} texts={texts} date={date} offset={offset} /> },
+        // Sledece promene na nebu i kuca u koju ulaze (Ivanov plan).
+        ...(daily.skyEvents.length > 0
+          ? [{ key: 'sky', label: 'Promene na nebu', node: <SkyEvents daily={daily} today={date} /> }]
+          : []),
+        // Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
+        // (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
+        // Svi brzi tranziti ostaju u tabu "Tranziti".
+        ...(daily.bySpeed.slow.length > 0
+          ? [{ key: 'slow', label: 'Tema perioda', node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} /> }]
+          : []),
+      ]} />
     </Screen>
+  );
+}
+
+/** Razmak izmedju slajdova; susedni slajd ne viri, sirina slajda je sirina sadrzaja ekrana. */
+const SLIDE_GAP = 12;
+
+/**
+ * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
+ * sam karusel izlazi do ivica ekrana da kartica pri pomeranju ne bude odsecena
+ * na margini. Visina je visina NAJVISE kartice; kartice ostaju svoje visine
+ * (poravnate gore), jer rastegnuta kartica sa praznim dnom izgleda kao greska.
+ */
+function Carousel({ slides }: { slides: { key: string; label?: string; node: React.ReactNode }[] }) {
+  const [width, setWidth] = React.useState(0);
+  const [page, setPage] = React.useState(0);
+  const slideWidth = width - space.screen * 2;
+  const step = slideWidth + SLIDE_GAP;
+  const aktivna = Math.min(page, slides.length - 1);
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (step <= 0) return;
+    setPage(Math.round(e.nativeEvent.contentOffset.x / step));
+  };
+
+  if (slides.length === 0) return null;
+  return (
+    <View style={{ marginHorizontal: -space.screen }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      {width > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={step}
+          decelerationRate="fast"
+          disableIntervalMomentum
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingHorizontal: space.screen, gap: SLIDE_GAP, alignItems: 'flex-start' }}>
+          {slides.map((s) => (
+            <View key={s.key} style={{ width: slideWidth }}>
+              {!!s.label && <Text variant="label" className="mb-3">{s.label}</Text>}
+              {s.node}
+            </View>
+          ))}
+        </ScrollView>
+      )}
+      {slides.length > 1 && (
+        <View
+          className="mt-4 flex-row justify-center gap-1.5"
+          accessible
+          accessibilityLabel={`Kartica ${aktivna + 1} od ${slides.length}`}>
+          {slides.map((s, i) => (
+            <View key={s.key} className={cn('h-1.5 rounded-pill', i === aktivna ? 'w-4 bg-foreground' : 'w-1.5 bg-fill-strong')} />
+          ))}
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -266,7 +364,9 @@ function Hero({ daily, date, isToday, texts, loading }: {
       onPress={() => router.push('/daily')}
       accessibilityRole="button"
       accessibilityLabel={`Tranzit dana: ${ime}`}
-      className={cn(CARD_SURFACE, 'p-5 active:opacity-60')}>
+      // Bez kartice (Ivan, 28.9.2026): tranzit dana stoji direktno na pozadini,
+      // kao prvi slajd karusela.
+      className="active:opacity-60">
       {/* Ime tranzita na vrhu, pa mesto za ilustraciju (150pt; logika ilustracije
           je kod drugog agenta), pa tumacenje. Raspored: Ivan, 26.9.2026. */}
       <Text variant="caption">{ime}</Text>
@@ -331,24 +431,18 @@ function grupaSaRezervom(
   return [{ t: hero!, recenica }, ...redovi].slice(0, 3);
 }
 
-function Brief({ daily, texts, isToday }: { daily: PersonalDaily; texts: Texts; isToday: boolean }) {
-  const hero = daily.hero.transit;
-  const ide = grupaSaRezervom(daily.brief.ide, 'positive', 'ide', hero, texts);
-  const koci = grupaSaRezervom(daily.brief.koci, 'challenge', 'koci', hero, texts);
-  if (ide.length === 0 && koci.length === 0) return null;
+type Redovi = { t: Transit; recenica: string | null }[];
 
+function Brief({ ide, koci }: { ide: Redovi; koci: Redovi }) {
   // Dve grupe jedna ispod druge, razdvojene linijom od ivice do ivice: "ide ti" sa
   // plusom, "koci te" sa minusom; samo recenice, bez imena tranzita (Ivan, 26.9.2026).
   // Boje ikona su Ivanove — jedino mesto boje na kartici, ikona je mala.
+  // Svaki red je za sebe dodir i vodi na tumacenje tog tranzita; strelica to kaze.
   return (
-    <View className="mt-9">
-      <Text variant="label" className="mb-3">{isToday ? 'Danas ukratko' : 'Ukratko'}</Text>
-      {/* Svaki red je za sebe dodir i vodi na tumacenje tog tranzita; strelica to kaze. */}
-      <View className={CARD_SURFACE}>
-        {ide.length > 0 && <Grupa naslov="Ide ti" ikona={<Plus size={18} color={PLUS} strokeWidth={3} />} redovi={ide} />}
-        {ide.length > 0 && koci.length > 0 && <View className="h-px bg-border" />}
-        {koci.length > 0 && <Grupa naslov="Koči te" ikona={<Minus size={18} color={MINUS} strokeWidth={3} />} redovi={koci} />}
-      </View>
+    <View className={CARD_SURFACE}>
+      {ide.length > 0 && <Grupa naslov="Ide ti" ikona={<Plus size={18} color={PLUS} strokeWidth={3} />} redovi={ide} />}
+      {ide.length > 0 && koci.length > 0 && <View className="h-px bg-border" />}
+      {koci.length > 0 && <Grupa naslov="Koči te" ikona={<Minus size={18} color={MINUS} strokeWidth={3} />} redovi={koci} />}
     </View>
   );
 }
@@ -356,7 +450,7 @@ function Brief({ daily, texts, isToday }: { daily: PersonalDaily; texts: Texts; 
 const PLUS = '#7ACCEA';
 const MINUS = '#F8B3C3';
 
-function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: { t: Transit; recenica: string | null }[] }) {
+function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: Redovi }) {
   return (
     <View className="p-5">
       <View className="mb-2 flex-row items-center gap-1.5">
@@ -407,74 +501,71 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
   const otvori = () => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } });
 
   return (
-    <View className="mt-9">
-      <Text variant="label" className="mb-3">Mesec</Text>
-      <View className={CARD_SURFACE}>
-        <Pressable
-          onPress={otvori}
-          accessibilityRole="button"
-          accessibilityLabel={`${moon.phase}, ${formatIllumination(stanje.illumination)} osvetljen, u ${SIGN_CASES[znak.key].loc}. Otvori Mesec`}
-          className="flex-row items-center gap-4 p-5 active:opacity-60">
-          <MoonDisc angle={stanje.angle} size={56} />
-          <View className="flex-1">
-            <Text variant="h3">{moon.phase}</Text>
-            <Text variant="muted">{formatIllumination(stanje.illumination)} osvetljen · u {SIGN_CASES[znak.key].loc}</Text>
-          </View>
-          <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
-        </Pressable>
+    <View className={CARD_SURFACE}>
+      <Pressable
+        onPress={otvori}
+        accessibilityRole="button"
+        accessibilityLabel={`${moon.phase}, ${formatIllumination(stanje.illumination)} osvetljen, u ${SIGN_CASES[znak.key].loc}. Otvori Mesec`}
+        className="flex-row items-center gap-4 p-5 active:opacity-60">
+        <MoonDisc angle={stanje.angle} size={56} />
+        <View className="flex-1">
+          <Text variant="h3">{moon.phase}</Text>
+          <Text variant="muted">{formatIllumination(stanje.illumination)} osvetljen · u {SIGN_CASES[znak.key].loc}</Text>
+        </View>
+        <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
+      </Pressable>
 
-        {/* Oblasti kao tabovi: ikonica menja recenicu ispod (Ivan, 27.9.2026). Prva je
-            Ljubav. Ekran Mesec se otvara na izabranoj oblasti. */}
-        <View className="h-px bg-border" />
-        <View className="px-5 pt-4">
-          <View className="flex-row justify-between">
-            {LUNAR_AREAS.map((a) => {
-              const aktivna = a.key === oblast;
-              return (
-                <Pressable
-                  key={a.key}
-                  onPress={() => setOblast(a.key)}
-                  accessibilityRole="tab"
-                  accessibilityLabel={a.name}
-                  accessibilityState={{ selected: aktivna }}
-                  hitSlop={6}
-                  className={cn('h-11 w-11 items-center justify-center rounded-full', aktivna ? 'bg-fill' : 'opacity-40')}>
-                  <Text className="text-[22px] leading-[28px]">{a.emoji}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
+      {/* Oblasti kao tabovi: ikonica menja recenicu ispod (Ivan, 27.9.2026). Prva je
+          Ljubav. Ekran Mesec se otvara na izabranoj oblasti. */}
+      <View className="h-px bg-border" />
+      <View className="px-5 pt-4">
+        <View className="flex-row justify-between">
+          {LUNAR_AREAS.map((a) => {
+            const aktivna = a.key === oblast;
+            return (
+              <Pressable
+                key={a.key}
+                onPress={() => setOblast(a.key)}
+                accessibilityRole="tab"
+                accessibilityLabel={a.name}
+                accessibilityState={{ selected: aktivna }}
+                hitSlop={6}
+                className={cn('h-11 w-11 items-center justify-center rounded-full', aktivna ? 'bg-fill' : 'opacity-40')}>
+                <Text className="text-[22px] leading-[28px]">{a.emoji}</Text>
+              </Pressable>
+            );
+          })}
         </View>
-        {/* Recenica se samo cita — ekran Mesec otvara jedino gornji deo (Ivan, 27.9.2026). */}
-        <View className="px-5 pb-5 pt-3">
-          {recenica ? (
-            <Text variant="default">{recenica}</Text>
-          ) : (
-            <Text variant="muted">Saveti iz lunarnog kalendara još nisu stigli.</Text>
-          )}
-        </View>
-        {t && (
-          <>
-            <View className="h-px bg-border" />
-            <Pressable
-              disabled={!tekst}
-              onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
-              accessibilityRole={tekst ? 'button' : undefined}
-              accessibilityLabel={`${tekst?.title ?? ''} ${ime}, tačan u ${formatTime(t.exactAt)}`.trim()}
-              className="flex-row items-center gap-3 p-5 active:opacity-60">
-              <View className="flex-1">
-                <Text variant="caption">Za tebe danas</Text>
-                <Text variant="row" className="mt-1">{tekst?.title || ime}</Text>
-                {!!tekst?.body && <Text variant="body" className="mt-1" numberOfLines={2}>{tekst.body}</Text>}
-                <Text variant="muted" className="mt-1">
-                  {[tekst?.title ? ime : null, `tačan u ${formatTime(t.exactAt)}`].filter(Boolean).join(' · ')}
-                </Text>
-              </View>
-              {tekst && <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />}
-            </Pressable>
-          </>
+      </View>
+      {/* Recenica se samo cita — ekran Mesec otvara jedino gornji deo (Ivan, 27.9.2026). */}
+      <View className="px-5 pb-5 pt-3">
+        {recenica ? (
+          <Text variant="default">{recenica}</Text>
+        ) : (
+          <Text variant="muted">Saveti iz lunarnog kalendara još nisu stigli.</Text>
         )}
       </View>
+      {t && (
+        <>
+          <View className="h-px bg-border" />
+          <Pressable
+            disabled={!tekst}
+            onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+            accessibilityRole={tekst ? 'button' : undefined}
+            accessibilityLabel={`${tekst?.title ?? ''} ${ime}, tačan u ${formatTime(t.exactAt)}`.trim()}
+            className="flex-row items-center gap-3 p-5 active:opacity-60">
+            <View className="flex-1">
+              <Text variant="caption">Za tebe danas</Text>
+              <Text variant="row" className="mt-1">{tekst?.title || ime}</Text>
+              {!!tekst?.body && <Text variant="body" className="mt-1" numberOfLines={2}>{tekst.body}</Text>}
+              <Text variant="muted" className="mt-1">
+                {[tekst?.title ? ime : null, `tačan u ${formatTime(t.exactAt)}`].filter(Boolean).join(' · ')}
+              </Text>
+            </View>
+            {tekst && <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />}
+          </Pressable>
+        </>
+      )}
     </View>
   );
 }
@@ -492,35 +583,32 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
 function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
   if (daily.skyEvents.length === 0) return null;
   return (
-    <View className="mt-9">
-      <Text variant="label" className="mb-3">Promene na nebu</Text>
-      <Group className="mx-0" inset={false}>
-        {daily.skyEvents.map((e) => {
-          // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad).
-          const zenski = e.planet.key === 'venus';
-          const znak = SIGN_CASES[e.sign.key];
-          const naslov =
-            e.kind === 'ingress' ? `${e.planet.name} ulazi u ${znak.acc}`
-            : e.kind === 'retrograde' ? `${zenski ? 'Retrogradna' : 'Retrogradni'} ${e.planet.name} u ${znak.loc}`
-            : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u ${znak.loc}`;
-          // Direktno kretanje nema kraj — tu stoji samo kuca.
-          const trajanje = e.kind === 'direct' ? null
-            : e.until ? `Traje ${formatUntil(e.until, today)}` : 'Traje godinama';
-          const kuca = e.house === null ? null
-            : e.kind === 'ingress' ? `ulazi u tvoju ${e.house}. kuću` : `u tvojoj ${e.house}. kući`;
-          const podnaslov = [trajanje, kuca].filter(Boolean).join(' · ');
-          return (
-            <ListRow
-              key={e.planet.key}
-              leading={<CalendarDay date={e.at} />}
-              title={naslov}
-              subtitle={podnaslov ? podnaslov.charAt(0).toUpperCase() + podnaslov.slice(1) : undefined}
-              chevron
-            />
-          );
-        })}
-      </Group>
-    </View>
+    <Group className="mx-0" inset={false}>
+      {daily.skyEvents.map((e) => {
+        // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad).
+        const zenski = e.planet.key === 'venus';
+        const znak = SIGN_CASES[e.sign.key];
+        const naslov =
+          e.kind === 'ingress' ? `${e.planet.name} ulazi u ${znak.acc}`
+          : e.kind === 'retrograde' ? `${zenski ? 'Retrogradna' : 'Retrogradni'} ${e.planet.name} u ${znak.loc}`
+          : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u ${znak.loc}`;
+        // Direktno kretanje nema kraj — tu stoji samo kuca.
+        const trajanje = e.kind === 'direct' ? null
+          : e.until ? `Traje ${formatUntil(e.until, today)}` : 'Traje godinama';
+        const kuca = e.house === null ? null
+          : e.kind === 'ingress' ? `ulazi u tvoju ${e.house}. kuću` : `u tvojoj ${e.house}. kući`;
+        const podnaslov = [trajanje, kuca].filter(Boolean).join(' · ');
+        return (
+          <ListRow
+            key={e.planet.key}
+            leading={<CalendarDay date={e.at} />}
+            title={naslov}
+            subtitle={podnaslov ? podnaslov.charAt(0).toUpperCase() + podnaslov.slice(1) : undefined}
+            chevron
+          />
+        );
+      })}
+    </Group>
   );
 }
 
@@ -540,41 +628,38 @@ const MAX_ROWS = 5;
 /** Da li red nosi i kraj tranzita (samo spori ga imaju). */
 const imaKraj = (t: Transit | SlowTransit): t is SlowTransit => 'endsOn' in t;
 
-function TransitList({ naslov, list, texts, today }: {
-  naslov: string; list: (Transit | SlowTransit)[]; texts: Texts; today: Date;
+function TransitList({ list, texts, today }: {
+  list: (Transit | SlowTransit)[]; texts: Texts; today: Date;
 }) {
   if (list.length === 0) return null;
   const prikaz = list.slice(0, MAX_ROWS);
   const ostalo = list.length - prikaz.length;
 
+  // Group nosi mx-screen, a ekran vec ima marginu — ponistava se. Redovi nemaju ikonu, linija ide od ivice do ivice.
   return (
-    <View className="mt-9">
-      <Text variant="label" className="mb-3">{naslov}</Text>
-      {/* Group nosi mx-screen, a ekran vec ima marginu — ponistava se. Redovi nemaju ikonu, linija ide od ivice do ivice. */}
-      <Group className="mx-0" inset={false}>
-        {prikaz.map((t) => {
-          // Velikim: naslov tumacenja. Malim: sam tranzit, i dokle traje ako je spor.
-          // Bez teksta se ne izmislja — tranzit ide u naslov, podnaslov ostaje kraj.
-          const ime = `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`;
-          const naslovTeksta = texts.get(t.contentKey)?.title;
-          const kraj = imaKraj(t) ? formatUntil(t.endsOn, today) : null;
-          const podnaslov = [naslovTeksta ? ime : null, kraj].filter(Boolean).join(' · ');
-          return (
-            <ListRow
-              key={t.contentKey}
-              title={naslovTeksta || ime}
-              subtitle={podnaslov || undefined}
-              onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
-            />
-          );
-        })}
-        {ostalo > 0 && (
+    <Group className="mx-0" inset={false}>
+      {prikaz.map((t) => {
+        // Velikim: naslov tumacenja. Malim: sam tranzit, i dokle traje ako je spor.
+        // Bez teksta se ne izmislja — tranzit ide u naslov, podnaslov ostaje kraj.
+        const ime = `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`;
+        const naslovTeksta = texts.get(t.contentKey)?.title;
+        const kraj = imaKraj(t) ? formatUntil(t.endsOn, today) : null;
+        const podnaslov = [naslovTeksta ? ime : null, kraj].filter(Boolean).join(' · ');
+        return (
           <ListRow
-            title={`Još ${ostalo} u Tranzitima`}
-            onPress={() => router.push('/daily')}
+            key={t.contentKey}
+            title={naslovTeksta || ime}
+            subtitle={podnaslov || undefined}
+            onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
           />
-        )}
-      </Group>
-    </View>
+        );
+      })}
+      {ostalo > 0 && (
+        <ListRow
+          title={`Još ${ostalo} u Tranzitima`}
+          onPress={() => router.push('/daily')}
+        />
+      )}
+    </Group>
   );
 }

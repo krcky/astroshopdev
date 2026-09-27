@@ -68,7 +68,10 @@
     "check:timezone": "tsx scripts/check-timezone.ts",
     "check:sky": "tsx scripts/check-sky.ts",
     "check:cities": "tsx scripts/check-cities.ts",
-    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities",
+    "check:tumacenje": "tsx scripts/check-tumacenje.ts",
+    "check:tvoj-dan": "TZ=Europe/Belgrade tsx scripts/check-tvoj-dan.ts",
+    "check:natal-tekst": "tsx scripts/check-natal-tekst.ts",
+    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst",
     "check:tokens": "tsx scripts/check-tokens.ts"
   },
   "private": true

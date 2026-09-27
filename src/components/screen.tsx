@@ -1,12 +1,16 @@
 import * as React from 'react';
 import { Animated as RNAnimated, Platform, Pressable, StyleSheet, View, type ScrollViewProps } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Extrapolation,
   interpolate,
+  interpolateColor,
   useAnimatedProps,
+  useAnimatedStyle,
   useAnimatedScrollHandler,
   useReducedMotion,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -187,14 +191,24 @@ export function Screen({
   /*
    * Pozadina se PRETAPA kao i preliv (Ivan, 26.9.2026: prelaz sa bele Natalne
    * karte na sivi ekran je bljeskao — native tabovi menjaju ekran trenutno).
-   * Koren je uvek siv, a preko njega beli sloj cija providnost ide 0 <-> 1;
+   * Boja pozadine ide siva <-> bela kroz `belina` (0 <-> 1);
    * u pozadini prati pozadinu aktivnog ekrana, da prvi kadar posle fokusa
    * bude isti kao poslednji pre njega.
+   *
+   * Boju nosi SAM SKROL, ne omotac. iOS 26 skuplja traku tabova na skrol samo
+   * ako nadje skrol niz prvo dete svakog nivoa, a UIKit ne silazi duboko:
+   * vec jedan `View` sa pozadinom izmedju ekrana i skrola je dovoljan da
+   * traka stoji (provereno u iOS 26.5 simulatoru, Ivan 27.9.2026). Omotaci
+   * koji nose samo raspored React Native izbaci iz native stabla, pa oni ne
+   * smetaju. Zato je Reanimated (`useAnimatedStyle` na skrolu), ne RN `Animated`.
    */
   const bezPokreta = useReducedMotion();
   const bgGlobalna = useBackdropStore((s) => s.lastBg);
   const [bgAktivan, setBgAktivan] = React.useState(pushed);
-  const [belina] = React.useState(() => new RNAnimated.Value(pushed && background === 'white' ? 1 : 0));
+  const belina = useSharedValue(pushed && background === 'white' ? 1 : 0);
+  const pozadina = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(belina.get(), [0, 1], [neutral.grouped, neutral.white]),
+  }));
   // Otkazivanje odlozenog "u pozadini" (vidi `ODLAZAK_MS`) — ako se ekran vrati pre isteka.
   const [odlazak] = React.useState(() => ({ otkazi: () => {} }));
   useFocusEffect(
@@ -204,20 +218,18 @@ export function Screen({
       const prethodna = useBackdropStore.getState().lastBg;
       useBackdropStore.getState().setLastBg(background);
       const cilj = background === 'white' ? 1 : 0;
-      let anim: RNAnimated.CompositeAnimation | null = null;
       if (prethodna !== background && !bezPokreta) {
-        belina.setValue(prethodna === 'white' ? 1 : 0);
-        anim = RNAnimated.timing(belina, { toValue: cilj, duration: 500, useNativeDriver: true });
-        anim.start();
+        belina.set(prethodna === 'white' ? 1 : 0);
+        belina.set(withTiming(cilj, { duration: 500 }));
       } else {
-        belina.setValue(cilj);
+        belina.set(cilj);
       }
       setBgAktivan(true);
-      return () => { anim?.stop(); odlazak.otkazi = posleOdlaska(() => setBgAktivan(false)); };
+      return () => { cancelAnimation(belina); odlazak.otkazi = posleOdlaska(() => setBgAktivan(false)); };
     }, [background, bezPokreta, belina, pushed, odlazak])
   );
   React.useEffect(() => {
-    if (!bgAktivan) belina.setValue(bgGlobalna === 'white' ? 1 : 0);
+    if (!bgAktivan) belina.set(bgGlobalna === 'white' ? 1 : 0);
   }, [bgAktivan, bgGlobalna, belina]);
 
   /** Visina trake zajedno sa statusnom trakom — jedini broj koji se racuna. */
@@ -237,12 +249,13 @@ export function Screen({
   }));
 
   return (
-    <View className="flex-1 bg-grouped">
-      {/* 0. bela pozadina, providnost se pretapa (vidi gore) */}
-      <RNAnimated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: neutral.white, opacity: belina }]} />
-      {/* 1. sadrzaj */}
+    // Koren nosi SAMO raspored — bez pozadine, da ga React Native izbaci iz
+    // native stabla i skrol ostane dovoljno plitko za iOS 26 (vidi `belina`).
+    <View style={{ flex: 1 }}>
+      {/* 1. sadrzaj — skrol nosi i pozadinu (siva <-> bela) */}
       <BlurTargetView ref={cilj} style={{ flex: 1 }}>
         <Animated.ScrollView
+          style={pozadina}
           showsVerticalScrollIndicator={false}
           // iOS ume sam da doda umetak za statusnu traku; ovde bi se sabrao sa
           // nasim i naslov bi pao predaleko. Razmak racunamo iskljucivo mi.
