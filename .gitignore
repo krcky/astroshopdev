@@ -50,3 +50,7 @@ supabase/.temp/
 
 # Preuzeti Noto izvori za sklapanje AstroGlyphs.ttf — vidi scripts/font/
 scripts/font/.izvori/
+
+# Posiljke od astrologa (.docx) — korpus NE ide u repo. Mesto im je u
+# ~/Desktop/Astroshop App/Tranziti AstroShop/ (vidi .claude/skills/korpus).
+files/
