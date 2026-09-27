@@ -4,12 +4,12 @@ import { router } from 'expo-router';
 import { Apple, Carrot, ChevronRight, Flower2, Leaf } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
-import { formatDay, formatTime } from '@/lib/horoscope';
 import { SIGN_CASES, signFromLongitude, type Element } from '@/lib/zodiac';
 import type { NatalChart } from '@/lib/natal';
 import {
@@ -37,12 +37,13 @@ const DAN_BILJKE: Record<Element, string> = { vatra: 'Dan ploda', zemlja: 'Dan k
  *
  * Redosled tabova je fiksan: onboarding jos nema korak sa interesovanjima.
  */
-export function MesecDanasCard({ date, offset, chart, timeUnknown, name, excludeKey = null }: {
+export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = null }: {
   date: Date;
   offset: number;
   chart: NatalChart;
   timeUnknown: boolean;
-  name: string;
+  /** Vise se ne prikazuje ("Za tebe" bez imena, Ivan 28.9.2026); ostaje da pozivi ne pucaju. */
+  name?: string;
   /** Tranzit vec prikazan u "Tvom danu" — ne ponavlja se ovde. */
   excludeKey?: string | null;
 }) {
@@ -50,7 +51,8 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
   const znak = signFromLongitude(faza.moonLongitude).sign;
   const [oblast, setOblast] = React.useState<LunarArea>('ljubav');
   const { body, loading } = useLunarText(faza.textPhase, znak.key, oblast);
-  const s = body ? lunarneStavke(body) : null;
+  // Jedna stavka po oblasti (Ivan, 28.9.2026); Basta i dalje Uradi / Izbegavaj.
+  const s = body ? lunarneStavke(body, oblast === 'basta' ? 3 : 1) : null;
   const smer = faza.waxing ? 'raste' : 'opada';
   const naslov = `${faza.name} u ${SIGN_CASES[znak.key].loc}`;
 
@@ -61,8 +63,8 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
   const hit = strongestMoonHit(dan.hits, excludeKey);
   const kljucevi = React.useMemo(() => (hit ? [hit.contentKey] : []), [hit?.contentKey]);
   const { texts } = useTransitTexts(kljucevi);
+  // Bez imena tranzita i sata (Ivan, 28.9.2026) — red postoji samo kad ima tekst.
   const hitTekst = hit ? texts.get(hit.contentKey) : undefined;
-  const hitIme = hit ? `${hit.transiting.name} ${hit.aspect.name} natalni ${hit.natal.name}` : '';
 
   const kuca = lunationHouse(faza, chart, timeUnknown);
   // Tekst "faza u kuci" jos ne postoji; red se ne prikazuje dok ga astrolog ne posalje.
@@ -73,9 +75,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
   return (
     <View className={CARD_SURFACE}>
       <View className="p-5">
-        <Text variant="caption">Za sve znakove</Text>
-
-        <View className="mt-3 flex-row items-center gap-4">
+        <View className="flex-row items-center gap-4">
           <View
             accessible
             accessibilityRole="image"
@@ -90,7 +90,6 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
 
         {/* PRIVREMENA recenica faze dok astrolog ne posalje prave (`PHASE_SUMMARY_PRIVREMENO`). */}
         <Text variant="body" className="mt-4">{PHASE_SUMMARY_PRIVREMENO[faza.key]}</Text>
-        <Text variant="muted" className="mt-1">Sledeća faza: {faza.next.name}, {formatDay(faza.next.at, date)}</Text>
       </View>
 
       {/* Oblasti — vodoravni niz kapsula, da duzi nazivi i Dynamic Type ne lome red. */}
@@ -104,7 +103,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
         ))}
       </ScrollView>
 
-      <View className="px-5 pb-5 pt-4">
+      <View className="px-5 pt-4">
         {oblast === 'basta' && (
           <View className="mb-3 flex-row items-center gap-2">
             <BiljkaIkona size={18} color={neutral.ink} strokeWidth={1.8} />
@@ -127,11 +126,11 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
         )}
       </View>
 
-      {(hit || (kuca && licniTekst)) && (
+      {((hit && hitTekst) || (kuca && licniTekst)) && (
         <>
           <View className="h-px bg-border" />
           <View className="px-5 pt-5">
-            <Text variant="caption">Za tebe, {name}</Text>
+            <Text variant="caption">Za tebe</Text>
           </View>
           {kuca && licniTekst && (
             <View className="px-5 pt-1">
@@ -139,36 +138,31 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, name, exclude
               <Text variant="body" className="mt-1">{licniTekst}</Text>
             </View>
           )}
-          {hit && (
-            // Red vodi na tumacenje tek kad tekst postoji; bez teksta ostaje racunato ime.
+          {hit && hitTekst && (
             <Pressable
-              disabled={!hitTekst}
               onPress={() => router.push({ pathname: '/transit', params: { key: hit.contentKey } })}
-              accessibilityRole={hitTekst ? 'button' : undefined}
-              accessibilityLabel={`${hitTekst?.title ?? ''} ${hitIme}, tačan u ${formatTime(hit.exactAt)}`.trim()}
-              className="flex-row items-center gap-3 px-5 pb-5 pt-2 active:opacity-60">
+              accessibilityRole="button"
+              accessibilityLabel={hitTekst.title || 'Tumačenje'}
+              className="flex-row items-center gap-3 px-5 pt-2 active:opacity-60">
               <View className="flex-1">
-                <Text variant="row">{hitTekst?.title || hitIme}</Text>
-                {!!hitTekst?.body && <Text variant="body" className="mt-1" numberOfLines={3}>{hitTekst.body}</Text>}
-                <Text variant="muted" className="mt-1">
-                  {[hitTekst?.title ? hitIme : null, `tačan u ${formatTime(hit.exactAt)}`].filter(Boolean).join(' · ')}
-                </Text>
+                {!!hitTekst.title && <Text variant="row">{hitTekst.title}</Text>}
+                {!!hitTekst.body && <Text variant="body" className="mt-1" numberOfLines={3}>{hitTekst.body}</Text>}
               </View>
-              {hitTekst && <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />}
+              <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
             </Pressable>
           )}
-          {!hit && <View className="h-5" />}
         </>
       )}
 
-      <View className="h-px bg-border" />
-      <Pressable
-        onPress={() => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } })}
-        accessibilityRole="button"
-        className="flex-row items-center justify-between px-5 py-4 active:opacity-60">
-        <Text variant="row">Saznaj više</Text>
-        <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
-      </Pressable>
+      {/* Crno dugme, ne preko cele sirine (Ivan, 28.9.2026) — ista mera kao na "Tvom danu". */}
+      <View className="px-5 pb-5 pt-5">
+        <Button
+          size="compact"
+          className="h-auto self-start px-5 py-[10px]"
+          onPress={() => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } })}>
+          <Text className="text-[16px] leading-[20px]">Saznaj više</Text>
+        </Button>
+      </View>
     </View>
   );
 }

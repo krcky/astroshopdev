@@ -201,7 +201,7 @@ Podela je **po aspektu**, jer tekstovi korpusa nisu podeljeni na dobre i loše:
 - **Lični deo — „Za tebe, {ime}"** (Ivan, 28.9.2026): kako Mesec danas utiče na tebe. Najjači Mesečev aspekt na natalnu kartu koji postaje tačan tog dana, sa satom (isti izbor kao na staroj kartici Mesec, gore). Ako je baš taj tranzit već u „Tvom danu", ide sledeći najjači. Dana bez ijednog tačnog aspekta nema (0–9 godišnje) i red se ne prikazuje. ✅
 - **Red o lunaciji u kući**: samo na Mlad i Pun Mesec, samo sa vremenom rođenja. Navodi u koju natalnu kuću (**Placidus**) faza pada. Teme kuća su početne vrednosti ⏳. Tekst po kući još ne postoji, pa se red ne prikazuje.
 - **Rečenica faze** je PRIVREMENA (nije astrologova) dok ne stignu tekstovi ⏳.
-- **Oblasti**: tekst lunarnog kalendara po paru faza + znak. Na kartici idu prve tri stavke, a u Bašti „Uradi" i „Izbegavaj" (stavke koje počinju sa „Ne", „Nemojte", „Izbegavajte" ili sadrže „nepovoljn"). Ceo tekst je na ekranu Mesec.
+- **Oblasti**: tekst lunarnog kalendara po paru faza + znak. Na kartici ide **jedna** stavka, prva iz liste (Ivan, 28.9.2026), a u Bašti „Uradi" i „Izbegavaj" (stavke koje počinju sa „Ne", „Nemojte", „Izbegavajte" ili sadrže „nepovoljn"). Ceo tekst je na ekranu Mesec.
 
 **Kartica Mesec (besplatni):**
 

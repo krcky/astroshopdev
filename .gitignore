@@ -54,3 +54,6 @@ scripts/font/.izvori/
 # Posiljke od astrologa (.docx) — korpus NE ide u repo. Mesto im je u
 # ~/Desktop/Astroshop App/Tranziti AstroShop/ (vidi .claude/skills/korpus).
 files/
+
+# Python kes skripti korpusa
+__pycache__/

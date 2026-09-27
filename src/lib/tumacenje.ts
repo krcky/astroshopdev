@@ -90,8 +90,9 @@ export function prveRecenice(tekst: string, koliko = 2): string {
 
 /* ------------------------------------------------------------------------- *
  * LUNARNI KALENDAR NA KARTICI "Mesec danas" (Ivan, 27. i 28.9.2026): bez
- * uvodnog pasusa, TRI stavke; u Basti "Uradi" i "Izbegavaj". Ceo tekst je na
- * ekranu Mesec.
+ * uvodnog pasusa; kartica trazi JEDNU stavku (`koliko = 1`), u Basti "Uradi"
+ * i "Izbegavaj" do tri. Ceo tekst je na ekranu Mesec. Dopuna iz uvoda ispod
+ * vazi kad se trazi vise stavki nego sto lista ima.
  *
  * Tekst astrologa (`lunar_texts.body`) je uvodni pasus pa lista "• …". Lista
  * ima 1—2 stavke u ~30% tekstova (Kuca cak 46 od 84), pa se do tri DOPUNJAVA
