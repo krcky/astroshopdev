@@ -27,14 +27,18 @@ import { neutral } from '@/theme/tokens';
  * podlogu. Na iOS-u 26 je traka staklo i ovo ne treba.
  */
 
+/** Boja izabranog taba. PROBA (Ivan, 27.9.2026): svetla lila umesto indiga iz loga (`brand.indigo`). */
+const IZABRANI = '#B39DDB';
+
 export default function TabsLayout() {
   return (
     <NativeTabs
       // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
-      // (#9C9C9D, `inkSubtle`), izabrani u `ink` (Ivan, 26.9.2026). `tintColor` bi na
-      // nivou UITabBar-a mogao da preboji i neaktivne, pa ga nema.
-      iconColor={{ default: neutral.inkSubtle, selected: neutral.ink }}
-      labelStyle={{ default: { color: neutral.inkSubtle }, selected: { color: neutral.ink } }}
+      // (#9C9C9D, `inkSubtle`), izabrani u `IZABRANI` (Ivan, 27.9.2026;
+      // do tada `ink`). `tintColor` bi na nivou UITabBar-a mogao da preboji i
+      // neaktivne, pa ga nema.
+      iconColor={{ default: neutral.inkSubtle, selected: IZABRANI }}
+      labelStyle={{ default: { color: neutral.inkSubtle }, selected: { color: IZABRANI } }}
       // iOS 26: traka se sazme pri skrolu nadole.
       minimizeBehavior="onScrollDown"
       // Bela podloga: Android (Material 3) i iOS 18 i stariji (vidi `STARI_IOS`).

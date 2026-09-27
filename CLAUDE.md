@@ -215,7 +215,7 @@ podvlake polja skoro nestanu. Unutar bele kartice `border-border` ostaje.
 PRELIV JE IZNAD SADRZAJA, NE POZADINA. Sve tri boje su providne, pa kartice
 prolaze ispod njega i primaju nijansu. Cim postane pozadina, kartice ostanu
 bele i efekta nema. Mora da nosi `pointerEvents="none"` — inace pokrije gornjih
-180pt liste i tamo nista ne moze da se pritisne. Crta se POSLE zamucenja: ako
+230pt liste i tamo nista ne moze da se pritisne. Crta se POSLE zamucenja: ako
 ode iznad, gornjih 53pt izgubi boju i traka izgleda kao siva pruga. Sva tri
 sloja su direktna deca korenskog `View`-a jer Android secka ono sto izadje iz
 roditelja, a iOS ne — razlika bi se videla tek na drugom telefonu.

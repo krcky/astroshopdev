@@ -39,7 +39,7 @@ import { STARI_IOS } from '@/lib/platform';
  *
  *   1. sadrzaj (ScrollView)   ide ispod svega, bez svojih umetaka na vrhu
  *   2. zamucenje              visoko `insets.top + headerBar.height`, ostro se zavrsava
- *   3. preliv                 visok 180 od vrha ekrana, PREKO zamucenja
+ *   3. preliv                 visok 230 od vrha ekrana, PREKO zamucenja
  *   4. natpis trake           preko svega
  *
  * U referenci je preliv dete trake koja nosi `backdrop-filter`, pa se crta

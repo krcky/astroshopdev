@@ -97,6 +97,15 @@ export const accent = {
  * ucitava spoljno pismo: tamo je svaki rez zasebna familija pa `fontWeight`
  * ne radi.
  */
+/**
+ * Brend boja iz loga — indigo kruga (`logo-krug.json`). Nije izmerena sa
+ * referentne aplikacije nego uzeta iz brend fajla, pa nema CSS varijablu i ne
+ * ide kroz `check:tokens`. Koristi se za krug loga i izabrani tab (Ivan, 27.9.2026).
+ */
+export const brand = {
+  indigo: '#403F98',
+} as const;
+
 export const fontWeight = {
   regular: '400',
   medium: '500',
@@ -253,18 +262,21 @@ export const shadow = {
  *    tajna izgleda i jedina stvar koju ne smes da "pojednostavis".
  *
  * 2. Ne sme da hvata dodir. Bez `pointerEvents="none"` preliv pokrije gornjih
- *    180pt liste i tamo nista ne moze da se pritisne.
+ *    230pt liste i tamo nista ne moze da se pritisne.
  *
  * 3. Visina se meri od SAMOG vrha ekrana, ispod statusne trake. Na vebu
- *    statusne trake nema pa je tamo 180px od vrha prozora; ovde je 180pt od
+ *    statusne trake nema pa je tamo 230px od vrha prozora; ovde je 230pt od
  *    vrha uredjaja, sto na telefonu sa zarezom znaci da preliv zavrsi oko 70pt
  *    ispod trake — isti odnos kao u referenci.
  */
 export const backdrop = {
-  /** Visina preliva, od vrha ekrana. */
-  height: 180,
   /**
-   * Tri boje iz reference, ali DVOSTRUKE providnosti.
+   * Visina preliva, od vrha ekrana. Referenca je 180; spusteno za 50 da preliv
+   * sezne dublje i jace se vidi (Ivan, 27.9.2026).
+   */
+  height: 230,
+  /**
+   * Tri boje iz reference, ali JACE: vrh 0,50 (Ivan, 27.9.2026; bilo 0,40), sredina 0,21.
    *
    * Referenca ima 0,2 / 0,1 / 0. Toliko se na vebu, preko sirokog prozora,
    * lepo vidi — na telefonu je preslabo i preliv izgleda kao prljav ekran, ne
@@ -274,20 +286,20 @@ export const backdrop = {
    * Ako treba jace ili slabije, menja se SAMO alfa ovde — nigde drugde nije
    * prepisana.
    */
-  colors: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
+  colors: ['rgba(125, 83, 230, 0.50)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
   /** Polozaji zaustavljanja: vrh, sredina, dno. */
   locations: [0, 0.5, 1],
   /**
    * Nijanse preliva po ekranu (Ivan, 26.9.2026): `purple` je izmerena referentna
    * (isto sto i `colors`), ostale su NASE, izvedene iz akcenata sa istim
-   * providnostima 0,40 / 0,21 / 0 da se ponasaju isto nad karticama.
+   * providnostima 0,50 / 0,21 / 0 da se ponasaju isto nad karticama.
    * Ekran bira nijansu kroz `<Screen tint="gold">`; pri promeni ekrana preliv
    * se pretapa iz prethodne nijanse u svoju (`ScreenBackdrop`).
    */
   tints: {
-    purple: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
+    purple: ['rgba(125, 83, 230, 0.50)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
     /** Tranziti: zlatno-zuta, iz `accent.yellow` ka toplijoj sredini. */
-    gold: ['rgba(244, 200, 68, 0.40)', 'rgba(245, 158, 11, 0.21)', 'rgba(198, 160, 95, 0)'],
+    gold: ['rgba(244, 200, 68, 0.50)', 'rgba(245, 158, 11, 0.21)', 'rgba(198, 160, 95, 0)'],
     /**
      * Natalna karta ("Ti"): crna/grafitna (Ivan, 26.9.2026: zelena se nije
      * uklapala). Providnosti su NIZE od ostalih (0,30 / 0,14): crna na 0,40 bi
@@ -295,13 +307,13 @@ export const backdrop = {
      */
     ink: ['rgba(20, 23, 27, 0.30)', 'rgba(60, 60, 70, 0.14)', 'rgba(60, 60, 70, 0)'],
     /** Pitaj astrologa: svetla nebesko-plava (Ivan, 26.9.2026; ranije Nebo). */
-    blue: ['rgba(125, 211, 252, 0.40)', 'rgba(56, 189, 248, 0.21)', 'rgba(96, 165, 250, 0)'],
+    blue: ['rgba(125, 211, 252, 0.50)', 'rgba(56, 189, 248, 0.21)', 'rgba(96, 165, 250, 0)'],
     /** Bez preliva — providno. Natalna karta na BELOJ pozadini (Ivan, 26.9.2026); pretapa se kao i ostale. */
     none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
     /** Nebo: crvena iz `accent.red` (Ivan, 26.9.2026; ranije Pitaj). */
-    red: ['rgba(235, 71, 67, 0.40)', 'rgba(220, 38, 38, 0.21)', 'rgba(230, 60, 60, 0)'],
+    red: ['rgba(235, 71, 67, 0.50)', 'rgba(220, 38, 38, 0.21)', 'rgba(230, 60, 60, 0)'],
     /** Profil: roze iz `accent.pink` ka svetlijoj — licno, toplo. */
-    pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
+    pink: ['rgba(235, 60, 134, 0.50)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
   },
 } as const;
 
@@ -344,4 +356,4 @@ export const headerBar = {
   blurAt: 24,
 } as const;
 
-export const tokens = { neutral, accent, fontWeight, type, radius, space, size, shadow, backdrop, headerBar } as const;
+export const tokens = { neutral, accent, brand, fontWeight, type, radius, space, size, shadow, backdrop, headerBar } as const;

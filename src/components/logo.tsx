@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native';
 import { useFocusEffect } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
+import { brand } from '@/theme/tokens';
 
 /*
  * Logo u traci na vrhu ekrana: animirani krug + natpis ASTROSHOP.
@@ -56,7 +57,7 @@ const FULL_SHIFT_X = -((FULL_CX - FULL_W / 2) / FULL_H) * FULL_SIZE;
  * reciklira Lottie poglede izmedju ekrana: krug sa crnog taba je tako stigao na
  * "Danas" i "Natalnu kartu" crn (iOS 26, Ivan 27.9.2026).
  */
-const KRUG_INDIGO = '#403F98';
+const KRUG_INDIGO = brand.indigo;
 
 /** Imena slojeva kruga sa oblicima (iz logo-krug.json) — na njih ide preboja. */
 const KRUG_SLOJEVI = [
