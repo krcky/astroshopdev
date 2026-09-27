@@ -40,17 +40,21 @@ Engleska imena u ključu (`sun`, `moon`, …, `pluto`, plus `ascendant` i
 `midheaven`) su ista u `parse_docx.py` (rečnici `PLANETE`, `ASPEKTI`) i u
 `astro.ts`. Ako dodaješ telo, dodaje se na oba mesta ili ništa ne radi.
 
-## Stanje (24.9.2026)
+## Stanje (27.9.2026)
 
-- 433/600 kratkih, 443/600 dugih.
-- **Mesec: nula tekstova.** Najveća rupa. Mesec obiđe zodijak za 28 dana i
-  jedini menja ton *svakog dana* — bez njega dnevni horoskop nema ono što ga
-  čini dnevnim. Treba 50 po verziji (5 aspekata × 10 natalnih planeta).
-- **Ascendent i MC kao meta: 100 po verziji.** Odlučeno 23.9.2026. da ostaju u
-  proračunu i da se tekstovi očekuju. Ako ne stignu — izbaciti ih iz
-  `transits.ts`, ne ostavljati ih da vise.
-- Ne piše se: `pluto.conjunction.pluto` (248 godina) i
-  `neptune.conjunction.neptune` (165 godina). Stoje u `NEMOGUCE` u `izvestaj.py`.
+- Duge verzije: nova pošiljka 27.9.2026, 12 fajlova sa prefiksom broja
+  (`01. Sunce…`, `11. Planete tranziti Ascendent`, `12. … MC`). Stara pošiljka
+  je u `Duzi trazniti - stara verzija 2025/` — parser je ne čita.
+- **Mesec:** duga 50/50, **kratka 0/50**. Mesec jedini menja ton *svakog dana*.
+- **Ascendent i MC kao meta:** duga 99/100, **kratka 0/100**. Ključ je
+  `…natal.ascendant` / `…natal.midheaven`. Ako kratke ne stignu — izbaciti ih
+  iz `transits.ts`, ne ostavljati ih da vise.
+- `NEMOGUCE` (u `parse_docx.py`, `izvestaj.py` ga uvozi) — parser ih i ne vraća.
+  **Proverava se proračunom, ne preuzima od astrologa:** astrolog je 27.9.
+  proglasio nemogućim i Pluton konjunkcija Neptun (rođeni 1999–2011 ga imaju
+  SADA) i Pluton opozicija Pluton (rođeni od 1942, sa ~83 godine).
+- `NAPOMENE` (u `parse_docx.py`) — mesta gde u `.docx` stoji poruka nama umesto
+  tumačenja. Parser ih preskače da poruka ne završi na ekranu korisnika.
 
 Kad ti treba tačan broj — **pokreni `izvestaj.py`, ne prepisuj ove brojeve.**
 Izveštaj se računa iz samih `.docx` fajlova, pa je uvek tačan.
@@ -87,6 +91,13 @@ sve tri su **tihe** — parser prođe, vrati manje, niko ne primeti:
 
 Dodatno, naslov ume da bude nepravilan: reč "natal" ponekad fali, podnaslov
 posle crtice ponekad fali. `NASLOV` regex oboje dopušta — ostaviti tako.
+
+4. **Naslov koji regex ne prepozna ne nestaje — zalepi se na PRETHODNI tekst.**
+   "Mesec kvadrat natalni Mars", "Merkur u kvadratu sa Neptunom", "MC(om)-",
+   "Mecec", "/ podnaslov" — svaki je tiho produžio tekst ispred sebe (Mesec
+   opozicija Sunce je progutao ostalih 45 Mesečevih, 131 hiljadu znakova). Zato
+   se ime planete prepoznaje po korenu od 4 slova. Provera: broj pasusa koji
+   liče na naslov (`planeta + aspekt` na početku, kratki) = broj zapisa.
 
 **Pravilo: svaka izmena parsera prati brojanje pre i posle.** Ako broj zapisa
 padne, izmena je pogrešna, ma koliko čistije izgledala.

@@ -302,14 +302,15 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       email" iskljucen, Supabase salje samo taj sablon, "Confirm signup" se ne koristi
 - [x] Turnstile — widget, `captchaToken` u oba poziva, provera upaljena u Supabase-u
 - [ ] Osobine po znaku od astrologa (`lib/traits.ts`) — 12 x 3 reda, mali posao
-- [x] ETL korpusa — 18 .docx fajlova parsirano (`scripts/korpus/parse_docx.py`),
-      tekstovi u `transit_texts`. Popunjeno 433/600 kratkih i 443/600 dugih.
-- [ ] MESEC — nema nijedan tekst, a jedini menja ton svakog dana. 50 po verziji.
+- [x] ETL korpusa — .docx fajlovi parsirani (`scripts/korpus/parse_docx.py`),
+      tekstovi u `transit_texts`. Pokrivenost: `python3 scripts/korpus/izvestaj.py`.
+      Duge verzije stigle 27.9.2026 (i Mesec, ASC i MC) — 593/597; NIJE JOS UVEZENO.
+- [ ] MESEC — duga verzija stigla (50/50), KRATKE NEMA NIJEDNE. 50 kratkih
       CEKA astrologa. Spisak: `python3 scripts/korpus/izvestaj.py`
       Predlog "Mesecev naslov dana" (Co-Star analiza, oblik teksta, varijante):
       `docs/ASTRO-LOGIKA.md`, poglavlje 10.
-- [ ] Ascendent i MC kao meta — 100 tekstova po verziji. ODLUCENO 23.9.2026:
-      ostaju u proracunu, ocekuju se tekstovi. Ako ne stignu, izbaciti ih iz
+- [ ] Ascendent i MC kao meta — duga 99/100 stigla 27.9.2026, kratka 0/100.
+      ODLUCENO 23.9.2026: ostaju u proracunu. Ako kratke ne stignu, izbaciti ih iz
       `transits.ts`. Dotle nije kvar — `daily.tsx` tranzit bez teksta prikazuje
       kao sazet red, ne kao praznu karticu.
 - [x] "Trenutno na nebu" (peti tab) — nebo SADA nad gradom iz profila: tocak,
@@ -363,7 +364,7 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
       elementu (biodinamicki: vatra plod, zemlja koren, vazduh cvet, voda list) —
       CEKA POTVRDU ASTROLOGA. Testovi: `check:natal`, deo 9g.
 - [ ] Tekstovi za karticu Mesec — tekstova
-      za Mesec kao tranzitnu planetu nema (0/50), a tekstovi lunarnog kalendara
+      za Mesec kao tranzitnu planetu ima samo duga verzija (kratka 0/50), a tekstovi lunarnog kalendara
       (`~/Desktop/Astroshop/lunarni/`, 12 znakova x 5 oblasti) NISU najnoviji — ne uvoziti
       dok Ivan ne posalje aktuelne.
 - [x] Astroloski font — `assets/fonts/AstroGlyphs.ttf` (5,6 KB), 30 znakova iz tri
