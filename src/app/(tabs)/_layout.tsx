@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { STARI_IOS } from '@/lib/platform';
@@ -26,6 +28,29 @@ import { neutral } from '@/theme/tokens';
  * kroz ikone (iOS 18.6 simulator, Ivan 27.9.2026). Ovim traka uvek nosi belu
  * podlogu. Na iOS-u 26 je traka staklo i ovo ne treba.
  */
+
+/**
+ * Mala vibracija na SVAKI dodir taba, i na vec izabrani (Ivan, 28.9.2026).
+ * `tabPress` stize i za ponovljen dodir — react-native-screens ga javlja na obe
+ * platforme (`isRepeated`), a expo-router ga ne filtrira.
+ *
+ * Jacina (Ivan, 28.9.2026): iOS `selection` -> Light ("malo jaci") -> Medium
+ * ("jos jaci"); Android `Virtual_Key` -> `Long_Press`.
+ * iOS: `impact` Medium — jasan udar; sledeci je Heavy.
+ * Android: `Long_Press` — na Pixelu "tezak klik", najjaci od ostrih efekata.
+ * Ide kroz `performHapticFeedback`, pa postuje sistemsko podesavanje dodira.
+ * `impactAsync` na Androidu NIJE jaci: ide preko motora (`Vibrator`), Medium je
+ * 43 ms na 50/255 — slabije i zuji umesto da klikne.
+ * Na vebu nista.
+ */
+function tik() {
+  const gotovo = () => {};
+  if (Platform.OS === 'ios') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(gotovo);
+  else if (Platform.OS === 'android') {
+    Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Long_Press).catch(gotovo);
+  }
+}
+const SLUSAOCI = { tabPress: tik };
 
 /** Boja izabranog taba. PROBA (Ivan, 27.9.2026): svetla lila umesto indiga iz loga (`brand.indigo`). */
 const IZABRANI = '#B39DDB';
@@ -59,7 +84,8 @@ export default function TabsLayout() {
       rippleColor={neutral.fill}
       // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).
       // Material podrazumevano ("auto") sa 4+ tabova prikaze samo izabrani.
-      labelVisibilityMode="labeled">
+      labelVisibilityMode="labeled"
+      screenListeners={SLUSAOCI}>
       <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
         <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>

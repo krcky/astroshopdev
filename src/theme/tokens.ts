@@ -276,7 +276,8 @@ export const backdrop = {
    */
   height: 230,
   /**
-   * Tri boje iz reference, ali JACE: vrh 0,50 (Ivan, 27.9.2026; bilo 0,40), sredina 0,21.
+   * Tri boje iz reference, ali JACE: vrh 0,40, sredina 0,17 (Ivan, 28.9.2026: uz zivi
+   * preliv "previse je jako"; bilo 0,50 / 0,21, a pre toga 0,40 / 0,21).
    *
    * Referenca ima 0,2 / 0,1 / 0. Toliko se na vebu, preko sirokog prozora,
    * lepo vidi — na telefonu je preslabo i preliv izgleda kao prljav ekran, ne
@@ -286,34 +287,80 @@ export const backdrop = {
    * Ako treba jace ili slabije, menja se SAMO alfa ovde — nigde drugde nije
    * prepisana.
    */
-  colors: ['rgba(125, 83, 230, 0.50)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
+  colors: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.17)', 'rgba(95, 121, 198, 0)'],
   /** Polozaji zaustavljanja: vrh, sredina, dno. */
   locations: [0, 0.5, 1],
   /**
    * Nijanse preliva po ekranu (Ivan, 26.9.2026): `purple` je izmerena referentna
    * (isto sto i `colors`), ostale su NASE, izvedene iz akcenata sa istim
-   * providnostima 0,50 / 0,21 / 0 da se ponasaju isto nad karticama.
-   * Ekran bira nijansu kroz `<Screen tint="gold">`; pri promeni ekrana preliv
+   * providnostima 0,40 / 0,17 / 0 da se ponasaju isto nad karticama.
+   * Ekran bira nijansu kroz `<Screen tint="blue">`; pri promeni ekrana preliv
    * se pretapa iz prethodne nijanse u svoju (`ScreenBackdrop`).
    */
   tints: {
-    purple: ['rgba(125, 83, 230, 0.50)', 'rgba(57, 91, 242, 0.21)', 'rgba(95, 121, 198, 0)'],
-    /** Tranziti: zlatno-zuta, iz `accent.yellow` ka toplijoj sredini. */
-    gold: ['rgba(244, 200, 68, 0.50)', 'rgba(245, 158, 11, 0.21)', 'rgba(198, 160, 95, 0)'],
+    purple: ['rgba(125, 83, 230, 0.40)', 'rgba(57, 91, 242, 0.17)', 'rgba(95, 121, 198, 0)'],
+    /** Pitaj astrologa: zlatno-zuta, iz `accent.yellow` ka toplijoj sredini (Ivan, 28.9.2026; ranije Tranziti). */
+    gold: ['rgba(244, 200, 68, 0.40)', 'rgba(245, 158, 11, 0.17)', 'rgba(198, 160, 95, 0)'],
     /**
      * Natalna karta ("Ti"): crna/grafitna (Ivan, 26.9.2026: zelena se nije
-     * uklapala). Providnosti su NIZE od ostalih (0,30 / 0,14): crna na 0,40 bi
-     * dala tesku sivu prugu preko bele kartice.
+     * uklapala). Providnosti su NIZE od ostalih (0,24 / 0,11): crna jacine ostalih
+     * bi dala tesku sivu prugu preko bele kartice.
      */
-    ink: ['rgba(20, 23, 27, 0.30)', 'rgba(60, 60, 70, 0.14)', 'rgba(60, 60, 70, 0)'],
-    /** Pitaj astrologa: svetla nebesko-plava (Ivan, 26.9.2026; ranije Nebo). */
-    blue: ['rgba(125, 211, 252, 0.50)', 'rgba(56, 189, 248, 0.21)', 'rgba(96, 165, 250, 0)'],
+    ink: ['rgba(20, 23, 27, 0.24)', 'rgba(60, 60, 70, 0.11)', 'rgba(60, 60, 70, 0)'],
+    /** Tranziti: svetla nebesko-plava (Ivan, 28.9.2026; ranije Pitaj, pre toga Nebo). */
+    blue: ['rgba(125, 211, 252, 0.40)', 'rgba(56, 189, 248, 0.17)', 'rgba(96, 165, 250, 0)'],
     /** Bez preliva — providno. Natalna karta na BELOJ pozadini (Ivan, 26.9.2026); pretapa se kao i ostale. */
     none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
-    /** Nebo: crvena iz `accent.red` (Ivan, 26.9.2026; ranije Pitaj). */
-    red: ['rgba(235, 71, 67, 0.50)', 'rgba(220, 38, 38, 0.21)', 'rgba(230, 60, 60, 0)'],
-    /** Profil: roze iz `accent.pink` ka svetlijoj — licno, toplo. */
-    pink: ['rgba(235, 60, 134, 0.50)', 'rgba(244, 114, 182, 0.21)', 'rgba(240, 87, 158, 0)'],
+    /** Crvena iz `accent.red` — trenutno je nijedan ekran ne koristi (Nebo presao na `pink`, Ivan 28.9.2026). */
+    red: ['rgba(235, 71, 67, 0.40)', 'rgba(220, 38, 38, 0.17)', 'rgba(230, 60, 60, 0)'],
+    /** Nebo: roze iz `accent.pink` ka svetlijoj (Ivan, 28.9.2026; ranije crvena). */
+    pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.17)', 'rgba(240, 87, 158, 0)'],
+  },
+  /**
+   * ZIVI PRELIV (Ivan, 28.9.2026): preko mirnog preliva plove dve meke mrlje
+   * (elipse koje od sredine blede u nista), svaka svojim tempom — boja na vrhu
+   * se polako preliva levo-desno, a preliv ostaje isti.
+   *
+   * Namerno SPORO i TIHO: aplikacija je bela strana za citanje, ne "kosmos".
+   * Ako se pokret primeti pre teksta, prejak je — smanjuje se `sway`, ne brzina.
+   */
+  drift: {
+    /**
+     * Jedan krug sata, u ms. Mrlje ga obidju 2 odnosno 3 puta (18 s i 12 s
+     * levo-desno). Ivan, 28.9.2026: "malo brze"; bilo 48000 (24 s i 16 s).
+     */
+    cycleMs: 36000,
+    /** Koliko mrlja odlazi levo-desno od svog mesta, kao udeo sirine ekrana (Ivan, 28.9.2026: jace; bilo 0,3). */
+    sway: 0.4,
+    /** Koliko se mrlja dize i spusta, u pt. */
+    lift: 12,
+    /** Koliko mrlja "dise" — udeo velicine. */
+    breathe: 0.08,
+    /** Sirina mrlje kao udeo sirine ekrana. */
+    width: 1.3,
+    /**
+     * Poluvisina mrlje i njen centar od vrha ekrana, u pt. Donja ivica, i kad
+     * mrlja najvise naraste, mora ostati iznad `height` (230) — inace je preliv
+     * odsece ravnom linijom.
+     */
+    radiusY: 150,
+    centerY: 20,
+  },
+  /**
+   * Mrlje po nijansi: boja i providnost u sredini. Boje su PRVE DVE boje iste
+   * nijanse iz `tints` — nista novo; menja se samo gde stoje. Grafitna je slabija
+   * iz istog razloga kao i njen preliv. Providnost 0,26 (Ivan, 28.9.2026: prvo
+   * 0,24 pa "da se bolje vidi" 0,34, pa "previse je jako" — spusten je i mirni
+   * preliv ispod, da pokret ostane vidljiv a ukupno bude svetlije).
+   */
+  blobs: {
+    purple: [['rgb(125, 83, 230)', 0.26], ['rgb(57, 91, 242)', 0.26]],
+    gold: [['rgb(244, 200, 68)', 0.26], ['rgb(245, 158, 11)', 0.26]],
+    ink: [['rgb(20, 23, 27)', 0.11], ['rgb(60, 60, 70)', 0.11]],
+    blue: [['rgb(125, 211, 252)', 0.26], ['rgb(56, 189, 248)', 0.26]],
+    none: [],
+    red: [['rgb(235, 71, 67)', 0.26], ['rgb(220, 38, 38)', 0.26]],
+    pink: [['rgb(235, 60, 134)', 0.26], ['rgb(244, 114, 182)', 0.26]],
   },
 } as const;
 

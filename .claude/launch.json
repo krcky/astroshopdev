@@ -26,6 +26,18 @@
         "/Users/ivankrstic/Desktop/Astroshop App/Tranziti AstroShop"
       ],
       "port": 8765
+    },
+    {
+      "name": "astroshop-web-8082",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8082"
+      ],
+      "port": 8082
     }
   ]
 }

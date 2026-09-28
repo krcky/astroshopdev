@@ -45,7 +45,7 @@ function DailyPremium() {
   if (!resolved || !rez) return <Redirect href="/" />;
 
   return (
-    <Screen label="Tranziti" tint="gold" right={<ProfileButton />}>
+    <Screen label="Tranziti" tint="blue" right={<ProfileButton />}>
       <TranzitiLista rez={rez} date={today} />
     </Screen>
   );
@@ -76,7 +76,7 @@ function DailyBesplatno({ isPremium }: { isPremium: boolean }) {
   const locked = !isPremium;
 
   return (
-    <Screen label="Tranziti" tint="gold" right={<ProfileButton />}>
+    <Screen label="Tranziti" tint="blue" right={<ProfileButton />}>
       {/* Bez naslova, trake sa planetama i oznake "Po jacini" — lista odmah
           pocinje karticama (Ivan, 27.9.2026). Redosled je i dalje po jacini. */}
       <View className="pt-6">

@@ -283,7 +283,7 @@ vraca kontrast. Unutar bele kartice `border-border` ostaje.
 ```
 linear-gradient(
   rgba(125, 83, 230, 0.40)  0%,    ljubicasta
-  rgba(57, 91, 242, 0.21)  50%,    plava
+  rgba(57, 91, 242, 0.17)  50%,    plava
   rgba(95, 121, 198, 0)   100%     providno
 )
 ```
@@ -305,6 +305,15 @@ gornjih 180pt. Da je pozadina, kartice bi ostale bele i efekta ne bi bilo.
 
 Ne sme da hvata dodir: bez `pointerEvents="none"` preliv pokrije gornjih 180pt
 liste i tamo nista ne moze da se pritisne.
+
+**Zivi preliv (Ivan, 28.9.2026).** Preko mirnog preliva plove dve meke mrlje
+(`backdrop.drift`, `backdrop.blobs`) u prve dve boje iste nijanse. Svaka ima
+svoj tempo (18 s i 12 s levo-desno), pa se boja na vrhu polako preliva, a sam
+preliv ostaje isti. Pokret je samo `transform` na UI niti. Sat tece SAMO na
+ekranu u fokusu, jer tabovi ostaju montirani. Kad je u sistemu ukljuceno
+"smanji pokret", mrlje stoje. Ako se pokret primeti pre teksta, prejak je:
+smanjuje se `sway`, ne brzina. Donja ivica mrlje mora ostati iznad visine
+preliva, inace je preliv odsece ravnom linijom.
 
 ### Traka
 

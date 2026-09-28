@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Animated as RNAnimated, Platform, Pressable, StyleSheet, View, type ScrollViewProps } from 'react-native';
+import {
+  Animated as RNAnimated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  type ScrollViewProps,
+} from 'react-native';
 import Animated, {
   cancelAnimation,
   Extrapolation,
@@ -8,10 +16,13 @@ import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
   useAnimatedScrollHandler,
+  useFrameCallback,
   useReducedMotion,
   useSharedValue,
   withTiming,
+  type SharedValue,
 } from 'react-native-reanimated';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView, BlurView } from 'expo-blur';
@@ -393,6 +404,24 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
   const [udeo] = React.useState(() => new RNAnimated.Value(1));
   const [odlazak] = React.useState(() => ({ otkazi: () => {} }));
 
+  /*
+   * Sat zivog preliva (vidi `backdrop.drift`), u krugovima. Tece SAMO dok je
+   * ekran u fokusu: tabovi ostaju montirani, pa bi inace pet ekrana crtalo
+   * pokret koji niko ne gleda. Posle pauze nastavlja odakle je stao — mrlje ne
+   * skacu. Jedan sat za oba sloja pretapanja, da se ne raziđu.
+   */
+  const sat = useSharedValue(0);
+  const kadar = useFrameCallback((f) => {
+    sat.set(sat.get() + (f.timeSincePreviousFrame ?? 0) / backdrop.drift.cycleMs);
+  }, false);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (bezPokreta || backdrop.blobs[tint].length === 0) return;
+      kadar.setActive(true);
+      return () => kadar.setActive(false);
+    }, [bezPokreta, tint, kadar])
+  );
+
   useFocusEffect(
     React.useCallback(() => {
       if (pushed) return; // svoje odmah, zajednicko stanje ne dira
@@ -432,19 +461,91 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
   const mirna: BackdropTint = aktivan ? tint : globalna;
 
   return (
-    <View pointerEvents="none" style={sloj}>
+    // `overflow: hidden` na obe platforme: mrlje izlaze levo, desno i iznad, a
+    // Android secka a iOS ne — ovako je isto svuda.
+    <View pointerEvents="none" style={[sloj, { overflow: 'hidden' }]}>
       {prelaz ? (
         <>
           <RNAnimated.View style={[StyleSheet.absoluteFill, { opacity: stariUdeo }]}>
-            <LinearGradient colors={backdrop.tints[prelaz]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+            <PrelivSloj tint={prelaz} sat={sat} />
           </RNAnimated.View>
           <RNAnimated.View style={[StyleSheet.absoluteFill, { opacity: udeo }]}>
-            <LinearGradient colors={backdrop.tints[tint]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+            <PrelivSloj tint={tint} sat={sat} />
           </RNAnimated.View>
         </>
       ) : (
-        <LinearGradient colors={backdrop.tints[mirna]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+        <PrelivSloj tint={mirna} sat={sat} />
       )}
     </View>
+  );
+}
+
+/** Jedna nijansa preliva: mirni preliv + mrlje koje plove preko njega. */
+function PrelivSloj({ tint, sat }: { tint: BackdropTint; sat: SharedValue<number> }) {
+  const mrlje: readonly (readonly [string, number])[] = backdrop.blobs[tint];
+  return (
+    <>
+      <LinearGradient colors={backdrop.tints[tint]} locations={backdrop.locations} style={StyleSheet.absoluteFill} />
+      {mrlje.map(([boja, alfa], i) => (
+        <Mrlja key={i} redni={i} boja={boja} alfa={alfa} sat={sat} />
+      ))}
+    </>
+  );
+}
+
+/**
+ * Po mrlji: mesto u miru (udeo sirine ekrana), koliko puta obidje u jednom
+ * krugu sata i pomeraj faze. Razliciti tempovi, da se sklop mrlja ne ponavlja
+ * vidljivo; razlicita faza, da ne krenu obe iz sredine u istom smeru.
+ */
+const MRLJE = [
+  { x: 0.2, puta: 2, faza: 0 },
+  { x: 0.8, puta: 3, faza: 2 },
+] as const;
+
+/**
+ * Meka elipsa koja od sredine bledi u nista. SVG se crta jednom; pomera se samo
+ * `transform` na UI niti, pa pokret ne prolazi kroz JS ni kroz ponovno crtanje.
+ */
+function Mrlja({ redni, boja, alfa, sat }: { redni: number; boja: string; alfa: number; sat: SharedValue<number> }) {
+  // Jedinstven id, bez dvotacaka iz `useId` (pravilo 13).
+  const id = `mrlja-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const { width: ekran } = useWindowDimensions();
+  const d = backdrop.drift;
+  const m = MRLJE[redni % MRLJE.length];
+  const sirina = ekran * d.width;
+  const visina = d.radiusY * 2;
+  const pomak = d.sway * ekran;
+
+  const pokret = useAnimatedStyle(() => {
+    const ugao = 2 * Math.PI * m.puta * sat.get() + m.faza;
+    return {
+      transform: [
+        { translateX: Math.sin(ugao) * pomak },
+        { translateY: Math.cos(ugao * 1.5) * d.lift },
+        { scale: 1 + Math.sin(ugao * 0.5) * d.breathe },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View
+      style={[
+        { position: 'absolute', left: ekran * m.x - sirina / 2, top: d.centerY - d.radiusY, width: sirina, height: visina },
+        pokret,
+      ]}>
+      <Svg width={sirina} height={visina}>
+        <Defs>
+          {/* Priblizno zvono (gausovski pad), ne kupa — kod linearnog pada se vidi vrh. */}
+          <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+            <Stop offset="0" stopColor={boja} stopOpacity={alfa} />
+            <Stop offset="0.35" stopColor={boja} stopOpacity={alfa * 0.8} />
+            <Stop offset="0.7" stopColor={boja} stopOpacity={alfa * 0.3} />
+            <Stop offset="1" stopColor={boja} stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Rect width={sirina} height={visina} fill={`url(#${id})`} />
+      </Svg>
+    </Animated.View>
   );
 }

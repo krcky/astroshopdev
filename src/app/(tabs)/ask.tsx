@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
  */
 export default function AskScreen() {
   return (
-    <Screen label="Pitaj astrologa" tint="blue" right={<ProfileButton />}>
+    <Screen label="Pitaj astrologa" tint="gold" right={<ProfileButton />}>
       <View className="pt-4" />
       <View className={cn(CARD_SURFACE, 'p-5')}>
         <Text variant="h3">Pitanje za astrologa</Text>
