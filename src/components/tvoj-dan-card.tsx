@@ -39,8 +39,9 @@ export function TvojDanCard({ pick, date, isToday }: {
 }) {
   const key = pick.contentKey;
   const kljucevi = React.useMemo(() => [key], [key]);
-  const { texts: kratke } = useTransitTexts(kljucevi, 'short');
-  const { texts: duge, loading } = useTransitTexts(kljucevi, 'long');
+  const { texts: kratke, loading: l1 } = useTransitTexts(kljucevi, 'short');
+  const { texts: duge, loading: l2 } = useTransitTexts(kljucevi, 'long');
+  const loading = l1 || l2;
   const record = useTvojDanLog((s) => s.record);
 
   // Upis prikaza — SAMO za danas; pregled sutrasnjice ne sme da "potrosi" sutrasnji izbor.
@@ -90,7 +91,13 @@ export function TvojDanCard({ pick, date, isToday }: {
       {/* 2. Naslov teksta — najveca klasa u sistemu (`display`, Ivan 28.9.2026).
           TON je sklonjen za sada (Ivan, 28.9.2026: "dodacemo ga posle"); racun je u
           `lib/tone.ts`, prikaz u `components/tone-badge.tsx`. */}
-      <Text variant="display" className="mt-1">{naslov}</Text>
+      {/* Dok tekst ne stigne — traka, ne racunato ime: ime bi na promeni dana
+          bljesnulo pre naslova teksta (Ivan, 28.9.2026). */}
+      {loading && !duga?.title && !kratka?.title ? (
+        <TextPlaceholder lines={0} title="display" className="mt-1" />
+      ) : (
+        <Text variant="display" className="mt-1">{naslov}</Text>
+      )}
 
       {/* 5. Sazetak */}
       {!!sazetak && <Text variant="body" className="mt-4">{sazetak}</Text>}

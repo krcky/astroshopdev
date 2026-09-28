@@ -126,9 +126,11 @@ function KarticaTranzita({ t, naslov, loading, trajanje }: {
           {!!tekst.manji && <Text variant="body" className="mt-0.5">{tekst.manji}</Text>}
         </>
       )}
+      {/* Ton pa trajanje, u jednom redu (Ivan, 28.9.2026). */}
       <View className="mt-2 flex-row flex-wrap items-center gap-x-2 gap-y-1">
-        <Text variant="muted">{trajanje}</Text>
         <TonOznaka tone={t.ton} />
+        {!!trajanje && <Text variant="muted">·</Text>}
+        <Text variant="muted">{trajanje}</Text>
       </View>
     </Pressable>
   );

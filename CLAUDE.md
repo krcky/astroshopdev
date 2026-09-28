@@ -253,7 +253,7 @@ upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 **18b. Premium tab "Tranziti" = lista po VAZNOSTI; ocene oblasti SAMO na pocetnoj (28.9.2026).**
 Tab "Tranziti" (`components/tranziti-lista.tsx`): svi tranziti dana, najjaci prvi, svaki u
 svojoj kartici — BEZ oblasti i BEZ ocena (Ivan: "to je ok za homepage"). Ocena 1—5 po oblasti
-je samo na pocetnoj: zbijena kartica (4 reda, bez linija) iznad sazetka na slajdu "Danas ukratko". Racun `lib/oblasti.ts` (`poVaznosti` za listu,
+je samo na pocetnoj: 4 reda bez linija, u ISTOJ kartici iznad "Ide ti / Koci te" na slajdu "Danas ukratko". Racun `lib/oblasti.ts` (`poVaznosti` za listu,
 `oblasti` za ocene), SVE vrednosti za astrologa u `lib/oblasti-config.ts`. Oba ekrana idu
 kroz ISTI `useOblastiDana`. Mnozina ("21 dan", "5 meseci") samo kroz `lib/mnozina.ts`.
 Interesovanja iz onboardinga jos ne postoje: `redosled`/`iskljucene` su parametri sa

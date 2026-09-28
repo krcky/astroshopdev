@@ -5,6 +5,7 @@ import { Redirect, Stack, router } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Screen, useTabBarSpace } from '@/components/screen';
+import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { Button } from '@/components/ui/button';
 import { GlassBubble } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -24,6 +25,7 @@ import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { TvojDanCard } from '@/components/tvoj-dan-card';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { OceneOblasti } from '@/components/ocena-oblasti';
+import { OblastIkona } from '@/components/oblast-ikona';
 import { useOblastiDana } from '@/lib/use-oblasti';
 import { useHeroLog } from '@/store/hero-log';
 import { dayKey, briefBucket, heroHistoryFor, pickBrief, type BriefBucket, type Transit } from '@/lib/transits';
@@ -118,10 +120,8 @@ export default function Home() {
               key: 'brief',
               label: offset === 0 ? 'Danas ukratko' : 'Ukratko',
               node: (
-                <View className="gap-3">
-                  {oblasti && <OceneOblasti rez={oblasti} />}
-                  {(briefGroups.ide.length > 0 || briefGroups.koci.length > 0) && <Brief {...briefGroups} />}
-                </View>
+                // Jedna kartica: ocene oblasti gore, ide ti / koci te ispod (Ivan, 28.9.2026).
+                <Brief {...briefGroups} vrh={oblasti ? <OceneOblasti rez={oblasti} bare /> : null} />
               ),
             }]
           : []),
@@ -510,27 +510,32 @@ function grupaSaRezervom(
 
 type Redovi = { t: Transit; recenica: string | null }[];
 
-function Brief({ ide, koci }: { ide: Redovi; koci: Redovi }) {
+function Brief({ ide, koci, vrh = null }: { ide: Redovi; koci: Redovi; vrh?: React.ReactNode }) {
   // Dve grupe jedna ispod druge, razdvojene linijom od ivice do ivice: "ide ti" sa
   // plusom, "koci te" sa minusom; samo recenice, bez imena tranzita (Ivan, 26.9.2026).
   // Boje ikona su Ivanove — jedino mesto boje na kartici, ikona je mala.
   // Svaki red je za sebe dodir i vodi na tumacenje tog tranzita; strelica to kaze.
   return (
+    // `vrh`: Premium ocene oblasti, u istoj kartici iznad grupa (Ivan, 28.9.2026).
     <View className={CARD_SURFACE}>
-      {ide.length > 0 && <Grupa naslov="Ide ti" ikona={<Plus size={18} color={PLUS} strokeWidth={3} />} redovi={ide} />}
+      {vrh}
+      {!!vrh && (ide.length > 0 || koci.length > 0) && <View className="h-px bg-border" />}
+      {ide.length > 0 && <Grupa naslov="Ide ti" ikona={<Plus size={16} color={PLUS} strokeWidth={3} />} redovi={ide} />}
       {ide.length > 0 && koci.length > 0 && <View className="h-px bg-border" />}
-      {koci.length > 0 && <Grupa naslov="Koči te" ikona={<Minus size={18} color={MINUS} strokeWidth={3} />} redovi={koci} />}
+      {koci.length > 0 && <Grupa naslov="Koči te" ikona={<Minus size={16} color={MINUS} strokeWidth={3} />} redovi={koci} />}
     </View>
   );
 }
 
-const PLUS = '#7ACCEA';
-const MINUS = '#F8B3C3';
+// Iste boje nosi i ton na tabu "Tranziti" (`components/ton.tsx`).
+const PLUS = PLUS_BOJA;
+const MINUS = MINUS_BOJA;
 
+// Zbijeno (Ivan, 28.9.2026): manji okvir i razmak medju redovima.
 function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: Redovi }) {
   return (
-    <View className="p-5">
-      <View className="mb-2 flex-row items-center gap-1.5">
+    <View className="px-4 py-4">
+      <View className="mb-1 flex-row items-center gap-1.5">
         {ikona}
         <Text variant="h3">{naslov}</Text>
       </View>
@@ -540,14 +545,14 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
           onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
           accessibilityRole="button"
           accessibilityLabel={`${recenica ?? ''} ${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`.trim()}
-          className="flex-row items-center gap-3 py-2 active:opacity-60">
+          className="flex-row items-center gap-3 py-1.5 active:opacity-60">
           {recenica ? (
             <Text variant="default" className="flex-1">{recenica}</Text>
           ) : (
             // Bez teksta ostaje samo ime tranzita, sivo — jedino sto se o njemu zna.
             <Text variant="muted" className="flex-1">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
           )}
-          <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
+          <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} />
         </Pressable>
       ))}
     </View>
@@ -556,7 +561,7 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
 
 /**
  * Kartica Mesec: crtez Meseca kakav je sada, faza, procenat i znak; ispod pet
- * oblasti lunarnog kalendara kao tabovi (emoji) i jedna recenica izabrane, pa najjaci Mesecev tranzit dana (`moonDay` u
+ * oblasti lunarnog kalendara kao tabovi (Ivanove ikonice) i jedna recenica izabrane, pa najjaci Mesecev tranzit dana (`moonDay` u
  * `transits.ts`) sa satom. Gornji deo otvara ekran Mesec (`app/moon.tsx`) gde je
  * sve ostalo: element, deo biljke, lunarni dan, oblasti, svi Mesecevi tranziti.
  * Bez kruzica sa podacima na pocetnoj (Ivan, 27.9.2026).
@@ -608,7 +613,7 @@ function MoonCard({ daily, texts, date, offset }: { daily: PersonalDaily; texts:
                 accessibilityState={{ selected: aktivna }}
                 hitSlop={6}
                 className={cn('h-11 w-11 items-center justify-center rounded-full', aktivna ? 'bg-fill' : 'opacity-40')}>
-                <Text className="text-[22px] leading-[28px]">{a.emoji}</Text>
+                <OblastIkona oblast={a.key} size={22} />
               </Pressable>
             );
           })}

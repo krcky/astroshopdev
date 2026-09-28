@@ -107,12 +107,12 @@ export function moonSignAt(
  * oblast, `lib/lunar-texts.ts`). Tekstovi su u bazi (pravilo 7), ne u kodu.
  */
 export const LUNAR_AREAS = [
-  // `emoji` je ikonica na pocetnoj (Ivan, 27.9.2026) — namerno emoji, ne `<Glyph>`.
-  { key: 'ljubav', name: 'Ljubav', emoji: '❤️' },
-  { key: 'zdravlje', name: 'Zdravlje', emoji: '🌿' },
-  { key: 'karijera', name: 'Karijera', emoji: '💼' },
-  { key: 'kuca', name: 'Kuća', emoji: '🏠' },
-  { key: 'basta', name: 'Bašta', emoji: '🌷' },
+  // Ikonice su u `components/oblast-ikona.tsx` (Ivanove, 28.9.2026).
+  { key: 'ljubav', name: 'Ljubav' },
+  { key: 'zdravlje', name: 'Zdravlje' },
+  { key: 'karijera', name: 'Karijera' },
+  { key: 'kuca', name: 'Kuća' },
+  { key: 'basta', name: 'Bašta' },
 ] as const;
 
 export type LunarArea = (typeof LUNAR_AREAS)[number]['key'];

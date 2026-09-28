@@ -364,7 +364,7 @@ Primer, Mesec trigon natalni Saturn:
 
 ## 11. Ocena dana po oblastima (Premium, od 28.9.2026) ⏳
 
-Zbijena kartica (četiri reda bez linija: ikona, naziv, tačkice) iznad sažetka na slajdu „Danas ukratko" na početnoj; oznaka („Dobar dan") je samo u VoiceOver-u. Tab „Tranziti" koristi ŠIRI spisak (orbis „Teme perioda", poglavlje 5) i
+Četiri reda bez linija (ikona, naziv, tačkice), u istoj kartici iznad „Ide ti / Koči te" na slajdu „Danas ukratko" na početnoj; oznaka („Dobar dan") je samo u VoiceOver-u. Tab „Tranziti" koristi ŠIRI spisak (orbis „Teme perioda", poglavlje 5) i
 istu jačinu (za redosled po važnosti), ali oblasti i ocene NE prikazuje (Ivan, 28.9.2026). **Sve vrednosti iz ovog poglavlja
 su u jednom fajlu, `src/lib/oblasti-config.ts`** — menjaju se bez diranja koda.
 Sve je predlog iz specifikacije i čeka potvrdu.

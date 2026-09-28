@@ -16,8 +16,6 @@ export type OblastKey = 'ljubav' | 'zdravlje' | 'karijera' | 'kuca';
 export type OblastDef = {
   key: OblastKey;
   name: string;
-  /** Ikona oblasti — isti emoji kao u lunarnom kalendaru (`LUNAR_AREAS`). */
-  emoji: string;
   /** Kuce sa punom vezom. */
   houses: readonly number[];
   /** Kuce sa slabijom vezom (`VEZA.slabaKuca`). */
@@ -28,10 +26,10 @@ export type OblastDef = {
 
 /** Tabela veze tranzita sa oblascu. */
 export const OBLASTI: readonly OblastDef[] = [
-  { key: 'ljubav', name: 'Ljubav', emoji: '❤️', houses: [5, 7], weakHouses: [], points: ['venus', 'moon', 'mars'] },
-  { key: 'zdravlje', name: 'Zdravlje i lepota', emoji: '🌿', houses: [1, 6], weakHouses: [], points: ['sun', 'mars', 'ascendant'] },
-  { key: 'karijera', name: 'Karijera i finansije', emoji: '💼', houses: [2, 10], weakHouses: [6, 8], points: ['jupiter', 'saturn', 'mercury', 'midheaven'] },
-  { key: 'kuca', name: 'Kuća i bašta', emoji: '🏠', houses: [4], weakHouses: [], points: ['moon', 'saturn'] },
+  { key: 'ljubav', name: 'Ljubav', houses: [5, 7], weakHouses: [], points: ['venus', 'moon', 'mars'] },
+  { key: 'zdravlje', name: 'Zdravlje i lepota', houses: [1, 6], weakHouses: [], points: ['sun', 'mars', 'ascendant'] },
+  { key: 'karijera', name: 'Karijera i finansije', houses: [2, 10], weakHouses: [6, 8], points: ['jupiter', 'saturn', 'mercury', 'midheaven'] },
+  { key: 'kuca', name: 'Kuća i bašta', houses: [4], weakHouses: [], points: ['moon', 'saturn'] },
 ];
 
 /**

@@ -13,6 +13,7 @@
 import * as React from 'react';
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { useAuthStore } from '@/store/auth';
 
 export type TransitVersion = 'short' | 'long';
 
@@ -58,11 +59,14 @@ function toText(r: Row): TransitText {
   };
 }
 
-/** Jedan upit za sve danasnje tranzite, ne jedan po tranzitu. */
+/**
+ * Jedan upit za sve danasnje tranzite, ne jedan po tranzitu. `null` = upit nije
+ * uspeo (mreza) — razlicito od prazne mape, jer se "nema teksta" pamti, a pad ne.
+ */
 export async function fetchTransitTexts(
   keys: string[],
   version: TransitVersion = 'short'
-): Promise<Map<string, TransitText>> {
+): Promise<Map<string, TransitText> | null> {
   const out = new Map<string, TransitText>();
   if (!isSupabaseConfigured || keys.length === 0) return out;
 
@@ -72,32 +76,64 @@ export async function fetchTransitTexts(
     .eq('version', version)
     .in('key', keys);
 
-  if (error || !data) return out;
+  if (error || !data) return null;
   for (const r of data as Row[]) out.set(r.key, toText(r));
   return out;
 }
 
+/**
+ * Tekstovi koji su vec stigli, po kljucu. Bez ovoga svaka promena dana krene od
+ * prazne mape, pa kartica na trenutak pokaze racunato ime tranzita umesto
+ * naslova teksta (Ivan, 28.9.2026). Pamti se i "nema teksta" (null), da se
+ * tranzit bez teksta ne ucitava iznova. Deo kljuca je nalog i pravo pristupa:
+ * sta server vrati zavisi od RLS-a, pa posle kupovine ili odjave kes ne vazi.
+ */
+const kes = new Map<string, TransitText | null>();
+
 export function useTransitTexts(keys: string[], version: TransitVersion = 'short') {
-  const [texts, setTexts] = React.useState<Map<string, TransitText>>(new Map());
-  const [loading, setLoading] = React.useState(keys.length > 0);
+  const korisnik = useAuthStore((s) => s.user?.id ?? '');
+  const pristup = useAuthStore((s) => (s.entitlement?.active ? 'p' : ''));
+  const kesKljuc = (k: string) => `${korisnik}|${pristup}|${version}|${k}`;
 
   // Kljucevi se menjaju svakog dana; poredi se sadrzaj, ne referenca niza.
   const potpis = keys.join('|');
+  const [stiglo, osvezi] = React.useReducer((n: number) => n + 1, 0);
+
+  const fali = keys.filter((k) => !kes.has(kesKljuc(k)));
+  // Potpis kljuceva za koje upit nije uspeo — tada se ne ceka u nedogled.
+  const [palo, setPalo] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (keys.length === 0) { setTexts(new Map()); setLoading(false); return; }
+    if (fali.length === 0) return;
     let otkazano = false;
-    setLoading(true);
-    fetchTransitTexts(keys, version).then((m) => {
+    fetchTransitTexts(fali, version).then((m) => {
       if (otkazano) return;
-      setTexts(m);
-      setLoading(false);
+      // Pad upita se ne pamti: `loading` se spusti, a upit ide ponovo sa sledecim
+      // kljucevima (drugi dan) ili kad se ekran ponovo otvori.
+      if (!m) { setPalo(potpis); return; }
+      for (const k of fali) kes.set(kesKljuc(k), m.get(k) ?? null);
+      osvezi();
     });
     return () => { otkazano = true; };
-  }, [potpis, version]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [potpis, version, korisnik, pristup, fali.length]);
 
-  return { texts, loading };
+  // Racuna se u renderu, ne u efektu: vec prvi prikaz novog dana ima tekstove
+  // iz kesa, a `loading` je tacan od prvog prikaza (efekat bi kasnio jedan frejm).
+  // Ista mapa dok se nista ne promeni — pozivaoci je drze u zavisnostima efekata
+  // (`tranziti-lista.tsx`), pa bi nova mapa u svakom renderu vrtela efekat u krug.
+  const texts = React.useMemo(() => {
+    const m = new Map<string, TransitText>();
+    for (const k of keys) {
+      const t = kes.get(kesKljuc(k));
+      if (t) m.set(k, t);
+    }
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [potpis, version, korisnik, pristup, stiglo, fali.length]);
+  return { texts, loading: fali.length > 0 && palo !== potpis };
 }
+
 
 /**
  * Rucna oznaka tona (`transit_texts.tone`, na KRATKOJ verziji) — kartica

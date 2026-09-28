@@ -292,8 +292,8 @@ export function rasporedi(
 }
 
 /** Samo ocene — za karticu na slajdu "Danas ukratko". */
-export function oceneOblasti(r: OblastiDana): { key: OblastKey; name: string; emoji: string; ocena: number; oznaka: string }[] {
-  return r.oblasti.map((o) => ({ key: o.def.key, name: o.def.name, emoji: o.def.emoji, ocena: o.ocena, oznaka: o.oznaka }));
+export function oceneOblasti(r: OblastiDana): { key: OblastKey; name: string; ocena: number; oznaka: string }[] {
+  return r.oblasti.map((o) => ({ key: o.def.key, name: o.def.name, ocena: o.ocena, oznaka: o.oznaka }));
 }
 
 /* ------------------------------------------------------------------------- *

@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Pressable, View } from 'react-native';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import {
-  Apple, Briefcase, Carrot, ChevronRight, Droplet, Flame, Flower2,
-  Heart, HeartPulse, House, Leaf, Mountain, Sprout, Wind,
+  Apple, Carrot, ChevronRight, Droplet, Flame, Flower2,
+  Leaf, Mountain, Wind,
 } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
@@ -12,6 +12,7 @@ import { Screen } from '@/components/screen';
 import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
+import { OblastIkona, OBLAST_BOJA } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
 import { moonPhase } from '@/lib/astro';
 import { moonDay } from '@/lib/transits';
@@ -28,9 +29,6 @@ import { neutral } from '@/theme/tokens';
 
 const PLANT_ICON: Record<Element, typeof Apple> = { vatra: Apple, zemlja: Carrot, vazduh: Flower2, voda: Leaf };
 const ELEMENT_ICON: Record<Element, typeof Apple> = { vatra: Flame, zemlja: Mountain, vazduh: Wind, voda: Droplet };
-const AREA_ICON: Record<LunarArea, typeof Apple> = {
-  ljubav: Heart, zdravlje: HeartPulse, karijera: Briefcase, kuca: House, basta: Sprout,
-};
 
 /**
  * Ekran Mesec — otvara se sa kartice na pocetnoj. Sve sto se o Mesecu tog dana
@@ -126,7 +124,6 @@ export default function MoonScreen() {
       <View className={cn(CARD_SURFACE, 'mt-4 px-4 pb-5 pt-2')}>
         <View className="flex-row border-b border-border">
           {LUNAR_AREAS.map((a) => {
-            const Ikona = AREA_ICON[a.key];
             const aktivna = a.key === oblast;
             return (
               <Pressable
@@ -135,7 +132,8 @@ export default function MoonScreen() {
                 accessibilityRole="tab"
                 accessibilityState={{ selected: aktivna }}
                 className={cn('flex-1 items-center gap-1 pb-2 pt-2', aktivna && 'border-b-2 border-foreground')}>
-                <Ikona size={20} color={aktivna ? neutral.ink : neutral.inkSubtle} strokeWidth={1.8} />
+                {/* Ivanove ikonice (28.9.2026): izabrana u lila, ostale sive. */}
+                <OblastIkona oblast={a.key} size={20} color={aktivna ? OBLAST_BOJA : neutral.inkSubtle} />
                 <Text variant="caption" className={cn('text-[11px]', aktivna && 'text-foreground')}>{a.name}</Text>
               </Pressable>
             );
