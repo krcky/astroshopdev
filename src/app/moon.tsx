@@ -7,9 +7,9 @@ import {
 } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { ZnakIkona } from '@/components/znak-ikona';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Screen } from '@/components/screen';
-import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { OblastIkona, OBLAST_BOJA } from '@/components/oblast-ikona';
@@ -26,6 +26,7 @@ import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { neutral } from '@/theme/tokens';
+import { tezina } from '@/theme/tipografija';
 
 const PLANT_ICON: Record<Element, typeof Apple> = { vatra: Apple, zemlja: Carrot, vazduh: Flower2, voda: Leaf };
 const ELEMENT_ICON: Record<Element, typeof Apple> = { vatra: Flame, zemlja: Mountain, vazduh: Wind, voda: Droplet };
@@ -110,7 +111,7 @@ export default function MoonScreen() {
           <MoonDisc angle={stanje.angle} size={26} />
         </Stat>
         <Stat label="Znak" value={znak.name}>
-          <Glyph size={22} className="text-foreground">{znak.glyph}</Glyph>
+          <ZnakIkona znak={znak.key} element={znak.element} size={26} />
         </Stat>
         <Stat label="Biljka" value={plant}>
           <BiljkaIkona size={22} color={neutral.ink} strokeWidth={1.8} />
@@ -189,7 +190,7 @@ function Stat({ label, value, children }: { label: string; value: string; childr
   return (
     <View className="flex-1 items-center">
       <View className="h-11 w-11 items-center justify-center rounded-full bg-fill">{children}</View>
-      <Text variant="caption" className="mt-2 font-semibold uppercase text-foreground">{label}</Text>
+      <Text variant="caption" className={cn('mt-2 uppercase text-foreground', tezina('statOznaka'))}>{label}</Text>
       <Text variant="muted">{value}</Text>
     </View>
   );

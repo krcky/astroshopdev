@@ -2,6 +2,8 @@ import * as React from 'react';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
 import { GLYPH_FONT } from '@/components/ui/glyph';
+import { ZNAK_VIEWBOX, ZnakOblik } from '@/components/znak-ikona';
+import { fontUloge } from '@/theme/tipografija';
 import { SIGNS, norm360, signFromLongitude } from '@/lib/zodiac';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
@@ -77,6 +79,9 @@ const TICK_STYLE = {
  */
 const DEGREES_MIN_SIZE = 340;
 
+/** Precnik ikonice znaka u prstenu zodijaka (prsten je sirok 30 jedinica). */
+const ZNAK_TOCAK = 22;
+
 const COLORS = {
   ink: '#141414',
   line: '#D8D8D8',
@@ -89,6 +94,8 @@ const COLORS = {
   tense: '#C4453A',
   /** Skladni aspekti — trigon, sekstil. */
   easy: '#3B6FA8',
+  /** Ispuna kruga — bela na svakoj pozadini, da tocak ne bude providan (Ivan, 28.9.2026). */
+  disk: '#FFFFFF',
 };
 
 const ASPECT_STYLE: Record<string, { color: string; width: number; dash?: string }> = {
@@ -189,7 +196,8 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   return (
     <Svg width={size} height={size} viewBox="-30 -30 420 420">
       {/* --- prstenovi --- */}
-      <Circle cx={cx} cy={cy} r={R.outer} stroke={COLORS.line} strokeWidth={1} fill="none" />
+      {/* Bela ispuna ispod svega: na sivoj pozadini ekrana tocak inace prosijava. */}
+      <Circle cx={cx} cy={cy} r={R.outer} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
       <Circle cx={cx} cy={cy} r={R.zodiacIn} stroke={COLORS.line} strokeWidth={1} fill="none" />
       <Circle cx={cx} cy={cy} r={R.houseRing} stroke={COLORS.line} strokeWidth={1} fill="none" />
 
@@ -220,12 +228,10 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
             <G key={s.key}>
               <Line x1={inner.x} y1={inner.y} x2={edge.x} y2={edge.y}
                     stroke={COLORS.line} strokeWidth={1} />
-              <SvgText
-                x={mid.x} y={mid.y + 6}
-                fontSize={17} fontFamily={GLYPH_FONT} fill={COLORS.ink}
-                textAnchor="middle">
-                {s.glyph}
-              </SvgText>
+              {/* Ivanova ikonica znaka (`znak-ikona.tsx`), ZNAK_TOCAK jedinica, u sredini prstena. */}
+              <G transform={`translate(${mid.x - ZNAK_TOCAK / 2} ${mid.y - ZNAK_TOCAK / 2}) scale(${ZNAK_TOCAK / ZNAK_VIEWBOX})`}>
+                <ZnakOblik znak={s.key} element={s.element} />
+              </G>
             </G>
           );
         })}
@@ -249,7 +255,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
               {/* Uz stepene ovo su druge cifre na ekranu — sitnije i svetlije,
                   da se broj kuce ne procita kao stepen planete. */}
               <SvgText x={n.x} y={n.y + 3.5}
-                       fontSize={degrees ? 8.5 : 9.5}
+                       fontSize={degrees ? 8.5 : 9.5} fontFamily={fontUloge('tockKuca')}
                        fill={degrees ? COLORS.houseNum : COLORS.muted}
                        textAnchor="middle">
                 {i + 1}
@@ -311,7 +317,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
                 const r = degrees ? atAngle(spread - 5.5, planetR + 2) : { x: pos.x + 11, y: pos.y + 10 };
                 return (
                   <SvgText x={r.x} y={degrees ? r.y + 2.4 : r.y}
-                           fontSize={degrees ? 7 : 8} fill={COLORS.muted} textAnchor="middle">
+                           fontSize={degrees ? 7 : 8} fontFamily={fontUloge('tockKuca')} fill={COLORS.muted} textAnchor="middle">
                     R
                   </SvgText>
                 );
@@ -337,15 +343,15 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
 
                 return (
                   <>
-                    {/* Bez `fontFamily` — AstroGlyphs nema cifre, sistem bi ih
-                        crtao rezervnim fontom i visina reda bi odskakala. */}
+                    {/* Pismo aplikacije, ne AstroGlyphs — on nema cifre (rezervni font bi
+                        pomerio visinu reda). Debljina je familija (`theme/font.ts`). */}
                     <SvgText x={degX} y={base}
-                             fontSize={degSize} fontWeight="700"
+                             fontSize={degSize} fontFamily={fontUloge('tockStepen')}
                              fill={boja} textAnchor="middle">
                       {deg}
                     </SvgText>
                     <SvgText x={degX + degW / 2 + NUM.gap} y={base - NUM.rise}
-                             fontSize={minSize} fontWeight="400"
+                             fontSize={minSize} fontFamily={fontUloge('tockMinut')}
                              fill={COLORS.muted} textAnchor="start">
                       {min}'
                     </SvgText>
@@ -366,7 +372,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           return (
             <G key={label}>
               <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.gold} strokeWidth={1.5} />
-              <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontWeight="600"
+              <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontFamily={fontUloge('tockUgao')}
                        fill={COLORS.gold} textAnchor="middle">
                 {label}
               </SvgText>

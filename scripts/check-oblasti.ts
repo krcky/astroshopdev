@@ -6,16 +6,17 @@
  */
 import * as Astronomy from 'astronomy-engine';
 
-import { ASPECTS, BODIES } from '../src/lib/astro';
+import { ASPECTS, BODIES, bodyLongitude } from '../src/lib/astro';
 import { buildNatalChart } from '../src/lib/natal';
 import { dana, josTraje, meseci } from '../src/lib/mnozina';
 import {
-  jacinaTranzita, oblastiDana, oceneOblasti, ocenaIzDoprinosa, parseNaslov, rasporedi, tekstReda,
-  type TranzitRed,
+  aktivniTranziti, jacinaTranzita, LISTA_ORB, oblastiDana, oceneOblasti, ocenaIzDoprinosa, parseNaslov, rasporedi, tekstReda,
+  trajanjeTekst, trajanjeTranzita, type TranzitRed,
 } from '../src/lib/oblasti';
 import { OBLASTI } from '../src/lib/oblasti-config';
-import { findTransits } from '../src/lib/transits';
-import { BEOGRAD, primerZaOblasti } from '../src/lib/test-karta';
+import { dayKey, daysBetween, findTransits } from '../src/lib/transits';
+import { dayStatus } from '../src/lib/tvoj-dan';
+import { BEOGRAD, kartaSaAscendentom, primerZaOblasti } from '../src/lib/test-karta';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -72,9 +73,9 @@ console.log('\n=== 2. Mnozina ===');
   const m = [1, 3, 5, 12, 21].map(meseci);
   ok(m.join(', ') === '1 mesec, 3 meseca, 5 meseci, 12 meseci, 21 mesec', 'mesec', m.join(', '));
   ok(josTraje(0) === 'Poslednji dan', '0 dana -> "Poslednji dan"');
-  ok(josTraje(30) === 'Još 30 dana', '30 -> dani', josTraje(30));
-  ok(josTraje(31) === 'Još 1 mesec', '31 -> meseci', josTraje(31));
-  ok(josTraje(95) === 'Još 3 meseca', '95 -> 3 meseca', josTraje(95));
+  ok(josTraje(30) === 'Traje još 30 dana', '30 -> dani', josTraje(30));
+  ok(josTraje(31) === 'Traje još 1 mesec', '31 -> meseci', josTraje(31));
+  ok(josTraje(95) === 'Traje još 3 meseca', '95 -> 3 meseca', josTraje(95));
 }
 
 /* ------------------------------------------------------------------------- */
@@ -198,6 +199,41 @@ console.log('\n=== 6. Pregled /dev-tranziti ===');
   const p = primerZaOblasti(new Date(2026, 8, 28));
   ok(!!p, 'postoji test karta sa redom u svakoj oblasti i u ostalima', p ? `${p.chart.birth.date.toISOString().slice(0, 13)}h UT, ${p.date.toDateString()}, ${Date.now() - t0} ms` : '');
   ok(OBLASTI.length === 4, 'cetiri oblasti');
+}
+
+/* ------------------------------------------------------------------------- */
+console.log('\n=== 7. Trajanje: isto na listi i na celom tekstu, opseg se slaze sa "jos N dana" ===');
+{
+  // Do 29.9.2026 lista (3°) i ceo tekst (1,5°) su za isti tranzit davali razlicit
+  // broj dana (Ivan). Sada svi ekrani zovu `trajanjeTranzita`; ovde se proverava
+  // da je prozor tacan po orbisu liste i da se broj slaze sa datumima.
+  const chart = kartaSaAscendentom('pisces');
+  // Lokalne ponoci, kao `activeDayFn` u `tvoj-dan.ts`.
+  const plus = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const aktivan = (r: TranzitRed, d: Date) => dayStatus(
+    bodyLongitude(r.transiting.key, d), bodyLongitude(r.transiting.key, plus(d, 1)),
+    r.natal.longitude, r.aspect.angle, LISTA_ORB(r.transiting.key, r.aspect.key)).active;
+  let n = 0, losih: string[] = [];
+  for (let i = 0; i < 60; i += 3) {
+    const date = new Date(2026, 8, 1 + i, 10);
+    for (const r of aktivniTranziti(chart, date, false, LISTA_ORB)) {
+      if (r.transiting.key === 'moon') continue;
+      n++;
+      const t = trajanjeTranzita(r, date);
+      const dan = dayKey(date);
+      const greska =
+        t.start && daysBetween(dan, t.start) > 0 ? 'pocetak posle danas'
+        : t.end && daysBetween(dan, t.end) < 0 ? 'kraj pre danas'
+        : t.end && t.preostalo !== daysBetween(dan, t.end) ? 'preostalo != kraj - danas'
+        : t.start && (aktivan(r, plus(t.start, -1)) || !aktivan(r, t.start)) ? 'pocetak nije ulazak u orbis'
+        : t.end && (aktivan(r, plus(t.end, 1)) || !aktivan(r, t.end)) ? 'kraj nije izlazak iz orbisa'
+        : null;
+      if (greska) losih.push(`${dan} ${r.key}: ${greska}`);
+    }
+  }
+  ok(losih.length === 0, `prozor po orbisu liste, ${n} tranzita u 20 dana`, losih.slice(0, 3).join('; '));
+  const mesec = aktivniTranziti(chart, new Date(2026, 8, 28, 10), false, LISTA_ORB).find((r) => r.transiting.key === 'moon');
+  if (mesec) ok(trajanjeTekst(trajanjeTranzita(mesec, new Date(2026, 8, 28, 10))) === 'Samo danas', 'Mesec: "Samo danas" svuda');
 }
 
 console.log(fail ? `\n${fail} FAIL` : '\nSve provere prosle.');

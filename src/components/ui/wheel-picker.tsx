@@ -127,7 +127,7 @@ function WebInput({ value, onChangeText, maxLength }: {
       keyboardType="number-pad"
       maxLength={maxLength}
       className={cn(
-        'border-b border-border pb-1 text-center text-3xl text-foreground',
+        'border-b border-border pb-1 text-center font-sans text-3xl text-foreground',
         maxLength === 4 ? 'w-24' : 'w-16'
       )}
     />

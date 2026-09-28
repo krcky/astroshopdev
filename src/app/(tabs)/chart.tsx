@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { AspectRow, Row, RowHead } from '@/components/ui/row';
+import { ZnakIkona } from '@/components/znak-ikona';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { natalAspects } from '@/lib/natal-keys';
 
@@ -40,7 +41,7 @@ export default function ChartScreen() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label="Natalna karta" padded={false} tint="none" background="white" right={<ProfileButton />}>
+    <Screen label="Natalna karta" padded={false} tint="none" right={<ProfileButton />}>
       <View className="px-5 pb-5 pt-6">
         <Text variant="display">{profile.name}</Text>
         <Text variant="muted" className="mt-1.5">
@@ -89,11 +90,13 @@ export default function ChartScreen() {
       <View className={cn(KARTICA, 'mx-5 mt-7')}>
         <RowHead>Uglovi</RowHead>
         <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
+             icon={<ZnakIkona znak={chart.ascendantSign.sign.key} element={chart.ascendantSign.sign.element} size={22} />}
              value={chart.ascendantSign.formatted} muted={timeUnknown}
              // Bez vremena rodjenja podznak nije poznat — nema ni tumacenja.
              onPress={timeUnknown ? undefined : () => otvori('ascendant')}
              accessibilityLabel={`Ascendent ${chart.ascendantSign.formatted}. Tumačenje`} />
         <Row glyph={chart.midheavenSign.sign.glyph} name="MC"
+             icon={<ZnakIkona znak={chart.midheavenSign.sign.key} element={chart.midheavenSign.sign.element} size={22} />}
              value={chart.midheavenSign.formatted} muted={timeUnknown} last />
       </View>
 

@@ -141,7 +141,7 @@ Za Premium korisnike **zamenjuje Hero** (4.1). Besplatni i dalje vide Hero po st
 - konjunkcija: ima tešku → Mešovito ako je druga blaga, inače Izazovno; ima dinamičnu → Mešovito; inače Povoljno
 - kvadrat, opozicija: ima blagu a nema tešku → Mešovito, inače Izazovno
 
-**Trajanje** na kartici: od dana ulaska u orbis do poslednjeg dana u orbisu (po orbisima iz tabele gore).
+**Trajanje**: od dana ulaska u orbis do poslednjeg dana u orbisu, po orbisu LISTE (3°, sekstil 2°; vidi „Koliko još traje" u poglavlju 11), ne po orbisima iz tabele gore — oni važe samo za izbor. Tako isti tranzit ima isto trajanje na svakom ekranu (29.9.2026).
 
 ### 4.1 Hero (glavni tranzit dana) — važi za BESPLATNE; arhiva pravila pre 27.9.2026
 
@@ -408,8 +408,11 @@ Ton je astrologova ručna oznaka, a bez nje pravilo iz 4.0.
 **Bez vremena rođenja:** kuća nema, veza je samo preko planeta, Asc i MC nisu mete,
 nema Mladog i Punog Meseca u kući.
 
-**Koliko još traje** (tab „Tranziti"): do izlaska iz orbisa liste (3°, sekstil 2°). Do 30 dana „Još N dana" („Poslednji
-dan" na poslednji), preko toga „Još N meseci".
+**Koliko još traje** — ISTO na svim ekranima: tab „Tranziti", „Tema perioda" na početnoj, ceo tekst
+tranzita i list „Na osnovu čega". Do izlaska iz orbisa liste (3°, sekstil 2°). N = broj dana POSLE danas
+do poslednjeg dana u orbisu, pa se slaže sa opsegom datuma („27 SEP – 30 SEP" 28. septembra = „Traje još 2 dana").
+Do 30 dana „Traje još N dana" („Poslednji dan" na poslednji), preko toga „Traje još N meseci"; Mesec „Samo danas".
+Do 29.9.2026 ceo tekst je merio orbisom „Tvog dana" (1,5°) i pokazivao drugi broj nego lista.
 
 Provere: `npm run check:oblasti`. Pregled sa test kartom: `/dev-tranziti` (samo dev).
 

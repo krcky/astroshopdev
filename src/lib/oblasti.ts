@@ -26,8 +26,9 @@ import { BODIES, ASPECTS, bodyLongitude, type AspectDef, type PlanetKey } from '
 import { houseOf, type NatalChart } from '@/lib/natal';
 import { chartRulers, rulerRole, type RulerRole } from '@/lib/rulers';
 import { transitTone, type Tone, type ToneSource } from '@/lib/tone';
-import { natalTargets, TRANSIT_ORB, type NatalTarget } from '@/lib/transits';
-import { dayStatus, TD_ORB } from '@/lib/tvoj-dan';
+import { dayKey, daysBetween, natalTargets, TRANSIT_ORB, type NatalTarget } from '@/lib/transits';
+import { dayStatus, TD_ORB, tvojDanWindow } from '@/lib/tvoj-dan';
+import { josTraje } from '@/lib/mnozina';
 import { HOUSE_THEMES, PHASE_NAME, phaseDay } from '@/lib/moon';
 import {
   BLIZINA_PAD, DOPRINOS_FAKTOR, INCLUDE_MOON_TRANSITS, JACINA_ASPEKTA, JACINA_PLANETE,
@@ -135,6 +136,26 @@ export function jacinaTranzita(
  * je tog dana skoro tacno.
  */
 export const LISTA_ORB = (_body: PlanetKey, aspectKey: string): number => TRANSIT_ORB[aspectKey];
+
+/** Trajanje tranzita za prikaz. `preostalo`: dana posle `date` do kraja (0 = danas je poslednji). */
+export type Trajanje = { start: Date | null; end: Date | null; preostalo: number | null; mesec: boolean };
+
+/**
+ * JEDINO mesto koje racuna trajanje za prikaz — lista "Tranziti", "Tema perioda",
+ * ceo tekst tranzita i list "Na osnovu cega". Do 29.9.2026 su lista i ceo tekst
+ * isti tranzit merili razlicitim orbisom (3° naspram 1,5°) i pokazivali razlicit
+ * broj dana (Ivan). Orbis je orbis liste (`LISTA_ORB`), jer je njime tranzit usao
+ * na ekran; orbisi "Tvog dana" vaze samo za izbor, ne za trajanje.
+ * Mesec: samo dan kad je tacan.
+ */
+export function trajanjeTranzita(pick: Pick<TranzitRed, 'transiting' | 'aspect' | 'natal'>, date: Date): Trajanje {
+  const mesec = pick.transiting.key === 'moon';
+  const w = tvojDanWindow(pick, date, LISTA_ORB(pick.transiting.key, pick.aspect.key));
+  return { ...w, preostalo: w.end ? daysBetween(dayKey(date), w.end) : null, mesec };
+}
+
+/** "Samo danas" za Mesec, inace `josTraje` — isti natpis svuda. */
+export const trajanjeTekst = (t: Trajanje): string => (t.mesec ? 'Samo danas' : josTraje(t.preostalo));
 
 /** Svi tranziti u orbisu tog lokalnog dana, najjaci prvi. `orbZa` podrazumevano je `TD_ORB`. */
 export function aktivniTranziti(

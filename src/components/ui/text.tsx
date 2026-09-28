@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Text as RNText } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { fontFamilyZaKlase } from '@/theme/font';
+import { tezina } from '@/theme/tipografija';
 
 /**
  * Kljucni Reusables pattern: roditelj (Card, Button) postavlja klase za tekst
@@ -11,54 +13,60 @@ export const TextClassContext = React.createContext<string | undefined>(undefine
 
 /*
  * Tipografska skala je izmerena iz snimaka referentne aplikacije — vidi
- * `src/theme/tokens.ts`. Pismo je SISTEMSKO (SF Pro na iOS-u, Roboto na
- * Androidu): `fontFamily` se nigde ne postavlja, a debljina ide obicnim
- * Tailwind klasama za tezinu.
+ * `src/theme/tokens.ts`. Pismo je SATOSHI (Ivan, 28.9.2026; `theme/font.ts`):
+ * debljina svake varijante je u `theme/tipografija.ts` (jedno mesto za celu
+ * hijerarhiju), a `Text` iz klase tezine bira familiju — Regular, Medium, Bold.
  */
 const textVariants = cva('text-foreground', {
   variants: {
     variant: {
       /* --- skala referentne aplikacije ------------------------------- */
       /** Tekuci tekst. Podrazumevano crn; opis ide kroz `body`. */
-      default: 'text-body',
+      default: cn('text-body', tezina('default')),
       /** Najveci naslov u praznom stanju ekrana. */
-      title: 'text-title font-bold tracking-[-0.2px]',
+      title: cn('text-title tracking-[-0.2px]', tezina('title')),
       /** Naslov sekcije unutar liste. */
-      section: 'text-section font-bold tracking-[-0.2px]',
+      section: cn('text-section tracking-[-0.2px]', tezina('section')),
       /** Naslov u navigacionoj traci. */
-      nav: 'text-nav font-semibold',
+      nav: cn('text-nav', tezina('nav')),
       /** Naslov reda ili kartice. */
-      row: 'text-row font-medium',
+      row: cn('text-row', tezina('row')),
       /** Opis ispod naslova — siv, kao u referentnoj aplikaciji. */
-      body: 'text-body text-muted-foreground',
+      body: cn('text-body text-muted-foreground', tezina('body')),
       /**
        * Tekst tumacenja — duzi pasusi koji se CITAJU (tranzit, natal, lunarni).
        * 17pt kao iOS body, prored 26 (Ivan, 28.9.2026: "malo veci tekst na tumacenju").
        */
-      reading: 'text-row leading-[26px] text-muted-foreground',
+      reading: cn('text-row leading-[26px] text-muted-foreground', tezina('reading')),
       /** Naslov grupe iznad kartica ("Preferences"). Siv, BEZ verzala. */
-      label: 'text-group font-medium text-subtle',
+      label: cn('text-group text-subtle', tezina('label')),
       /** Natpis u kapsuli kategorije. */
-      chip: 'text-chip font-medium',
+      chip: cn('text-chip', tezina('chip')),
       /** Meta podatak uz stavku: vreme, mesto, broj. */
-      muted: 'text-meta text-muted-foreground',
+      muted: cn('text-meta text-muted-foreground', tezina('muted')),
       /** Sitan podnaslov ispod imena. */
-      caption: 'text-caption text-muted-foreground',
+      caption: cn('text-caption text-muted-foreground', tezina('caption')),
+      /**
+       * Oznaka verzalom iznad naslova: ime tranzita na kartici i listu, datum na
+       * "Tvom danu", oblasti u "Danas ukratko" (Ivan, 28.9.2026). 11pt, siva,
+       * razmak slova 4% (0,44 na 11pt — preracunati ako se menja velicina).
+       */
+      oznaka: cn('text-[11px] leading-[15px] uppercase tracking-[0.44px] text-muted-foreground', tezina('karticaOznaka')),
       /** Natpis ispod ikone u lebdecoj traci. */
-      tab: 'text-tab font-medium text-subtle',
+      tab: cn('text-tab text-subtle', tezina('tab')),
 
       /* --- nasledjene varijante ------------------------------------- */
       /** Veliki naslov koraka onboardinga. Referentna aplikacija ga nema,
        *  ali nas onboarding stoji na njemu — zato ostaje, samo u Inter-u. */
-      display: 'text-[32px] leading-[38px] font-bold tracking-[-0.6px]',
-      h1: 'text-title font-bold tracking-[-0.2px]',
-      h2: 'text-section font-bold tracking-[-0.2px]',
-      h3: 'text-row font-semibold',
-      lead: 'text-body text-muted-foreground',
+      display: cn('text-[32px] leading-[38px] tracking-[-0.6px]', tezina('display')),
+      h1: cn('text-title tracking-[-0.2px]', tezina('title')),
+      h2: cn('text-section tracking-[-0.2px]', tezina('section')),
+      h3: cn('text-row', tezina('h3')),
+      lead: cn('text-body text-muted-foreground', tezina('lead')),
       /** Pitanje na vrhu koraka onboardinga. */
-      question: 'text-group font-medium text-subtle text-center',
+      question: cn('text-group text-subtle text-center', tezina('question')),
       /** Sitno objasnjenje iznad dugmeta. */
-      note: 'text-meta text-muted-foreground text-center',
+      note: cn('text-meta text-muted-foreground text-center', tezina('note')),
     },
   },
   defaultVariants: { variant: 'default' },
@@ -66,9 +74,17 @@ const textVariants = cva('text-foreground', {
 
 type TextProps = React.ComponentProps<typeof RNText> & VariantProps<typeof textVariants>;
 
-export function Text({ className, variant, ...props }: TextProps) {
+export function Text({ className, variant, style, ...props }: TextProps) {
   const contextClass = React.useContext(TextClassContext);
-  return <RNText className={cn(textVariants({ variant }), contextClass, className)} {...props} />;
+  const klase = cn(textVariants({ variant }), contextClass, className);
+  // Ucitano pismo: debljina je familija, ne `fontWeight` (vidi `theme/font.ts`).
+  return (
+    <RNText
+      className={klase}
+      style={[{ fontFamily: fontFamilyZaKlase(klase), fontWeight: 'normal' }, style]}
+      {...props}
+    />
+  );
 }
 
 export { textVariants };

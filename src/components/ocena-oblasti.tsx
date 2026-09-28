@@ -48,7 +48,7 @@ export function OceneOblasti({ rez, bare = false }: {
       {ocene.map((o) => (
         <View key={o.key} className="flex-row items-center gap-2 py-1">
           <OblastIkona oblast={o.key} size={16} />
-          <Text variant="default" className="flex-1 font-medium text-foreground">{o.name}</Text>
+          <Text variant="oznaka" className="flex-1">{o.name}</Text>
           <OcenaTackice ocena={o.ocena} />
         </View>
       ))}

@@ -36,7 +36,7 @@ export default function BirthPlace() {
         placeholderTextColor={neutral.inkSubtle}
         autoFocus
         autoCorrect={false}
-        className="border-b border-fill-strong pb-3 text-center text-3xl text-foreground"
+        className="border-b border-fill-strong pb-3 text-center text-3xl text-foreground font-sans"
       />
 
       <View className="mt-4">

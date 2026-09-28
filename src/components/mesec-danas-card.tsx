@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
+import { OblastIkona, OBLAST_BOJA } from '@/components/oblast-ikona';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ import { useLunarText } from '@/lib/lunar-texts';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { moonDay, strongestMoonHit } from '@/lib/transits';
 import { lunarneStavke, type Stavka } from '@/lib/tumacenje';
+import { tezina } from '@/theme/tipografija';
 
 /** Nazivi tabova na kartici (brief). "Ljubav" je u tekstovima "Ljubav i odnosi". */
 const TAB: Record<LunarArea, string> = {
@@ -100,7 +102,14 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
         accessibilityRole="tablist"
         contentContainerClassName="gap-2 px-5">
         {LUNAR_AREAS.map((a) => (
-          <Chip key={a.key} label={TAB[a.key]} selected={a.key === oblast} onPress={() => setOblast(a.key)} />
+          <Chip
+            key={a.key}
+            label={TAB[a.key]}
+            // Ivanove ikonice oblasti, kao na ekranu Mesec: izabrana lila, ostale sive.
+            icon={<OblastIkona oblast={a.key} size={16} color={a.key === oblast ? OBLAST_BOJA : neutral.inkSubtle} />}
+            selected={a.key === oblast}
+            onPress={() => setOblast(a.key)}
+          />
         ))}
       </ScrollView>
 
@@ -177,7 +186,7 @@ function Lista({ naslov, stavke, className }: { naslov?: string; stavke: Stavka[
         <View key={i} className="flex-row gap-2">
           <Text variant="body">•</Text>
           <Text variant="default" className="flex-1">
-            {x.naslov ? <Text variant="default" className="font-semibold">{x.naslov} – </Text> : null}
+            {x.naslov ? <Text variant="default" className={tezina('naslovUTekstu')}>{x.naslov} – </Text> : null}
             {x.tekst}
           </Text>
         </View>

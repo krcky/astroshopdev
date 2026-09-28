@@ -11,11 +11,17 @@ import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Glyph } from '@/components/ui/glyph';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
-import { findTransits } from '@/lib/transits';
+import { tvojDanInfo } from '@/lib/tvoj-dan';
+import { trajanjeTranzita } from '@/lib/oblasti';
+import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
+import { AspektIlustracija } from '@/components/aspekt-ilustracija';
+import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { TransitTrajanje } from '@/components/transit-trajanje';
+import { NaslovCeleReci } from '@/components/naslov-cele-reci';
+import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
 import { neutral } from '@/theme/tokens';
 
@@ -52,10 +58,14 @@ export default function TransitDetail() {
   const { texts: duga, loading: dugaLoading } = useTransitTexts(kljucevi, 'long');
   const { texts: kratka } = useTransitTexts(kljucevi, 'short');
 
-  const tranzit = React.useMemo(() => {
-    if (!resolved || !key) return null;
-    return findTransits(resolved.chart).find((t) => t.contentKey === key) ?? null;
-  }, [resolved, key]);
+  // Sve o tranzitu iz KLJUCA i karte (ne iz trenutnog neba): planete, aspekt,
+  // vladar; trajanje isto kao na listi (`trajanjeTranzita`).
+  const danas = React.useMemo(() => new Date(), []);
+  const tranzit = React.useMemo(
+    () => (resolved && key ? tvojDanInfo(resolved.chart, resolved.timeUnknown, String(key)) : null),
+    [resolved, key]
+  );
+  const prozor = React.useMemo(() => (tranzit ? trajanjeTranzita(tranzit, danas) : null), [tranzit, danas]);
 
   if (!resolved) return <Redirect href="/" />;
 
@@ -65,20 +75,39 @@ export default function TransitDetail() {
   return (
     // Nativni list odozdo, kao sva tumacenja (`_layout.tsx`, Ivan 28.9.2026).
     <SheetScroll>
+          {/* Gore: ikonice levo, ime tranzita GORE DESNO (Ivan, 28.9.2026). Ispod:
+              naslov levo i ilustracija aspekta desno, dnom u istoj ravni. */}
           {tranzit && (
-            <View className="flex-row items-center gap-2 pb-1">
-              <Glyph size={17} className="text-foreground">
-                {`${tranzit.transiting.glyph} ${tranzit.aspect.glyph} ${tranzit.natal.glyph}`}
-              </Glyph>
-              <Text variant="label">
-                {tranzit.transiting.name} {tranzit.aspect.name} natalni {tranzit.natal.name}
+            <View className="flex-row items-center gap-3">
+              <View className="flex-row items-center gap-2">
+                <Simbol tacka={tranzit.transiting} />
+                <AspektIkona aspekt={tranzit.aspect.key as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
+                <Simbol tacka={tranzit.natal} />
+              </View>
+              <Text variant="oznaka" className="flex-1 text-right">
+                {tranzit.transiting.name} {tranzit.aspect.name} {tranzit.natal.name}
               </Text>
             </View>
           )}
-
-          <Text variant="display" className="mb-5 mt-1">
-            {puna?.title || sazeta?.title || 'Tranzit'}
-          </Text>
+          <View className="mt-7 flex-row items-end gap-5">
+            {/* Cele reci: duga rec u uskoj koloni smanji naslov umesto da se prelomi (32 -> najmanje 22). */}
+            <NaslovCeleReci size={32} lineHeight={38} min={22} className="flex-1">
+              {puna?.title || sazeta?.title || 'Tranzit'}
+            </NaslovCeleReci>
+            {tranzit && imaAspekt(tranzit.aspect.key) && (
+              <AspektIlustracija
+                aspekt={tranzit.aspect.key}
+                tranzitna={{ key: tranzit.transiting.key, glyph: tranzit.transiting.glyph, vladar: tranzit.ruler === 'transiting' }}
+                natalna={{ key: tranzit.natal.key, glyph: tranzit.natal.glyph, vladar: tranzit.ruler === 'natal' }}
+                width={120}
+              />
+            )}
+          </View>
+          {/* Traka u svetloj lila, boji ikonica oblasti i izabranog taba (Ivan, 28.9.2026). */}
+          {prozor && tranzit && (
+            <TransitTrajanje trajanje={prozor} date={danas} className="mt-8" boja={OBLAST_BOJA} opseg />
+          )}
+          <View className="mb-8" />
 
           {dugaLoading ? (
             <TextPlaceholder lines={8} />
@@ -130,4 +159,12 @@ export default function TransitDetail() {
           )}
     </SheetScroll>
   );
+}
+
+/** Precnik crnih ikonica planeta u zaglavlju lista (Ivan: "smanji"). */
+const SIMBOL = 26;
+
+/** Crna ikonica planete (ili Asc/MC) za zaglavlje lista — ista i na natalnom tumacenju. */
+function Simbol({ tacka }: { tacka: { key: string; glyph: string } }) {
+  return <TamnaTacka tacka={tacka} size={SIMBOL} />;
 }

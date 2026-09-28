@@ -5,6 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { TextClassContext } from '@/components/ui/text';
 import { shadow } from '@/theme/tokens';
+import { tezina } from '@/theme/tipografija';
 
 /*
  * Dugme referentne aplikacije: KAPSULA preko cele sirine, 50pt visoko,
@@ -49,7 +50,7 @@ const buttonVariants = cva(
 );
 
 /** Klase za tekst UNUTAR dugmeta — parne se sa buttonVariants preko contexta. */
-const buttonTextVariants = cva('font-semibold', {
+const buttonTextVariants = cva(tezina('dugme'), {
   variants: {
     variant: {
       default: 'text-primary-foreground',
@@ -149,7 +150,60 @@ function SjajIvice() {
   );
 }
 
-type ButtonProps = React.ComponentProps<typeof Pressable> & VariantProps<typeof buttonVariants>;
+/* ------------------------------------------------------------------ */
+/* ISTAKNUTO CRNO DUGME ("Saznaj više")                                */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Ivan, 28.9.2026: crno dugme "previse flat — da ima neke sjajeve, senku".
+ * Samo uz `istaknuto`; ostala crna dugmad ostaju kakva su bila.
+ *
+ *   1. Ispuna nije ravna: svetlija crna gore, tamnija dole (kao zakrivljena povrsina).
+ *   2. Sjaj preko gornje polovine — providna bela koja se gubi ka sredini.
+ *   3. Tanka svetla linija na samom vrhu (odsjaj ivice) — pojacan `SjajIvice`.
+ *   4. Tiha crna senka ispod, da dugme malo lebdi.
+ *      Senka ide na OMOTAC: dugme ima `overflow-hidden` (zbog zaobljenja
+ *      sjaja), a iOS ne crta senku pogleda koji secka svoj sadrzaj.
+ */
+// Ublazeno (Ivan: "prejak sjaj"): ispuna blizu ravne, sjaj i linija na vrhu upola tisi.
+const ISTAKNUTO_ISPUNA = ['#26262A', '#18181A', '#111112'] as const;
+const ISTAKNUTO_ISPUNA_TACKE = [0, 0.55, 1] as const;
+const ISTAKNUTO_SENKA = {
+  // Prvo je bila indigo 0,35 / 14 — "previse naglaseno, i da nije ljubicasta" (Ivan):
+  // sada crna, tisa i bliza dugmetu.
+  shadowColor: '#000000',
+  shadowOpacity: 0.12,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 3 },
+  elevation: 3,
+} as const;
+
+function SjajIstaknuto() {
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <LinearGradient
+        colors={ISTAKNUTO_ISPUNA as unknown as readonly [string, string, ...string[]]}
+        locations={ISTAKNUTO_ISPUNA_TACKE as unknown as readonly [number, number, ...number[]]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.09)', 'rgba(255,255,255,0.02)', 'rgba(255,255,255,0)']}
+        locations={[0, 0.7, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%' }}
+      />
+      <View style={{ position: 'absolute', top: 0, left: 12, right: 12, height: 1, backgroundColor: 'rgba(255,255,255,0.18)' }} />
+    </View>
+  );
+}
+
+type ButtonProps = React.ComponentProps<typeof Pressable> & VariantProps<typeof buttonVariants> & {
+  /** Crno dugme sa prelivom, sjajem i indigo senkom (`SjajIstaknuto`). */
+  istaknuto?: boolean;
+};
 
 export function Button({
   className,
@@ -158,6 +212,7 @@ export function Button({
   disabled,
   style,
   children,
+  istaknuto = false,
   ...props
 }: ButtonProps) {
   /*
@@ -169,28 +224,40 @@ export function Button({
   const stvarni = ugaseno ? 'soft' : (variant ?? 'default');
   const meka = stvarni === 'soft';
   const crno = stvarni === 'default' || stvarni === 'destructive';
+  const sjajno = istaknuto && stvarni === 'default';
 
-  return (
+  const dugme = (
     <TextClassContext.Provider
       value={cn(buttonTextVariants({ variant: stvarni, size }), ugaseno && 'text-subtle')}>
       <Pressable
         accessibilityRole="button"
         disabled={disabled}
-        style={(stanje) => [
-          meka ? shadow.soft : null,
-          typeof style === 'function' ? style(stanje) : style,
-        ]}
+        // Obican niz, ne funkcija: NativeWind uz `className` ODBACI `style` zadat
+        // kao funkcija — senka mekog dugmeta i boja poslata spolja nisu stizale do
+        // ekrana (izmereno na vebu, 28.9.2026). Funkcija ostaje samo kad ju je
+        // pozivalac sam dao.
+        style={typeof style === 'function'
+          ? (stanje) => [meka ? shadow.soft : null, style(stanje)]
+          : [meka ? shadow.soft : null, style]}
         className={cn(buttonVariants({ variant: stvarni, size }), className)}
         {...props}>
         {(stanje) => (
           <>
             {/* PRVI u stablu, da natpis ostane iznad njega. */}
+            {sjajno ? <SjajIstaknuto /> : null}
             {crno ? <SjajIvice /> : null}
             {typeof children === 'function' ? children(stanje) : children}
           </>
         )}
       </Pressable>
     </TextClassContext.Provider>
+  );
+  if (!sjajno) return dugme;
+  // Omotac nosi senku (vidi `ISTAKNUTO_SENKA`); na Androidu `elevation` trazi pozadinu i oblik.
+  return (
+    <View style={[ISTAKNUTO_SENKA, { borderRadius: 999, backgroundColor: '#111112' }]}>
+      {dugme}
+    </View>
   );
 }
 

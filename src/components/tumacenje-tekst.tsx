@@ -3,6 +3,8 @@ import { View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 import { blokovi } from '@/lib/tumacenje';
+import { tezina } from '@/theme/tipografija';
+import { cn } from '@/lib/utils';
 
 /**
  * Pasusi i liste teksta astrologa (duga verzija tranzita, lunarni kalendar).
@@ -26,7 +28,7 @@ export function TumacenjeTekst({ tekst }: { tekst: string }) {
                     rec se odsece na ivici, a ispod ostane prazan red (Ivan, snimak
                     28.9.2026, "Nepotpuni podaci"). Bez ugnezdenog teksta nema ni greske. */}
                 <View className="flex-1">
-                  {!!s.naslov && <Text variant="reading" className="font-semibold text-foreground">{s.naslov}</Text>}
+                  {!!s.naslov && <Text variant="reading" className={cn('text-foreground', tezina('naslovStavke'))}>{s.naslov}</Text>}
                   <Text variant="reading">{s.tekst}</Text>
                 </View>
               </View>

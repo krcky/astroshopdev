@@ -71,8 +71,8 @@ export const accent = {
 /* ------------------------------------------------------------------ */
 
 /**
- * Pismo je SISTEMSKO — SF Pro na iOS-u, Roboto na Androidu. Nigde se ne
- * postavlja `fontFamily`; React Native bez nje uzme sistemsko pismo.
+ * PISMO JE OD 28.9.2026 SATOSHI (`theme/font.ts`). Ispod je istorija merenja
+ * iz vremena sistemskog pisma — velicine su iz nje i ostaju.
  *
  * KOJE JE PISMO NA SNIMCIMA — sta se zna, a sta ne:
  *
@@ -164,8 +164,8 @@ export const radius = {
   tile: 8,
   /** Mehuric poruke. */
   bubble: 16,
-  /** Kartica, grupa redova, veliki panel. */
-  card: 24,
+  /** Kartica, grupa redova, veliki panel. 12 = pola reference (Ivan, 28.9.2026; bilo 24). */
+  card: 12,
   /** Dugme, polje, kapsula kategorije, traka. */
   pill: 999,
 } as const;
@@ -313,8 +313,13 @@ export const backdrop = {
     none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
     /** Crvena iz `accent.red` — trenutno je nijedan ekran ne koristi (Nebo presao na `pink`, Ivan 28.9.2026). */
     red: ['rgba(235, 71, 67, 0.40)', 'rgba(220, 38, 38, 0.17)', 'rgba(230, 60, 60, 0)'],
-    /** Nebo: roze iz `accent.pink` ka svetlijoj (Ivan, 28.9.2026; ranije crvena). */
-    pink: ['rgba(235, 60, 134, 0.40)', 'rgba(244, 114, 182, 0.17)', 'rgba(240, 87, 158, 0)'],
+    /**
+     * Nebo: SVETLA roze iz aplikacije — `MINUS_BOJA` #F8B3C3 ("Koci te", oznaka
+     * "izazovno"), ka malo zasicenijoj #F49AB8 u sredini (Ivan, 28.9.2026: "malo
+     * svetlija"; bilo `accent.pink` #EB3C86, pre toga crvena). Providnost JACA od
+     * ostalih, 0,60 / 0,26 ("bas je bledo") — svetla boja na 0,40 skoro nestane.
+     */
+    pink: ['rgba(248, 179, 195, 0.60)', 'rgba(244, 154, 184, 0.26)', 'rgba(244, 154, 184, 0)'],
   },
   /**
    * ZIVI PRELIV (Ivan, 28.9.2026): preko mirnog preliva plove dve meke mrlje
@@ -360,7 +365,7 @@ export const backdrop = {
     blue: [['rgb(125, 211, 252)', 0.26], ['rgb(56, 189, 248)', 0.26]],
     none: [],
     red: [['rgb(235, 71, 67)', 0.26], ['rgb(220, 38, 38)', 0.26]],
-    pink: [['rgb(235, 60, 134)', 0.26], ['rgb(244, 114, 182)', 0.26]],
+    pink: [['rgb(248, 179, 195)', 0.38], ['rgb(244, 154, 184)', 0.38]], // jace, kao i preliv (svetla boja)
   },
 } as const;
 

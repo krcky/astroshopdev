@@ -5,10 +5,10 @@ import { router } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { ZnakIkona } from '@/components/znak-ikona';
 import { ScreenBackdrop } from '@/components/screen';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Glyph } from '@/components/ui/glyph';
 import { moonPhase, planetPositions } from '@/lib/astro';
 import { useDraft } from '@/store/draft';
 
@@ -43,7 +43,7 @@ export default function Welcome() {
               </Text>
 
               <View className="mt-6 flex-row items-center justify-center gap-2">
-                <Glyph size={18} className="text-muted-foreground">{sky.moon.position.sign.glyph}</Glyph>
+                <ZnakIkona znak={sky.moon.position.sign.key} element={sky.moon.position.sign.element} size={18} />
                 <Text variant="muted" className="text-xs">
                   Mesec u znaku {sky.moon.position.sign.name} · {sky.phase.name}
                 </Text>

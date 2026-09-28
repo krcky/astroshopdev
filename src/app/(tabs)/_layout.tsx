@@ -4,6 +4,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { STARI_IOS } from '@/lib/platform';
 import { neutral } from '@/theme/tokens';
+import { fontUloge } from '@/theme/tipografija';
 
 /*
  * NATIVE traka tabova (UITabBarController na iOS-u, Liquid Glass na iOS-u 26;
@@ -71,7 +72,11 @@ export default function TabsLayout() {
       // do tada `ink`). `tintColor` bi na nivou UITabBar-a mogao da preboji i
       // neaktivne, pa ga nema.
       iconColor={{ default: neutral.inkSubtle, selected: IZABRANI }}
-      labelStyle={{ default: { color: neutral.inkSubtle }, selected: { color: IZABRANI } }}
+      // Natpisi u Medium rezu pisma aplikacije (`theme/font.ts`).
+      labelStyle={{
+        default: { color: neutral.inkSubtle, fontFamily: fontUloge('tabTraka') },
+        selected: { color: IZABRANI, fontFamily: fontUloge('tabTraka') },
+      }}
       // iOS 26: traka se NE skuplja pri skrolu (Ivan, 27.9.2026). Sistem ume samo
       // da je sazme u jedno dugme, a trazeno je blago smanjenje kao na Instagramu —
       // to sistemska traka nema. Skupljanje radi (vidi `belina` u `Screen`) ako se vrati.

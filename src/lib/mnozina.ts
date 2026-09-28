@@ -33,6 +33,7 @@ const DANA_U_MESECU = 30.44;
 export function josTraje(preostalo: number | null): string {
   if (preostalo === null) return 'Traje godinama';
   if (preostalo <= 0) return 'Poslednji dan';
-  if (preostalo <= 30) return `Još ${dana(preostalo)}`;
-  return `Još ${meseci(Math.max(1, Math.round(preostalo / DANA_U_MESECU)))}`;
+  // "Traje još …" (Ivan, 28.9.2026) — samo "Još 23 dana" nije govorilo sta.
+  if (preostalo <= 30) return `Traje još ${dana(preostalo)}`;
+  return `Traje još ${meseci(Math.max(1, Math.round(preostalo / DANA_U_MESECU)))}`;
 }

@@ -12,6 +12,7 @@ import { useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { tezina } from '@/theme/tipografija';
 
 /**
  * Izbor mesta odakle se gleda nebo.
@@ -57,7 +58,7 @@ export default function SkyPlace() {
             placeholder="traži grad"
             placeholderTextColor={neutral.inkSubtle}
             autoCorrect={false}
-            className="border-b border-fill-strong pb-3 text-2xl text-foreground"
+            className="border-b border-fill-strong pb-3 text-2xl text-foreground font-sans"
           />
 
           <View className="mt-4">
@@ -120,7 +121,7 @@ function Izbor({ naslov, opis, aktivno, onPress }: {
       accessibilityLabel={`${naslov}, ${opis}`}
       className="flex-row items-center justify-between border-b border-fill-strong py-3.5 active:opacity-60">
       <View className="flex-1">
-        <Text className={cn('text-base', aktivno && 'font-semibold')}>{naslov}</Text>
+        <Text className={cn('text-base', aktivno && tezina('izabranRed'))}>{naslov}</Text>
         <Text variant="muted" className="text-xs">{opis}</Text>
       </View>
       {aktivno && <Check size={17} color={neutral.ink} />}

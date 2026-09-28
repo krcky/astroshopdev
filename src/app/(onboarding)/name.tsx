@@ -46,7 +46,7 @@ export default function Name() {
           autoFocus
           selectTextOnFocus
           maxLength={60}
-          className="w-full border-b border-fill-strong pb-3 text-center text-3xl text-foreground"
+          className="w-full border-b border-fill-strong pb-3 text-center text-3xl text-foreground font-sans"
         />
       </View>
     </OnboardingStep>

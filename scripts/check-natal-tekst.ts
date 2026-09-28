@@ -12,7 +12,7 @@ import * as path from 'path';
 
 import { buildNatalChart } from '../src/lib/natal';
 import {
-  allNatalKeys, isFreeNatalKey, moonSignForUnknownTime, natalAspects, natalTopic,
+  allNatalKeys, isFreeNatalKey, moonSignForUnknownTime, natalAspects, natalTopic, tacnostAspekta, udeoUZnaku,
 } from '../src/lib/natal-keys';
 import { BEOGRAD, kartaSaAscendentom } from '../src/lib/test-karta';
 
@@ -57,6 +57,18 @@ console.log('\n=== Bez vremena rodjenja ===');
     }
   }
   ok(nadjen, 'nadjen dan kad Mesec menja znak');
+}
+
+console.log('\n=== Trake u zaglavlju tumacenja ===');
+ok(udeoUZnaku(0) === 0 && udeoUZnaku(15) === 0.5 && udeoUZnaku(29.99) < 1, 'polozaj u znaku: 0 / 15 / 29,99 stepeni');
+ok(udeoUZnaku(-1) === 0 && udeoUZnaku(31) === 1, 'polozaj u znaku ostaje u 0—1');
+{
+  const t = tacnostAspekta('square', 1.5);
+  ok(!!t && t.max === 6 && Math.abs(t.udeo - 0.75) < 1e-9, 'kvadrat, orbis 1,5 od 6 -> 0,75', JSON.stringify(t));
+  ok(tacnostAspekta('conjunction', 0)?.udeo === 1, 'egzaktan aspekt -> 1');
+  ok(tacnostAspekta('nepostoji', 1) === null, 'nepoznat aspekt -> null');
+  const svi = natalAspects(ribe, false).map((a) => tacnostAspekta(a.aspect.key, a.orb));
+  ok(svi.every((t) => !!t && t.udeo >= 0 && t.udeo <= 1), 'svaki aspekt test karte ima tacnost u 0—1', `${svi.length} aspekata`);
 }
 
 console.log('\n=== Kljucevi prema korpusu (files/natal-texts.csv) ===');

@@ -6,13 +6,18 @@ import { Lock } from 'lucide-react-native';
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
-import { Glyph } from '@/components/ui/glyph';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { cn } from '@/lib/utils';
 import { SIGN_CASES } from '@/lib/zodiac';
-import { isFreeNatalKey, natalTopic } from '@/lib/natal-keys';
+import { isFreeNatalKey, natalTopic, tacnostAspekta, udeoUZnaku } from '@/lib/natal-keys';
+import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
+import { AspektIlustracija } from '@/components/aspekt-ilustracija';
+import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { TrakaNapretka } from '@/components/transit-trajanje';
+import { OBLAST_BOJA } from '@/components/oblast-ikona';
+import type { SignPosition } from '@/lib/zodiac';
 import { useNatalTexts, type NatalText } from '@/lib/natal-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
@@ -59,20 +64,42 @@ export default function NatalTumacenje() {
   const { chart } = resolved;
   const zakljucani = kljucevi.filter((k) => !texts.has(k) && !loading && !premium && !isFreeNatalKey(k));
 
+  // Veliki naslov je podnaslov astrologa iz PRVOG teksta ("Druzeljubivi vizionar"),
+  // kao sto je na tranzitu naslov teksta; racunato ime ide u oznaku iznad njega.
+  const prvi = kljucevi.length > 0 ? texts.get(kljucevi[0]) : undefined;
   let zaglavlje: React.ReactNode = null;
   if (topic.kind === 'planet') {
     const p = chart.planets.find((x) => x.key === topic.planet)!;
+    const neznan = !!topic.moon && !topic.moon.certain; // Mesec bez vremena rodjenja
     zaglavlje = (
-      <Glava znaci={[p.glyph]} naslov={p.name}
-        podnaslov={[topic.moon && !topic.moon.certain ? null : p.position.formatted, topic.houseKey ? `${p.house}. kuća` : null].filter(Boolean).join(' · ')} />
+      <Glava
+        tacke={[{ key: p.key, glyph: p.glyph }]}
+        oznaka={[neznan ? p.name : `${p.name} u ${SIGN_CASES[p.position.sign.key].loc}`, topic.houseKey ? `${p.house}. kuća` : null].filter(Boolean).join(' · ')}
+        naslov={prvi?.subtitle || p.name}
+        traka={neznan ? null : trakaZnaka(p.position)}
+      />
     );
   } else if (topic.kind === 'ascendant') {
-    zaglavlje = <Glava znaci={[chart.ascendantSign.sign.glyph]} naslov="Ascendent" podnaslov={chart.ascendantSign.formatted} />;
+    const asc = chart.ascendantSign;
+    zaglavlje = (
+      <Glava
+        tacke={[{ key: 'ascendant', glyph: 'ASC' }]}
+        oznaka={`Ascendent u ${SIGN_CASES[asc.sign.key].loc}`}
+        naslov={prvi?.subtitle || 'Ascendent'}
+        traka={trakaZnaka(asc)}
+      />
+    );
   } else {
     const a = topic.aspect;
+    const t = tacnostAspekta(a.aspect.key, a.orb);
     zaglavlje = (
-      <Glava znaci={[a.a.glyph, a.aspect.glyph, a.b.glyph]} naslov={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
-        podnaslov={`orbis ${a.orb.toFixed(1)}°`} />
+      <Glava
+        tacke={[a.a, a.b]}
+        aspekt={a.aspect.key}
+        oznaka={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
+        naslov={prvi?.subtitle || `${a.a.name} ${a.aspect.name} ${a.b.name}`}
+        traka={t && { levo: 'Tačnost aspekta', desno: `orbis ${stepen(a.orb)} od ${t.max}°`, udeo: t.udeo }}
+      />
     );
   }
 
@@ -94,8 +121,8 @@ export default function NatalTumacenje() {
         </View>
       )}
 
-      {kljucevi.map((k) => (
-        <Odeljak key={k} tekst={texts.get(k)} loading={loading} zakljucan={zakljucani.includes(k)} />
+      {kljucevi.map((k, i) => (
+        <Odeljak key={k} tekst={texts.get(k)} loading={loading} zakljucan={zakljucani.includes(k)} prvi={i === 0} />
       ))}
 
       {/* Kuca zavisi od vremena rodjenja — bez njega se ne tumaci (pravilo 5). */}
@@ -123,43 +150,86 @@ export default function NatalTumacenje() {
   );
 }
 
-/** Simboli u kapsuli (krug za jedan), pa naslov. Kod aspekta su tri simbola u jednom redu. */
-function Glava({ znaci, naslov, podnaslov }: { znaci: string[]; naslov: string; podnaslov: string }) {
+/** Precnik crnih ikonica tacaka — isti kao na tumacenju tranzita (`transit.tsx`). */
+const SIMBOL = 26;
+
+type Traka = { levo: string; desno: string; udeo: number };
+
+/** "2,3°" — decimalni zarez. */
+const stepen = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
+
+/** Traka polozaja u znaku: koliko je tacka odmakla kroz svojih 30°. */
+function trakaZnaka(pos: SignPosition): Traka {
+  return {
+    levo: `Položaj u ${SIGN_CASES[pos.sign.key].loc}`,
+    desno: `${pos.deg}° ${String(pos.min).padStart(2, '0')}' od 30°`,
+    udeo: udeoUZnaku(pos.degree),
+  };
+}
+
+/**
+ * Zaglavlje u obliku tumacenja tranzita (Ivan, 28.9.2026: "iste ikonice, isti
+ * progress bar"): crne ikonice tacaka (kod aspekta sa znakom aspekta izmedju),
+ * oznaka verzalom, veliki naslov; desno ilustracija aspekta; ispod cele sirine
+ * ista lila traka. Traka ovde NIJE trajanje (natalna karta se ne menja) nego
+ * polozaj u znaku, odnosno tacnost aspekta.
+ */
+function Glava({ tacke, aspekt, oznaka, naslov, traka }: {
+  tacke: { key: string; glyph: string }[];
+  aspekt?: string;
+  oznaka: string;
+  naslov: string;
+  traka: Traka | null;
+}) {
+  const ilustracija = !!aspekt && imaAspekt(aspekt) && tacke.length === 2;
   return (
-    <View className="flex-row items-center gap-4">
-      <View className="h-14 min-w-14 flex-row items-center justify-center gap-2 rounded-full bg-fill px-3">
-        {znaci.map((z, i) =>
-          // ASC nije u astroloskom fontu — obicnim slovima (vidi CLAUDE.md).
-          z === 'ASC' ? (
-            <Text key={i} variant="h3">Asc</Text>
-          ) : (
-            <Glyph key={i} size={znaci.length > 1 && i === 1 ? 18 : 24} className={znaci.length > 1 && i === 1 ? 'text-muted-foreground' : 'text-foreground'}>{z}</Glyph>
-          )
+    <>
+      <View className="flex-row gap-5">
+        <View className="flex-1 justify-between">
+          <View className="flex-row items-center gap-2">
+            <TamnaTacka tacka={tacke[0]} size={SIMBOL} />
+            {aspekt && imaAspekt(aspekt) && (
+              <AspektIkona aspekt={aspekt as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
+            )}
+            {tacke[1] && <TamnaTacka tacka={tacke[1]} size={SIMBOL} />}
+          </View>
+          <View className="mt-7">
+            <Text variant="oznaka">{oznaka}</Text>
+            <Text variant="display" className="mt-2">{naslov}</Text>
+          </View>
+        </View>
+        {ilustracija && (
+          <View className="justify-end">
+            <AspektIlustracija aspekt={aspekt as AspektKljuc} tranzitna={tacke[0]} natalna={tacke[1]} width={120} />
+          </View>
         )}
       </View>
-      <View className="flex-1">
-        <Text variant="h2">{naslov}</Text>
-        {!!podnaslov && <Text variant="muted" className="mt-0.5">{podnaslov}</Text>}
-      </View>
-    </View>
+      {traka && <TrakaNapretka {...traka} boja={OBLAST_BOJA} className="mt-8" />}
+      <View className="mb-2" />
+    </>
   );
 }
 
-/** Jedan tekst: "Sunce u Lavu" krupno, podnaslov astrologa, pa tekst. */
-function Odeljak({ tekst, loading, zakljucan }: { tekst?: NatalText; loading: boolean; zakljucan: boolean }) {
+/**
+ * Jedan tekst, kao sekcija duge verzije tranzita: naslov astrologa ("Sunce u
+ * Lavu") u sivom natpisu sa linijom ispod, pa tekst. Podnaslov prvog teksta je
+ * vec veliki naslov gore, pa se ovde ponavlja samo kod drugog (kuca).
+ */
+function Odeljak({ tekst, loading, zakljucan, prvi }: { tekst?: NatalText; loading: boolean; zakljucan: boolean; prvi: boolean }) {
   if (zakljucan) return null; // jedna kartica za otkljucavanje ispod svih
   return (
-    <View className="mt-8">
+    <View className="mt-7">
       {tekst ? (
         <>
-          <Text variant="display">{tekst.title}</Text>
-          {!!tekst.subtitle && <Text variant="lead" className="mt-1">{tekst.subtitle}</Text>}
-          <View className="mt-4">
-            <TumacenjeTekst tekst={tekst.body} />
+          {/* Linija ispod naslova: list je beo, pa `border-border` (pravilo 17). */}
+          <View className="mb-3 border-b border-border pb-2">
+            <Text variant="label">{tekst.title}</Text>
           </View>
+          {!prvi && !!tekst.subtitle && <Text variant="h3" className="mb-2">{tekst.subtitle}</Text>}
+          <TumacenjeTekst tekst={tekst.body} />
         </>
       ) : loading ? (
-        <TextPlaceholder title="display" lines={6} />
+        <TextPlaceholder lines={6} />
       ) : (
         // Korpus je kompletan (`npm run check:natal-tekst`): tekst koji ne stigne
         // je problem veze ili prijave, ne nenapisan tekst.

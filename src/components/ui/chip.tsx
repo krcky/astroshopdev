@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Pressable, View } from 'react-native';
 import { cn } from '@/lib/utils';
 import { Text } from '@/components/ui/text';
+import { tezina } from '@/theme/tipografija';
 
 /**
  * Kapsula kategorije — vodoravni niz izbora ("Family", "Tech", "Food & Drink").
@@ -34,7 +35,7 @@ export function Chip({ label, icon, selected, onPress, className }: ChipProps) {
         className
       )}>
       {icon}
-      <Text variant="chip" className={cn(selected && 'font-semibold')}>
+      <Text variant="chip" className={cn(selected && tezina('chipIzabran'))}>
         {label}
       </Text>
     </Okvir>

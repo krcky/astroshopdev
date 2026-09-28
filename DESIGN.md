@@ -12,10 +12,26 @@ su prepis istih brojeva u oblik koji NativeWind razume. Menja se prvo tokens.ts.
 
 ## 1. Pismo
 
-**Sistemsko** — SF Pro na iOS-u, Roboto na Androidu. `fontFamily` se nigde ne
-postavlja; React Native bez nje uzme sistemsko pismo. Debljina ide obicnim
-Tailwind klasama za tezinu (`font-medium`, `font-semibold`, `font-bold`), sto sa
-sistemskim pismom radi kako treba.
+**Plus Jakarta Sans** (Ivan, 28.9.2026; pre toga istog dana Satoshi) — pet
+rezova, 400 do 800, `src/theme/font.ts`, licenca SIL OFL. Debljina i dalje ide
+Tailwind klasama (`font-medium` … `font-extrabold`); `<Text>` iz njih bira
+familiju. Velicine ispod su izmerene za sistemsko pismo i nisu menjane.
+
+Hijerarhija na Jakarti (`TEZINE_JAKARTA_LAKSE`; Ivan: "mnogo su debeli"):
+naslovi, podnaslovi, dugme i podebljan pocetak SemiBold, sve ostalo Medium;
+naslove od podnaslova odvaja velicina. Teze stanje sa cetiri nivoa
+(800/700/600/500) je `TEZINE_JAKARTA`. Stanje sa Satoshija je sacuvano
+kao `TEZINE_SATOSHI`. Ispod je opis Satoshi stanja, kao istorija.
+
+Debljina SVAKE uloge teksta je u `src/theme/tipografija.ts` (tabela `TEZINE`).
+Bold nose samo naslovi, glavno dugme i podebljan pocetak u crnom tekstu kartice;
+sve ostalo, ukljucujuci tekst za citanje, je Medium (Ivan, 28.9.2026: tekst za
+citanje "malo podebljan" — Satoshi nema rez izmedju 400 i 500). Prethodna stanja
+su sacuvana kao `TEZINE_SATOSHI_1` i `TEZINE_HIJERARHIJA` — za povratak
+`export const TEZINE = <stanje>`. Sve uloge zajedno: `/dev-tipografija`.
+
+Ranije je pismo bilo sistemsko (SF Pro / Roboto); obrazlozenje ispod ostaje kao
+istorija merenja.
 
 ### Kako je odluceno
 
@@ -123,7 +139,7 @@ ISKLJUCIVO kao akcenat na placenom sadrzaju.
 |---|---|---|
 | `rounded-tile` | 8 | kvadratic ikone |
 | `rounded-bubble` | 16 | mehuric poruke |
-| `rounded-lg` | 24 | kartica, panel, grupa redova |
+| `rounded-lg` | 12 | kartica, panel, grupa redova (Ivan, 28.9.2026: duplo manje od reference; bilo 24) |
 | `rounded-pill` | puna kapsula | dugme, polje, kapsula kategorije, traka |
 
 Referentna aplikacija ima samo dve prave vrednosti: **24** i **kapsula**. Posto

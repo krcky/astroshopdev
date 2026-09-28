@@ -74,7 +74,7 @@ export default function EditBirthData() {
               placeholderTextColor={neutral.inkSubtle}
               autoCapitalize="words"
               maxLength={60}
-              className="border-b border-border pb-2 text-center text-2xl text-foreground"
+              className="border-b border-border pb-2 text-center text-2xl text-foreground font-sans"
             />
           </Section>
 
@@ -107,7 +107,7 @@ export default function EditBirthData() {
               placeholder="grad"
               placeholderTextColor={neutral.inkSubtle}
               autoCorrect={false}
-              className="border-b border-border pb-2 text-center text-2xl text-foreground"
+              className="border-b border-border pb-2 text-center text-2xl text-foreground font-sans"
             />
             {!city && (
               <View className="mt-3">

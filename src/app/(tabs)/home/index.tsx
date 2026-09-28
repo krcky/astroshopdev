@@ -13,11 +13,12 @@ import { Group, ListRow } from '@/components/ui/list';
 import { buildPersonalDaily, formatDate, formatTime, formatUntil, MESECI_KRATKO, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Calendar, Check, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
 import { MoonDisc } from '@/components/moon-disc';
 import { moonState, moonSignAt, formatIllumination, LUNAR_AREAS, type LunarArea } from '@/lib/moon';
-import { useTransitTexts, type TransitText } from '@/lib/transit-texts';
+import { fetchTransitTones, useTransitTexts, type TransitText } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore, useEntitlement } from '@/store/auth';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
@@ -25,6 +26,11 @@ import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { TvojDanCard } from '@/components/tvoj-dan-card';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { OceneOblasti } from '@/components/ocena-oblasti';
+import { KarticaTranzita } from '@/components/tranziti-lista';
+import { chartRulers, rulerRole } from '@/lib/rulers';
+import { transitTone } from '@/lib/tone';
+import { trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
+import type { NatalChart } from '@/lib/natal';
 import { OblastIkona } from '@/components/oblast-ikona';
 import { useOblastiDana } from '@/lib/use-oblasti';
 import { useHeroLog } from '@/store/hero-log';
@@ -33,6 +39,7 @@ import { cn } from '@/lib/utils';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
 import { SIGN_CASES } from '@/lib/zodiac';
+import { tezina } from '@/theme/tipografija';
 
 /** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Tranziti". */
 export default function Home() {
@@ -45,6 +52,7 @@ export default function Home() {
   const [offset, setOffset] = React.useState(0);
   // Slajd karusela; indikator je van skrola pa stanje zivi ovde.
   const [slide, setSlide] = React.useState(0);
+  const dno = useDnoKarusela();
   const date = React.useMemo(() => {
     const d = new Date(today); d.setDate(today.getDate() + offset); return d;
   }, [today, offset]);
@@ -137,7 +145,7 @@ export default function Home() {
         // (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
         // Svi brzi tranziti ostaju u tabu "Tranziti".
         ...(daily.bySpeed.slow.length > 0
-          ? [{ key: 'slow', label: 'Tema perioda', node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} /> }]
+          ? [{ key: 'slow', label: 'Tema perioda', node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} chart={resolved.chart} timeUnknown={resolved.timeUnknown} /> }]
           : []),
   ];
 
@@ -228,10 +236,12 @@ export default function Home() {
           isti kao kad su stajale jedna ispod druge. Kartica bez sadrzaja ne dobija
           slajd — prazan slajd bi izgledao kao greska. */}
       <Carousel page={slide} onPage={setSlide} slides={slides} />
-      {/* Vazduh ispod kartica, da indikator ne legne preko kraja poslednje. */}
-      <View style={{ height: DOTS_SPACE }} />
+      {/* Vazduh ispod kartica: kraj kartice na dnu skrola staje tacno na vrh
+          preliva, ne ispod pune sive (`useDnoKarusela`). */}
+      <View style={{ height: dno.prostor }} />
     </Screen>
-    <SlideDots count={slides.length} active={Math.min(slide, slides.length - 1)} />
+    <DnoPreliv visina={dno.vrh} />
+    <SlideDots count={slides.length} active={Math.min(slide, slides.length - 1)} bottom={dno.tackice} />
     </View>
   );
 }
@@ -250,10 +260,50 @@ const SLIDE_GAP = space.screen * 2;
  */
 type Slide = { key: string; label?: string; node: React.ReactNode };
 
-/** Koliko vazduha ostaje ispod kartica u skrolu: tackice + razmak, da ne legnu preko sadrzaja. */
-const DOTS_SPACE = 28;
 /** Razmak od vrha trake tabova do tackica (Ivan, 28.9.2026: 32). */
 const DOTS_ABOVE_TAB_BAR = 32;
+/** Visina tackica (`h-1.5`). */
+const DOTS_HEIGHT = 6;
+/** Pun sivi pojas iznad tackica, pre nego sto preliv pocne da bledi. */
+const DNO_PUNO_IZNAD = 12;
+/** Koliko preliv bledi — od pune sive do providnog. */
+const DNO_BLEDI = 40;
+
+/**
+ * Mere dna pocetne: gde stoje tackice, gde pocinje preliv i koliko praznog
+ * prostora skrol ostavlja ispod kartica. Jedno mesto, da se tri broja ne raziđu.
+ *
+ *   tackice  od dna prostora ekrana do tackica (vidi `SlideDots` za iOS/Android)
+ *   vrh      od dna prostora ekrana do vrha preliva
+ *   prostor  vazduh na kraju skrola, POVRH onog sto `Screen` vec dodaje za traku —
+ *            kraj poslednje kartice tada staje na vrh preliva. iOS: 28, kao ranije.
+ */
+function useDnoKarusela() {
+  const insets = useSafeAreaInsets();
+  const traka = useTabBarSpace();
+  const tackice = (Platform.OS === 'ios' ? insets.bottom : traka) + DOTS_ABOVE_TAB_BAR;
+  const vrh = tackice + DOTS_HEIGHT + DNO_PUNO_IZNAD + DNO_BLEDI;
+  return { tackice, vrh, prostor: Math.max(0, vrh - traka) };
+}
+
+/**
+ * Preliv na dnu pocetne (Ivan, 28.9.2026): kartica koja klizi ispod tackica i
+ * trake tabova se vise ne vidi kroz njih — dugacak slajd ("Tema perioda") je
+ * tamo mesao tekst sa tackicama. Od vrha bledi 40pt, pa je puna siva boja
+ * pozadine (`neutral.grouped`) od 12pt iznad tackica do dna ekrana, i iza
+ * trake tabova (na iOS-u 26 staklo onda preuzima sivu, ne tekst).
+ * Ide IZNAD skrola a ISPOD tackica; ne prima dodir.
+ */
+function DnoPreliv({ visina }: { visina: number }) {
+  return (
+    <LinearGradient
+      pointerEvents="none"
+      colors={[`${neutral.grouped}00`, neutral.grouped, neutral.grouped]}
+      locations={[0, DNO_BLEDI / visina, 1]}
+      style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: visina }}
+    />
+  );
+}
 
 /**
  * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
@@ -288,10 +338,11 @@ function Carousel({ slides, page, onPage }: { slides: Slide[]; page: number; onP
           contentContainerStyle={{ paddingHorizontal: space.screen, gap: SLIDE_GAP, alignItems: 'flex-start' }}>
           {slides.map((s) => (
             <View key={s.key} style={{ width: slideWidth }}>
-              {/* Naslov slajda istom klasom kao naslov na "Tvom danu" (`display`, Ivan 28.9.2026). */}
-              {/* Naslov slajda pocinje u istoj visini kao datum na prvom slajdu, istom
-                  klasom kao naslov "Tvog dana" (`display`, Ivan 28.9.2026). */}
-              {!!s.label && <Text variant="display" className="mb-4" accessibilityRole="header">{s.label}</Text>}
+              {/* Naslov slajda istom klasom kao naslov "Tvog dana" (`display`, Ivan 28.9.2026).
+                  Naslov ima svaki slajd osim prvog. Podignut 8pt iznad datuma na prvom
+                  slajdu i odmaknut od kartice 24pt umesto 16 (Ivan, 28.9.2026). Debljina
+                  je svoja uloga, `naslovSlajda` — tanja od ostalih `display` naslova. */}
+              {!!s.label && <Text variant="display" className={cn('-mt-2 mb-6', tezina('naslovSlajda'))} accessibilityRole="header">{s.label}</Text>}
               {s.node}
             </View>
           ))}
@@ -317,10 +368,7 @@ function Carousel({ slides, page, onPage }: { slides: Slide[]; page: number; onP
  * sakrivene iza trake (Pixel 9 emulator, 28.9.2026). Tamo se dodaje cela
  * traka + umetak — `useTabBarSpace`, isti broj kojim `Screen` pravi mesto na dnu.
  */
-function SlideDots({ count, active }: { count: number; active: number }) {
-  const insets = useSafeAreaInsets();
-  const traka = useTabBarSpace();
-  const bottom = (Platform.OS === 'ios' ? insets.bottom : traka) + DOTS_ABOVE_TAB_BAR;
+function SlideDots({ count, active, bottom }: { count: number; active: number; bottom: number }) {
   if (count < 2) return null;
   return (
     <View
@@ -408,7 +456,7 @@ function DayMenu({ today, offset, onChange }: { today: Date; offset: number; onC
 
 
 /** Naslov Hero kartice — van skale iz tokens.ts, po Ivanovoj meri. */
-const HERO_TITLE = 'text-[24px] leading-[30px] font-semibold tracking-[-0.3px]';
+const HERO_TITLE = cn('text-[24px] leading-[30px] tracking-[-0.3px]', tezina('heroNaslov'));
 /** Prazan prostor za ilustraciju tranzita dana, dok ilustracije ne stignu. */
 const ILLUSTRATION_HEIGHT = 150;
 
@@ -698,7 +746,7 @@ function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
 function CalendarDay({ date }: { date: Date }) {
   return (
     <View className="w-11 items-center">
-      <Text className="text-[26px] leading-[30px] font-semibold tracking-[-0.3px]">{date.getDate()}</Text>
+      <Text className={cn('text-[26px] leading-[30px] tracking-[-0.3px]', tezina('kalendarBroj'))}>{date.getDate()}</Text>
       <Text variant="caption">{MESECI_KRATKO[date.getMonth()]}</Text>
     </View>
   );
@@ -707,41 +755,52 @@ function CalendarDay({ date }: { date: Date }) {
 /** Koliko redova stane na pocetni ekran pre nego sto lista uputi u tab "Tranziti". */
 const MAX_ROWS = 5;
 
-/** Da li red nosi i kraj tranzita (samo spori ga imaju). */
-const imaKraj = (t: Transit | SlowTransit): t is SlowTransit => 'endsOn' in t;
-
-function TransitList({ list, texts, today }: {
-  list: (Transit | SlowTransit)[]; texts: Texts; today: Date;
+function TransitList({ list, texts, today, chart, timeUnknown }: {
+  list: (Transit | SlowTransit)[]; texts: Texts; today: Date; chart: NatalChart; timeUnknown: boolean;
 }) {
+  // Rucne oznake tona astrologa, jednim upitom — isto kao na tabu "Tranziti".
+  const potpis = list.map((t) => t.contentKey).join('|');
+  const [tonovi, setTonovi] = React.useState<Map<string, string>>(new Map());
+  React.useEffect(() => {
+    if (!potpis) return;
+    let otkazano = false;
+    fetchTransitTones(potpis.split('|')).then((m) => { if (!otkazano) setTonovi(m); });
+    return () => { otkazano = true; };
+  }, [potpis]);
+
   if (list.length === 0) return null;
   const prikaz = list.slice(0, MAX_ROWS);
   const ostalo = list.length - prikaz.length;
+  const vladari = chartRulers(chart, timeUnknown);
 
-  // Group nosi mx-screen, a ekran vec ima marginu — ponistava se. Redovi nemaju ikonu, linija ide od ivice do ivice.
+  // Iste kartice kao na tabu "Tranziti" (Ivan, 28.9.2026): ime, naslov tumacenja,
+  // ton i trajanje, ilustracija aspekta. Trajanje je isto kao na listi i na celom
+  // tekstu tranzita (`trajanjeTranzita`).
   return (
-    <Group className="mx-0" inset={false}>
+    <View className="gap-3">
       {prikaz.map((t) => {
-        // Velikim: naslov tumacenja. Malim: sam tranzit, i dokle traje ako je spor.
-        // Bez teksta se ne izmislja — tranzit ide u naslov, podnaslov ostaje kraj.
-        const ime = `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`;
-        const naslovTeksta = texts.get(t.contentKey)?.title;
-        const kraj = imaKraj(t) ? formatUntil(t.endsOn, today) : null;
-        const podnaslov = [naslovTeksta ? ime : null, kraj].filter(Boolean).join(' · ');
         return (
-          <ListRow
+          <KarticaTranzita
             key={t.contentKey}
-            title={naslovTeksta || ime}
-            subtitle={podnaslov || undefined}
-            onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
+            red={{
+              key: t.contentKey,
+              transiting: { key: t.transiting.key, name: t.transiting.name, glyph: t.transiting.glyph },
+              aspect: t.aspect,
+              natal: t.natal,
+              ruler: rulerRole(t.transiting.key, t.natal.key, vladari),
+            }}
+            ton={transitTone(t.transiting.key, t.aspect.key, t.natal.key, tonovi.get(t.contentKey)).tone}
+            naslov={texts.get(t.contentKey)?.title ?? ''}
+            loading={false}
+            trajanje={trajanjeTekst(trajanjeTranzita(t, today))}
           />
         );
       })}
       {ostalo > 0 && (
-        <ListRow
-          title={`Još ${ostalo} u Tranzitima`}
-          onPress={() => router.push('/daily')}
-        />
+        <Pressable onPress={() => router.navigate('/daily')} accessibilityRole="link" className="py-1 active:opacity-60">
+          <Text variant="muted">Još {ostalo} u Tranzitima</Text>
+        </Pressable>
       )}
-    </Group>
+    </View>
   );
 }

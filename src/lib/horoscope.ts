@@ -41,6 +41,17 @@ export function formatDay(day: Date, today: Date = new Date()): string {
 /** Skracena imena meseci, za kalendarski listic: "okt". */
 export const MESECI_KRATKO = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
 
+/**
+ * Opseg trajanja tranzita: "13 SEP – 26 SEP". Kad se zavrsava u drugoj godini
+ * nego sto je poceo, godina ide uz drugi datum: "13 DEC – 26 JAN 2027"
+ * (Ivan, 28.9.2026).
+ */
+export function opsegDatuma(start: Date, end: Date): string {
+  const d = (x: Date) => `${x.getDate()} ${MESECI_KRATKO[x.getMonth()].toUpperCase()}`;
+  const godina = end.getFullYear() !== start.getFullYear() ? ` ${end.getFullYear()}` : '';
+  return `${d(start)} – ${d(end)}${godina}`;
+}
+
 /** "14:05" po lokalnom vremenu uredjaja. */
 export function formatTime(date: Date): string {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;

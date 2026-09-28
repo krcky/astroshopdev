@@ -3,6 +3,8 @@ import { View } from 'react-native';
 import { Image } from 'expo-image';
 
 import { Text } from '@/components/ui/text';
+import { tezina } from '@/theme/tipografija';
+import { cn } from '@/lib/utils';
 
 /**
  * Veb varijanta loga: staticni krug umesto Lottie animacije.
@@ -44,7 +46,7 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
         contentFit="contain"
         tintColor={color}
       />
-      <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
+      <Text className={cn('text-[24px] leading-[30px] tracking-[-0.3px]', tezina('naslovStrane'))} numberOfLines={1}>{title}</Text>
     </View>
   );
 }

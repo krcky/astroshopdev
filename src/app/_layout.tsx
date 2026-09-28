@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { colorScheme } from 'nativewind';
 import { useAuthListener } from '@/store/auth';
 import { neutral } from '@/theme/tokens';
+import { useFonts } from 'expo-font';
+import { FONT_FILES } from '@/theme/font';
 
 // Astroshop je light-first. Tamna tema ostaje definisana u global.css
 // (.dark:root) ako je ikad budemo ponudili kao opciju.
@@ -41,9 +43,12 @@ const TUMACENJE_LIST = {
 export default function RootLayout() {
   useAuthListener();
 
-  // Pismo se NE ucitava: interfejs stoji na sistemskom (SF Pro na iOS-u,
-  // Roboto na Androidu). Vidi `src/theme/tokens.ts` za merenja koja su
-  // dovela do te odluke.
+  // Pismo je Plus Jakarta Sans (`theme/font.ts`). Dok se ne ucita, ekran ostaje prazan —
+  // inace bi prvi kadar bio u sistemskom pismu pa preskocio. Ako ucitavanje
+  // padne, aplikacija ide dalje sa sistemskim, ne ostaje prazna.
+  const [fontovi, greska] = useFonts(FONT_FILES);
+  if (!fontovi && !greska) return null;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>

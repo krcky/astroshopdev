@@ -16,7 +16,7 @@ export function Input({ className, ...props }: React.ComponentProps<typeof TextI
     <TextInput
       placeholderTextColor={neutral.inkSubtle}
       className={cn(
-        'h-field rounded-pill bg-input px-5 text-row text-foreground',
+        'h-field rounded-pill bg-input px-5 font-sans text-row text-foreground',
         className
       )}
       {...props}

@@ -5,6 +5,8 @@ import { useFocusEffect } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
 import { brand } from '@/theme/tokens';
+import { tezina } from '@/theme/tipografija';
+import { cn } from '@/lib/utils';
 
 /*
  * Logo u traci na vrhu ekrana: animirani krug + natpis ASTROSHOP.
@@ -127,7 +129,7 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
         colorFilters={KRUG_SLOJEVI.map((keypath) => ({ keypath, color: color ?? KRUG_INDIGO }))}
         style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
       />
-      <Text className="text-[24px] leading-[30px] font-semibold tracking-[-0.3px]" numberOfLines={1}>{title}</Text>
+      <Text className={cn('text-[24px] leading-[30px] tracking-[-0.3px]', tezina('naslovStrane'))} numberOfLines={1}>{title}</Text>
     </View>
   );
 }

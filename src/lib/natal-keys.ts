@@ -143,3 +143,21 @@ export function allNatalKeys(chart: NatalChart, timeUnknown: boolean, utc: Date)
   for (const a of natalAspects(chart, timeUnknown)) if (a.interpreted) out.push(a.key);
   return out;
 }
+
+/**
+ * Koliko je tacka odmakla kroz svoj znak, 0—1 (0° = pocetak, 30° = kraj).
+ * Za traku u zaglavlju natalnog tumacenja — ista traka kao trajanje tranzita.
+ */
+export function udeoUZnaku(degree: number): number {
+  return Math.min(1, Math.max(0, degree / 30));
+}
+
+/**
+ * Koliko je natalni aspekt tacan: 1 = egzaktan (orbis 0), 0 = na granici
+ * dozvoljenog orbisa. `max` je taj orbis iz `ASPECTS` (isti kojim je aspekt i nadjen).
+ */
+export function tacnostAspekta(aspekt: string, orb: number): { udeo: number; max: number } | null {
+  const def = ASPECTS.find((a) => a.key === aspekt);
+  if (!def) return null;
+  return { udeo: Math.min(1, Math.max(0, 1 - orb / def.orb)), max: def.orb };
+}

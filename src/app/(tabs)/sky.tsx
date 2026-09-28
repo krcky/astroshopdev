@@ -9,6 +9,7 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { AspectRow, Row, RowHead } from '@/components/ui/row';
+import { ZnakIkona } from '@/components/znak-ikona';
 import { buildSky, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
 import { formatDate } from '@/lib/horoscope';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
@@ -160,8 +161,10 @@ export default function Sky() {
       <View className={cn(CARD_SURFACE, 'mx-5 mt-7')}>
         <RowHead>Uglovi nad mestom {grad.name}</RowHead>
         <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
+             icon={<ZnakIkona znak={chart.ascendantSign.sign.key} element={chart.ascendantSign.sign.element} size={22} />}
              value={chart.ascendantSign.formatted} />
         <Row glyph={chart.midheavenSign.sign.glyph} name="MC"
+             icon={<ZnakIkona znak={chart.midheavenSign.sign.key} element={chart.midheavenSign.sign.element} size={22} />}
              value={chart.midheavenSign.formatted} last />
       </View>
 

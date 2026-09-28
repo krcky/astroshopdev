@@ -29,8 +29,9 @@ export function TonOznaka({ tone, className }: { tone: Tone; className?: string 
   const { Ikona, boja } = IKONA[tone];
   return (
     <View className={cn('flex-row items-center gap-1', className)}>
-      <Ikona size={15} color={boja} strokeWidth={3} />
-      <Text variant="muted">{TONE_LABEL[tone]}</Text>
+      <Ikona size={13} color={boja} strokeWidth={3} />
+      {/* 13pt, sitnije od imena tranzita (Ivan, 28.9.2026) — isto kao trajanje pored. */}
+      <Text variant="caption">{TONE_LABEL[tone]}</Text>
     </View>
   );
 }

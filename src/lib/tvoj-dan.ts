@@ -277,12 +277,17 @@ function windowEnd(active: (o: number) => boolean, date: Date): Date | null {
   return e >= WINDOW_HORIZON_DAYS ? null : midnight(date, e);
 }
 
-export function tvojDanWindow(pick: WindowPick, date: Date): TvojDanWindow {
+/**
+ * Pocetak i kraj tekuceg prolaza kroz orbis. `orb` podrazumevano je orbis izbora
+ * "Tvog dana"; za PRIKAZ trajanja ide kroz `trajanjeTranzita` (`lib/oblasti.ts`),
+ * koji ga zove orbisom liste — isti broj na svakom ekranu.
+ */
+export function tvojDanWindow(pick: WindowPick, date: Date, orb?: number): TvojDanWindow {
   const today = midnight(date, 0);
   // Mesec je u orbisu 0 samo dan kad je tacan.
   if (pick.transiting.key === 'moon') return { start: today, end: today };
 
-  const active = activeDayFn(pick, date);
+  const active = activeDayFn(pick, date, orb);
   let s = 0;
   while (s > -WINDOW_HORIZON_DAYS && active(s - 1)) s--;
   return {

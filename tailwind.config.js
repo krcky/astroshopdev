@@ -92,11 +92,15 @@ module.exports = {
       },
 
       /*
-       * `fontFamily` se NE postavlja. Pismo je sistemsko — SF Pro na iOS-u,
-       * Roboto na Androidu — a React Native ga uzme sam kad familije nema.
-       * Debljina ide obicnim Tailwind klasama za tezinu (`font-semibold`),
-       * sto sa sistemskim pismom radi kako treba.
+       * Pismo je Plus Jakarta Sans (Ivan, 28.9.2026; `src/theme/font.ts`). `font-sans`
+       * postoji samo za polja za unos (`TextInput`); `<Text>` bira familiju
+       * sam, po klasi tezine. Kljuc `sans` Tailwind vec zna, pa `tailwind-merge`
+       * ne treba dopunu u `lib/utils.ts`.
        */
+      fontFamily: {
+        sans: ['PlusJakartaSans-Regular'],
+      },
+
 
       /* Velicine su izvedene iz visine verzala na snimcima; drugi broj je visina reda. */
       fontSize: {

@@ -25,6 +25,7 @@ src/
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
+    dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
@@ -83,11 +84,20 @@ Pozadina ekrana je `bg-grouped` (#F6F7F8), povrsine su bele i poluprovidne
 (`CARD_SURFACE` u `ui/card.tsx`). Obrnuto ne radi — vidi pravilo 17.
 Sve boje su CSS varijable u `global.css` pod `:root`, a njihov izvor je
 `src/theme/tokens.ts` — vrednosti su IZMERENE sa snimaka referentne aplikacije,
-ne izabrane. Pismo je SISTEMSKO (SF Pro na iOS-u, Roboto na Androidu) —
-`fontFamily` se nigde ne postavlja, debljina ide obicnim `font-semibold` i
-slicnima. Sa snimaka se Inter i SF Pro ne mogu razlikovati (merenja su u
-`DESIGN.md`); presudilo je to sto je referenca nativna iOS aplikacija i sto
-izvedene velicine padaju tacno na iOS-ovu lestvicu. Zlatna (`--gold`) se koristi ISKLJUCIVO kao akcenat na placenom sadrzaju
+ne izabrane. Pismo je PLUS JAKARTA SANS (Ivan, 28.9.2026; pre toga istog dana
+Satoshi, a jos ranije sistemsko): pet rezova (Regular, Medium, SemiBold, Bold,
+ExtraBold) u `assets/fonts/plus-jakarta-sans/`, licenca SIL OFL uz njih. Satoshi fajlovi ostaju
+u `assets/fonts/satoshi/` (ITF FFL zabranjuje izmenu i podskup; repo mora ostati
+privatan), povratak je `FONT_SATOSHI` u `theme/font.ts`. Klase tezine ostaju
+(`font-semibold`…), a `<Text>` iz njih bira familiju — `theme/font.ts`. Hijerarhija
+je `TEZINE_JAKARTA_LAKSE` (Ivan: "mnogo su debeli"): naslovi, podnaslovi i dugme
+SemiBold, sve ostalo Medium. Teze stanje sa cetiri nivoa (800/700/600/500) je
+`TEZINE_JAKARTA`, Satoshi stanje `TEZINE_SATOSHI`. DEBLJINA SVAKE ULOGE je u `theme/tipografija.ts` — ekrani ne
+pisu `font-semibold` sami nego `tezina('uloga')`; stanje pre procene hijerarhije
+su sacuvana kao `TEZINE_SATOSHI_1`, `TEZINE_HIJERARHIJA` i `TEZINE_SATOSHI` (povratak: jedna linija).
+Tekst za citanje je Medium, ne Regular (Ivan: "malo podebljaj"). Uzorak: `/dev-tipografija`. `TextInput` nosi `font-sans`; SVG tekst i natpisi tabova
+dobijaju `FONT.*` direktno. Ne postavljati `fontWeight` uz ucitanu familiju —
+Android bi je vestacki podebljao. Skala velicina (merena sa SF Pro-a) je ostala. Zlatna (`--gold`) se koristi ISKLJUCIVO kao akcenat na placenom sadrzaju
 — nigde drugde, da paywall ostane jedina stvar koja "svetli" na stranici. Tamna
 tema je i dalje definisana pod `.dark:root` ako je ikad budemo ponudili kao
 opciju; `_layout.tsx` je zakljucan na `colorScheme.set('light')`.
@@ -100,6 +110,17 @@ Svaki kljuc dodat u `tailwind.config.js` MORA da se pojavi i u spisku u
 Unicode astroloski znaci (♈ ♃ ☽) imaju podrazumevanu EMOJI prezentaciju i
 sistem ih renderuje kao obojene kvadratice. `components/ui/glyph.tsx` forsira
 tekstualni font. Nikad ne stavljati simbol direktno u `<Text>`.
+Izuzetak (28.9.2026): na tabu "Tranziti" planete i tacke su Ivanove SVG ikonice
+(`components/planeta-ikona.tsx`, beo krug sa sivim obrisom, znak u indigu) — ima ih za 10 tela,
+Ascendent, MC, Severni cvor i Kiron; aspekti su `components/aspekt-ikona.tsx` (precrtani kao linije ISTE debljine kao znaci planeta, `PLANETA_POTEZ`; indigo
+iz fajlova, `brand.indigo`). KARTICA TRANZITA (28.9.2026) ipak koristi SLIKE planeta
+(`assets/images/planete/`) na ILUSTRACIJI ASPEKTA (`components/aspekt-ilustracija.tsx`,
+`assets/images/aspekti/`): tocak, natalna planeta unutra, tranzitna van kruga — slike se
+lepe preko tackica cije su pozicije IZMERENE na slikama (`MERE`). Asc/MC su SVG ikonica.
+Ilustracije u `assets/` imaju belu pretvorenu u providnu; izvor je u `files/`.
+ZNACI ZODIJAKA su SVUDA Ivanove SVG ikonice (28.9.2026, `components/znak-ikona.tsx`): krug u boji
+elementa + beli znak — prsten natalnog tocka, redovi Ascendent/MC, ekran Mesec, dobrodoslica.
+`SIGNS[].glyph` ostaje samo za tekst; znak se vise ne crta kroz `<Glyph>`.
 
 **4. Vreme rodjenja mora u UTC preko `timezone.ts`.**
 Rezervno pravilo je GRUBA APROKSIMACIJA i tacno je samo za Srbiju/Jugoslaviju:
@@ -262,8 +283,11 @@ check:oblasti`. Pregled: `/dev-tranziti` (samo dev).
 
 **18. Tranzit dana: Premium "Tvoj dan" po SKORU, besplatni Hero waterfall-om.**
 PREMIUM (od 27.9.2026, Ivan): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
-(isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — vaze i za Premium
-tab "Tranziti" (28.9.2026, pravilo 18b); "Danas ukratko" i besplatni "Tranziti" ostaju na 3°. Bodovanje tezina x aspekt x meta (x1,3 za Sunce,
+(isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — VAZE SAMO za izbor i
+ocene oblasti. Lista u tabu "Tranziti" ide orbisom liste (`LISTA_ORB`: 3°, sekstil 2°), kao i
+"Danas ukratko". TRAJANJE ("Traje jos N", opseg datuma) se racuna ISKLJUCIVO kroz
+`trajanjeTranzita` (`lib/oblasti.ts`), orbisom liste, na svakom ekranu — do 29.9.2026 su lista
+i ceo tekst istog tranzita pokazivali razlicit broj dana (Ivan). Provera: `check:oblasti`, deo 7. Bodovanje tezina x aspekt x meta (x1,3 za Sunce,
 Mesec, ASC, MC i VLADARA) x blizina x momenat; brze odmor 3 dana, spore samo na dan
 pocetka/egzaktnosti/kraja uz odmor 7, Mesec samo egzaktan. Vladar = TRADICIONALNI vladar
 Ascendenta (`lib/rulers.ts`, `RULER_SYSTEM`). Ton: `lib/tone.ts`. Dnevnik:
@@ -359,7 +383,8 @@ npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacen
       se ponovi isti zid-sat postoji dvaput. Mesec i godina nisu dodati.
 - [ ] Kiron — jedino telo sa referentnog snimka koje ne prikazujemo. Nema ga u
       `astronomy-engine` (nije ni geometrijska tacka kao cvor), pa mu treba zasebna
-      efemerida. Kad stigne: i font se mora presloziti, ⚷ u njemu ne postoji.
+      efemerida. Kad stigne: i font se mora presloziti, ⚷ u njemu ne postoji
+      (SVG ikonica vec postoji u `planeta-ikona.tsx`).
 - [ ] Natalna tumacenja (stigla 27.9.2026) — parser `scripts/korpus/natal.py`,
       tabela `supabase/natal-texts.sql`, CSV `files/natal-texts.csv` (496). Kljucevi
       `natal.sun.sign.aries` / `natal.sun.house.1` / `natal.moon.square.sun`.

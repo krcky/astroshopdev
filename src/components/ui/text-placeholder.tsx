@@ -27,6 +27,8 @@ import { cn } from '@/lib/utils';
 const RED = {
   /** `body` — 15/20 */
   body: { visina: 12, red: 20 },
+  /** veci tekst tela, 17/24 (sazetak "Tvog dana") */
+  veliki: { visina: 13, red: 24 },
   /** `display` — 32/38 */
   display: { visina: 26, red: 38 },
   /** naslov tranzita dana na pocetnoj — 24/30 */
@@ -36,9 +38,11 @@ const RED = {
 // Poslednji red kraci, kao pravi pasus; ostali skoro puni.
 const SIRINE = ['100%', '96%', '100%', '92%', '98%'] as const;
 
-export function TextPlaceholder({ lines = 3, title, className }: {
+export function TextPlaceholder({ lines = 3, title, lineType = 'body', className }: {
   /** Broj redova teksta tela. */
   lines?: number;
+  /** Visina reda teksta koji stize: `body` 15/20 ili `veliki` 17/24. */
+  lineType?: 'body' | 'veliki';
   /** Traka naslova iznad teksta, u visini te varijante. */
   title?: 'display' | 'hero';
   className?: string;
@@ -69,7 +73,7 @@ export function TextPlaceholder({ lines = 3, title, className }: {
       accessibilityState={{ busy: true }}>
       {title && <View className="mb-2">{traka(title, '70%', 'naslov')}</View>}
       {Array.from({ length: lines }, (_, i) =>
-        traka('body', i === lines - 1 && lines > 1 ? '60%' : SIRINE[i % SIRINE.length], i),
+        traka(lineType, i === lines - 1 && lines > 1 ? '60%' : SIRINE[i % SIRINE.length], i),
       )}
     </Animated.View>
   );

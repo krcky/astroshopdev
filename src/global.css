@@ -68,8 +68,9 @@
     --gold: 38 72% 38%;
 
     /* Referentna aplikacija ima samo dve mere: 24 za povrsine i punu kapsulu
-       za sve sto je nisko. 24 je ovde osnova, kapsula ide kroz `rounded-pill`. */
-    --radius: 24px;
+       za sve sto je nisko. Kapsula ide kroz `rounded-pill`. Povrsine su od
+       28.9.2026 na 12 — duplo manje od reference (Ivan). */
+    --radius: 12px;
   }
 
   /*

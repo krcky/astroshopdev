@@ -26,6 +26,8 @@ export function RowHead({ children }: { children: React.ReactNode }) {
 
 type RowProps = {
   glyph: string;
+  /** Ikonica umesto simbola (znak zodijaka — `ZnakIkona`); tada se `glyph` ne crta. */
+  icon?: React.ReactNode;
   name: string;
   value: string;
   /** Sitan red ispod vrednosti — kod nas broj kuce. */
@@ -54,10 +56,10 @@ function Okvir({ onPress, accessibilityLabel, last, className, children }: {
   );
 }
 
-export function Row({ glyph, name, value, extra, retro, muted, last, onPress, accessibilityLabel }: RowProps) {
+export function Row({ glyph, icon, name, value, extra, retro, muted, last, onPress, accessibilityLabel }: RowProps) {
   return (
     <Okvir onPress={onPress} accessibilityLabel={accessibilityLabel} last={last} className="flex-row items-center px-4 py-3">
-      <Glyph size={17} className={muted ? 'text-muted-foreground' : 'text-foreground'}>{glyph}</Glyph>
+      {icon ?? <Glyph size={17} className={muted ? 'text-muted-foreground' : 'text-foreground'}>{glyph}</Glyph>}
       <Text className={cn('ml-3 flex-1 text-sm', muted && 'text-muted-foreground')}>{name}</Text>
       <View className="items-end">
         <Text className={cn('text-sm', muted && 'text-muted-foreground')}>

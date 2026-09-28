@@ -115,7 +115,7 @@ export default function Account() {
           autoCorrect={false}
           autoComplete="email"
           autoFocus
-          className="w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground"
+          className="w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground font-sans"
         />
 
         {AUTH_MODE === 'password' && (
@@ -127,7 +127,7 @@ export default function Account() {
             secureTextEntry
             autoCapitalize="none"
             autoComplete="new-password"
-            className="mt-6 w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground"
+            className="mt-6 w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground font-sans"
           />
         )}
 
