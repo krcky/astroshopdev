@@ -29,6 +29,15 @@ const queryClient = new QueryClient({
   },
 });
 
+/** Tumacenje (tranzit, natal): nativni list odozdo, odmah do vrha (Ivan, 28.9.2026); tekst se skroluje unutra. */
+const TUMACENJE_LIST = {
+  presentation: 'formSheet' as const,
+  sheetAllowedDetents: [1],
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 24,
+  contentStyle: { backgroundColor: neutral.white },
+};
+
 export default function RootLayout() {
   useAuthListener();
 
@@ -51,8 +60,24 @@ export default function RootLayout() {
               // false, ali je postavljamo izricito jer se u Expo Go ponasalo
               // kao da je ukljuceno.
               autoHideHomeIndicator: false,
-            }}
-          />
+            }}>
+            {/* Nativni iOS list odozdo, visok koliko sadrzaj (Ivan, 28.9.2026): na osnovu
+                cega je napisan "Tvoj dan". Na webu i Androidu je obican modal. */}
+            {/* Sva tumacenja kao isti nativni list, odmah do vrha (Ivan, 28.9.2026).
+                Pozivaoci se ne menjaju — `router.push('/transit')` sam otvara list. */}
+            <Stack.Screen name="transit" options={TUMACENJE_LIST} />
+            <Stack.Screen name="natal" options={TUMACENJE_LIST} />
+            <Stack.Screen
+              name="tvoj-dan-info"
+              options={{
+                presentation: 'formSheet',
+                sheetAllowedDetents: 'fitToContents',
+                sheetGrabberVisible: true,
+                sheetCornerRadius: 24,
+                contentStyle: { backgroundColor: neutral.white },
+              }}
+            />
+          </Stack>
         </SafeAreaProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

@@ -161,7 +161,7 @@ export default function Sky() {
         <RowHead>Uglovi nad mestom {grad.name}</RowHead>
         <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
              value={chart.ascendantSign.formatted} />
-        <Row glyph={chart.midheavenSign.sign.glyph} name="Medium Coeli"
+        <Row glyph={chart.midheavenSign.sign.glyph} name="MC"
              value={chart.midheavenSign.formatted} last />
       </View>
 

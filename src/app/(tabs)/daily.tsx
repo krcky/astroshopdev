@@ -6,6 +6,7 @@ import { ChevronRight, Lock, Sparkles } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { Glyph } from '@/components/ui/glyph';
@@ -15,18 +16,45 @@ import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore, useEntitlement } from '@/store/auth';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { TranzitiLista } from '@/components/tranziti-lista';
+import { useOblastiDana } from '@/lib/use-oblasti';
 
 const GOLD = '#A7731B';
 
+/**
+ * Tab "Tranziti". PREMIUM: svi tranziti dana po vaznosti, svaki u svojoj
+ * kartici (`components/tranziti-lista.tsx`, 28.9.2026). Besplatni do daljeg vide
+ * stari prikaz sa katancima (`DailyBesplatno`).
+ */
 export default function Daily() {
-  const hydrated = useProfileStore((s) => s.hydrated);
-  const authLoading = useAuthStore((s) => s.loading);
-  const resolved = useResolvedProfile();
-
   // Pravo pristupa iskljucivo sa servera — RLS dozvoljava samo citanje svog
   // reda. U razvoju kroz ovo prolazi i test prekidac iz /profile.
   const entitlement = useEntitlement();
   const isPremium = entitlement?.active ?? false;
+  return isPremium ? <DailyPremium /> : <DailyBesplatno isPremium={false} />;
+}
+
+function DailyPremium() {
+  const hydrated = useProfileStore((s) => s.hydrated);
+  const authLoading = useAuthStore((s) => s.loading);
+  const resolved = useResolvedProfile();
+  const today = React.useMemo(() => new Date(), []);
+  const rez = useOblastiDana(resolved, today);
+
+  if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
+  if (!resolved || !rez) return <Redirect href="/" />;
+
+  return (
+    <Screen label="Tranziti" tint="gold" right={<ProfileButton />}>
+      <TranzitiLista rez={rez} date={today} />
+    </Screen>
+  );
+}
+
+function DailyBesplatno({ isPremium }: { isPremium: boolean }) {
+  const hydrated = useProfileStore((s) => s.hydrated);
+  const authLoading = useAuthStore((s) => s.loading);
+  const resolved = useResolvedProfile();
 
   const today = React.useMemo(() => new Date(), []);
   const daily = React.useMemo(
@@ -57,6 +85,26 @@ export default function Daily() {
           const t = e.transit;
           const tekst = texts.get(t.contentKey);
 
+          // Tekst jos stize: ista kartica kao gotova (ime tranzita je poznato),
+          // sa trakama umesto teksta — da lista ne skoci kad tekst stigne.
+          if (!tekst && textsLoading) {
+            return (
+              <Card key={t.contentKey} className="mb-3">
+                <CardContent className="p-5">
+                  <View className="flex-row items-center gap-2 pb-1">
+                    <Glyph size={15} className="text-foreground">
+                      {`${t.transiting.glyph} ${t.aspect.glyph} ${t.natal.glyph}`}
+                    </Glyph>
+                    <Text variant="label">
+                      {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
+                    </Text>
+                  </View>
+                  <TextPlaceholder lines={4} className="mt-2" />
+                </CardContent>
+              </Card>
+            );
+          }
+
           // Bez teksta u korpusu — prikazuje se kao sazet red, ne kao
           // prazna kartica. Iskreno je, a ne izgleda kao kvar.
           if (!tekst) {
@@ -68,7 +116,6 @@ export default function Daily() {
                 <Text variant="muted" className="flex-1 text-xs">
                   {t.transiting.name} {t.aspect.name} natalni {t.natal.name}
                 </Text>
-                {textsLoading && <Text variant="muted" className="text-xs">…</Text>}
               </View>
             );
           }

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 import { Lock } from 'lucide-react-native';
 
-import { Screen } from '@/components/screen';
+import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Glyph } from '@/components/ui/glyph';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -49,30 +50,26 @@ export default function NatalTumacenje() {
   if (!resolved) return <Redirect href="/" />;
   if (!topic) {
     return (
-      <Screen label="Tumačenje" tabBarSpace={false} pushed>
-        <Text variant="muted" className="pt-4">Ovo tumačenje nije deo tvoje karte.</Text>
-      </Screen>
+      <SheetScroll>
+        <Text variant="muted">Ovo tumačenje nije deo tvoje karte.</Text>
+      </SheetScroll>
     );
   }
 
   const { chart } = resolved;
   const zakljucani = kljucevi.filter((k) => !texts.has(k) && !loading && !premium && !isFreeNatalKey(k));
 
-  let label = 'Tumačenje';
   let zaglavlje: React.ReactNode = null;
   if (topic.kind === 'planet') {
     const p = chart.planets.find((x) => x.key === topic.planet)!;
-    label = p.name;
     zaglavlje = (
       <Glava znaci={[p.glyph]} naslov={p.name}
         podnaslov={[topic.moon && !topic.moon.certain ? null : p.position.formatted, topic.houseKey ? `${p.house}. kuća` : null].filter(Boolean).join(' · ')} />
     );
   } else if (topic.kind === 'ascendant') {
-    label = 'Podznak';
     zaglavlje = <Glava znaci={[chart.ascendantSign.sign.glyph]} naslov="Ascendent" podnaslov={chart.ascendantSign.formatted} />;
   } else {
     const a = topic.aspect;
-    label = 'Aspekt';
     zaglavlje = (
       <Glava znaci={[a.a.glyph, a.aspect.glyph, a.b.glyph]} naslov={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
         podnaslov={`orbis ${a.orb.toFixed(1)}°`} />
@@ -80,7 +77,8 @@ export default function NatalTumacenje() {
   }
 
   return (
-    <Screen label={label} tabBarSpace={false} pushed>
+    // Nativni list odozdo, kao sva tumacenja (`_layout.tsx`, Ivan 28.9.2026).
+    <SheetScroll>
       {zaglavlje}
 
       {/* Mesec bez vremena rodjenja: tog dana je presao iz znaka u znak — ne pogadja se. */}
@@ -90,7 +88,7 @@ export default function NatalTumacenje() {
             Na dan tvog rođenja Mesec je bio u {SIGN_CASES[topic.moon.from.key].loc}, pa prešao u {SIGN_CASES[topic.moon.to.key].acc}.
             Bez vremena rođenja ne znamo u kom je znaku bio kad si se rodio, pa tumačenje ne prikazujemo.
           </Text>
-          <Button variant="secondary" className="mt-4 self-start" onPress={() => router.push('/edit')}>
+          <Button variant="secondary" className="mt-4 self-start" onPress={() => leaveSheetTo('/edit')}>
             <Text>Dodaj vreme rođenja</Text>
           </Button>
         </View>
@@ -116,19 +114,19 @@ export default function NatalTumacenje() {
           <Text variant="muted" className="mt-2 text-center">
             Sve planete u znakovima i kućama i svi aspekti tvoje karte. Sunce, Mesec i podznak su besplatni.
           </Text>
-          <Button className="mt-5 w-full" onPress={() => router.push('/profile')}>
+          <Button className="mt-5 w-full" onPress={() => leaveSheetTo('/profile')}>
             <Text>Otključaj</Text>
           </Button>
         </View>
       )}
-    </Screen>
+    </SheetScroll>
   );
 }
 
 /** Simboli u kapsuli (krug za jedan), pa naslov. Kod aspekta su tri simbola u jednom redu. */
 function Glava({ znaci, naslov, podnaslov }: { znaci: string[]; naslov: string; podnaslov: string }) {
   return (
-    <View className="flex-row items-center gap-4 pt-4">
+    <View className="flex-row items-center gap-4">
       <View className="h-14 min-w-14 flex-row items-center justify-center gap-2 rounded-full bg-fill px-3">
         {znaci.map((z, i) =>
           // ASC nije u astroloskom fontu — obicnim slovima (vidi CLAUDE.md).
@@ -161,7 +159,7 @@ function Odeljak({ tekst, loading, zakljucan }: { tekst?: NatalText; loading: bo
           </View>
         </>
       ) : loading ? (
-        <Text variant="muted">Učitavam…</Text>
+        <TextPlaceholder title="display" lines={6} />
       ) : (
         // Korpus je kompletan (`npm run check:natal-tekst`): tekst koji ne stigne
         // je problem veze ili prijave, ne nenapisan tekst.

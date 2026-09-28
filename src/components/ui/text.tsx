@@ -31,6 +31,11 @@ const textVariants = cva('text-foreground', {
       row: 'text-row font-medium',
       /** Opis ispod naslova — siv, kao u referentnoj aplikaciji. */
       body: 'text-body text-muted-foreground',
+      /**
+       * Tekst tumacenja — duzi pasusi koji se CITAJU (tranzit, natal, lunarni).
+       * 17pt kao iOS body, prored 26 (Ivan, 28.9.2026: "malo veci tekst na tumacenju").
+       */
+      reading: 'text-row leading-[26px] text-muted-foreground',
       /** Naslov grupe iznad kartica ("Preferences"). Siv, BEZ verzala. */
       label: 'text-group font-medium text-subtle',
       /** Natpis u kapsuli kategorije. */

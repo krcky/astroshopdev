@@ -5,7 +5,7 @@
  * razidju, stavke se na telefonu prikazu kao obican tekst sa bulletom u sebi,
  * ili se naslov ne podebljava — tiho, bez greske.
  */
-import { blokovi, stavka } from '../src/lib/tumacenje';
+import { blokovi, stavka, vrstaSekcije, vrstaOdeljka } from '../src/lib/tumacenje';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -31,6 +31,25 @@ ok(b[2].vrsta === 'pasus', 'pasus posle liste');
 const mesano = blokovi('• Stavka\nobican red');
 ok(mesano[0].vrsta === 'pasus', 'blok sa redom bez bulleta je pasus, ne lista');
 ok(blokovi('').length === 0 && blokovi('\n\n\n').length === 0, 'prazan tekst -> nema blokova');
+
+console.log('\n=== Vrsta sekcije (ikona) ===');
+const vrste: [string, string | null][] = [
+  ['Suština', 'sustina'],
+  ['Dugoročni efekti', 'dugorocno'],
+  ['Specifične sfere života', 'sfere'],
+  ['Specifične oblasti života', 'sfere'],
+  ['Pozitivni efekti', 'efekat'],
+  ['Pozitivna dejstva', 'efekat'],
+  ['ozitivni efekti', 'efekat'],
+  ['Izazovi', 'pazi'],
+  ['Izazov', 'pazi'],
+  ['Saveti', 'savet'],
+  ['Opšte preporuke', 'savet'],
+  ['Mitološke paralele', null],
+  ['Kako najbolje iskoristiti ovaj tranzit?', null],
+];
+for (const [n, v] of vrste) ok(vrstaSekcije(n) === v, n, String(vrstaSekcije(n)));
+ok(vrstaOdeljka('Opšte preporuke') === null, 'preporuke NISU savet u kartici "Tvoj dan"');
 
 console.log(fail ? `\n${fail} FAIL` : '\nsve OK');
 process.exit(fail ? 1 : 0);

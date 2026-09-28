@@ -93,7 +93,7 @@ export default function ChartScreen() {
              // Bez vremena rodjenja podznak nije poznat — nema ni tumacenja.
              onPress={timeUnknown ? undefined : () => otvori('ascendant')}
              accessibilityLabel={`Ascendent ${chart.ascendantSign.formatted}. Tumačenje`} />
-        <Row glyph={chart.midheavenSign.sign.glyph} name="Medium Coeli"
+        <Row glyph={chart.midheavenSign.sign.glyph} name="MC"
              value={chart.midheavenSign.formatted} muted={timeUnknown} last />
       </View>
 

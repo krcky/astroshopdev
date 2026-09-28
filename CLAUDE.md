@@ -25,6 +25,9 @@ src/
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
+    dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
+    transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
+    tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
@@ -247,10 +250,20 @@ Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 Svaka promena pravila, orbisa, tezina ili izbora (Hero, sazetak, Mesec, kuce) se
 upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 
+**18b. Premium tab "Tranziti" = lista po VAZNOSTI; ocene oblasti SAMO na pocetnoj (28.9.2026).**
+Tab "Tranziti" (`components/tranziti-lista.tsx`): svi tranziti dana, najjaci prvi, svaki u
+svojoj kartici — BEZ oblasti i BEZ ocena (Ivan: "to je ok za homepage"). Ocena 1—5 po oblasti
+je samo na pocetnoj: zbijena kartica (4 reda, bez linija) iznad sazetka na slajdu "Danas ukratko". Racun `lib/oblasti.ts` (`poVaznosti` za listu,
+`oblasti` za ocene), SVE vrednosti za astrologa u `lib/oblasti-config.ts`. Oba ekrana idu
+kroz ISTI `useOblastiDana`. Mnozina ("21 dan", "5 meseci") samo kroz `lib/mnozina.ts`.
+Interesovanja iz onboardinga jos ne postoje: `redosled`/`iskljucene` su parametri sa
+podrazumevanom vrednoscu. Opis: `docs/ASTRO-LOGIKA.md`, poglavlje 11. Testovi: `npm run
+check:oblasti`. Pregled: `/dev-tranziti` (samo dev).
+
 **18. Tranzit dana: Premium "Tvoj dan" po SKORU, besplatni Hero waterfall-om.**
 PREMIUM (od 27.9.2026, Ivan): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
-(isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — VAZE SAMO TU, tab
-"Tranziti" i "Danas ukratko" ostaju na 3°. Bodovanje tezina x aspekt x meta (x1,3 za Sunce,
+(isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — vaze i za Premium
+tab "Tranziti" (28.9.2026, pravilo 18b); "Danas ukratko" i besplatni "Tranziti" ostaju na 3°. Bodovanje tezina x aspekt x meta (x1,3 za Sunce,
 Mesec, ASC, MC i VLADARA) x blizina x momenat; brze odmor 3 dana, spore samo na dan
 pocetka/egzaktnosti/kraja uz odmor 7, Mesec samo egzaktan. Vladar = TRADICIONALNI vladar
 Ascendenta (`lib/rulers.ts`, `RULER_SYSTEM`). Ton: `lib/tone.ts`. Dnevnik:
@@ -302,6 +315,7 @@ npm run check:timezone    vreme rodjenja -> UTC
 npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
 npm run check:cities      predlozi gradova + da se pretraga nije suzila
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
+npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
 ```
 
 ## Jos nije uradjeno

@@ -71,7 +71,8 @@
     "check:tumacenje": "tsx scripts/check-tumacenje.ts",
     "check:tvoj-dan": "TZ=Europe/Belgrade tsx scripts/check-tvoj-dan.ts",
     "check:natal-tekst": "tsx scripts/check-natal-tekst.ts",
-    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst",
+    "check:oblasti": "TZ=Europe/Belgrade tsx scripts/check-oblasti.ts",
+    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst && npm run check:oblasti",
     "check:tokens": "tsx scripts/check-tokens.ts"
   },
   "private": true

@@ -32,6 +32,7 @@ import { BODIES, ASPECTS, bodyLongitude, type AspectDef, type PlanetKey } from '
 import type { NatalChart } from '@/lib/natal';
 import { chartRulers, rulerRole, type RulerRole } from '@/lib/rulers';
 import { dayKey, daysBetween, localMidnight, natalTargets, type NatalTarget } from '@/lib/transits';
+import { SIGN_CASES } from '@/lib/zodiac';
 
 export const TD_ORB: Record<PlanetKey, number> = {
   sun: 1.5, mercury: 1.5, venus: 1.5, mars: 1.5, jupiter: 1.5, saturn: 1.5,
@@ -256,26 +257,100 @@ const WINDOW_HORIZON_DAYS = 1100;
 
 export type TvojDanWindow = { start: Date | null; end: Date | null };
 
-export function tvojDanWindow(pick: Pick<TvojDanPick, 'transiting' | 'aspect' | 'natal'>, date: Date): TvojDanWindow {
-  const today = midnight(date, 0);
-  // Mesec je u orbisu 0 samo dan kad je tacan.
-  if (pick.transiting.key === 'moon') return { start: today, end: today };
+type WindowPick = Pick<TvojDanPick, 'transiting' | 'aspect' | 'natal'>;
 
+/** Da li je tranzit aktivan `o` dana od `date` — po istoj definiciji kao izbor. */
+function activeDayFn(pick: WindowPick, date: Date, orb = TD_ORB[pick.transiting.key]) {
   const key = pick.transiting.key;
-  const orb = TD_ORB[key];
   const lon = new Map<number, number>();
   const at = (o: number) => {
     if (!lon.has(o)) lon.set(o, bodyLongitude(key, midnight(date, o)));
     return lon.get(o)!;
   };
-  const active = (o: number) => dayStatus(at(o), at(o + 1), pick.natal.longitude, pick.aspect.angle, orb).active;
+  return (o: number) => dayStatus(at(o), at(o + 1), pick.natal.longitude, pick.aspect.angle, orb).active;
+}
 
-  let s = 0;
-  while (s > -WINDOW_HORIZON_DAYS && active(s - 1)) s--;
+/** Poslednji dan u orbisu (tekuci prolaz). Samo kraj — pola posla od `tvojDanWindow`. */
+function windowEnd(active: (o: number) => boolean, date: Date): Date | null {
   let e = 0;
   while (e < WINDOW_HORIZON_DAYS && active(e + 1)) e++;
+  return e >= WINDOW_HORIZON_DAYS ? null : midnight(date, e);
+}
+
+export function tvojDanWindow(pick: WindowPick, date: Date): TvojDanWindow {
+  const today = midnight(date, 0);
+  // Mesec je u orbisu 0 samo dan kad je tacan.
+  if (pick.transiting.key === 'moon') return { start: today, end: today };
+
+  const active = activeDayFn(pick, date);
+  let s = 0;
+  while (s > -WINDOW_HORIZON_DAYS && active(s - 1)) s--;
   return {
     start: s <= -WINDOW_HORIZON_DAYS ? null : midnight(date, s),
-    end: e >= WINDOW_HORIZON_DAYS ? null : midnight(date, e),
+    end: windowEnd(active, date),
+  };
+}
+
+/**
+ * Kraj tranzita (izlazak iz orbisa) — za "Jos N dana" na ekranu "Tranziti".
+ * `orb`: lista na tom ekranu ide sirim orbisom od izbora "Tvog dana"
+ * (`LISTA_ORB` u `oblasti.ts`), pa kraj mora da se racuna istim.
+ */
+export function tvojDanEnd(pick: WindowPick, date: Date, orb?: number): Date | null {
+  if (pick.transiting.key === 'moon') return midnight(date, 0);
+  return windowEnd(activeDayFn(pick, date, orb), date);
+}
+
+/* ------------------------------------------------------------------------- *
+ * NA OSNOVU CEGA JE TEKST — list koji se otvara sa kartice (Ivan, 28.9.2026):
+ * koji je to tranzit i, kad vazi, zasto ima prednost (vladar horoskopa).
+ * Sve se cita iz KARTE korisnika; iz kljuca se uzimaju samo imena tela i aspekta.
+ * ------------------------------------------------------------------------- */
+
+/** "tvoje Sunce", "tvoju Veneru" — akuzativ sa prisvojnom zamenicom. */
+const TVOJ_AKUZATIV: Record<string, string> = {
+  sun: 'tvoje Sunce', moon: 'tvoj Mesec', mercury: 'tvoj Merkur', venus: 'tvoju Veneru',
+  mars: 'tvog Marsa', jupiter: 'tvog Jupitera', saturn: 'tvog Saturna', uranus: 'tvog Urana',
+  neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj Ascendent', midheaven: 'tvoj MC',
+};
+
+
+export type TvojDanInfo = {
+  transiting: { key: PlanetKey; name: string; glyph: string };
+  aspect: AspectDef;
+  natal: NatalTarget;
+  ruler: RulerRole | null;
+  /** Recenica o vladaru, ili null kad tranzit nije tranzit vladara. */
+  rulerText: string | null;
+};
+
+export function rulerSentence(
+  ruler: RulerRole,
+  transitingName: string,
+  natal: { key: string; name: string },
+  chart: NatalChart
+): string {
+  const znak = SIGN_CASES[chart.ascendantSign.sign.key].loc;
+  return ruler === 'natal'
+    ? `${natal.name} je vladar tvog Ascendenta u ${znak}. Kad ga tranzit dodirne, dan se oseća ličnije i jače, zato ovaj tranzit danas ima prednost.`
+    : `${transitingName} je vladar tvog Ascendenta u ${znak}, a danas pokreće ${TVOJ_AKUZATIV[natal.key] ?? natal.name}. Zato ovaj tranzit danas ima prednost.`;
+}
+
+/** Iz kljuca `transit.<telo>.<aspekt>.natal.<meta>` i karte; null ako kljuc ne pripada karti. */
+export function tvojDanInfo(chart: NatalChart, timeUnknown: boolean, contentKey: string): TvojDanInfo | null {
+  const m = /^transit\.(\w+)\.(\w+)\.natal\.(\w+)$/.exec(contentKey);
+  if (!m) return null;
+  const body = BODIES.find((b) => b.key === m[1]);
+  const aspect = ASPECTS.find((a) => a.key === m[2]);
+  const natal = natalTargets(chart).find((n) => n.key === m[3]);
+  if (!body || !aspect || !natal) return null;
+  if (timeUnknown && TIME_DEPENDENT.includes(natal.key)) return null;
+  const ruler = rulerRole(body.key, natal.key, chartRulers(chart, timeUnknown));
+  return {
+    transiting: { key: body.key, name: body.name, glyph: body.glyph },
+    aspect,
+    natal,
+    ruler,
+    rulerText: ruler ? rulerSentence(ruler, body.name, natal, chart) : null,
   };
 }

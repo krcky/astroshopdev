@@ -231,6 +231,15 @@ Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa da
 
 ## 5. Tab „Tranziti"
 
+**Premium (od 28.9.2026):** svi tranziti dana (Sunce–Pluton, bez Meseca), **orbisom
+kao „Tema perioda"** — 3°, sekstil 2°, za sve planete (Ivan, 28.9.2026; do tada uski
+orbis „Tvog dana", pa su falili spori tranziti na 1–3°, npr. Pluton opozicija ASC na 2°),
+**po važnosti**, svaki u svojoj kartici: naslov tumačenja, ime tranzita, koliko još
+traje, ton. Važnost = jačina iz poglavlja 11. Bez oblasti i bez ocena — ocene su
+samo na početnoj (kartica na slajdu „Danas ukratko"). ✅
+
+Besplatni korisnici do daljeg vide stari prikaz:
+
 - **Svi** tranziti u orbisu, poređani po skoru (poglavlje 3). ✅
 - Svaki ima kratko tumačenje. Plaća se dubina (dugo tumačenje), ne pristup. ✅
 - **Planete u kućama:** prikazuju se do 3 spore planete sa kućom kroz koju prolaze. Tekstovi „planeta u kući" **ne postoje** (120 rečenica čeka astrologa). ⏳
@@ -292,6 +301,7 @@ Tačan spisak onoga što nedostaje: `python3 scripts/korpus/izvestaj.py`
 10. **Nepoznato vreme rođenja**: da li natalni Mesec izostaviti kao metu, jer za 12 sati pređe i do 7°?
 11. **Ton tranzita** (4.0): pravilo po prirodi planeta, dok ne postoji ručna oznaka.
 12. **Teme kuća** za red „Za tebe" (4.3).
+13. **Ocene oblasti** (poglavlje 11): veza kuća i planeta sa oblašću, jačine, formula ocene, ton Mladog i Punog Meseca.
 
 ---
 
@@ -349,3 +359,57 @@ Primer, Mesec trigon natalni Saturn:
 - da li je 50 kombinacija dovoljno ili traži i Ascendent i MC;
 - koliko varijanti po kombinaciji;
 - ton i dužina (primer iznad).
+
+---
+
+## 11. Ocena dana po oblastima (Premium, od 28.9.2026) ⏳
+
+Zbijena kartica (četiri reda bez linija: ikona, naziv, tačkice) iznad sažetka na slajdu „Danas ukratko" na početnoj; oznaka („Dobar dan") je samo u VoiceOver-u. Tab „Tranziti" koristi ŠIRI spisak (orbis „Teme perioda", poglavlje 5) i
+istu jačinu (za redosled po važnosti), ali oblasti i ocene NE prikazuje (Ivan, 28.9.2026). **Sve vrednosti iz ovog poglavlja
+su u jednom fajlu, `src/lib/oblasti-config.ts`** — menjaju se bez diranja koda.
+Sve je predlog iz specifikacije i čeka potvrdu.
+
+**Koji tranziti ulaze u ocenu:** svi tranziti Sunca do Plutona koji su tog dana u orbisu.
+Orbisi su **isti kao za „Tvoj dan"** (1,5°; Uran, Neptun, Pluton 1°), a ne 3° kao
+u „Danas ukratko". Tranzit je „tog dana" ako je u orbisu u nekoj od dve ponoći ili
+postaje tačan tokom dana — lista i ocena su iste ceo dan. **Mesečevi tranziti ne
+ulaze** (traju nekoliko sati i zatrpali bi listu).
+
+**Oblasti i veza:**
+
+| Oblast | Kuće | Planete |
+|---|---|---|
+| Ljubav | 5, 7 | Venera, Mesec, Mars |
+| Zdravlje i lepota | 1, 6 | Sunce, Mars, Asc |
+| Karijera i finansije | 2, 10 (6 i 8 slabije) | Jupiter, Saturn, Merkur, MC |
+| Kuća i bašta | 4 | Mesec, Saturn |
+
+Tranzit je vezan za oblast ako: tranzitna planeta prolazi kroz njenu kuću, ili
+pogođena natalna tačka stoji u njenoj kući, ili je tranzitna ili natalna planeta
+na njenoj listi. Jačina veze: kuća 1,0 (slabija kuća 0,5), planeta 0,5 — uzima se
+najveća. Tranzit može biti u više oblasti; bez ijedne veze ne utiče ni na jednu ocenu. Kuće su Placidus, kao u natalnoj karti.
+
+**Jačina tranzita (0–1):** planeta (Pluton, Neptun, Uran 1,0; Saturn 0,9; Jupiter
+0,8; Mars 0,7; Sunce, Venera, Merkur 0,6) × aspekt (konjunkcija 1,0; opozicija i
+kvadrat 0,9; trigon 0,7; sekstil 0,5) × 1,2 ako je pogođeno Sunce, Mesec, Asc, MC
+ili vladar horoskopa × blizina (1 − 0,5 × udaljenost / orbis; tačan = 1, ivica
+orbisa = 0,5). Najviše 1. Udaljenost je najmanja tog dana, ne u trenutku otvaranja.
+
+**Ocena:** doprinos = znak tona (Povoljno +1, Izazovno −1, Mešovito 0) × jačina ×
+veza × 2; ocena = 3 + zbir doprinosa, zaokruženo i u granicama 1–5. Zaokružuje se
+simetrično oko 3 (+2,5 → 5 i −2,5 → 1), da loš dan ne ispadne blaži od dobrog.
+Oznake: 5 „Odličan dan", 4 „Dobar dan", 3 „Miran dan", 2 „Oprezno", 1 „Težak dan".
+Ton je astrologova ručna oznaka, a bez nje pravilo iz 4.0.
+
+**Mlad i Pun Mesec u kući:** poseban red u oblasti te kuće, samo na dan faze:
+„Novi početak: {tema kuće}" (Povoljno) / „Vrhunac: {tema kuće}" (Mešovito), jačina
+0,5. Teme kuća su iz 4.3. Ulazi samo u ocenu (na tabu „Tranziti" se ne prikazuje).
+
+**Bez vremena rođenja:** kuća nema, veza je samo preko planeta, Asc i MC nisu mete,
+nema Mladog i Punog Meseca u kući.
+
+**Koliko još traje** (tab „Tranziti"): do izlaska iz orbisa liste (3°, sekstil 2°). Do 30 dana „Još N dana" („Poslednji
+dan" na poslednji), preko toga „Još N meseci".
+
+Provere: `npm run check:oblasti`. Pregled sa test kartom: `/dev-tranziti` (samo dev).
+

@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 import { Lock } from 'lucide-react-native';
+import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { Screen } from '@/components/screen';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
+import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -14,8 +16,24 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
 import { findTransits } from '@/lib/transits';
+import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
+import { neutral } from '@/theme/tokens';
 
 const GOLD = '#A7731B';
+
+/**
+ * Ikona uz naslov sekcije duge verzije — boja naslova (`label`), ne akcenat.
+ * SF Symbols na iOS-u; Android i web crtaju isti znak iz Material Symbols
+ * (expo-symbols nosi font sam, radi i u Expo Go).
+ */
+const IKONA_SEKCIJE: Record<VrstaSekcije, SymbolViewProps['name']> = {
+  sustina: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
+  dugorocno: { ios: 'hourglass', android: 'hourglass_empty', web: 'hourglass_empty' },
+  sfere: { ios: 'square.grid.2x2', android: 'grid_view', web: 'grid_view' },
+  efekat: { ios: 'checkmark.circle', android: 'check_circle', web: 'check_circle' },
+  pazi: { ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' },
+  savet: { ios: 'lightbulb', android: 'lightbulb', web: 'lightbulb' },
+};
 
 /**
  * Detaljno tumacenje jednog tranzita — duga verzija.
@@ -45,12 +63,10 @@ export default function TransitDetail() {
   const sazeta = kratka.get(String(key));
 
   return (
-    <Screen
-      label="Tumačenje"
-      tabBarSpace={false}
-      pushed>
+    // Nativni list odozdo, kao sva tumacenja (`_layout.tsx`, Ivan 28.9.2026).
+    <SheetScroll>
           {tranzit && (
-            <View className="flex-row items-center gap-2 pb-1 pt-2">
+            <View className="flex-row items-center gap-2 pb-1">
               <Glyph size={17} className="text-foreground">
                 {`${tranzit.transiting.glyph} ${tranzit.aspect.glyph} ${tranzit.natal.glyph}`}
               </Glyph>
@@ -65,20 +81,28 @@ export default function TransitDetail() {
           </Text>
 
           {dugaLoading ? (
-            <Text variant="muted">Učitavam…</Text>
+            <TextPlaceholder lines={8} />
           ) : puna ? (
             <>
               {!!puna.body && <TumacenjeTekst tekst={puna.body} />}
-              {puna.sections.map((s) => (
+              {puna.sections.map((s) => {
+                const vrsta = vrstaSekcije(s.heading);
+
+                return (
                 <View key={s.heading} className="mt-7">
-                  <Text variant="label" className="mb-2">{s.heading}</Text>
+                  {/* Linija ispod naslova: list je beo, pa `border-border` (pravilo 17). */}
+                  <View className="mb-3 flex-row items-center gap-2 border-b border-border pb-2">
+                    {vrsta && <SymbolView name={IKONA_SEKCIJE[vrsta]} size={17} tintColor={neutral.inkSubtle} />}
+                    <Text variant="label" className="flex-1">{s.heading}</Text>
+                  </View>
                   <TumacenjeTekst tekst={s.body} />
                 </View>
-              ))}
+                );
+              })}
             </>
           ) : (
             <>
-              {!!sazeta?.body && <Text variant="body">{sazeta.body}</Text>}
+              {!!sazeta?.body && <Text variant="reading">{sazeta.body}</Text>}
 
               {/* Pristup je placen a duga verzija ipak nije dosla — tekst za
                   ovaj tranzit jos nije u korpusu. Poziv na kupovinu bi tu bio
@@ -97,13 +121,13 @@ export default function TransitDetail() {
                     Dugoročni efekti, sfere života na koje se odnosi, i konkretni
                     saveti za ovaj period.
                   </Text>
-                  <Button className="mt-5 w-full" onPress={() => router.push('/profile')}>
+                  <Button className="mt-5 w-full" onPress={() => leaveSheetTo('/profile')}>
                     <Text>Otključaj</Text>
                   </Button>
                 </View>
               )}
             </>
           )}
-    </Screen>
+    </SheetScroll>
   );
 }

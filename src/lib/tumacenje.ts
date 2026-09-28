@@ -63,6 +63,24 @@ export function vrstaOdeljka(naslov: string): Odeljak | null {
   return null;
 }
 
+/**
+ * Vrsta sekcije duge verzije — za ikonu uz naslov (Ivan, 28.9.2026). Sedam
+ * naslova se ponavlja kroz ceo korpus, pisani na vise nacina, pa ide po korenu
+ * kao `vrstaOdeljka`. "Saveti" i "Opste preporuke" su po sadrzaju isto i dele
+ * ikonu — ali NE i odeljak kartice "Tvoj dan", zato je ovo zasebna funkcija.
+ * Jednokratni naslovi (~20, iz tekstova drugacije grade) vracaju null: bez ikone.
+ */
+export type VrstaSekcije = 'sustina' | 'dugorocno' | 'sfere' | Odeljak;
+
+export function vrstaSekcije(naslov: string): VrstaSekcije | null {
+  const n = naslov.trim().toLowerCase();
+  if (/^su[sš]tin/.test(n)) return 'sustina';
+  if (/^dugoro[cč]n/.test(n)) return 'dugorocno';
+  if (/^specifi[cč]n\S* (sfer|oblast)/.test(n)) return 'sfere';
+  if (/^op[sš]t\S* preporuk/.test(n)) return 'savet';
+  return vrstaOdeljka(naslov);
+}
+
 export type TriOdeljka = Record<Odeljak, Stavka[]>;
 
 /** Stavke liste iz sva tri odeljka. Pasusi (uvod, zavrsna recenica) se preskacu. */

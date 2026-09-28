@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Apple, Carrot, ChevronRight, Flower2, Leaf } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -120,7 +121,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
         ) : s && s.stavke.length ? (
           <Lista stavke={s.stavke} />
         ) : loading ? (
-          <Text variant="muted">…</Text>
+          <TextPlaceholder lines={2} />
         ) : (
           <Text variant="muted">Saveti za ovu oblast još nisu stigli.</Text>
         )}

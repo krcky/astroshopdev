@@ -120,8 +120,17 @@ const TAB_BAR_SPACE = Platform.select({ ios: 62, default: 80 });
  * na starijem ostavljao rupu.
  */
 function TabBarSpacer() {
+  return <View style={{ height: useTabBarSpace() }} />;
+}
+
+/**
+ * Koliko je od dna ekrana do vrha trake tabova (sa vazduhom), na ovom uredjaju.
+ * Za sve sto mora da stoji IZNAD trake nezavisno od visine ekrana — npr.
+ * indikator slajdova na pocetnoj. Isti broj kao `TabBarSpacer`, da se ne raziđu.
+ */
+export function useTabBarSpace(): number {
   const insets = useSafeAreaInsets();
-  return <View style={{ height: TAB_BAR_SPACE + insets.bottom }} />;
+  return TAB_BAR_SPACE + insets.bottom;
 }
 
 type ScreenProps = {
@@ -247,6 +256,15 @@ export function Screen({
       Extrapolation.CLAMP
     ),
   }));
+  // ANDROID: Dimezis i sa `intensity` 0 crta snimak sadrzaja ispod trake, koji se
+  // za nijansu razlikuje od prave pozadine — na vrhu liste se videla ivica trake
+  // (Pixel 9 emulator, Ivan 28.9.2026). Zato tamo traka i NESTAJE na vrhu:
+  // providnost ide 0 -> 1 istom rampom kao zamucenje. iOS na nuli ne crta nista.
+  const vidljivost = useAnimatedStyle(() => ({
+    opacity: Platform.OS === 'android'
+      ? interpolate(pomeraj.value, [0, headerBar.blurAt], [0, 1], Extrapolation.CLAMP)
+      : 1,
+  }));
 
   return (
     // Koren nosi SAMO raspored — bez pozadine, da ga React Native izbaci iz
@@ -286,7 +304,7 @@ export function Screen({
         // trzanje pri klizanju — `...Sdk31Plus` sam padne na `none` ispod 31.
         blurMethod="dimezisBlurViewSdk31Plus"
         blurTarget={cilj}
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }}
+        style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }, vidljivost]}
       />
 
       {/* 3. preliv */}

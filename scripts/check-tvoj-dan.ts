@@ -13,7 +13,7 @@ import { phaseDay, lunationHouse, MAIN_PHASES } from '../src/lib/moon';
 import { signRulers, chartRulers } from '../src/lib/rulers';
 import { toneByRule, transitTone, type Tone } from '../src/lib/tone';
 import {
-  dayStatus, pickTvojDan, tvojDanCandidates, tvojDanWindow, TD_ORB, type TvojDanLog,
+  dayStatus, pickTvojDan, tvojDanCandidates, tvojDanWindow, tvojDanInfo, TD_ORB, type TvojDanLog,
 } from '../src/lib/tvoj-dan';
 import { dayKey, moonDay, strongestMoonHit } from '../src/lib/transits';
 import { kartaSaAscendentom } from '../src/lib/test-karta';
@@ -112,6 +112,17 @@ for (let o = 0; o < 400 && !danKonj; o++) {
   ok(!!k && k.ruler === 'natal', `Sunce konj. natalni Jupiter (${dayKey(danKonj!)}): oznaka vladara`, k ? `ruler=${k.ruler}, skor ${k.score.toFixed(2)}` : 'nije kandidat');
   const bezVladara = tvojDanCandidates({ ...ribe }, danKonj!, true).find((c) => c.contentKey === k?.contentKey);
   ok(!!bezVladara && bezVladara.ruler === null && bezVladara.score < k!.score, 'isti tranzit bez vremena rodjenja: bez oznake, nizi skor');
+}
+
+{
+  // List "Na osnovu cega je ovaj tekst" (`app/tvoj-dan-info.tsx`).
+  const i = tvojDanInfo(ribe, false, 'transit.sun.conjunction.natal.jupiter');
+  ok(i?.ruler === 'natal' && i.rulerText === 'Jupiter je vladar tvog Ascendenta u Ribama. Kad ga tranzit dodirne, dan se oseća ličnije i jače, zato ovaj tranzit danas ima prednost.', 'list: vladar natalni, recenica iz briefa', i?.rulerText ?? '');
+  const t = tvojDanInfo(ribe, false, 'transit.jupiter.square.natal.venus');
+  ok(t?.ruler === 'transiting' && t.rulerText === 'Jupiter je vladar tvog Ascendenta u Ribama, a danas pokreće tvoju Veneru. Zato ovaj tranzit danas ima prednost.', 'list: vladar tranzitni, akuzativ "tvoju Veneru"');
+  ok(tvojDanInfo(ribe, false, 'transit.mars.trine.natal.venus')?.rulerText === null, 'list: tranzit bez vladara -> bez recenice');
+  ok(tvojDanInfo(ribe, true, 'transit.sun.conjunction.natal.jupiter')?.ruler === null, 'list: bez vremena rodjenja nema vladara');
+  ok(tvojDanInfo(ribe, true, 'transit.sun.trine.natal.ascendant') === null && tvojDanInfo(ribe, false, 'nesto.drugo') === null, 'list: ASC bez vremena i los kljuc -> null');
 }
 
 /* ------------------------------------------------------------------------- */

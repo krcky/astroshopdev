@@ -1,7 +1,9 @@
 /** Opcije za `NativeDayMenu` (iOS varijanta je u `native-day-menu.ios.tsx`). */
 export type NativeDayMenuProps = {
-  /** Natpis okidaca ("Danas", "Pon"…). */
-  label: string;
+  /** Okidac je SF simbol (`calendar`), bez natpisa. */
+  systemImage: string;
+  /** Za VoiceOver: "Izabran dan: Danas…". */
+  accessibilityLabel: string;
   color: string;
   options: { value: number; title: string }[];
   selected: number;

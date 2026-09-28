@@ -183,6 +183,19 @@ verzije. Sve radi `python3 scripts/korpus/natal.py` — izvestaj, pa
 - Stanje 28.9.2026: znakovi 116/116, kuce 120/120, aspekti 260/260.
   **Podznak u znaku 0/12** — besplatan je, a nema ga. Nema ni aspekata na MC.
 
+## Odgovor astrologa — Excel, ne Word
+
+`scripts/korpus/odgovor.py` (treba `.venv` sa openpyxl — vidi zaglavlje skripte):
+- `napravi` — `~/Desktop/Astroshop App/Odgovor astrologa <datum>.xlsx`: list
+  Lektura (sve ispravke iz tri `ispravke.json`, Odluka unapred DA, sumnjive na
+  vrhu, ista ispravka u vise tekstova = jedan red) i Pitanja
+  (`files/pitanja-astrologu.json`). Preskace ispravke koje vec imaju `astrolog`.
+- `ucitaj <xlsx>` pa `--upisi` — NE ide u `odbijene-ispravke.json`, "Vasa
+  verzija" zamenjuje ispravku (nasa ostaje u `nasa_ispravka`), rezervna kopija
+  `*.pre-odgovora-*.json`, odgovori u `files/odgovori-astrologa-<datum>.md`.
+  Skrivene kolone su JSON: Excel vraca prazan string kao None.
+Novi TEKSTOVI ne idu kroz Excel nego u Word, u obliku koji parseri vec citaju.
+
 ## Otvoreno
 
 Tri ključa su u `Sunce tranziti kratki.docx` upisana dvaput (Sunce opozicija

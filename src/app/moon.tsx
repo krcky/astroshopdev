@@ -7,6 +7,7 @@ import {
 } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Screen } from '@/components/screen';
 import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -145,10 +146,10 @@ export default function MoonScreen() {
             <Text variant="caption">{faza.name} u {SIGN_CASES[lunarniZnak.key].loc}</Text>
             <TumacenjeTekst tekst={savet} />
           </View>
+        ) : lunarniLoading ? (
+          <TextPlaceholder lines={4} className="mt-4" />
         ) : (
-          <Text variant="muted" className="mt-4">
-            {lunarniLoading ? 'Učitavam…' : 'Saveti za ovu oblast još nisu stigli.'}
-          </Text>
+          <Text variant="muted" className="mt-4">Saveti za ovu oblast još nisu stigli.</Text>
         )}
       </View>
 

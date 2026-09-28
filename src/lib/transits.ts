@@ -27,7 +27,7 @@ const NATAL_WEIGHT: Record<string, number> = {
 };
 
 /** Orbite za tranzite, u stepenima. */
-const TRANSIT_ORB: Record<string, number> = {
+export const TRANSIT_ORB: Record<string, number> = {
   conjunction: 3, opposition: 3, square: 3, trine: 3, sextile: 2,
 };
 
@@ -43,7 +43,7 @@ export function natalTargets(chart: NatalChart): NatalTarget[] {
   return [
     ...chart.planets.map((p) => ({ key: p.key as string, name: p.name, glyph: p.glyph, longitude: p.longitude })),
     { key: 'ascendant', name: 'Ascendent', glyph: 'ASC', longitude: chart.houses.ascendant },
-    { key: 'midheaven', name: 'Medium Coeli', glyph: 'MC', longitude: chart.houses.midheaven },
+    { key: 'midheaven', name: 'MC', glyph: 'MC', longitude: chart.houses.midheaven },
   ];
 }
 

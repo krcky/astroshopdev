@@ -3,13 +3,14 @@ import { Modal, Platform, Pressable, ScrollView, View, type NativeScrollEvent, t
 import { Redirect, Stack, router } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
-import { Screen } from '@/components/screen';
+import { TextPlaceholder } from '@/components/ui/text-placeholder';
+import { Screen, useTabBarSpace } from '@/components/screen';
 import { Button } from '@/components/ui/button';
-import { GlassIconButton } from '@/components/ui/glass-button';
+import { GlassBubble } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Group, ListRow } from '@/components/ui/list';
 import { buildPersonalDaily, formatDate, formatTime, formatUntil, MESECI_KRATKO, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
-import { Check, ChevronDown, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
+import { Calendar, Check, ChevronRight, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
@@ -22,6 +23,8 @@ import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { TvojDanCard } from '@/components/tvoj-dan-card';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
+import { OceneOblasti } from '@/components/ocena-oblasti';
+import { useOblastiDana } from '@/lib/use-oblasti';
 import { useHeroLog } from '@/store/hero-log';
 import { dayKey, briefBucket, heroHistoryFor, pickBrief, type BriefBucket, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
@@ -38,6 +41,8 @@ export default function Home() {
   const today = React.useMemo(() => new Date(), []);
   // Pomeraj dana: -2..2. Ceo ekran (Hero, sazetak, liste) se racuna za izabrani dan.
   const [offset, setOffset] = React.useState(0);
+  // Slajd karusela; indikator je van skrola pa stanje zivi ovde.
+  const [slide, setSlide] = React.useState(0);
   const date = React.useMemo(() => {
     const d = new Date(today); d.setDate(today.getDate() + offset); return d;
   }, [today, offset]);
@@ -81,6 +86,8 @@ export default function Home() {
     () => (premium && daily ? pickBrief(daily.entries.map((e) => e.transit), tvojDan?.contentKey ?? null) : daily?.brief ?? null),
     [premium, daily, tvojDan]
   );
+  // Ocene oblasti — isti `useOblastiDana` kao lista na tabu "Tranziti".
+  const oblasti = useOblastiDana(premium ? resolved : null, date);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved || !daily) return <Redirect href="/" />;
@@ -96,50 +103,100 @@ export default function Home() {
     koci: grupaSaRezervom(b.koci, 'challenge', 'koci', heroRezerva, texts),
   };
 
+  const slides: Slide[] = [
+        // Tranzit dana, prvi slajd, bez kartice i bez naslova iznad (nosi svoj).
+        // Premium: "Tvoj dan" (`lib/tvoj-dan.ts`); ostali: Hero (waterfall u `transits.ts`).
+        // Dan bez ijednog kandidata: slajda nema (Ivan, 27.9.2026).
+        ...(premium
+          ? tvojDan ? [{ key: 'day', node: <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} /> }] : []
+          : daily.hero.transit ? [{ key: 'day', node: <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} /> }] : []),
+        // Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`.
+        // Premium: iznad sazetka zbijena kartica sa ocenama oblasti (Ivan, 28.9.2026 —
+        // umesto zasebnog slajda "Oblasti danas").
+        ...(briefGroups.ide.length > 0 || briefGroups.koci.length > 0 || oblasti
+          ? [{
+              key: 'brief',
+              label: offset === 0 ? 'Danas ukratko' : 'Ukratko',
+              node: (
+                <View className="gap-3">
+                  {oblasti && <OceneOblasti rez={oblasti} />}
+                  {(briefGroups.ide.length > 0 || briefGroups.koci.length > 0) && <Brief {...briefGroups} />}
+                </View>
+              ),
+            }]
+          : []),
+        // Mesec — posle sazetka (Ivan, 27.9.2026). Premium: "Mesec danas".
+        premium
+          ? { key: 'moon', label: 'Mesec danas', node: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} /> }
+          : { key: 'moon', label: 'Mesec', node: <MoonCard daily={daily} texts={texts} date={date} offset={offset} /> },
+        // Sledece promene na nebu i kuca u koju ulaze (Ivanov plan).
+        ...(daily.skyEvents.length > 0
+          ? [{ key: 'sky', label: 'Promene na nebu', node: <SkyEvents daily={daily} today={date} /> }]
+          : []),
+        // Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
+        // (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
+        // Svi brzi tranziti ostaju u tabu "Tranziti".
+        ...(daily.bySpeed.slow.length > 0
+          ? [{ key: 'slow', label: 'Tema perioda', node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} /> }]
+          : []),
+  ];
+
   return (
-    // Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`.
+    // Indikator slajdova stoji VAN skrola, vezan za dno ekrana (`SlideDots`), pa je
+    // uvek isto iznad trake tabova — ne zavisi od visine kartica ni ekrana (Ivan, 28.9.2026).
+    <View style={{ flex: 1 }}>
+    {/* Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`. */}
     <Screen
       label={<Logo />}
       // Gore desno: dan-meni i profil. Na iOS-u su to NATIVE stavke trake
       // (`unstable_headerRightItems` dole): UIMenu sa zamucenjem na dodir,
       // Liquid Glass dugmad (Ivan, 26.9.2026). Android nema tu traku, pa dobija
-      // nas meni i stakleni krug.
+      // nas meni u mehuru.
       // iOS pre 26: native stavke stoje u traci od 44pt, pa su ~5pt iznad loga i
-      // ne mogu da se spuste. Zato tamo crtamo svoje — goli natpis i ikona u
-      // `ZAGLAVLJE_STARI_IOS`, centrirani u nasem redu; meni dana je ipak
-      // sistemski UIMenu (`NativeDayMenu`) (Ivan, 27.9.2026).
+      // ne mogu da se spuste. Zato tamo crtamo svoj mehur, centriran u nasem redu;
+      // meni dana je ipak sistemski UIMenu (`NativeDayMenu`) (Ivan, 27.9.2026).
       right={
-        STARI_IOS ? (
-          <View className="flex-row items-center gap-4" style={{ transform: [{ translateY: -5 }] }}>
-            <NativeDayMenu
-              label={dayLabel(today, offset)}
-              color={ZAGLAVLJE_STARI_IOS}
-              options={DAY_OFFSETS.map((o) => ({ value: o, title: RELATIVE[o] }))}
-              selected={offset}
-              onChange={setOffset}
-            />
-            <Pressable onPress={() => router.push('/profile')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Profil" className="active:opacity-60">
-              <UserRound size={24} color={ZAGLAVLJE_STARI_IOS} />
-            </Pressable>
-          </View>
-        ) : Platform.OS === 'ios' ? undefined : (
-          <View className="flex-row items-center gap-2" style={{ transform: [{ translateY: -5 }] }}>
-            <DayMenu today={today} offset={offset} onChange={setOffset} />
-            <GlassIconButton onPress={() => router.push('/profile')} accessibilityLabel="Profil">
+        // Dve ikone u jednom mehuru i van iOS-a 26 (Ivan, 28.9.2026) — kalendar i profil. Bez stakla `GlassBubble` je bela pilula.
+        Platform.OS === 'ios' && !STARI_IOS ? undefined : (
+          <GlassBubble style={{ transform: [{ translateY: -5 }] }}>
+            {STARI_IOS ? (
+              <View className="h-full w-11 items-center justify-center">
+                <NativeDayMenu
+                  systemImage="calendar"
+                  accessibilityLabel={`Izabran dan: ${RELATIVE[offset]}. Promeni dan`}
+                  color={neutral.ink}
+                  options={DAY_OFFSETS.map((o) => ({ value: o, title: RELATIVE[o] }))}
+                  selected={offset}
+                  onChange={setOffset}
+                />
+              </View>
+            ) : (
+              <DayMenu today={today} offset={offset} onChange={setOffset} />
+            )}
+            <Pressable
+              onPress={() => router.push('/profile')}
+              accessibilityRole="button"
+              accessibilityLabel="Profil"
+              className="h-full w-11 items-center justify-center active:opacity-60">
               <UserRound size={20} color={neutral.ink} />
-            </GlassIconButton>
-          </View>
+            </Pressable>
+          </GlassBubble>
         )
       }>
       {Platform.OS === 'ios' && !STARI_IOS && (
         <Stack.Screen
           options={{
+            // Dve ikone u JEDNOM staklenom mehuru (Ivan, 28.9.2026): kalendar i profil.
+            // iOS 26 sam spaja susedne stavke sa slikom (`sharesBackground`); stavka sa
+            // tekstom bi dobila svoj mehur — zato dan vise nije natpis nego obicna
+            // ikona kalendara, bez broja (Ivan, 28.9.2026); izabran dan pokazuje meni.
             unstable_headerRightItems: () => [
               {
                 type: 'menu',
                 label: dayLabel(today, offset),
-                icon: { type: 'sfSymbol', name: 'chevron.down' },
-                changesSelectionAsPrimaryAction: true,
+                icon: { type: 'sfSymbol', name: 'calendar' },
+                accessibilityLabel: `Izabran dan: ${RELATIVE[offset]}. Promeni dan`,
+                sharesBackground: true,
                 menu: {
                   title: 'Dan',
                   items: DAY_OFFSETS.map((o) => ({
@@ -156,6 +213,7 @@ export default function Home() {
                 label: 'Profil',
                 icon: { type: 'sfSymbol', name: 'person' },
                 accessibilityLabel: 'Profil',
+                sharesBackground: true,
                 onPress: () => router.push('/profile'),
               },
             ],
@@ -163,43 +221,26 @@ export default function Home() {
         />
       )}
       {/* Bez naslova i bez datuma (Ivan, 26.9.2026): dan se vidi i bira u zaglavlju. */}
-      <View className="pt-4" />
+      {/* Karusel malo nize od zaglavlja (Ivan, 28.9.2026: 16 -> 32pt). */}
+      <View className="pt-8" />
 
       {/* Sve kartice su karusel, jedna po slajdu (Ivan, 28.9.2026). Redosled je
           isti kao kad su stajale jedna ispod druge. Kartica bez sadrzaja ne dobija
           slajd — prazan slajd bi izgledao kao greska. */}
-      <Carousel slides={[
-        // Tranzit dana, prvi slajd, bez kartice i bez naslova iznad (nosi svoj).
-        // Premium: "Tvoj dan" (`lib/tvoj-dan.ts`); ostali: Hero (waterfall u `transits.ts`).
-        // Dan bez ijednog kandidata: slajda nema (Ivan, 27.9.2026).
-        ...(premium
-          ? tvojDan ? [{ key: 'day', node: <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} /> }] : []
-          : daily.hero.transit ? [{ key: 'day', node: <Hero daily={daily} date={date} isToday={offset === 0} texts={texts} loading={textsLoading} /> }] : []),
-        // Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`.
-        ...(briefGroups.ide.length > 0 || briefGroups.koci.length > 0
-          ? [{ key: 'brief', label: offset === 0 ? 'Danas ukratko' : 'Ukratko', node: <Brief {...briefGroups} /> }]
-          : []),
-        // Mesec — posle sazetka (Ivan, 27.9.2026). Premium: "Mesec danas".
-        premium
-          ? { key: 'moon', label: 'Mesec danas', node: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} /> }
-          : { key: 'moon', label: 'Mesec', node: <MoonCard daily={daily} texts={texts} date={date} offset={offset} /> },
-        // Sledece promene na nebu i kuca u koju ulaze (Ivanov plan).
-        ...(daily.skyEvents.length > 0
-          ? [{ key: 'sky', label: 'Promene na nebu', node: <SkyEvents daily={daily} today={date} /> }]
-          : []),
-        // Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
-        // (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
-        // Svi brzi tranziti ostaju u tabu "Tranziti".
-        ...(daily.bySpeed.slow.length > 0
-          ? [{ key: 'slow', label: 'Tema perioda', node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} /> }]
-          : []),
-      ]} />
+      <Carousel page={slide} onPage={setSlide} slides={slides} />
+      {/* Vazduh ispod kartica, da indikator ne legne preko kraja poslednje. */}
+      <View style={{ height: DOTS_SPACE }} />
     </Screen>
+    <SlideDots count={slides.length} active={Math.min(slide, slides.length - 1)} />
+    </View>
   );
 }
 
-/** Razmak izmedju slajdova; susedni slajd ne viri, sirina slajda je sirina sadrzaja ekrana. */
-const SLIDE_GAP = 12;
+/**
+ * Razmak izmedju slajdova = dve margine ekrana: susedni slajd tada pocinje tacno
+ * na ivici ekrana i ne viri (Ivan, 28.9.2026). Sa 12pt je virio 8pt sa strane.
+ */
+const SLIDE_GAP = space.screen * 2;
 
 /**
  * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
@@ -207,16 +248,29 @@ const SLIDE_GAP = 12;
  * na margini. Visina je visina NAJVISE kartice; kartice ostaju svoje visine
  * (poravnate gore), jer rastegnuta kartica sa praznim dnom izgleda kao greska.
  */
-function Carousel({ slides }: { slides: { key: string; label?: string; node: React.ReactNode }[] }) {
+type Slide = { key: string; label?: string; node: React.ReactNode };
+
+/** Koliko vazduha ostaje ispod kartica u skrolu: tackice + razmak, da ne legnu preko sadrzaja. */
+const DOTS_SPACE = 28;
+/** Razmak od vrha trake tabova do tackica (Ivan, 28.9.2026: 32). */
+const DOTS_ABOVE_TAB_BAR = 32;
+
+/**
+ * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
+ * sam karusel izlazi do ivica ekrana da kartica pri pomeranju ne bude odsecena
+ * na margini. Visina je visina NAJVISE kartice; kartice ostaju svoje visine
+ * (poravnate gore), jer rastegnuta kartica sa praznim dnom izgleda kao greska.
+ * Indikator NIJE ovde nego u `SlideDots`, van skrola.
+ */
+function Carousel({ slides, page, onPage }: { slides: Slide[]; page: number; onPage: (p: number) => void }) {
   const [width, setWidth] = React.useState(0);
-  const [page, setPage] = React.useState(0);
   const slideWidth = width - space.screen * 2;
   const step = slideWidth + SLIDE_GAP;
-  const aktivna = Math.min(page, slides.length - 1);
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (step <= 0) return;
-    setPage(Math.round(e.nativeEvent.contentOffset.x / step));
+    const p = Math.round(e.nativeEvent.contentOffset.x / step);
+    if (p !== page) onPage(p);
   };
 
   if (slides.length === 0) return null;
@@ -234,22 +288,51 @@ function Carousel({ slides }: { slides: { key: string; label?: string; node: Rea
           contentContainerStyle={{ paddingHorizontal: space.screen, gap: SLIDE_GAP, alignItems: 'flex-start' }}>
           {slides.map((s) => (
             <View key={s.key} style={{ width: slideWidth }}>
-              {!!s.label && <Text variant="label" className="mb-3">{s.label}</Text>}
+              {/* Naslov slajda istom klasom kao naslov na "Tvom danu" (`display`, Ivan 28.9.2026). */}
+              {/* Naslov slajda pocinje u istoj visini kao datum na prvom slajdu, istom
+                  klasom kao naslov "Tvog dana" (`display`, Ivan 28.9.2026). */}
+              {!!s.label && <Text variant="display" className="mb-4" accessibilityRole="header">{s.label}</Text>}
               {s.node}
             </View>
           ))}
         </ScrollView>
       )}
-      {slides.length > 1 && (
-        <View
-          className="mt-4 flex-row justify-center gap-1.5"
-          accessible
-          accessibilityLabel={`Kartica ${aktivna + 1} od ${slides.length}`}>
-          {slides.map((s, i) => (
-            <View key={s.key} className={cn('h-1.5 rounded-pill', i === aktivna ? 'w-4 bg-foreground' : 'w-1.5 bg-fill-strong')} />
-          ))}
-        </View>
-      )}
+    </View>
+  );
+}
+
+/**
+ * Indikator slajdova — uvek na istom mestu, `DOTS_ABOVE_TAB_BAR` iznad trake
+ * tabova, na svakom telefonu (Ivan, 28.9.2026). Ne zavisi od visine kartica.
+ * Van skrola je, pa ne klizi; ne prima dodir.
+ *
+ * `bottom` se racuna od DNA PROSTORA EKRANA, ne od dna telefona. Izmereno sa
+ * snimka iPhone-a (iOS 26, 28.9.2026): prostor ekrana se zavrsava 49pt iznad
+ * dna telefona, a vrh plutajuce trake je jos tacno za donji safe-area umetak
+ * (34pt) iznad toga. Zato na iOS-u: umetak + razmak. Na telefonu bez umetka
+ * (Home dugme) umetak je 0 i traka pocinje tacno na dnu prostora.
+ *
+ * ANDROID je obrnuto: prostor ekrana ide do dna telefona, IZA Material trake
+ * (edge-to-edge). Sa samo razmakom tackice su stajale 32dp od dna telefona,
+ * sakrivene iza trake (Pixel 9 emulator, 28.9.2026). Tamo se dodaje cela
+ * traka + umetak — `useTabBarSpace`, isti broj kojim `Screen` pravi mesto na dnu.
+ */
+function SlideDots({ count, active }: { count: number; active: number }) {
+  const insets = useSafeAreaInsets();
+  const traka = useTabBarSpace();
+  const bottom = (Platform.OS === 'ios' ? insets.bottom : traka) + DOTS_ABOVE_TAB_BAR;
+  if (count < 2) return null;
+  return (
+    <View
+      pointerEvents="none"
+      className="absolute left-0 right-0 flex-row justify-center gap-1.5"
+      style={{ bottom }}
+      accessible
+      accessibilityLabel={`Kartica ${active + 1} od ${count}`}>
+      {Array.from({ length: count }, (_, i) => (
+        // Neaktivne `bg-subtle` (#9C9C9D): `fill-strong` se na sivoj pozadini nije video (Ivan, 28.9.2026).
+        <View key={i} className={cn('h-1.5 rounded-pill', i === active ? 'w-4 bg-foreground' : 'w-1.5 bg-subtle')} />
+      ))}
     </View>
   );
 }
@@ -269,8 +352,6 @@ const dayAt = (today: Date, o: number) => { const d = new Date(today); d.setDate
 /** Natpis na dugmetu: "Danas", ili skracenica dana kad je izabran drugi. */
 const dayLabel = (today: Date, offset: number) => (offset === 0 ? 'Danas' : DANI_KRATKO[dayAt(today, offset).getDay()]);
 
-/** Boja natpisa dana i ikone profila u zaglavlju na iOS-u pre 26 (Ivan, 27.9.2026). */
-const ZAGLAVLJE_STARI_IOS = '#403F98';
 
 /**
  * ANDROID varijanta dan-menija (iOS ima native UIMenu u traci, vidi gore).
@@ -284,21 +365,17 @@ function DayMenu({ today, offset, onChange }: { today: Date; offset: number; onC
   const [otvoren, setOtvoren] = React.useState(false);
   const insets = useSafeAreaInsets();
   const dan = (o: number) => dayAt(today, o);
-  const natpis = dayLabel(today, offset);
   const ponude = DAY_OFFSETS;
 
   return (
     <>
-      {/* Goli natpis, bez mehura (Ivan, 27.9.2026). Visina ostaje kao kod dugmeta
-          zaglavlja, da dodirna povrsina ne spadne ispod 40pt. */}
+      {/* Ikona kalendara, leva polovina mehura sa profilom (Ivan, 28.9.2026). */}
       <Pressable
         onPress={() => setOtvoren(true)}
-        hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel={`Izabran dan: ${natpis}. Promeni dan`}
-        className="h-header-button flex-row items-center gap-1 px-1 active:opacity-60">
-        <Text variant="chip">{natpis}</Text>
-        <ChevronDown size={16} color={neutral.inkMuted} strokeWidth={2.4} />
+        accessibilityLabel={`Izabran dan: ${RELATIVE[offset]}. Promeni dan`}
+        className="h-full w-11 items-center justify-center active:opacity-60">
+        <Calendar size={20} color={neutral.ink} />
       </Pressable>
 
       <Modal visible={otvoren} transparent animationType="fade" onRequestClose={() => setOtvoren(false)}>
@@ -378,7 +455,7 @@ function Hero({ daily, date, isToday, texts, loading }: {
           <Text variant="body" className="mt-2" numberOfLines={3}>{tekst.body}</Text>
         </>
       ) : loading ? (
-        <Text variant="muted">…</Text>
+        <TextPlaceholder title="hero" lines={3} />
       ) : (
         // Bez teksta (ASC, MC, rupe u korpusu) ostaje samo racunato ime — ne izmislja se.
         <Text className={HERO_TITLE}>{ime}</Text>
