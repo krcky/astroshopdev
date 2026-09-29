@@ -25,11 +25,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from parse_docx import docx_fajlovi, pasusi
 import ispravke
+import pasusi as podela
 import liste
 
 IZVOR = Path('/Users/ivankrstic/Desktop/Astroshop App/Lunarni kalendar')
 CILJ = IZVOR / 'lunar-texts.csv'
 ISPRAVKE = IZVOR / 'ispravke.json'
+# Podela dugih uvoda na pasuse (Ivan, 29.9.2026) — posle lekture; vidi `pasusi.py`.
+PASUSI = IZVOR / 'pasusi.json'
 
 # Faza po NASLOVU u dokumentu, ne po imenu fajla. Dva opadajuca se razlikuju
 # samo po fajlu ("5. Waning Gibbous" / "7. Waning Crescent"), a naslovi su
@@ -121,6 +124,8 @@ def main():
         print(f"  ispravka nije primenjena: {x['kljuc']} | {x['original']!r}")
     for r in zapisi.values():
         r['body'] = telo(r['body'])
+    for x in podela.primeni({k: r for (k, _), r in zapisi.items()}, PASUSI):
+        print(f'  prelom pasusa nije primenjen: {x}')
 
     ocekivano = {(f, z, o) for f in FAZE_SR for z in set(ZNACI.values())
                  for o in ('ljubav', 'zdravlje', 'karijera', 'kuca', 'basta')}

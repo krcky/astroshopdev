@@ -568,6 +568,12 @@ npm run panel:build       panel za objavu -> panel/dist
       `natal.sun.sign.aries` / `natal.sun.house.1` / `natal.moon.square.sun`.
       Besplatno Sunce, Mesec i podznak u znaku. FALI: podznak 0/12, aspekti na MC.
       Jos nije: uvoz u bazu, lektura, prikaz u tabu "Ti".
+      PASUSI (Ivan, 29.9.2026, "da bude pitkije"): astrolog je pisao jedan blok po
+      tekstu (do 534 reci); podela po temi je u `files/natal-pasusi.json` (pocetak
+      recenice -> nov pasus), `scripts/korpus/pasusi.py` je ubacuje pri izvozu POSLE
+      lekture i proverava da se nijedna rec ne promeni. 508 tekstova -> 1442 pasusa,
+      najduzi 108 reci. Isto za lunarni (`Lunarni kalendar/pasusi.json`, uvodi) i
+      dugu verziju tranzita (`Tranziti AstroShop/pasusi.json`) — skill korpus.
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
 - [ ] Pitaj astrologa (pravilo 21) — URADJENO: baza (`pitanja.sql`), tab, pisanje, odgovor
       sa plejerom, panel. FALI: pokrenuti `pitanja.sql` + deploy `delete-account`; nalog za

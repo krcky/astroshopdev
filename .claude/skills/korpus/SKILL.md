@@ -77,6 +77,18 @@ postoji — obično znači da je astrolog to već sam ispravio. Ne brisati ih
 naslepo: pogledati da li je tekst ispravljen ili samo drugačije napisan.
 Lektura 27.9.2026: 775 ispravki, izveštaj `Lektura tumacenja 27.9.2026.docx`.
 
+## Pasusi — `pasusi.json`, posle lekture (29.9.2026)
+
+Astrolog piše dugačke blokove (natal do 534 reči u jednom pasusu). Podela po
+temi stoji u JSON-u pored izvora, kao lektura: `files/natal-pasusi.json`,
+`Lunarni kalendar/pasusi.json`, `Tranziti AstroShop/pasusi.json` (samo duga
+verzija). Oblik `{kljuc: ["početak rečenice koja otvara pasus", ...]}`.
+`scripts/korpus/pasusi.py` ga primenjuje u sva tri izvoza, POSLE lekture, i
+pada ako se ijedna reč promeni. Početak koji se ne nađe tačno jednom se
+preskoči i ispiše ("prelom pasusa nije primenjen") — posle nove pošiljke
+pogledati te redove, isto kao nenađene ispravke. Cilj je pasus od 40–90 reči;
+lista "• …" se ne deli. Nov tekst preko ~80 reči = nov unos u `pasusi.json`.
+
 ## Nacrti kratkih verzija (27.9.2026) — NISU u bazi
 
 Ivan je tražio da se napišu kratke verzije koje fale. Napisane su kao SAŽETAK
@@ -113,6 +125,12 @@ SAMO u redovima sa bulletom (uvod je pasus). Izlaz `lunar-texts.csv` → tabela
    prazna polja.
 5. Uvoz u `transit_texts` ide kao CSV, kroz Supabase. **Nema RLS politike za
    upis** — uvoz radi vlasnik, ne aplikacija.
+   `transit_texts` ima i kolonu `tone` koje u CSV-u NEMA — `truncate` + uvoz bi
+   je obrisao. Izmena postojecih tekstova (pasusi 29.9.2026) je isla kao UPDATE
+   samo `body`/`sections`, preko `supabase db query --linked --project-ref <ref>
+   -f upit.sql` (CLI iz npx kesa, token u keychainu), sa uslovom u SQL-u da se
+   tekst bez razmaka nije promenio i `returning key` da se broj proveri.
+   Rezervna kopija pre toga: `select key, body … ` u JSON.
 
 ## Parser — šta je već lomilo i ne sme ponovo
 

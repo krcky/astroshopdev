@@ -48,12 +48,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from ispravke import primeni
+import pasusi
 
 KOREN = Path(__file__).resolve().parents[2]
 IZVOR = KOREN / 'files'
 CILJ = IZVOR / 'natal-texts.csv'
 # Lektura po mestu — isto kao `ispravke.json` kod tranzita, verzija je 'natal'.
 ISPRAVKE = IZVOR / 'natal-ispravke.json'
+# Podela na pasuse (Ivan, 29.9.2026) — posle lekture; vidi `pasusi.py`.
+PASUSI = IZVOR / 'natal-pasusi.json'
 
 ZNAKOVI = 'Planete u znakovima natal files'
 # Podznak stigao posebno (28.9.2026), jedan fajl u korenu `files/`.
@@ -313,6 +316,8 @@ def izvoz(zapisi: dict) -> None:
     po_verziji = {(k, 'natal'): z for k, z in zapisi.items()}
     for x in primeni(po_verziji, ISPRAVKE):
         print(f"  ispravka nije primenjena (nema originala): {x['kljuc']} | {x['original']!r}")
+    for x in pasusi.primeni(zapisi, PASUSI):
+        print(f'  prelom pasusa nije primenjen: {x}')
     with open(CILJ, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=KOLONE, quoting=csv.QUOTE_ALL)
         w.writeheader()

@@ -17,7 +17,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from parse_docx import docx_fajlovi, parsiraj_kratku, parsiraj_dugu, NAPOMENE
-from ispravke import primeni
+from ispravke import primeni, _polja
+import pasusi
 import liste
 
 IZVOR = Path('/Users/ivankrstic/Desktop/Astroshop App/Tranziti AstroShop')
@@ -31,6 +32,8 @@ ISPRAVKE = IZVOR / 'ispravke.json'
 # prednost: nacrt ulazi samo za kljuc za koji kratka verzija ne postoji, pa
 # kad astrolog vrati ispravljen dokument u `Kraci tranziti/`, nacrt sam otpada.
 NACRTI = IZVOR / 'nacrti-kratkih.json'
+# Podela dugih pasusa (Ivan, 29.9.2026), samo duga verzija — vidi `pasusi.py`.
+PASUSI = IZVOR / 'pasusi.json'
 KOLONE = ['key', 'version', 'title', 'body', 'positive', 'challenge', 'advice', 'sections']
 
 
@@ -82,6 +85,9 @@ def main():
     for x in nenadjene:
         print(f"  ispravka nije primenjena (nema originala — mozda vec ispravljeno): "
               f"{x['kljuc']} | {x['verzija']} | {x['original']!r}")
+    duge = {k: r for (k, v), r in zapisi.items() if v == 'long'}
+    for x in pasusi.primeni(duge, PASUSI, _polja):
+        print(f'  prelom pasusa nije primenjen: {x}')
 
     with open(CILJ, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=KOLONE, quoting=csv.QUOTE_ALL)
