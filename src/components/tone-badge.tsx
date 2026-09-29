@@ -7,8 +7,8 @@ import { TONE_LABEL, type Tone } from '@/lib/tone';
 
 /**
  * Boje tona (Ivan, 28.9.2026). Zelena i roze su njegove; Mesovito je topla
- * neutralna izmedju njih — NE zuta, jer je zlatna rezervisana za placeni
- * sadrzaj (pravilo 2). Roze je ista kao minus u "Koci te" na pocetnoj.
+ * neutralna izmedju njih — NE zuta (do 29.9.2026 zlatna je bila boja placenog;
+ * sada je to indigo, pravilo 2). Roze je ista kao minus u "Koci te" na pocetnoj.
  */
 export const TONE_COLOR: Record<Tone, string> = {
   povoljno: '#66BB6A',

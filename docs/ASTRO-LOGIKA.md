@@ -89,9 +89,9 @@ Tamo gde je navedena funkcija u kodu (npr. `pickHero`), to je samo putokaz za pr
 
 ## 4. Početni ekran
 
-### 4.0 „Tvoj dan" (Premium, od 27.9.2026) ✅
+### 4.0 „Tvoj dan" (za sve od 29.9.2026; Premium od 27.9.2026) ✅
 
-Za Premium korisnike **zamenjuje Hero** (4.1). Besplatni i dalje vide Hero po starim pravilima, pa 4.1 ostaje zapisan i važi za njih. Pravila su iz `docs/tvoj_dan_simulacija.py`; kod (`src/lib/tvoj-dan.ts`) daje **isti izbor 20 od 20 dana** kao simulacija na njenoj test karti (27.9.–16.10.2026).
+**Zamenjuje Hero** (4.1) za sve korisnike (od 29.9.2026; do tada samo za Premium). Izbor tranzita je isti za besplatne i Premium. Razlika je samo u tekstu: besplatni dobija kratku verziju, a ceo tekst je uz Premium. Hero (4.1) se više nigde ne prikazuje i ostaje zapisan kao arhiva. Pravila su iz `docs/tvoj_dan_simulacija.py`; kod (`src/lib/tvoj-dan.ts`) daje **isti izbor 20 od 20 dana** kao simulacija na njenoj test karti (27.9.–16.10.2026).
 
 **Orbisi** (samo za ovu karticu; tab „Tranziti" i „Danas ukratko" ostaju na 3°):
 
@@ -144,7 +144,7 @@ Za Premium korisnike **zamenjuje Hero** (4.1). Besplatni i dalje vide Hero po st
 
 **Trajanje**: od dana ulaska u orbis do poslednjeg dana u orbisu, po orbisu LISTE (3°, sekstil 2°; vidi „Koliko još traje" u poglavlju 11), ne po orbisima iz tabele gore — oni važe samo za izbor. Tako isti tranzit ima isto trajanje na svakom ekranu (29.9.2026).
 
-### 4.1 Hero (glavni tranzit dana) — važi za BESPLATNE; arhiva pravila pre 27.9.2026
+### 4.1 Hero (glavni tranzit dana) — ARHIVA; ne prikazuje se od 29.9.2026
 
 Do 27.9.2026 ovo je bio izbor za sve. Orbisi i težine koje koristi su u poglavlju 3 (3°, sekstil 2°; težine 0,3–1,0).
 
@@ -193,9 +193,9 @@ Podela je **po aspektu**, jer tekstovi korpusa nisu podeljeni na dobre i loše:
 
 ⏳ **Pitanje za astrologa:** da li je ova podela konjunkcija ispravna? Da li Venera na natalni Saturn „ide" ili „koči"?
 
-### 4.3 Kartica Mesec (besplatni) i „Mesec danas" (Premium)
+### 4.3 „Mesec danas" (za sve od 29.9.2026) i stara kartica Mesec (arhiva)
 
-**„Mesec danas"** (Premium, od 27.9.2026):
+**„Mesec danas"** (od 27.9.2026 za Premium, od 29.9.2026 za sve; lunarni kalendar je besplatan):
 - **Faza dana**: Mlad Mesec, Prva četvrt, Pun Mesec, Poslednja četvrt nose **ceo kalendarski dan** (lokalno vreme) u kom se desi tačan trenutak; ostali dani su Rastući ili Opadajući Mesec. ✅
 - **Znak u naslovu**: za glavnu fazu to je znak u tačnom trenutku faze, inače znak u kom je Mesec sada. ✅
 - **Osvetljenost** u procentima i smer (raste / opada). ✅
@@ -204,7 +204,7 @@ Podela je **po aspektu**, jer tekstovi korpusa nisu podeljeni na dobre i loše:
 - **Rečenica faze** je PRIVREMENA (nije astrologova) dok ne stignu tekstovi ⏳.
 - **Oblasti**: tekst lunarnog kalendara po paru faza + znak. Na kartici ide **jedna** stavka, prva iz liste (Ivan, 28.9.2026), a u Bašti „Uradi" i „Izbegavaj" (stavke koje počinju sa „Ne", „Nemojte", „Izbegavajte" ili sadrže „nepovoljn"). Ceo tekst je na ekranu Mesec.
 
-**Kartica Mesec (besplatni):**
+**Kartica Mesec (arhiva — do 29.9.2026 za besplatne):**
 
 - **Faza** (procenat osvetljenosti, raste/opada), **lunarni dan** (1–30, od poslednjeg mladog Meseca), sledeći mlad i pun Mesec. ✅
 - **Znak** u kom je Mesec. Ako tog dana menja znak, prikazuje se i vreme prelaska. ✅
@@ -226,7 +226,11 @@ Bez vremena rođenja kuća se ne prikazuje. ✅
 
 ### 4.5 Tema perioda
 
-Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa datumom do kada traju. ✅
+Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa datumom do kada traju. ✅ Besplatni vidi prvi, ostale samo po imenu (poglavlje 5c).
+
+### 4.6 Drugi dani
+
+Meni „Juče / Sutra / ±2 dana" je samo za Premium (29.9.2026). Besplatni uvek vidi danas.
 
 ---
 
@@ -239,11 +243,25 @@ orbis „Tvog dana", pa su falili spori tranziti na 1–3°, npr. Pluton opozici
 traje, ton. Važnost = jačina iz poglavlja 11. Bez oblasti i bez ocena — ocene su
 samo na početnoj (kartica na slajdu „Danas ukratko"). ✅
 
-Besplatni korisnici do daljeg vide stari prikaz:
+**Besplatni (od 29.9.2026):** ista lista, isti redosled. Prva **3** tranzita imaju karticu (naslov, kratak tekst na dodir), ostali se vide samo po imenu i trajanju, pod katancem. Do 29.9.2026 besplatni je imao stari prikaz sa svim kratkim tekstovima.
 
-- **Svi** tranziti u orbisu, poređani po skoru (poglavlje 3). ✅
-- Svaki ima kratko tumačenje. Plaća se dubina (dugo tumačenje), ne pristup. ✅
-- **Planete u kućama:** prikazuju se do 3 spore planete sa kućom kroz koju prolaze. Tekstovi „planeta u kući" **ne postoje** (120 rečenica čeka astrologa). ⏳
+## 5c. Šta je besplatno, a šta uz Premium (29.9.2026)
+
+Besplatni i Premium vide **iste ekrane**; Premium otključava dubinu. Sve granice su u jednom fajlu, `src/lib/pristup.ts`.
+
+| Mesto | Besplatno | Premium |
+|---|---|---|
+| „Tvoj dan" | isti izbor, kratak tekst | ceo tekst |
+| Ocene oblasti | samo Ljubav, ostale pod katancem | sve četiri |
+| Ide ti / Koči te, Mesec danas, Promene na nebu | sve | sve |
+| Tema perioda | prvi spori tranzit | svi |
+| Tab „Tranziti" | prva 3, ostali po imenu | svi |
+| Drugi dani (juče, sutra…) | ne | da |
+| Tumačenje tranzita | kratko | dugo |
+| Natalna karta | Sunce, Mesec, podznak u znaku | sve |
+| Nebo, ekran Mesec, lunarni kalendar | sve | sve |
+
+Ono što se računa na telefonu (izbor, ocene, redosled) sakriva samo prikaz. Tekstovi koji se plaćaju stižu samo sa servera.
 
 ## 5b. Tumačenja natalne karte (tab „Ti", od 28.9.2026) ✅
 
@@ -369,7 +387,7 @@ Primer, Mesec trigon natalni Saturn:
 
 ---
 
-## 11. Ocena dana po oblastima (Premium, od 28.9.2026) ⏳
+## 11. Ocena dana po oblastima (od 28.9.2026; besplatni vidi samo Ljubav, 29.9.2026) ⏳
 
 Četiri reda bez linija (ikona, naziv, tačkice), u istoj kartici iznad „Ide ti / Koči te" na slajdu „Danas ukratko" na početnoj; oznaka („Dobar dan") je samo u VoiceOver-u. Tab „Tranziti" koristi ŠIRI spisak (orbis „Teme perioda", poglavlje 5) i
 istu jačinu (za redosled po važnosti), ali oblasti i ocene NE prikazuje (Ivan, 28.9.2026). **Sve vrednosti iz ovog poglavlja

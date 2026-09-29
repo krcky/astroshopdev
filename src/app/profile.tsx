@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Pressable, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Switch, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 
@@ -24,7 +24,8 @@ export default function ProfileTab() {
   const override = useDevStore((s) => s.entitlementOverride);
   const setOverride = useDevStore((s) => s.setEntitlementOverride);
   const resolved = useResolvedProfile();
-  const [busy, setBusy] = React.useState(false);
+  // Sta se ceka: odjava vrti spiner u svom dugmetu, brisanje u svom (Ivan, 29.9.2026).
+  const [busy, setBusy] = React.useState<'odjava' | 'brisanje' | null>(null);
 
   if (loading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved) return <Redirect href="/" />;
@@ -33,9 +34,9 @@ export default function ProfileTab() {
   const b = profile.birth;
 
   const doSignOut = async () => {
-    setBusy(true);
+    setBusy('odjava');
     await signOut();
-    setBusy(false);
+    setBusy(null);
     router.replace('/');
   };
 
@@ -53,9 +54,9 @@ export default function ProfileTab() {
           text: 'Obriši nalog',
           style: 'destructive',
           onPress: async () => {
-            setBusy(true);
+            setBusy('brisanje');
             const { error } = await deleteAccount();
-            setBusy(false);
+            setBusy(null);
             if (error) {
               Alert.alert('Nije uspelo', 'Nalog nije obrisan. Proveri internet pa probaj ponovo.');
               return;
@@ -158,17 +159,20 @@ export default function ProfileTab() {
         </View>
       )}
 
-      <Button variant="ghost" className="mt-8" disabled={busy} onPress={doSignOut}>
-        <Text className="text-destructive">{busy ? 'Odjavljujem…' : 'Odjavi se'}</Text>
+      <Button variant="ghost" className="mt-8" disabled={busy === 'brisanje'} ucitava={busy === 'odjava'} onPress={doSignOut}>
+        <Text className="text-destructive">Odjavi se</Text>
       </Button>
 
       <Pressable
         onPress={doDelete}
-        disabled={busy}
+        disabled={busy !== null}
+        accessibilityState={{ disabled: busy !== null, busy: busy === 'brisanje' }}
         accessibilityRole="button"
         accessibilityLabel="Obriši nalog i sve podatke"
         className="mt-2 items-center py-3 active:opacity-60">
-        <Text variant="muted" className="text-xs">Obriši nalog</Text>
+        {busy === 'brisanje'
+          ? <ActivityIndicator color={neutral.inkSubtle} />
+          : <Text variant="muted" className="text-xs">Obriši nalog</Text>}
       </Pressable>
     </Screen>
   );

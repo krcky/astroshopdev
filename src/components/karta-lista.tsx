@@ -14,6 +14,7 @@ import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
 import type { SignPosition, ZodiacSign } from '@/lib/zodiac';
 import { neutral } from '@/theme/tokens';
+import { PREMIUM } from '@/components/zakljucano';
 
 /**
  * Delovi liste ispod tocka — zajednicki za natalnu kartu (tab "Ti") i
@@ -23,8 +24,6 @@ import { neutral } from '@/theme/tokens';
  * razlicite vrste podatka. Zato su ovde, a ne kopirani u oba ekrana.
  */
 
-/** Ista zlatna kao na zakljucanom tumacenju (`natal.tsx`) — katanac je jedino mesto gde se placa (pravilo 2). */
-export const GOLD = '#A7731B';
 
 /**
  * Kolone liste planeta (Ivan, 28.9.2026): znakovi poravnati LEVO u koloni
@@ -204,7 +203,7 @@ export function AspektRed({ aspekt: a, naslov = '', zakljucan = false, muted, la
           <Text variant="caption" className="tabular-nums">{orbis(a.orb)}</Text>
         </View>
       )}
-      {zakljucan && <Lock size={13} color={GOLD} strokeWidth={2.4} style={{ marginLeft: 6 }} />}
+      {zakljucan && <Lock size={13} color={PREMIUM} strokeWidth={2.4} style={{ marginLeft: 6 }} />}
       {onPress && <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} style={{ marginLeft: 6 }} />}
     </>
   );

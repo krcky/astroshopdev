@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 
+import { UmeciTaba } from '@/components/umeci';
 import { STARI_IOS } from '@/lib/platform';
 
 /**
@@ -14,23 +15,27 @@ import { STARI_IOS } from '@/lib/platform';
  *
  * Do 29.9.2026 ovo je imala samo pocetna; sada svi tabovi, da profil gore desno
  * bude isto dugme na svakom.
+ *
+ * `UmeciTaba`: bez njega svaki tab pri prvom prikazu bljesne — vidi tamo.
  */
 export function TabStack() {
   return (
-    <Stack
-      screenOptions={{
-        // Native zaglavlje sluzi samo iOS stavkama; Android ih nema (dobija nasa
-        // dugmad u `Screen`), pa mu prazna traka ne treba. Isto i iOS pre 26: tamo
-        // crtamo svoje stavke, a prazna providna traka bi im jela dodir.
-        headerShown: Platform.OS === 'ios' && !STARI_IOS,
-        // PROVIDNA: neprovidna traka gura ceo nas ekran (preliv, logo) ispod sebe.
-        // Cena: sistemski "scroll edge" efekat se onda veze samo za statusnu traku,
-        // pa zamucenje ispod nase trake crta `Screen` sam (provereno 26.9.2026).
-        headerTransparent: true,
-        headerTitle: '',
-        headerShadowVisible: false,
-        headerBackVisible: false,
-      }}
-    />
+    <UmeciTaba>
+      <Stack
+        screenOptions={{
+          // Native zaglavlje sluzi samo iOS stavkama; Android ih nema (dobija nasa
+          // dugmad u `Screen`), pa mu prazna traka ne treba. Isto i iOS pre 26: tamo
+          // crtamo svoje stavke, a prazna providna traka bi im jela dodir.
+          headerShown: Platform.OS === 'ios' && !STARI_IOS,
+          // PROVIDNA: neprovidna traka gura ceo nas ekran (preliv, logo) ispod sebe.
+          // Cena: sistemski "scroll edge" efekat se onda veze samo za statusnu traku,
+          // pa zamucenje ispod nase trake crta `Screen` sam (provereno 26.9.2026).
+          headerTransparent: true,
+          headerTitle: '',
+          headerShadowVisible: false,
+          headerBackVisible: false,
+        }}
+      />
+    </UmeciTaba>
   );
 }

@@ -11,13 +11,15 @@
         "simulator": false
       },
       "env": {
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "development",
+        "EXPO_PUBLIC_PROBNE_CENE": "1"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "APP_VARIANT": "preview"
+        "APP_VARIANT": "preview",
+        "EXPO_PUBLIC_PROBNE_CENE": "1"
       }
     },
     "production": {

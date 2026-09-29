@@ -30,15 +30,86 @@ export async function kupiPitanje(_pitanjeId: string, _premium: boolean): Promis
 }
 
 /**
- * PRIVREMENO (Ivan, 29.9.2026): probna cena SAMO u razvoju (`__DEV__`), da se vidi
- * kako stoji na ekranu. U buildu za prodavnicu se ne prikazuje nista dok cena ne
- * stigne iz RevenueCat Offerings — tada ovo ide napolje.
+ * PRIVREMENO (Ivan, 29.9.2026): probne cene dok RevenueCat ne stigne, da se vidi
+ * kako stoje na ekranu — u razvoju (`__DEV__`) i u PROBNOM buildu sa
+ * `EXPO_PUBLIC_PROBNE_CENE=1` (lokalni `.env` za build iz Xcode-a, EAS profili
+ * `development` i `preview`). Build za prodavnicu (`production`) ih nema: tamo cena
+ * stize SAMO iz RevenueCat Offerings — tada ovo ide napolje.
+ * Do 29.9.2026 je vazilo samo `__DEV__`, pa Release build na telefonu nije imao cenu.
  */
+const PROBNE_CENE = __DEV__ || process.env.EXPO_PUBLIC_PROBNE_CENE === '1';
+
 // 19,99 € za sve, bez popusta za Premium (Ivan, 29.9.2026).
 const PROBNA_CENA = { obicna: '19,99 €', clanska: '19,99 €' } as const;
 
-/** Cena iz prodavnice, npr. "14,99 €". `null` dok RevenueCat ne stigne (osim probne u razvoju). */
+/** Cena iz prodavnice, npr. "14,99 €". `null` dok RevenueCat ne stigne (osim probne). */
 export function useCenaPitanja(premium: boolean): string | null {
-  if (__DEV__) return premium ? PROBNA_CENA.clanska : PROBNA_CENA.obicna;
+  if (PROBNE_CENE) return premium ? PROBNA_CENA.clanska : PROBNA_CENA.obicna;
   return null;
+}
+
+/* ------------------------------------------------------------------------- *
+ * PREMIUM PRETPLATA (paywall `/premium`, Ivan 29.9.2026) — JOS NIJE UKLJUCENO.
+ *
+ * Kad stigne RevenueCat: paketi iz tekuceg Offering-a (`$rc_annual`,
+ * `$rc_monthly`), cena i proba iz `product` (priceString, price, introPrice) —
+ * u kod se cena nikad ne upisuje. Pravo pristupa i dalje upisuje SAMO webhook
+ * na serveru (pravilo 8); aplikacija posle kupovine samo ponovo procita pravo.
+ * ------------------------------------------------------------------------- */
+
+export type PaketPremium = {
+  id: 'godisnje' | 'mesecno';
+  /** Cena kako je prodavnica formatira: "49,99 €". */
+  cena: string;
+  /** Broj, samo za racun ustede i cene po mesecu. */
+  iznos: number;
+  /** Valuta za "4,17 € mesečno" (ISO, npr. "EUR"). */
+  valuta: string;
+  /** Besplatna proba u danima; `null` = paket nema probu. */
+  probaDana: number | null;
+};
+
+/**
+ * PRIVREMENO: probni paketi pod istim uslovom kao probna cena pitanja
+ * (`PROBNE_CENE`), da se vidi raspored. Brojevi nisu odluka o ceni — prava cena
+ * stize iz App Store Connect-a / Play Console-a.
+ */
+const PROBNI_PAKETI: PaketPremium[] = [
+  { id: 'godisnje', cena: '49,99 €', iznos: 49.99, valuta: 'EUR', probaDana: 7 },
+  { id: 'mesecno', cena: '5,99 €', iznos: 5.99, valuta: 'EUR', probaDana: null },
+];
+
+/** Paketi iz prodavnice; `null` dok RevenueCat ne stigne (osim probnih). */
+export function usePaketiPremium(): PaketPremium[] | null {
+  if (PROBNE_CENE) return PROBNI_PAKETI;
+  return null;
+}
+
+export async function kupiPremium(_paket: PaketPremium['id']): Promise<IshodKupovine> {
+  return 'nedostupno';
+}
+
+export type IshodVracanja = 'vraceno' | 'nema' | 'greska' | 'nedostupno';
+
+/** "Vrati kupovine" — Apple ga trazi na svakom paywall-u. */
+export async function vratiKupovine(): Promise<IshodVracanja> {
+  return 'nedostupno';
+}
+
+/** Koliko je godisnje jeftinije od 12 mesecnih, zaokruzeno na ceo procenat; `null` kad nije jeftinije. */
+export function ustedaGodisnje(godisnje: number, mesecno: number): number | null {
+  if (!(godisnje > 0) || !(mesecno > 0)) return null;
+  const u = Math.round((1 - godisnje / (mesecno * 12)) * 100);
+  return u > 0 ? u : null;
+}
+
+/** "4,17 €" — godisnja cena podeljena na 12, u valuti paketa, srpskim zapisom. */
+export function cenaPoMesecu(godisnje: number, valuta: string): string {
+  const iznos = Math.floor((godisnje / 12) * 100) / 100;
+  try {
+    return new Intl.NumberFormat('sr-Latn-RS', { style: 'currency', currency: valuta }).format(iznos);
+  } catch {
+    // Android Hermes ume da nema punu Intl podrsku — tada rucno, decimalni zarez.
+    return `${iznos.toFixed(2).replace('.', ',')} ${valuta === 'EUR' ? '€' : valuta}`;
+  }
 }

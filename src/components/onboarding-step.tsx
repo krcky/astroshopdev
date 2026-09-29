@@ -34,7 +34,8 @@ import { neutral } from '@/theme/tokens';
  * Stari oblik (sivo pitanje, `question`) ostaje za korake bez naslova.
  */
 
-type Action = { label: string; onPress: () => void; disabled?: boolean };
+/** `ucitava`: spiner u dugmetu dok se ceka (vidi `ui/button.tsx`) — natpis se ne menja. */
+type Action = { label: string; onPress: () => void; disabled?: boolean; ucitava?: boolean };
 
 type Props = {
   /** Prvi korak nudi izlaz (X), ostali strelicu nazad. */
@@ -164,7 +165,7 @@ export function OnboardingStep({
 
           <View className="px-5 pb-2 pt-4">
             {note && <Text variant="note" className="mb-5 px-2">{note}</Text>}
-            <Button size="lg" disabled={primary.disabled} onPress={primary.onPress}>
+            <Button size="lg" disabled={primary.disabled} ucitava={primary.ucitava} onPress={primary.onPress}>
               <Text>{primary.label}</Text>
             </Button>
             {secondary && (

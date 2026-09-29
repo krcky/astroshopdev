@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { TextClassContext } from '@/components/ui/text';
-import { shadow } from '@/theme/tokens';
+import { neutral, shadow } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 /*
@@ -230,6 +230,18 @@ type ButtonProps = React.ComponentProps<typeof Pressable> & VariantProps<typeof 
    * dugme sa senkom nestane i ostane samo sivi natpis (Ivan, 29.9.2026).
    */
   ugasenoSivo?: boolean;
+  /**
+   * Nesto se ceka (slanje, cuvanje, provera koda). Dugme ZADRZI svoj izgled, a
+   * umesto natpisa se vrti sistemski spiner u boji natpisa (Ivan, 29.9.2026:
+   * "Ucitavam" koji samo stoji ne kaze da se nesto desava). Do tada je ekran
+   * menjao natpis ("Saljem…") i gasio dugme, pa je crno dugme za vreme cekanja
+   * pobelelo kao da nesto nije u redu.
+   *
+   * Dugme se za to vreme ne moze pritisnuti — drugi dodir ne salje dvaput.
+   * Natpis ostaje u stablu, samo nevidljiv: dugme zadrzi sirinu, a citac
+   * ekrana i dalje zna koje je dugme (uz `busy`).
+   */
+  ucitava?: boolean;
 };
 
 export function Button({
@@ -241,6 +253,8 @@ export function Button({
   children,
   istaknuto = true,
   ugasenoSivo = false,
+  ucitava = false,
+  accessibilityState,
   ...props
 }: ButtonProps) {
   /*
@@ -248,7 +262,8 @@ export function Button({
    * ono postane belo sa sivim natpisom. Razlika je vazna: prigusena crna i
    * dalje vuce oko kao glavna akcija, a belo jasno kaze "jos ne moze".
    */
-  const ugaseno = Boolean(disabled);
+  // Dok se ceka, dugme NIJE ugaseno na izgled — vidi `ucitava`.
+  const ugaseno = Boolean(disabled) && !ucitava;
   const stvarni = ugaseno ? (ugasenoSivo ? 'secondary' : 'soft') : (variant ?? 'default');
   const meka = stvarni === 'soft';
   const crno = stvarni === 'default' || stvarni === 'destructive';
@@ -259,7 +274,8 @@ export function Button({
       value={cn(buttonTextVariants({ variant: stvarni, size }), ugaseno && 'text-subtle')}>
       <Pressable
         accessibilityRole="button"
-        disabled={disabled}
+        disabled={Boolean(disabled) || ucitava}
+        accessibilityState={{ ...accessibilityState, disabled: Boolean(disabled) || ucitava, busy: ucitava }}
         // Obican niz, ne funkcija: NativeWind uz `className` ODBACI `style` zadat
         // kao funkcija — senka mekog dugmeta i boja poslata spolja nisu stizale do
         // ekrana (izmereno na vebu, 28.9.2026). Funkcija ostaje samo kad ju je
@@ -277,13 +293,23 @@ export function Button({
           className,
         )}
         {...props}>
-        {(stanje) => (
-          <>
-            {/* PRVI u stablu, da natpis ostane iznad njega. */}
-            {crno ? <SjajCrnogDugmeta istaknuto={sjajno} /> : null}
-            {typeof children === 'function' ? children(stanje) : children}
-          </>
-        )}
+        {(stanje) => {
+          const sadrzaj = typeof children === 'function' ? children(stanje) : children;
+          return (
+            <>
+              {/* PRVI u stablu, da natpis ostane iznad njega. */}
+              {crno ? <SjajCrnogDugmeta istaknuto={sjajno} /> : null}
+              {ucitava ? (
+                <>
+                  <View className="flex-row items-center justify-center gap-2 opacity-0">{sadrzaj}</View>
+                  <View pointerEvents="none" style={StyleSheet.absoluteFill} className="items-center justify-center">
+                    <ActivityIndicator color={crno ? neutral.white : neutral.ink} />
+                  </View>
+                </>
+              ) : sadrzaj}
+            </>
+          );
+        }}
       </Pressable>
     </TextClassContext.Provider>
   );

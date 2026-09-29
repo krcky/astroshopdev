@@ -77,6 +77,7 @@
     "check:cities": "tsx scripts/check-cities.ts",
     "check:tumacenje": "tsx scripts/check-tumacenje.ts",
     "check:tvoj-dan": "TZ=Europe/Belgrade tsx scripts/check-tvoj-dan.ts",
+    "check:lunarni-kalendar": "TZ=Europe/Belgrade tsx scripts/check-lunarni-kalendar.ts",
     "check:natal-tekst": "tsx scripts/check-natal-tekst.ts",
     "check:oblasti": "TZ=Europe/Belgrade tsx scripts/check-oblasti.ts",
     "check:uvod": "tsx scripts/check-uvod.ts",
@@ -85,7 +86,7 @@
     "panel": "vite --config panel/vite.config.mts",
     "panel:build": "vite build --config panel/vite.config.mts",
     "typecheck:panel": "tsc -p panel",
-    "check": "npm run typecheck && npm run typecheck:panel && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst && npm run check:oblasti && npm run check:uvod && npm run check:pitanja && npm run check:pitanja-baza",
+    "check": "npm run typecheck && npm run typecheck:panel && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:lunarni-kalendar && npm run check:natal-tekst && npm run check:oblasti && npm run check:uvod && npm run check:pitanja && npm run check:pitanja-baza",
     "check:tokens": "tsx scripts/check-tokens.ts"
   },
   "private": true

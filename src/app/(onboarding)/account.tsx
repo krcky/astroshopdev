@@ -119,9 +119,10 @@ export default function Account() {
       center={false}
       note={null}
       primary={{
-        label: busy ? 'Trenutak…' : AUTH_MODE === 'otp' ? 'Pošalji mi kod' : 'Nastavi',
+        label: AUTH_MODE === 'otp' ? 'Pošalji mi kod' : 'Nastavi',
         onPress: submit,
-        disabled: !valid || busy,
+        disabled: !valid,
+        ucitava: busy,
       }}>
 
       <Input

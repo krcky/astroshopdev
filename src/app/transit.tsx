@@ -1,17 +1,14 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { Lock } from 'lucide-react-native';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
-import { SheetScroll, leaveSheetTo } from '@/components/sheet';
+import { SheetScroll } from '@/components/sheet';
+import { PremiumKartica } from '@/components/zakljucano';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
-import { CARD_SURFACE } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
@@ -28,7 +25,6 @@ import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
 import { neutral } from '@/theme/tokens';
 import { useNaMrezi } from '@/lib/mreza';
 
-const GOLD = '#A7731B';
 
 /**
  * Ikona uz naslov sekcije duge verzije — boja naslova (`label`), ne akcenat.
@@ -150,19 +146,12 @@ export default function TransitDetail() {
                   {naMrezi ? 'Tumačenje za ovaj tranzit još nije napisano.' : 'Ceo tekst će se pojaviti kad se veza vrati.'}
                 </Text>
               ) : (
-                <View className={cn(CARD_SURFACE, 'mt-8 border-gold/40 p-6')}>
-                  <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-gold/10">
-                    <Lock size={20} color={GOLD} />
-                  </View>
-                  <Text variant="h3" className="mt-4 text-center">Detaljno tumačenje</Text>
-                  <Text variant="muted" className="mt-2 text-center">
-                    Dugoročni efekti, sfere života na koje se odnosi, i konkretni
-                    saveti za ovaj period.
-                  </Text>
-                  <Button className="mt-5 w-full" onPress={() => leaveSheetTo('/profile')}>
-                    <Text>Otključaj</Text>
-                  </Button>
-                </View>
+                <PremiumKartica
+                  izLista
+                  className="mt-8"
+                  naslov="Detaljno tumačenje"
+                  opis="Dugoročni efekti, sfere života na koje se odnosi, i konkretni saveti za ovaj period."
+                />
               )}
             </>
           )}

@@ -17,9 +17,11 @@ su tamne, ljubičaste i pune čestica. Astroshop je bela stranica sa crnim tekst
 zato što se tako čita, i zato što se tako razlikuje. Svaki predlog koji ide ka
 "kosmičkom" izgledu ide protiv proizvoda — odbij ga i reci zašto.
 
-**Zlatna je valuta.** `--gold` je JEDINA boja koja odudara na beloj strani, i zato
-sme samo tamo gde se plaća. Čim se zlatna pojavi na nečem besplatnom, paywall
-prestaje da svetli i gubimo jedini signal koji imamo. Ovo nije stilsko pitanje.
+**Premium je indigo** (Ivan, 29.9.2026; do tada zlatna). Katanci, kartica
+„Otključaj" i paywall uzimaju `PREMIUM` iz `components/zakljucano.tsx`, nikad svoj
+hex. Indigo je i boja brenda, pa znak plaćenog nije boja sama nego KATANAC u njoj —
+katanac se ne stavlja ni na šta što nije iza Premium-a. Zlatna (`--gold`) se za
+Premium više ne koristi.
 
 **Prazan prostor nosi težinu.** Ekran koji tumači nešto lično (natalna karta,
 dnevni tekst) ne sme da liči na kontrolnu tablu. Manje elemenata, veći razmak.

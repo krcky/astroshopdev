@@ -36,7 +36,7 @@ export default function Name() {
       subtitle="Tako ti se horoskop obraća direktno, umesto kao oglasna tabla."
       center={false}
       note={null}
-      primary={{ label: busy ? 'Čuvam…' : 'Nastavi', onPress: next, disabled: !valid || busy }}>
+      primary={{ label: 'Nastavi', onPress: next, disabled: !valid, ucitava: busy }}>
       <Input
         povrsina="siva"
         value={name}

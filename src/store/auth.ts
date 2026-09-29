@@ -60,6 +60,11 @@ export function useEntitlement(): Entitlement | null {
   return override ? DEV_ENTITLEMENT.on : DEV_ENTITLEMENT.off;
 }
 
+/** Da li ovaj korisnik ima Premium (kupovina ili poklon) — prikaz; granice su u `lib/pristup.ts`. */
+export function usePremium(): boolean {
+  return !!useEntitlement()?.active;
+}
+
 /** Pokrece se jednom iz korenskog layout-a. */
 export function useAuthListener() {
   React.useEffect(() => {

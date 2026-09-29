@@ -284,3 +284,13 @@ export function lunationHouse(
   const house = houseOf(phase.moonLongitude, chart.houses);
   return { house, theme: HOUSE_THEMES[house] };
 }
+
+/**
+ * Naslov ekrana Mesec: faza, uvek sa recju "Mesec", i znak (Ivan, 29.9.2026):
+ * "Pun Mesec u Biku", "Prva četvrt Meseca u Strelcu". `faza` je ime iz
+ * `moonPhase()` (`lib/astro.ts`), `uZnaku` lokativ znaka ("Biku").
+ */
+export function naslovMeseca(faza: string, uZnaku: string): string {
+  const saMesecom = faza.includes('Mesec') ? faza : `${faza} Meseca`;
+  return `${saMesecom} u ${uZnaku}`;
+}

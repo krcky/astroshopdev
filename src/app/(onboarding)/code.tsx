@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MessageSquareMore, UserRoundCheck } from 'lucide-react-native';
 import Animated, {
@@ -12,6 +12,7 @@ import { Text } from '@/components/ui/text';
 import { supabase } from '@/lib/supabase';
 import { pullProfile } from '@/lib/sync';
 import { datumRodjenja } from '@/lib/horoscope';
+import { cn } from '@/lib/utils';
 import { adoptRemote, completeSignup, routeAfterSignup } from '@/lib/signup';
 import { signOut } from '@/store/auth';
 import type { Profile } from '@/store/profile';
@@ -27,6 +28,8 @@ export default function Code() {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [resentAt, setResentAt] = React.useState<number | null>(null);
+  /** Novi kod se trazi (captcha + mreza): spiner umesto veze, drugi dodir ne salje dvaput. */
+  const [saljemNovi, setSaljemNovi] = React.useState(false);
   /** Kod je vec potvrdjen — ponovni pokusaj posle pada mreze ga ne trosi opet. */
   const [userId, setUserId] = React.useState<string | null>(null);
   /** "Napravi nalog", a pod ovim emailom vec stoji karta. */
@@ -85,20 +88,26 @@ export default function Code() {
   };
 
   const resend = async () => {
+    if (saljemNovi) return;
     setError(null);
-    let captchaToken: string | undefined;
+    setSaljemNovi(true);
     try {
-      captchaToken = await captcha.getToken();
-    } catch {
-      setError('Nismo uspeli da potvrdimo da nisi robot. Probaj ponovo.');
-      return;
+      let captchaToken: string | undefined;
+      try {
+        captchaToken = await captcha.getToken();
+      } catch {
+        setError('Nismo uspeli da potvrdimo da nisi robot. Probaj ponovo.');
+        return;
+      }
+      const { error } = await supabase.auth.signInWithOtp({
+        email: String(email),
+        options: { captchaToken },
+      });
+      if (error) setError('Sačekaj minut pre nego što tražiš novi kod.');
+      else setResentAt(Date.now());
+    } finally {
+      setSaljemNovi(false);
     }
-    const { error } = await supabase.auth.signInWithOtp({
-      email: String(email),
-      options: { captchaToken },
-    });
-    if (error) setError('Sačekaj minut pre nego što tražiš novi kod.');
-    else setResentAt(Date.now());
   };
 
   if (zauzet) {
@@ -134,9 +143,10 @@ export default function Code() {
       center={false}
       note={null}
       primary={{
-        label: busy ? 'Proveravam…' : 'Potvrdi',
+        label: 'Potvrdi',
         onPress: verify,
-        disabled: code.length !== LENGTH || busy,
+        disabled: code.length !== LENGTH,
+        ucitava: busy,
       }}>
 
       <View className="items-center">
@@ -154,10 +164,15 @@ export default function Code() {
             glavno dugme, kao na referentnom ekranu. */}
         <Pressable
           onPress={resend}
+          disabled={saljemNovi}
           accessibilityRole="button"
+          accessibilityLabel="Pošalji novi kod"
+          accessibilityState={{ disabled: saljemNovi, busy: saljemNovi }}
           hitSlop={8}
           className="mt-6 py-2 active:opacity-60">
-          <Text variant="label" className="text-foreground underline">Pošalji novi kod</Text>
+          {saljemNovi
+            ? <ActivityIndicator color={neutral.ink} />
+            : <Text variant="label" className="text-foreground underline">Pošalji novi kod</Text>}
         </Pressable>
       </View>
 
@@ -185,7 +200,12 @@ function PoljeZaKod({ value, onChange }: { value: string; onChange: (kod: string
   const [fokus, setFokus] = React.useState(false);
 
   return (
-    <View className="h-16 flex-row items-center justify-center gap-2.5 rounded-pill bg-card px-7">
+    // Aktivno stanje kao `ui/input.tsx`: obod u boji teksta dok se kuca (Ivan, 29.9.2026).
+    <View
+      className={cn(
+        'h-16 flex-row items-center justify-center gap-2.5 rounded-pill border bg-card px-7',
+        fokus ? 'border-ring' : 'border-transparent'
+      )}>
       {Array.from({ length: LENGTH }, (_, i) => {
         const cifra = value[i];
         // Kursor stoji ISPRED mesta koje je na redu; kad su sva puna — iza poslednjeg.

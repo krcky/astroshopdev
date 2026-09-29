@@ -209,8 +209,8 @@ export default function PitanjeNovo() {
             <Text variant="note">{napomena}</Text>
           )}
           {/* Ugaseno SIVO: belo dugme na belom listu je izgledalo kao sam natpis (Ivan). */}
-          <Button istaknuto ugasenoSivo onPress={posalji} disabled={!spremno}>
-            <Text>{saljem ? 'Šaljem…' : kreditom ? 'Pošalji pitanje' : 'Nastavi na plaćanje'}</Text>
+          <Button istaknuto ugasenoSivo onPress={posalji} disabled={!spremno} ucitava={saljem}>
+            <Text>{kreditom ? 'Pošalji pitanje' : 'Nastavi na plaćanje'}</Text>
           </Button>
         </View>
       </Animated.View>

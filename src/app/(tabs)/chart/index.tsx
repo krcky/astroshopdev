@@ -15,8 +15,9 @@ import { RowHead } from '@/components/ui/row';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import {
-  AspektRed, GOLD, KUCA_KOLONA, Tacka, TrojkaPlocica, ZnakKolona, redosledPlaneta, stepenMinut, TockInfo,
+  AspektRed, KUCA_KOLONA, Tacka, TrojkaPlocica, ZnakKolona, redosledPlaneta, stepenMinut, TockInfo,
 } from '@/components/karta-lista';
+import { PREMIUM } from '@/components/zakljucano';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
 import {
@@ -279,7 +280,7 @@ function PodRed({ ikona, tekst, naslov, zakljucan, onPress, prvi = true }: {
         <Text variant="muted">{tekst}{naslov ? ': ' : ''}</Text>
         {naslov}
       </Text>
-      {zakljucan && <Lock size={13} color={GOLD} strokeWidth={2.4} style={{ marginLeft: 6 }} />}
+      {zakljucan && <Lock size={13} color={PREMIUM} strokeWidth={2.4} style={{ marginLeft: 6 }} />}
       <ChevronRight size={16} color={neutral.inkSubtle} strokeWidth={2.2} style={{ marginLeft: 6 }} />
     </Pressable>
   );

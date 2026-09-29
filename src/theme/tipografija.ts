@@ -49,6 +49,7 @@ export type Uloga =
   | 'karticaOznaka'    // verzal nad naslovom kartice tranzita ("VENERA KONJUNKCIJA MESEC")
   | 'karticaNaslov'    // naslov tumacenja na kartici tranzita
   | 'cena'             // "Cena pitanja 14,99 €" na "Pitaj astrologa" (Ivan, 29.9.2026: bold)
+  | 'paywallStavka'    // naslov stavke na paywall-u ("Natalna karta", "Tranziti"; Ivan, 29.9.2026: bold)
   | 'tockStepen' | 'tockMinut' | 'tockUgao' | 'tockKuca'; // tocak natalne karte
 
 /**
@@ -56,7 +57,7 @@ export type Uloga =
  * odmah posle zamene pisma: `font-semibold` (600) -> Bold jer Satoshi nema 600.
  */
 export const TEZINE_SATOSHI_1: Record<Uloga, Rez> = {
-  cena: 'bold',
+  cena: 'bold', paywallStavka: 'bold',
   display: 'bold', title: 'bold', section: 'bold', nav: 'bold', row: 'medium', h3: 'bold',
   label: 'medium', chip: 'medium', tab: 'medium', question: 'medium',
   default: 'regular', body: 'regular', reading: 'regular', muted: 'regular', caption: 'regular',
@@ -132,7 +133,7 @@ export const TEZINE_SATOSHI: Record<Uloga, Rez> = {
  * Regular (400) ostaje samo za minute i kuce na tocku, gde je sitno i sivo.
  */
 export const TEZINE_JAKARTA: Record<Uloga, Rez> = {
-  cena: 'bold',
+  cena: 'bold', paywallStavka: 'bold',
   display: 'extrabold', title: 'extrabold', section: 'extrabold',
   naslovStrane: 'extrabold', heroNaslov: 'extrabold', naslovSlajda: 'extrabold',
 
@@ -165,7 +166,7 @@ export const TEZINE_JAKARTA: Record<Uloga, Rez> = {
  * naspram sive. Prethodno, teze stanje: `TEZINE_JAKARTA`.
  */
 export const TEZINE_JAKARTA_LAKSE: Record<Uloga, Rez> = {
-  cena: 'bold',
+  cena: 'bold', paywallStavka: 'bold',
   display: 'semibold', title: 'semibold', section: 'semibold',
   // Naslovi strana u zaglavlju: ista debljina kao naslov na kartici tranzita (Ivan, 28.9.2026:
   // "ova debljina za sve naslove svih stranica u hederu") — uz logo na tabovima i u traci unutrasnjih strana.

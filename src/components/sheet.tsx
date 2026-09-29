@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BezInterneta } from '@/components/bez-interneta';
+import { neutral } from '@/theme/tokens';
 
 /**
  * Blagi prelaz na vrhu lista, ispod rucice (Ivan, 28.9.2026): tekst koji se
@@ -38,8 +39,13 @@ export function SheetGrabber() {
  * nadole. List ide odmah do vrha (`TUMACENJE_LIST`), a dugacak tekst se
  * skroluje unutra.
  */
-export function SheetScroll({ children, keyboardShouldPersistTaps }: {
+export function SheetScroll({ children, keyboardShouldPersistTaps, siva = false }: {
   children: React.ReactNode;
+  /**
+   * Siva pozadina (`bg-grouped`) umesto bele — za list sa BELIM KARTICAMA (lunarni
+   * kalendar, Ivan 29.9.2026): bela kartica na belom listu se ne vidi (pravilo 17).
+   */
+  siva?: boolean;
   /** Lista sa poljem za pretragu: `handled`, da prvi dodir na rezultat izabere, a ne samo spusti tastaturu. */
   keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
 }) {
@@ -51,14 +57,16 @@ export function SheetScroll({ children, keyboardShouldPersistTaps }: {
     // (`stickyHeaderIndices`) — zalepljeno zaglavlje RN crta PREKO sadrzaja koji
     // prolazi ispod, a svojih 40pt ujedno sluzi kao gornji razmak.
     <ScrollView
-      className="flex-1 bg-background"
+      className={siva ? 'flex-1 bg-grouped' : 'flex-1 bg-background'}
       stickyHeaderIndices={[0]}
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       showsVerticalScrollIndicator={false}>
       <View pointerEvents="none" style={{ height: FADE }}>
         <LinearGradient
-          colors={['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
+          colors={siva
+            ? [neutral.grouped, neutral.grouped, `${neutral.grouped}00`]
+            : ['rgba(255,255,255,1)', 'rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
           locations={[0, 0.35, 1]}
           style={{ flex: 1 }}
         />

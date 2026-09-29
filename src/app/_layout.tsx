@@ -18,6 +18,7 @@ import { neutral } from '@/theme/tokens';
 import { useFonts } from 'expo-font';
 import { FONT_FILES } from '@/theme/font';
 import { Uvod } from '@/components/uvod';
+import { KorenskiUmeci } from '@/components/umeci';
 import { UVOD_MS } from '@/lib/uvod';
 
 // Sistemski splash ostaje dok ga ne skloni uvod (`components/uvod.tsx`) — tek kad
@@ -95,57 +96,70 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }} onStartShouldSetResponderCapture={() => { probudi(); return false; }}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <StatusBar style="dark" />
-          <Animated.View style={[{ flex: 1 }, zumStil]}>
-            {pismo && aplikacija && (
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  // Siva, ne bela — ista pozadina koju crta `Screen`. Sa belom
-                  // svaki prelaz izmedju ekrana kratko bljesne svetlije.
-                  contentStyle: { backgroundColor: neutral.grouped },
-                  // iOS home indikator mora da ostane vidljiv — tako izgleda svaka
-                  // druga aplikacija. Podrazumevana vrednost bi trebalo da bude
-                  // false, ali je postavljamo izricito jer se u Expo Go ponasalo
-                  // kao da je ukljuceno.
-                  autoHideHomeIndicator: false,
-                }}>
-                {/* Nativni iOS list odozdo, visok koliko sadrzaj (Ivan, 28.9.2026): na osnovu
-                    cega je napisan "Tvoj dan". Na webu i Androidu je obican modal. */}
-                {/* Sva tumacenja kao isti nativni list, odmah do vrha (Ivan, 28.9.2026).
-                    Pozivaoci se ne menjaju — `router.push('/transit')` sam otvara list. */}
-                <Stack.Screen name="transit" options={TUMACENJE_LIST} />
-                <Stack.Screen name="natal" options={TUMACENJE_LIST} />
-                {/* "Šta je natalna karta" sa ikonice "i" na tabu "Ti" — dug tekst, pa isti list do vrha. */}
-                <Stack.Screen name="natalna-karta-info" options={TUMACENJE_LIST} />
-                {/* "Šta je trenutno nebo" sa ikonice "i" pored tocka na Nebu (Ivan, 29.9.2026). */}
-                <Stack.Screen name="nebo-info" options={TUMACENJE_LIST} />
-                <Stack.Screen name="tvoj-dan-info" options={LIST_PO_SADRZAJU} />
-                {/* Nebo (Ivan, 28.9.2026): kalendar sa dugmeta sa datumom, visok koliko
-                    sadrzaj; izbor mesta sa dugmeta sa gradom, do vrha — lista gradova
-                    raste dok se kuca, a list koji menja visinu bi skakao. */}
-                <Stack.Screen name="sky-datum" options={LIST_PO_SADRZAJU} />
-                <Stack.Screen name="sky-place" options={TUMACENJE_LIST} />
-                {/* Pitaj astrologa (29.9.2026): odgovor je list kao tumacenje; pisanje je
-                    pageSheet preko celog ekrana — formSheet ne daje visinu, a polje mora
-                    da zauzme prostor i dugme da stoji iznad tastature (`pitanje-novo.tsx`). */}
-                <Stack.Screen name="pitanje" options={TUMACENJE_LIST} />
-                <Stack.Screen
-                  name="pitanje-novo"
-                  options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.white } }}
-                />
-              </Stack>
+          {/* Pravi umeci prozora za tabove koji jos nisu bili na ekranu — `components/umeci.tsx`. */}
+          <KorenskiUmeci>
+            <StatusBar style="dark" />
+            <Animated.View style={[{ flex: 1 }, zumStil]}>
+              {pismo && aplikacija && (
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    // Siva, ne bela — ista pozadina koju crta `Screen`. Sa belom
+                    // svaki prelaz izmedju ekrana kratko bljesne svetlije.
+                    contentStyle: { backgroundColor: neutral.grouped },
+                    // iOS home indikator mora da ostane vidljiv — tako izgleda svaka
+                    // druga aplikacija. Podrazumevana vrednost bi trebalo da bude
+                    // false, ali je postavljamo izricito jer se u Expo Go ponasalo
+                    // kao da je ukljuceno.
+                    autoHideHomeIndicator: false,
+                  }}>
+                  {/* Nativni iOS list odozdo, visok koliko sadrzaj (Ivan, 28.9.2026): na osnovu
+                      cega je napisan "Tvoj dan". Na webu i Androidu je obican modal. */}
+                  {/* Sva tumacenja kao isti nativni list, odmah do vrha (Ivan, 28.9.2026).
+                      Pozivaoci se ne menjaju — `router.push('/transit')` sam otvara list. */}
+                  <Stack.Screen name="transit" options={TUMACENJE_LIST} />
+                  <Stack.Screen name="natal" options={TUMACENJE_LIST} />
+                  {/* "Šta je natalna karta" sa ikonice "i" na tabu "Ti" — dug tekst, pa isti list do vrha. */}
+                  <Stack.Screen name="natalna-karta-info" options={TUMACENJE_LIST} />
+                  {/* "Šta je trenutno nebo" sa ikonice "i" pored tocka na Nebu (Ivan, 29.9.2026). */}
+                  <Stack.Screen name="nebo-info" options={TUMACENJE_LIST} />
+                  <Stack.Screen name="tvoj-dan-info" options={LIST_PO_SADRZAJU} />
+                  {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice
+                      nazad (Ivan, 29.9.2026). SIVA pozadina: na njemu su bele kartice. */}
+                  <Stack.Screen name="moon" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  {/* Paywall — sa svakog "Otključaj" (`components/zakljucano.tsx`). List preko
+                      celog ekrana (Ivan, 29.9.2026: "na 100%"); `modal`, jer `formSheet`
+                      sadrzaju ne daje visinu, a paketi i dugme stoje na dnu. */}
+                  <Stack.Screen
+                    name="premium"
+                    options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.grouped } }}
+                  />
+                  {/* Nebo (Ivan, 28.9.2026): kalendar sa dugmeta sa datumom, visok koliko
+                      sadrzaj; izbor mesta sa dugmeta sa gradom, do vrha — lista gradova
+                      raste dok se kuca, a list koji menja visinu bi skakao. */}
+                  <Stack.Screen name="sky-datum" options={LIST_PO_SADRZAJU} />
+                  <Stack.Screen name="sky-place" options={TUMACENJE_LIST} />
+                  {/* Pitaj astrologa (29.9.2026): odgovor je list kao tumacenje; pisanje je
+                      pageSheet preko celog ekrana — formSheet ne daje visinu, a polje mora
+                      da zauzme prostor i dugme da stoji iznad tastature (`pitanje-novo.tsx`). */}
+                  <Stack.Screen name="pitanje" options={TUMACENJE_LIST} />
+                  <Stack.Screen
+                    name="pitanje-novo"
+                    options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.white } }}
+                  />
+                </Stack>
+              )}
+            </Animated.View>
+            {/* Uvod pri pokretanju: pokriva aplikaciju dok se ne otvori, pa nestaje. */}
+            {uvod && (
+              <Uvod
+                spremno={pismo && aplikacija && !authLoading && hydrated}
+                zum={zum}
+                onPocetak={pocetakUvoda}
+                onKraj={krajUvoda}
+              />
             )}
-          </Animated.View>
-          {/* Uvod pri pokretanju: pokriva aplikaciju dok se ne otvori, pa nestaje. */}
-          {uvod && (
-            <Uvod
-              spremno={pismo && aplikacija && !authLoading && hydrated}
-              zum={zum}
-              onPocetak={pocetakUvoda}
-              onKraj={krajUvoda}
-            />
-          )}
+          </KorenskiUmeci>
         </SafeAreaProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

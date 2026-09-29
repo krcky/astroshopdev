@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pressable, ScrollView, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, View, type ViewStyle } from 'react-native';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
 import { Text } from '@/components/ui/text';
@@ -13,11 +13,26 @@ import { tezina } from '@/theme/tipografija';
  * Efekat / Pazi / Savet na "Tvom danu" (Ivan, 28.9.2026). Vodoravni skrol, da
  * duzi nazivi i Dynamic Type ne lome red. Kartica oko reda ima `p-4`.
  */
-export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor }: {
+export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false }: {
   stavke: { key: K; label: string; icon: React.ReactNode }[];
   izabrana: K;
   onIzbor: (k: K) => void;
+  /**
+   * Sve odjednom, bez skrola (lunarni kalendar, Ivan 29.9.2026): jednake USPRAVNE
+   * plocice — ikonica iznad natpisa — koje dele sirinu reda. Za pet oblasti; kapsule
+   * sa natpisom pored ikonice u taj red ne staju.
+   */
+  sveVidljive?: boolean;
 }) {
+  if (sveVidljive) {
+    return (
+      <View accessibilityRole="tablist" className="flex-row gap-1.5">
+        {stavke.map((s) => (
+          <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} uspravna />
+        ))}
+      </View>
+    );
+  }
   return (
     <ScrollView
       horizontal
@@ -33,7 +48,7 @@ export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor }: {
 }
 
 /** Izabrana kapsula: svetla lila izabrane ikonice oblasti (`OBLAST_BOJA`), providna. */
-const LILA_SVETLA = hexAlpha(OBLAST_BOJA, 0.3);
+export const LILA_SVETLA = hexAlpha(OBLAST_BOJA, 0.3);
 
 /**
  * Neizabrana kapsula: staklo sa SIVOM nijansom (Ivan, 29.9.2026: "loše izgleda").
@@ -49,6 +64,12 @@ const KAPSULA: ViewStyle = {
   flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16,
 };
 
+/** Uspravna plocica (`sveVidljive`): ikonica iznad natpisa, deli sirinu reda sa ostalima. */
+const USPRAVNA: ViewStyle = {
+  height: 64, borderRadius: 18, overflow: 'hidden',
+  alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 4,
+};
+
 function hexAlpha(hex: string, a: number) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
@@ -60,13 +81,19 @@ function hexAlpha(hex: string, a: number) {
  * sloj iza sadrzaja, i senka/obod oko njega — kapsula ostane siva ili bela.
  * Bez stakla (iOS 18, Android, veb): siva ispuna, izabrana ista lila.
  */
-function Kapsula({ label, icon, selected, onPress }: {
-  label: string; icon: React.ReactNode; selected: boolean; onPress: () => void;
+function Kapsula({ label, icon, selected, onPress, uspravna = false }: {
+  label: string; icon: React.ReactNode; selected: boolean; onPress: () => void; uspravna?: boolean;
 }) {
   const sadrzaj = (
     <>
       {icon}
-      <Text variant="chip" className={cn(selected && tezina('chipIzabran'))}>{label}</Text>
+      {uspravna ? (
+        // Najduzi natpis ("Karijera", "Zdravlje") mora da stane u petinu reda.
+        <Text variant="caption" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}
+          className={cn('text-foreground', selected && tezina('chipIzabran'))}>{label}</Text>
+      ) : (
+        <Text variant="chip" className={cn(selected && tezina('chipIzabran'))}>{label}</Text>
+      )}
     </>
   );
   if (!isLiquidGlassAvailable()) {
@@ -75,8 +102,11 @@ function Kapsula({ label, icon, selected, onPress }: {
         onPress={onPress}
         accessibilityRole="tab"
         accessibilityState={{ selected }}
-        style={selected ? { backgroundColor: LILA_SVETLA } : undefined}
-        className={cn('h-chip flex-row items-center gap-2 rounded-pill px-4 active:opacity-70', !selected && 'bg-fill')}>
+        style={[uspravna ? USPRAVNA : null, selected ? { backgroundColor: LILA_SVETLA } : null]}
+        className={cn(
+          uspravna ? 'flex-1 active:opacity-70' : 'h-chip flex-row items-center gap-2 rounded-pill px-4 active:opacity-70',
+          !selected && 'bg-fill',
+        )}>
         {sadrzaj}
       </Pressable>
     );
@@ -85,13 +115,13 @@ function Kapsula({ label, icon, selected, onPress }: {
     // BEZ `active:opacity-*`: iOS pokvari staklo cim je bilo koji roditelj providan
     // (UIVisualEffectView uz alpha < 1), pa je kapsula pri dodiru treptala sivo.
     // Odziv na dodir daje samo staklo (`isInteractive`).
-    <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected }}>
+    <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected }} style={uspravna ? { flex: 1 } : undefined}>
       <GlassView
         glassEffectStyle="regular"
         colorScheme="light"
         isInteractive
         tintColor={selected ? LILA_SVETLA : SIVO_STAKLO}
-        style={KAPSULA}>
+        style={uspravna ? USPRAVNA : KAPSULA}>
         {sadrzaj}
       </GlassView>
     </Pressable>

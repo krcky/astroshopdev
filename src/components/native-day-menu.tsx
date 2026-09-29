@@ -10,9 +10,14 @@ export type NativeDayMenuProps = {
   /** Za VoiceOver: "Izabran dan: Danas…". */
   accessibilityLabel: string;
   color: string;
-  options: { value: number; title: string }[];
+  /**
+   * `zakljucano`: dan koji besplatni ne moze da otvori — stoji u meniju sa
+   * katancem, a dodir zove `onZakljucano` (paywall), ne `onChange`.
+   */
+  options: { value: number; title: string; zakljucano?: boolean }[];
   selected: number;
   onChange: (value: number) => void;
+  onZakljucano?: (value: number) => void;
 };
 
 /** Van iOS-a native menija nema — pozivalac tamo crta svoj (`DayMenu`). */

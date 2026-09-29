@@ -17,6 +17,8 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { TONE_LABEL, type Tone } from '@/lib/tone';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
+import { PremiumKartica, ZakljucaniRedovi } from '@/components/zakljucano';
+import { mnozina, TRANZIT } from '@/lib/mnozina';
 
 /** Precnik slike planete na kartici (dve se preklapaju, `planete-par.tsx`). */
 const PLANETA = 36;
@@ -34,9 +36,14 @@ const ILUSTRACIJA = 88; // Ivan, 28.9.2026: "povecati malo" (bilo 80); dugo traj
  * dolazi iz DUGE verzije (Premium je dobija od servera, pravilo 8), inace iz
  * kratke. Tranzit bez naslova se prikazuje imenom i belezi se za proveru.
  */
-export function TranzitiLista({ rez, date, onZaProveru }: {
+export function TranzitiLista({ rez, date, onZaProveru, besplatno }: {
   rez: OblastiDana;
   date: Date;
+  /**
+   * Besplatni: koliko kartica je otvoreno (`BESPLATNO.tranzitiDana`); ostali su
+   * zakljucani redovi sa imenom i trajanjem, pa kartica "Otključaj". Premium: bez granice.
+   */
+  besplatno?: number;
   /** Kljucevi tranzita bez naslova tumacenja — za dev pregled i konzolu. */
   onZaProveru?: (keys: string[]) => void;
 }) {
@@ -51,6 +58,9 @@ export function TranzitiLista({ rez, date, onZaProveru }: {
     for (const t of rez.poVaznosti) m.set(t.red.key, trajanjeTekst(trajanjeTranzita(t.red, date)));
     return m;
   }, [rez, date]);
+
+  const otvoreni = besplatno === undefined ? rez.poVaznosti : rez.poVaznosti.slice(0, besplatno);
+  const zakljucani = rez.poVaznosti.slice(otvoreni.length);
 
   const naslov = (key: string) => duge.get(key)?.title || kratke.get(key)?.title || '';
 
@@ -72,11 +82,31 @@ export function TranzitiLista({ rez, date, onZaProveru }: {
       )}
 
       <View className="gap-3">
-        {rez.poVaznosti.map((t) => (
+        {otvoreni.map((t) => (
           <KarticaTranzita key={t.red.key} red={t.red} ton={t.ton} naslov={naslov(t.red.key)} loading={loading}
             trajanje={trajanja.get(t.red.key) ?? ''} />
         ))}
       </View>
+
+      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti po imenu, pod katancem — vidi se
+          da postoje, ne i sta pisu. */}
+      {zakljucani.length > 0 && (
+        <>
+          <ZakljucaniRedovi
+            className="mt-3"
+            redovi={zakljucani.map((t) => ({
+              key: t.red.key,
+              naslov: tekstReda(t.red, '').veci,
+              ispod: trajanja.get(t.red.key),
+            }))}
+          />
+          <PremiumKartica
+            className="mt-3"
+            naslov="Svi tranziti dana"
+            opis={`Još ${zakljucani.length} ${mnozina(zakljucani.length, TRANZIT)} danas, sa celim tekstom za svaki.`}
+          />
+        </>
+      )}
     </View>
   );
 }

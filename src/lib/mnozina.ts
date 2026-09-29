@@ -16,6 +16,7 @@ export function mnozina(n: number, [jedan, dva, pet]: Oblici): string {
 
 export const DAN: Oblici = ['dan', 'dana', 'dana'];
 export const MESEC: Oblici = ['mesec', 'meseca', 'meseci'];
+export const TRANZIT: Oblici = ['tranzit', 'tranzita', 'tranzita'];
 
 /** "21 dan", "22 dana", "11 dana". */
 export const dana = (n: number) => `${n} ${mnozina(n, DAN)}`;

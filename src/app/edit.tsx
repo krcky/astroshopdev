@@ -123,8 +123,8 @@ export default function EditBirthData() {
             )}
           </Section>
 
-          <Button className="mt-8" size="lg" disabled={!valid || busy} onPress={save}>
-            <Text>{busy ? 'Čuvam…' : 'Sačuvaj'}</Text>
+          <Button className="mt-8" size="lg" disabled={!valid} ucitava={busy} onPress={save}>
+            <Text>Sačuvaj</Text>
           </Button>
     </Screen>
   );

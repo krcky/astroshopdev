@@ -28,12 +28,14 @@ src/
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
+    premium.tsx      PAYWALL (po uzoru na CHANI) — modal preko celog ekrana, sa svakog "Otključaj"; paketi iz `kupovina.ts`
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     natalna-karta-info.tsx  list "Šta je natalna karta" (ikonica "i" pored tocka): sazetak, legenda aspekata, elementi
     nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
-    moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
+    moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
+                     i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
@@ -72,6 +74,7 @@ src/
     tocak-stil.ts    izgled tocka (boje, crtice, aspekti) — deli ga panel
     znak-oblici.ts   oblici i boje ikonica znakova — deli ih panel
     uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
+    pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — PRIVREMENO, ceka astrologa
     horoscope.ts     composer                   <- ovde ulazi korpus
@@ -115,8 +118,11 @@ pisu `font-semibold` sami nego `tezina('uloga')`; stanje pre procene hijerarhije
 su sacuvana kao `TEZINE_SATOSHI_1`, `TEZINE_HIJERARHIJA` i `TEZINE_SATOSHI` (povratak: jedna linija).
 Tekst za citanje je Medium, ne Regular (Ivan: "malo podebljaj"). Uzorak: `/dev-tipografija`. `TextInput` nosi `font-sans`; SVG tekst i natpisi tabova
 dobijaju `FONT.*` direktno. Ne postavljati `fontWeight` uz ucitanu familiju —
-Android bi je vestacki podebljao. Skala velicina (merena sa SF Pro-a) je ostala. Zlatna (`--gold`) se koristi ISKLJUCIVO kao akcenat na placenom sadrzaju
-— nigde drugde, da paywall ostane jedina stvar koja "svetli" na stranici. Tamna
+Android bi je vestacki podebljao. Skala velicina (merena sa SF Pro-a) je ostala. BOJA PREMIUM-A JE INDIGO (Ivan, 29.9.2026; do tada zlatna `--gold`): katanci,
+kartica "Otključaj" i paywall uzimaju `PREMIUM` iz `components/zakljucano.tsx`
+(= `brand.indigo`), nikad svoj hex. Indigo je i boja brenda (ikonice planeta,
+tackica novog odgovora), pa Premium ne prepoznaje boja sama nego katanac u njoj.
+`--gold` za Premium vise nije u upotrebi. Tamna
 tema je i dalje definisana pod `.dark:root` ako je ikad budemo ponudili kao
 opciju; `_layout.tsx` je zakljucan na `colorScheme.set('light')`.
 
@@ -309,6 +315,12 @@ rezerva za Android / iOS < 26 i tamo gde trake nema (kapsule u karticama). Provi
 roditelj (`active:opacity`) kvari staklo — nikad oko `GlassView`. `@expo/ui`
 SwiftUI dugme sa `RNHostView` sadrzajem je u Expo Go-u oborilo ceo bundle.
 
+UMETAK VRHA U TABU (29.9.2026): expo-router svaki native tab obmota SVOJIM
+`SafeAreaProvider`-om, a skriven tab (montiran unapred) dobije od njega vrh 0 — pa je
+svaki tab pri PRVOM prikazu ~0,1 s imao naslov preko sata i sadrzaj previsoko (snimak
+sa iPhone-a). `TabStack` zato ide kroz `UmeciTaba` (`components/umeci.tsx`), koji tada
+uzme umetke prozora iz korena (`KorenskiUmeci` u `_layout.tsx`). Ne uklanjati.
+
 ZIVI PRELIV STAJE KAD KORISNIK MIRUJE (baterija, 28.9.2026): mrlje teku samo na ekranu u
 fokusu, 20 s posle poslednjeg dodira uspore do nule (`store/budnost.ts`, dodir hvata koren u
 `_layout.tsx`, tab i povratak u app bude). U Low Power Mode / usteda baterije (`expo-battery`)
@@ -330,8 +342,23 @@ Interesovanja iz onboardinga jos ne postoje: `redosled`/`iskljucene` su parametr
 podrazumevanom vrednoscu. Opis: `docs/ASTRO-LOGIKA.md`, poglavlje 11. Testovi: `npm run
 check:oblasti`. Pregled: `/dev-tranziti` (samo dev).
 
-**18. Tranzit dana: Premium "Tvoj dan" po SKORU, besplatni Hero waterfall-om.**
-PREMIUM (od 27.9.2026, Ivan): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
+**18c. Besplatno = ISTI ekrani, manje dubine (Ivan, 29.9.2026).**
+Besplatni vise ne vidi "staru verziju": "Tvoj dan", "Mesec danas", ocene oblasti i
+nova lista Tranziti su za sve. Granice su SAMO u `lib/pristup.ts` (`BESPLATNO`):
+Tranziti prva 3 (ostali po imenu pod katancem), Tema perioda prvi, ocena samo za
+Ljubav, dan-meni samo Premium. Ekran pita `usePremium()` (`store/auth.ts`) i cita
+broj iz `BESPLATNO`, ne pise svoj. Zakljucano crta `components/zakljucano.tsx`
+(indigo katanac `PREMIUM`, `PremiumKartica`, `ZakljucaniRedovi`) i sve vodi na `/premium`.
+PAYWALL (`app/premium.tsx`): cetiri stavke sa nasim ilustracijama, dva paketa (godisnje
+izabrano, "Uštedi N%" se RACUNA iz cena), jedno crno dugme, pa Uslovi / Vrati kupovine /
+Privatnost i recenica o automatskom obnavljanju (Apple). Cena i proba SAMO iz prodavnice
+(`usePaketiPremium`); u `__DEV__` probni paketi, u buildu bez cene paketi se ne crtaju.
+Bez polja za promo kod (pravilo 8). Indigo (`PREMIUM`) samo na izabranom paketu i oznaci.
+Tekst za besplatne je KRATKA verzija — dugu ionako salje samo server (pravilo 8).
+Tabela: `docs/ASTRO-LOGIKA.md`, poglavlje 5c.
+
+**18. Tranzit dana: "Tvoj dan" po SKORU, za sve (od 29.9.2026; Hero je arhiva).**
+PREMIUM (od 27.9.2026, Ivan; od 29.9.2026 i besplatni, sa kratkim tekstom): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
 (isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — VAZE SAMO za izbor i
 ocene oblasti. Lista u tabu "Tranziti" ide orbisom liste (`LISTA_ORB`: 3°, sekstil 2°), kao i
 "Danas ukratko". TRAJANJE ("Traje jos N", opseg datuma) se racuna ISKLJUCIVO kroz
@@ -346,7 +373,7 @@ prazan, pri odjavi se brisu — ranije je drugi nalog na istom telefonu nasledji
 DANAS na tabovima je `useDanas()` (`store/danas.ts`), NE `useMemo(() => new Date(), [])`:
 tab ostaje montiran, pa je aplikacija ostavljena preko noci ujutru pokazivala jucerasnji dan.
 Testovi: `npm run check:tvoj-dan`. Pregled sa ASC u Ribama: `/dev-kartice` (samo dev).
-BESPLATNI — staro pravilo, ostaje zapisano ispod:
+ARHIVA — do 29.9.2026 besplatni su videli Hero; kod (`pickHero`) i testovi ostaju:
 `pickHero` u `lib/transits.ts` (specifikacija 26.9.2026): 1) jak aspekt (orb <= 1,5°,
 `STRONG_ORB`) na VLADARA Ascendenta ili Sunca -> 2) tranzit na Ascendent, MC, Sunce
 ili Mesec -> 3) najegzaktniji tranzit na bilo koju natalnu planetu -> 4) Hero se ne
@@ -432,8 +459,10 @@ broj u indigo krugu na tabu (`NativeTabs.Trigger.Badge`; kad je 0 ne salje se te
 pitanja; bez push-a se lista osvezava kad se aplikacija vrati u prvi plan.
 PLACANJE JOS NIJE UKLJUCENO: `lib/kupovina.ts` vraca `nedostupno`, cena se ne prikazuje
 (dolazi SAMO iz RevenueCat Offerings, `question` / `question_member`; Premium po
-`useEntitlement()`, da i poklon dobije nizu cenu). PRIVREMENO: u razvoju (`__DEV__`)
-stoji probna cena `PROBNA_CENA` u `kupovina.ts`, samo za izgled — ide napolje sa RevenueCat-om. Do tada se salje samo kreditom:
+`useEntitlement()`, da i poklon dobije nizu cenu). PRIVREMENO: probna cena `PROBNA_CENA`
+(i probni Premium paketi) u `kupovina.ts`, samo za izgled — u razvoju (`__DEV__`) i u probnom
+buildu sa `EXPO_PUBLIC_PROBNE_CENE=1` (lokalni `.env` za Xcode, EAS `development`/`preview`);
+EAS `production` ga NEMA. Ide napolje sa RevenueCat-om. Do tada se salje samo kreditom:
 `select admin.daj_pitanje('email')`. Push jos nema — ekran zato ne kaze "javicemo ti".
 MEJL ASTROLOGU (Ivan, 29.9.2026): pitanje predje u `paid` -> okidac (`pitanja-obavestenja.sql`,
 `pg_net`) -> funkcija `obavesti-astrologa` -> SendGrid, svim astrolozima. Samo ime, vreme i
@@ -472,6 +501,7 @@ npm run check:natal       ascendent, MC, Placidus kuce, tranziti
 npm run check:timezone    vreme rodjenja -> UTC
 npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
 npm run check:cities      predlozi gradova + da se pretraga nije suzila
+npm run check:lunarni-kalendar mreza meseca, glavne faze po danima, pomeranje dana (ekran Mesec)
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
 npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
 npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor

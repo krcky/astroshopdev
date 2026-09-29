@@ -55,7 +55,7 @@ export default function Push() {
         : 'Jednom ujutru, sa horoskopom za taj dan, i kad ti astrolog odgovori. Ništa drugo ti ne šaljemo.'}
       center={false}
       note={null}
-      primary={{ label: busy ? 'Trenutak…' : 'Uključi obaveštenja', onPress: ask, disabled: busy }}>
+      primary={{ label: 'Uključi obaveštenja', onPress: ask, ucitava: busy }}>
 
       <PrimeriObavestenja />
     </OnboardingStep>

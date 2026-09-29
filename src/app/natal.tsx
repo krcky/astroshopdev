@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { Lock } from 'lucide-react-native';
 
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
+import { PremiumKartica } from '@/components/zakljucano';
 import { Text } from '@/components/ui/text';
 import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
@@ -30,8 +30,6 @@ import { useNatalTexts, type NatalText } from '@/lib/natal-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
 
-/** Ista zlatna kao na zakljucanom tumacenju tranzita (`transit.tsx`) — jedino mesto gde se placa. */
-const GOLD = '#A7731B';
 
 /**
  * Tumacenje iz natalne karte: planeta (u znaku i u kuci), podznak ili aspekt.
@@ -148,18 +146,12 @@ export default function NatalTumacenje() {
       )}
 
       {zakljucani.length > 0 && (
-        <View className={cn(CARD_SURFACE, 'mt-8 border-gold/40 p-6')}>
-          <View className="h-12 w-12 items-center justify-center self-center rounded-full bg-gold/10">
-            <Lock size={20} color={GOLD} />
-          </View>
-          <Text variant="h3" className="mt-4 text-center">Cela natalna karta</Text>
-          <Text variant="muted" className="mt-2 text-center">
-            Sve planete u znakovima i kućama i svi aspekti tvoje karte. Sunce, Mesec i podznak su besplatni.
-          </Text>
-          <Button className="mt-5 w-full" onPress={() => leaveSheetTo('/profile')}>
-            <Text>Otključaj</Text>
-          </Button>
-        </View>
+        <PremiumKartica
+          izLista
+          className="mt-8"
+          naslov="Cela natalna karta"
+          opis="Sve planete u znakovima i kućama i svi aspekti tvoje karte. Sunce, Mesec i podznak su besplatni."
+        />
       )}
     </SheetScroll>
   );
