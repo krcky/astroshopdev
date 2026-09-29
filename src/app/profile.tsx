@@ -11,9 +11,9 @@ import { deleteAccount, signOut, useAuthStore, useEntitlement } from '@/store/au
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
 import { cn } from '@/lib/utils';
+import { datumRodjenja, formatDatum } from '@/lib/horoscope';
 import { neutral } from '@/theme/tokens';
 
-const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
 const pad = (n: number) => String(n).padStart(2, '0');
 
 export default function ProfileTab() {
@@ -90,7 +90,7 @@ export default function ProfileTab() {
         </View>
         <View className="px-4 py-3.5">
           <Text className="text-sm">
-            {b.day}. {MESECI[b.month - 1]} {b.year}
+            {datumRodjenja(b)}
             {profile.time ? ` u ${pad(profile.time.hour)}:${pad(profile.time.minute)}` : ''}
           </Text>
           <Text variant="muted" className="mt-1 text-sm">{city.name}, {city.country}</Text>
@@ -110,14 +110,14 @@ export default function ProfileTab() {
         <View className="flex-row items-center justify-between px-4 py-3.5">
           <Text className="text-sm">Plaćeni sadržaj</Text>
           <Text className={cn('text-sm', entitlement?.active ? 'text-foreground' : 'text-muted-foreground')}>
-            {entitlement?.active ? 'aktivan' : 'nije aktivan'}
+            {entitlement?.active ? (entitlement.productId === 'poklon' ? 'aktivan, poklon' : 'aktivan') : 'nije aktivan'}
           </Text>
         </View>
         {entitlement?.expiresAt && (
           <View className="flex-row items-center justify-between border-t border-border px-4 py-3.5">
             <Text className="text-sm">Ističe</Text>
             <Text variant="muted" className="text-sm">
-              {new Date(entitlement.expiresAt).toLocaleDateString('sr-Latn-RS')}
+              {formatDatum(new Date(entitlement.expiresAt))}
             </Text>
           </View>
         )}

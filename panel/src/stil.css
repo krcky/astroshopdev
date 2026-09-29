@@ -1,0 +1,120 @@
+/* Panel za astrologa — isti jezik kao aplikacija: siva pozadina, bele kartice,
+   crn tekst, crno dugme kao kapsula. Boje postavlja main.tsx iz theme/tokens.ts. */
+
+* { box-sizing: border-box; }
+
+/* Simboli planeta na tocku — isti font kao u aplikaciji (`assets/fonts/AstroGlyphs.ttf`). */
+@font-face {
+  font-family: 'AstroGlyphs';
+  src: url('../../assets/fonts/AstroGlyphs.ttf') format('truetype');
+  font-display: block;
+}
+
+html, body {
+  margin: 0;
+  background: var(--pozadina);
+  color: var(--tekst);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.strana { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+.uska { max-width: 420px; margin: 12vh auto 0; padding: 0 20px; }
+
+.zaglavlje { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.zaglavlje h1 { margin: 0; }
+
+h1 { font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -0.4px; margin: 0 0 8px; }
+h2 { font-size: 19px; line-height: 1.3; font-weight: 700; margin: 0 0 12px; }
+h3 { font-size: 13px; font-weight: 600; color: var(--tekst-bled); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px; }
+p { margin: 0; }
+
+.siv { color: var(--tekst-siv); }
+.bled { color: var(--tekst-bled); }
+.sitno { font-size: 13px; }
+.crveno { color: var(--crvena); }
+
+.kartica { background: var(--kartica); border-radius: 20px; padding: 20px; }
+.kartica + .kartica { margin-top: 12px; }
+.odeljak { margin-top: 28px; }
+
+/* Dugmad */
+button, .dugme {
+  font: inherit; cursor: pointer; border: 0; border-radius: 999px;
+  height: 46px; padding: 0 22px; font-weight: 600; font-size: 15px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.crno { background: var(--tekst); color: #fff; }
+.crno:hover { opacity: 0.88; }
+.sivo { background: var(--ispuna-jaka); color: var(--tekst); }
+.sivo:hover { background: #e2e2e2; }
+.tiho { background: transparent; color: var(--tekst-siv); padding: 0 8px; height: 36px; }
+.tiho:hover { color: var(--tekst); }
+.crveno-dugme { background: var(--crvena); color: #fff; }
+button:disabled { opacity: 0.4; cursor: default; }
+.puno { width: 100%; }
+.red-dugmadi { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+/* Polja */
+input[type='email'], input[type='text'] {
+  font: inherit; width: 100%; height: 48px; border: 0; border-radius: 999px;
+  background: var(--ispuna); padding: 0 20px; color: var(--tekst); outline: none;
+}
+input:focus { box-shadow: 0 0 0 2px var(--ispuna-jaka); }
+.kod { letter-spacing: 8px; font-size: 22px; text-align: center; font-weight: 600; }
+.polje + .polje { margin-top: 12px; }
+.greska { color: var(--crvena); margin-top: 12px; }
+
+/* Tabovi */
+.tabovi { display: flex; gap: 24px; border-bottom: 1px solid var(--ispuna-jaka); margin-bottom: 20px; }
+.tabovi button { background: none; border-radius: 0; height: auto; padding: 10px 0; color: var(--tekst-siv); font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabovi button.aktivan { color: var(--tekst); border-bottom-color: var(--tekst); }
+
+/* Lista pitanja */
+.stavka { display: block; width: 100%; text-align: left; height: auto; padding: 18px 20px; border-radius: 20px; background: var(--kartica); color: var(--tekst); font-weight: 500; }
+.stavka:hover { box-shadow: 0 0 0 2px var(--ispuna-jaka); }
+.stavka + .stavka { margin-top: 10px; }
+.stavka-vrh { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.stavka-tekst { color: var(--tekst-siv); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.oznaka { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 999px; background: var(--ispuna-jaka); color: var(--tekst-siv); vertical-align: middle; margin-left: 6px; }
+
+/* Pitanje */
+.pitanje-tekst { font-size: 19px; line-height: 1.55; white-space: pre-wrap; }
+.dve-kolone { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 720px) { .dve-kolone { grid-template-columns: 1fr; } }
+.podaci { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+.podaci dt { color: var(--tekst-siv); }
+.podaci dd { margin: 0; }
+
+table { width: 100%; border-collapse: collapse; }
+td, th { text-align: left; padding: 8px 0; border-bottom: 1px solid var(--linija); font-weight: 500; }
+th { color: var(--tekst-bled); font-size: 13px; font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.broj, th.broj { text-align: right; font-variant-numeric: tabular-nums; }
+
+.napomena { background: var(--ispuna); border-radius: 14px; padding: 12px 16px; color: var(--tekst-siv); margin-bottom: 12px; }
+
+/* Snimanje */
+.snimac-vreme { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+.tacka { width: 10px; height: 10px; border-radius: 50%; background: var(--crvena); display: inline-block; animation: puls 1.2s infinite; }
+@keyframes puls { 50% { opacity: 0.25; } }
+audio { width: 100%; margin-top: 12px; }
+
+.uputstvo { margin-top: 16px; color: var(--tekst-siv); }
+.uputstvo summary { cursor: pointer; font-weight: 600; color: var(--tekst); }
+.uputstvo ol { margin: 10px 0 8px; padding-left: 20px; }
+.uputstvo li + li { margin-top: 6px; }
+
+.poruka-uspeh { background: var(--tekst); color: #fff; border-radius: 14px; padding: 12px 16px; margin-bottom: 20px; }
+
+/* Pitanje: levo pitanje i odgovor (lepi se pri skrolu), desno karta. */
+.raspored { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.levo { position: sticky; top: 24px; }
+@media (max-width: 900px) {
+  .raspored { grid-template-columns: 1fr; }
+  .levo { position: static; }
+}
+.raspored .dve-kolone { grid-template-columns: 1fr; }

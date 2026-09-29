@@ -14,6 +14,8 @@ import * as React from 'react';
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuthStore } from '@/store/auth';
+import { kesProcitaj, kesUpisi, ucitajKes, useKesUcitan } from '@/lib/kes-na-disku';
+import { usePovratakMreze } from '@/lib/mreza';
 
 export type TransitVersion = 'short' | 'long';
 
@@ -87,6 +89,9 @@ export async function fetchTransitTexts(
  * naslova teksta (Ivan, 28.9.2026). Pamti se i "nema teksta" (null), da se
  * tranzit bez teksta ne ucitava iznova. Deo kljuca je nalog i pravo pristupa:
  * sta server vrati zavisi od RLS-a, pa posle kupovine ili odjave kes ne vazi.
+ *
+ * Ispod ovoga je kes NA DISKU (`kes-na-disku.ts`): rezerva kad server ne odgovori
+ * (bez interneta). Upit sa servera ide i dalje, pri svakom pokretanju.
  */
 const kes = new Map<string, TransitText | null>();
 
@@ -102,6 +107,9 @@ export function useTransitTexts(keys: string[], version: TransitVersion = 'short
   const fali = keys.filter((k) => !kes.has(kesKljuc(k)));
   // Potpis kljuceva za koje upit nije uspeo — tada se ne ceka u nedogled.
   const [palo, setPalo] = React.useState<string | null>(null);
+  const diskUcitan = useKesUcitan();
+  // Kad se mreza vrati, upit koji je pao ide ponovo (`povratak` je u zavisnostima).
+  const povratak = usePovratakMreze();
 
   React.useEffect(() => {
     if (fali.length === 0) return;
@@ -111,12 +119,20 @@ export function useTransitTexts(keys: string[], version: TransitVersion = 'short
       // Pad upita se ne pamti: `loading` se spusti, a upit ide ponovo sa sledecim
       // kljucevima (drugi dan) ili kad se ekran ponovo otvori.
       if (!m) { setPalo(potpis); return; }
-      for (const k of fali) kes.set(kesKljuc(k), m.get(k) ?? null);
+      for (const k of fali) {
+        const t = m.get(k) ?? null;
+        kes.set(kesKljuc(k), t);
+        if (t) kesUpisi(`tranzit|${kesKljuc(k)}`, t);
+      }
       osvezi();
     });
     return () => { otkazano = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, version, korisnik, pristup, fali.length]);
+  }, [potpis, version, korisnik, pristup, fali.length, povratak]);
+
+  // Sa servera, pa sa diska ako server jos nije odgovorio (ili ne moze).
+  const nadji = (k: string) => kes.get(kesKljuc(k)) ?? kesProcitaj<TransitText>(`tranzit|${kesKljuc(k)}`) ?? null;
+  const naDisku = (k: string) => !!kesProcitaj(`tranzit|${kesKljuc(k)}`);
 
   // Racuna se u renderu, ne u efektu: vec prvi prikaz novog dana ima tekstove
   // iz kesa, a `loading` je tacan od prvog prikaza (efekat bi kasnio jedan frejm).
@@ -125,13 +141,15 @@ export function useTransitTexts(keys: string[], version: TransitVersion = 'short
   const texts = React.useMemo(() => {
     const m = new Map<string, TransitText>();
     for (const k of keys) {
-      const t = kes.get(kesKljuc(k));
+      const t = nadji(k);
       if (t) m.set(k, t);
     }
     return m;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, version, korisnik, pristup, stiglo, fali.length]);
-  return { texts, loading: fali.length > 0 && palo !== potpis };
+  }, [potpis, version, korisnik, pristup, stiglo, fali.length, diskUcitan]);
+  // Ceka se samo tekst kog nema ni na disku; ostalo se vec prikazuje.
+  const ceka = fali.filter((k) => !naDisku(k));
+  return { texts, loading: ceka.length > 0 && palo !== potpis };
 }
 
 
@@ -140,6 +158,9 @@ export function useTransitTexts(keys: string[], version: TransitVersion = 'short
  * "Tvoj dan" (`lib/tone.ts`). Poseban upit, namerno: dok kolona ne postoji u
  * bazi (`supabase/transit-tone.sql` nije pokrenut) upit vrati gresku, a ta
  * greska ne sme da obori tekstove. Bez oznake ton se racuna po pravilu.
+ *
+ * Kad upit ne uspe (bez interneta), vracaju se oznake sa diska — inace bi ton
+ * bez interneta presao na pravilo i promenio se na kartici.
  */
 export async function fetchTransitTones(keys: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
@@ -149,19 +170,29 @@ export async function fetchTransitTones(keys: string[]): Promise<Map<string, str
     .select('key, tone')
     .eq('version', 'short')
     .in('key', keys);
-  if (error || !data) return out;
-  for (const r of data as { key: string; tone: string | null }[]) if (r.tone) out.set(r.key, r.tone);
+  if (error || !data) {
+    await ucitajKes();
+    for (const k of keys) {
+      const t = kesProcitaj<string>(`ton|${k}`);
+      if (t) out.set(k, t);
+    }
+    return out;
+  }
+  for (const r of data as { key: string; tone: string | null }[]) {
+    if (r.tone) { out.set(r.key, r.tone); kesUpisi(`ton|${r.key}`, r.tone); }
+  }
   return out;
 }
 
 export function useTransitTone(key: string | null): string | null {
   const [tone, setTone] = React.useState<string | null>(null);
+  const povratak = usePovratakMreze();
   React.useEffect(() => {
     setTone(null);
     if (!key) return;
     let otkazano = false;
     fetchTransitTones([key]).then((m) => { if (!otkazano) setTone(m.get(key) ?? null); });
     return () => { otkazano = true; };
-  }, [key]);
+  }, [key, povratak]);
   return tone;
 }

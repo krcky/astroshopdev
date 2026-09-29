@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { router } from 'expo-router';
+import { CalendarDays } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { WheelPicker } from '@/components/ui/wheel-picker';
@@ -25,7 +26,8 @@ export default function BirthDate() {
   return (
     <OnboardingStep
       exit={{ kind: 'cancel', onPress: () => router.replace('/welcome') }}
-      question="Kad si rođen?"
+      icon={CalendarDays}
+      title="Datum rođenja"
       primary={{ label: 'Nastavi', onPress: next }}>
       <WheelPicker mode="date" value={value} onChange={setValue} maximumDate={new Date()} />
     </OnboardingStep>

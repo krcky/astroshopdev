@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { router } from 'expo-router';
+import { Clock } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { WheelPicker } from '@/components/ui/wheel-picker';
@@ -28,7 +29,8 @@ export default function BirthTime() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      question="U koliko sati?"
+      icon={Clock}
+      title="Vreme rođenja"
       primary={{ label: 'Nastavi', onPress: next }}
       secondary={{ label: 'Ne znam vreme', onPress: skip }}>
       <WheelPicker mode="time" value={value} onChange={setValue} />

@@ -1,27 +1,37 @@
 import * as React from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import { router } from 'expo-router';
+import { Mail } from 'lucide-react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { useTurnstile } from '@/components/turnstile';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { AUTH_MODE } from '@/lib/auth-mode';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
-import { neutral } from '@/theme/tokens';
+import { pullProfile } from '@/lib/sync';
+import { signOut } from '@/store/auth';
 
 export default function Account() {
+  // `nov` = dolazi se iz "Napravi nalog" (posle reveal-a); `zauzet` = email koji vec
+  // ima kartu, vraca ga ekran sa kodom (`lib/signup.ts`).
+  const { nov, zauzet } = useLocalSearchParams<{ nov?: string; zauzet?: string }>();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [socialNote, setSocialNote] = React.useState(false);
   const captcha = useTurnstile();
+  const lozinka = React.useRef<TextInput>(null);
 
   const emailOk = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email.trim());
   const valid = AUTH_MODE === 'otp' ? emailOk : emailOk && password.length >= 6;
+  const poruka = error ?? (zauzet && email.trim().toLowerCase() === zauzet
+    ? 'Ovaj email već ima nalog. Unesi drugi.'
+    : null);
 
   const submit = async () => {
     if (!valid || busy) return;
@@ -52,7 +62,7 @@ export default function Account() {
             : 'Nismo uspeli da pošaljemo kod. Proveri email i internet.');
           return;
         }
-        router.push({ pathname: '/code', params: { email: mail } });
+        router.push({ pathname: '/code', params: nov ? { email: mail, nov } : { email: mail } });
         return;
       }
 
@@ -84,8 +94,15 @@ export default function Account() {
         return;
       }
 
+      if (nov && (await pullProfile(data.session.user.id))) {
+        await signOut('local');
+        setError('Ovaj email već ima nalog. Unesi drugi.');
+        return;
+      }
       const outcome = await completeSignup(data.session.user.id, mail);
       router.replace(routeAfterSignup(outcome));
+    } catch {
+      setError('Nismo uspeli da učitamo nalog. Proveri internet pa probaj ponovo.');
     } finally {
       setBusy(false);
     }
@@ -94,46 +111,54 @@ export default function Account() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      question={AUTH_MODE === 'otp' ? 'Koji ti je email?' : 'Napravi nalog'}
-      note={AUTH_MODE === 'otp'
+      icon={Mail}
+      title={AUTH_MODE === 'otp' ? 'Koji ti je email?' : 'Napravi nalog'}
+      subtitle={AUTH_MODE === 'otp'
         ? 'Šaljemo ti kod za prijavu. Bez lozinke, bez reklama, i email ne delimo ni sa kim.'
         : 'Nalog čuva tvoju kartu kad promeniš telefon. Email ne delimo ni sa kim.'}
+      center={false}
+      note={null}
       primary={{
         label: busy ? 'Trenutak…' : AUTH_MODE === 'otp' ? 'Pošalji mi kod' : 'Nastavi',
         onPress: submit,
         disabled: !valid || busy,
       }}>
 
-      <View className="items-center">
-        <TextInput
-          value={email}
-          onChangeText={(t) => { setEmail(t); setError(null); }}
-          placeholder="email@primer.com"
-          placeholderTextColor={neutral.inkSubtle}
-          keyboardType="email-address"
+      <Input
+        povrsina="siva"
+        value={email}
+        onChangeText={(t) => { setEmail(t); setError(null); }}
+        placeholder="Email adresa"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        textContentType="emailAddress"
+        returnKeyType={AUTH_MODE === 'otp' ? 'send' : 'next'}
+        onSubmitEditing={AUTH_MODE === 'otp' ? submit : () => lozinka.current?.focus()}
+        autoFocus
+      />
+
+      {AUTH_MODE === 'password' && (
+        <Input
+          ref={lozinka}
+          povrsina="siva"
+          value={password}
+          onChangeText={(t) => { setPassword(t); setError(null); }}
+          placeholder="Lozinka (bar 6 znakova)"
+          secureTextEntry
           autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="email"
-          autoFocus
-          className="w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground font-sans"
+          autoComplete="new-password"
+          returnKeyType="go"
+          onSubmitEditing={submit}
+          className="mt-3"
         />
+      )}
 
-        {AUTH_MODE === 'password' && (
-          <TextInput
-            value={password}
-            onChangeText={(t) => { setPassword(t); setError(null); }}
-            placeholder="lozinka (bar 6 znakova)"
-            placeholderTextColor={neutral.inkSubtle}
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="new-password"
-            className="mt-6 w-full border-b border-fill-strong pb-3 text-center text-2xl text-foreground font-sans"
-          />
-        )}
+      {poruka && <Text className="mt-4 px-2 text-center text-sm text-destructive">{poruka}</Text>}
 
-        {error && <Text className="mt-5 text-center text-sm text-destructive">{error}</Text>}
-
-        <Text variant="muted" className="mt-12">Ili nastavi preko</Text>
+      <View className="items-center">
+        <Text variant="muted" className="mt-10">Ili nastavi preko</Text>
         <View className="mt-4 flex-row gap-3">
           <SocialButton label="Apple" onPress={() => setSocialNote(true)} />
           <SocialButton label="Google" onPress={() => setSocialNote(true)} />

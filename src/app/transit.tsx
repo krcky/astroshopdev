@@ -6,6 +6,7 @@ import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
@@ -22,8 +23,10 @@ import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
 import { TransitTrajanje } from '@/components/transit-trajanje';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
+import { OdeljakIkona } from '@/components/odeljak-ikona';
 import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
 import { neutral } from '@/theme/tokens';
+import { useNaMrezi } from '@/lib/mreza';
 
 const GOLD = '#A7731B';
 
@@ -53,6 +56,7 @@ export default function TransitDetail() {
   const { key } = useLocalSearchParams<{ key: string }>();
   const resolved = useResolvedProfile();
   const entitlement = useEntitlement();
+  const naMrezi = useNaMrezi();
 
   const kljucevi = React.useMemo(() => (key ? [String(key)] : []), [key]);
   const { texts: duga, loading: dugaLoading } = useTransitTexts(kljucevi, 'long');
@@ -84,7 +88,7 @@ export default function TransitDetail() {
                 <AspektIkona aspekt={tranzit.aspect.key as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
                 <Simbol tacka={tranzit.natal} />
               </View>
-              <Text variant="oznaka" className="flex-1 text-right">
+              <Text variant="oznaka" className="flex-1 text-right text-foreground">
                 {tranzit.transiting.name} {tranzit.aspect.name} {tranzit.natal.name}
               </Text>
             </View>
@@ -119,11 +123,14 @@ export default function TransitDetail() {
 
                 return (
                 <View key={s.heading} className="mt-7">
-                  {/* Linija ispod naslova: list je beo, pa `border-border` (pravilo 17). */}
-                  <View className="mb-3 flex-row items-center gap-2 border-b border-border pb-2">
-                    {vrsta && <SymbolView name={IKONA_SEKCIJE[vrsta]} size={17} tintColor={neutral.inkSubtle} />}
-                    <Text variant="label" className="flex-1">{s.heading}</Text>
-                  </View>
+                  {/* Efekat, Pazi, Savet: Ivanove 3D slike, iste kao na "Tvom danu"; ostali odeljci SF/Material.
+                      Ikonice vece nego uz nekadasnji sivi `label` — podnaslov je sad `h2`. */}
+                  <NaslovSekcije
+                    ikona={vrsta === 'efekat' || vrsta === 'pazi' || vrsta === 'savet'
+                      ? <OdeljakIkona odeljak={vrsta} size={26} />
+                      : vrsta ? <SymbolView name={IKONA_SEKCIJE[vrsta]} size={20} tintColor={neutral.inkSubtle} /> : undefined}>
+                    {s.heading}
+                  </NaslovSekcije>
                   <TumacenjeTekst tekst={s.body} />
                 </View>
                 );
@@ -136,9 +143,11 @@ export default function TransitDetail() {
               {/* Pristup je placen a duga verzija ipak nije dosla — tekst za
                   ovaj tranzit jos nije u korpusu. Poziv na kupovinu bi tu bio
                   pogresan: nema sta da se otkljuca. */}
+              {/* Bez interneta duga verzija nije stigla jer nema veze, ne zato sto je
+                  nema — tada se to i kaze (Ivan, 29.9.2026). */}
               {entitlement?.active ? (
                 <Text variant="muted" className="mt-6 text-xs">
-                  Tumačenje za ovaj tranzit još nije napisano.
+                  {naMrezi ? 'Tumačenje za ovaj tranzit još nije napisano.' : 'Ceo tekst će se pojaviti kad se veza vrati.'}
                 </Text>
               ) : (
                 <View className={cn(CARD_SURFACE, 'mt-8 border-gold/40 p-6')}>

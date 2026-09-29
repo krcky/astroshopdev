@@ -3,7 +3,8 @@ import * as Haptics from 'expo-haptics';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { STARI_IOS } from '@/lib/platform';
-import { neutral } from '@/theme/tokens';
+import { useBrojNeprocitanih } from '@/lib/pitanja-api';
+import { brand, neutral } from '@/theme/tokens';
 import { fontUloge } from '@/theme/tipografija';
 
 /*
@@ -65,6 +66,8 @@ const IZABRANI = '#B39DDB';
  * `belina` u `Screen`); provereno u iOS 26.5 simulatoru, Ivan 27.9.2026.
  */
 export default function TabsLayout() {
+  // Novi odgovori astrologa (Ivan, 29.9.2026): broj u indigo krugu na tabu "Pitaj".
+  const noviOdgovori = useBrojNeprocitanih();
   return (
     <NativeTabs
       // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
@@ -90,6 +93,9 @@ export default function TabsLayout() {
       // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).
       // Material podrazumevano ("auto") sa 4+ tabova prikaze samo izabrani.
       labelVisibilityMode="labeled"
+      // Oznaka novog odgovora: indigo iz loga, ne sistemska crvena (Ivan, 29.9.2026).
+      badgeBackgroundColor={brand.indigo}
+      badgeTextColor={neutral.white}
       screenListeners={SLUSAOCI}>
       <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
@@ -102,6 +108,8 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="ask" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.message', selected: 'ellipsis.message.fill' }} md="sms" />
         <NativeTabs.Trigger.Label>Pitaj</NativeTabs.Trigger.Label>
+        {/* Bez teksta nema oznake. `hidden` sam ne sklanja vec prikazanu — ostajalo je "0". */}
+        <NativeTabs.Trigger.Badge hidden={noviOdgovori === 0}>{noviOdgovori > 0 ? String(noviOdgovori) : undefined}</NativeTabs.Trigger.Badge>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chart" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />

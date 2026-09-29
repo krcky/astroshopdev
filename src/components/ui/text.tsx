@@ -59,6 +59,12 @@ const textVariants = cva('text-foreground', {
       /** Veliki naslov koraka onboardinga. Referentna aplikacija ga nema,
        *  ali nas onboarding stoji na njemu — zato ostaje, samo u Inter-u. */
       display: cn('text-[32px] leading-[38px] tracking-[-0.6px]', tezina('display')),
+      /**
+       * Naslov informativnog lista odozdo: "Šta je natalna karta", "Zašto baš
+       * ovaj tekst" (Ivan, 28.9.2026: malo manji od `display`). Ista
+       * debljina kao `display`; podnaslovi sekcija ispod su `h2` (`NaslovSekcije`).
+       */
+      naslovLista: cn('text-[28px] leading-[34px] tracking-[-0.5px]', tezina('display')),
       h1: cn('text-title tracking-[-0.2px]', tezina('title')),
       h2: cn('text-section tracking-[-0.2px]', tezina('section')),
       h3: cn('text-row', tezina('h3')),

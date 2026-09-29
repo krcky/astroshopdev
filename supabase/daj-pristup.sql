@@ -1,4 +1,6 @@
 -- RUCNO DODELJIVANJE PLACENOG PRISTUPA — samo za testiranje.
+-- ZASTARELO: poklanjanje premiuma ide kroz `pokloni.sql` (`admin.daj_premium`),
+-- jer RevenueCat webhook moze da prepise red koji je ovde upisan.
 --
 -- U produkciji ovu tabelu puni ISKLJUCIVO RevenueCat webhook. Korisnici nemaju
 -- politiku za upis, pa niko ne moze sebi da otkljuca pristup iz aplikacije.

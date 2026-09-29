@@ -309,6 +309,13 @@ export const backdrop = {
     ink: ['rgba(20, 23, 27, 0.24)', 'rgba(60, 60, 70, 0.11)', 'rgba(60, 60, 70, 0)'],
     /** Tranziti: svetla nebesko-plava (Ivan, 28.9.2026; ranije Pitaj, pre toga Nebo). */
     blue: ['rgba(125, 211, 252, 0.40)', 'rgba(56, 189, 248, 0.17)', 'rgba(96, 165, 250, 0)'],
+    /**
+     * Natalna karta ("Ti"): indigo iz LOGA (`brand.indigo` #403F98), ka svetlijoj
+     * #6366B4 u sredini (Ivan, 28.9.2026; izabran od tri predloga — lavanda,
+     * breskva, indigo). Tamna boja, pa providnosti NIZE od ostalih (0,30 / 0,13),
+     * kao nekad grafitna: jaca bi dala tesku prugu preko kartica.
+     */
+    indigo: ['rgba(64, 63, 152, 0.30)', 'rgba(99, 102, 180, 0.13)', 'rgba(99, 102, 180, 0)'],
     /** Bez preliva — providno. Natalna karta na BELOJ pozadini (Ivan, 26.9.2026); pretapa se kao i ostale. */
     none: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
     /** Crvena iz `accent.red` — trenutno je nijedan ekran ne koristi (Nebo presao na `pink`, Ivan 28.9.2026). */
@@ -364,6 +371,7 @@ export const backdrop = {
     ink: [['rgb(20, 23, 27)', 0.11], ['rgb(60, 60, 70)', 0.11]],
     blue: [['rgb(125, 211, 252)', 0.26], ['rgb(56, 189, 248)', 0.26]],
     none: [],
+    indigo: [['rgb(64, 63, 152)', 0.18], ['rgb(99, 102, 180)', 0.18]], // slabije, tamna boja
     red: [['rgb(235, 71, 67)', 0.26], ['rgb(220, 38, 38)', 0.26]],
     pink: [['rgb(248, 179, 195)', 0.38], ['rgb(244, 154, 184)', 0.38]], // jace, kao i preliv (svetla boja)
   },

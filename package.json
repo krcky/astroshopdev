@@ -12,6 +12,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "~57.0.19",
+    "expo-audio": "~57.0.5",
+    "expo-battery": "~57.0.3",
     "expo-blur": "~57.0.3",
     "expo-constants": "~57.0.17",
     "expo-dev-client": "~57.0.18",
@@ -50,11 +52,15 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.3.16",
     "@types/react": "~19.2.2",
+    "@types/react-dom": "~19.2",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
     "tsx": "^4.23.13",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vite": "^8.3.1"
   },
   "scripts": {
     "start": "expo start",
@@ -73,7 +79,13 @@
     "check:tvoj-dan": "TZ=Europe/Belgrade tsx scripts/check-tvoj-dan.ts",
     "check:natal-tekst": "tsx scripts/check-natal-tekst.ts",
     "check:oblasti": "TZ=Europe/Belgrade tsx scripts/check-oblasti.ts",
-    "check": "npm run typecheck && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst && npm run check:oblasti",
+    "check:uvod": "tsx scripts/check-uvod.ts",
+    "check:pitanja": "TZ=Europe/Belgrade tsx scripts/check-pitanja.ts",
+    "check:pitanja-baza": "tsx scripts/check-pitanja-baza.ts",
+    "panel": "vite --config panel/vite.config.mts",
+    "panel:build": "vite build --config panel/vite.config.mts",
+    "typecheck:panel": "tsc -p panel",
+    "check": "npm run typecheck && npm run typecheck:panel && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:natal-tekst && npm run check:oblasti && npm run check:uvod && npm run check:pitanja && npm run check:pitanja-baza",
     "check:tokens": "tsx scripts/check-tokens.ts"
   },
   "private": true

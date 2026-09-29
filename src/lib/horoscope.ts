@@ -17,15 +17,41 @@ import {
 import { upcomingSkyEvents, type SkyEvent } from '@/lib/sky-events';
 import type { ResolvedProfile } from '@/store/profile';
 
-const DANI = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
-/** Genitiv, za "do 14. novembra". */
-const MESECI_GEN = [
-  'januara', 'februara', 'marta', 'aprila', 'maja', 'juna',
-  'jula', 'avgusta', 'septembra', 'oktobra', 'novembra', 'decembra',
-];
+/*
+ * DATUM JE SVUDA ISTOG OBLIKA (Ivan, 29.9.2026): "Uto, 29. sep 2026" —
+ * skracen dan, broj sa tackom, skracen mesec malim slovima, godina bez tacke.
+ * Mesta se razlikuju samo po tome sta nose (dan u nedelji, godina), ne po
+ * obliku. Verzali ("TVOJ DAN · UTO, 29. SEP 2026") dolaze iz stila `oznaka`,
+ * ne iz teksta. Datum se NE sklapa u ekranu — samo kroz funkcije ispod.
+ */
+
+/** Skracena imena dana (nedelja je 0, kao `getDay()`). */
+const DANI_KRATKO = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
+/** Skracena imena meseci: "okt". */
+export const MESECI_KRATKO = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
+
+const veliko = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 
 /**
- * "do 14. novembra", a ako je druge godine "do 3. marta 2027." — kad tranzit
+ * Jedini sklapac datuma. "29. sep", uz `dan` "Uto, 29. sep", uz `godina`
+ * "29. sep 2026". `utc` cita UTC polja (vidi `formatDate`).
+ */
+export function datum(date: Date, { dan = false, godina = false, utc = false }: { dan?: boolean; godina?: boolean; utc?: boolean } = {}): string {
+  const d = utc ? date.getUTCDay() : date.getDay();
+  const broj = utc ? date.getUTCDate() : date.getDate();
+  const m = utc ? date.getUTCMonth() : date.getMonth();
+  const g = utc ? date.getUTCFullYear() : date.getFullYear();
+  const s = `${broj}. ${MESECI_KRATKO[m]}${godina ? ` ${g}` : ''}`;
+  return dan ? `${veliko(DANI_KRATKO[d])}, ${s}` : s;
+}
+
+/** Datum rodjenja iz profila (mesec 1—12): "10. jul 1990". */
+export function datumRodjenja(b: { year: number; month: number; day: number }): string {
+  return `${b.day}. ${MESECI_KRATKO[b.month - 1]} ${b.year}`;
+}
+
+/**
+ * "do 14. nov", a ako je druge godine "do 3. mar 2027" — kad tranzit
  * traje. `null` (iza horizonta od ~3 godine) daje "još godinama".
  */
 export function formatUntil(end: Date | null, today: Date = new Date()): string {
@@ -33,23 +59,18 @@ export function formatUntil(end: Date | null, today: Date = new Date()): string 
   return `do ${formatDay(end, today)}`;
 }
 
-/** "14. novembra", a druge godine "3. marta 2027." — genitiv, za "od" i "do". */
+/** "14. nov", a druge godine "3. mar 2027" — za "od" i "do". */
 export function formatDay(day: Date, today: Date = new Date()): string {
-  const godina = day.getFullYear() === today.getFullYear() ? '' : ` ${day.getFullYear()}.`;
-  return `${day.getDate()}. ${MESECI_GEN[day.getMonth()]}${godina}`;
+  return datum(day, { godina: day.getFullYear() !== today.getFullYear() });
 }
-/** Skracena imena meseci, za kalendarski listic: "okt". */
-export const MESECI_KRATKO = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
 
 /**
- * Opseg trajanja tranzita: "13 SEP – 26 SEP". Kad se zavrsava u drugoj godini
- * nego sto je poceo, godina ide uz drugi datum: "13 DEC – 26 JAN 2027"
- * (Ivan, 28.9.2026).
+ * Opseg trajanja tranzita: "13. sep – 26. sep". Kad se zavrsava u drugoj godini
+ * nego sto je poceo, godina ide uz drugi datum: "13. dec – 26. jan 2027"
+ * (Ivan, 28.9.2026). Verzale daje stil `oznaka` na mestu prikaza.
  */
 export function opsegDatuma(start: Date, end: Date): string {
-  const d = (x: Date) => `${x.getDate()} ${MESECI_KRATKO[x.getMonth()].toUpperCase()}`;
-  const godina = end.getFullYear() !== start.getFullYear() ? ` ${end.getFullYear()}` : '';
-  return `${d(start)} – ${d(end)}${godina}`;
+  return `${datum(start)} – ${datum(end, { godina: end.getFullYear() !== start.getFullYear() })}`;
 }
 
 /** "14:05" po lokalnom vremenu uredjaja. */
@@ -57,13 +78,8 @@ export function formatTime(date: Date): string {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-const MESECI = [
-  'januar', 'februar', 'mart', 'april', 'maj', 'jun',
-  'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar',
-];
-
 /**
- * "Četvrtak, 24. septembar".
+ * "Čet, 24. sep" — dan u nedelji, bez godine.
  *
  * `utc` cita UTC polja umesto lokalnih. Sluzi ekranu "Trenutno na nebu": tamo
  * se datum ispisuje uz sat NAD GRADOM IZ PROFILA, pa se dobija pomeren trenutak
@@ -72,11 +88,17 @@ const MESECI = [
  * drugog dana.
  */
 export function formatDate(date: Date, utc = false): string {
-  const dan = utc ? date.getUTCDay() : date.getDay();
-  const broj = utc ? date.getUTCDate() : date.getDate();
-  const mesec = utc ? date.getUTCMonth() : date.getMonth();
-  const s = `${DANI[dan]}, ${broj}. ${MESECI[mesec]}`;
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  return datum(date, { dan: true, utc });
+}
+
+/** "Uto, 29. sep 2026" — dan u nedelji i godina (oznaka "Tvoj dan"). */
+export function formatDatumKratko(date: Date): string {
+  return datum(date, { dan: true, godina: true });
+}
+
+/** "28. sep 2026" — sa godinom, bez dana u nedelji. `utc` kao kod `formatDate`. */
+export function formatDatum(date: Date, utc = false): string {
+  return datum(date, { godina: true, utc });
 }
 
 

@@ -5,6 +5,7 @@ import { Lock } from 'lucide-react-native';
 
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
+import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -15,9 +16,16 @@ import { isFreeNatalKey, natalTopic, tacnostAspekta, udeoUZnaku } from '@/lib/na
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { Planeta } from '@/components/planete-par';
 import { TrakaNapretka } from '@/components/transit-trajanje';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import type { SignPosition } from '@/lib/zodiac';
+import type { NatalChart } from '@/lib/natal';
+import type { NatalTopic } from '@/lib/natal-keys';
+import { SIMBOLIKA_ASPEKTA, SIMBOLIKA_KUCE, SIMBOLIKA_PLANETA, SIMBOLIKA_ZNAKA } from '@/lib/simbolika';
+import { ZnakIkona } from '@/components/znak-ikona';
+import { KucaBroj } from '@/components/kuca-broj';
+import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { useNatalTexts, type NatalText } from '@/lib/natal-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { useEntitlement } from '@/store/auth';
@@ -36,7 +44,8 @@ const GOLD = '#A7731B';
  * da se kupovina ne nudi kad je problem u vezi.
  */
 export default function NatalTumacenje() {
-  const { tema } = useLocalSearchParams<{ tema: string }>();
+  // `deo=kuca`: otvoreno sa reda "u 2. kući" na ekranu "Ti" — kuca ide prva.
+  const { tema, deo } = useLocalSearchParams<{ tema: string; deo?: string }>();
   const resolved = useResolvedProfile();
   const premium = !!useEntitlement()?.active;
 
@@ -46,10 +55,13 @@ export default function NatalTumacenje() {
   );
   const kljucevi = React.useMemo(() => {
     if (!topic) return [];
-    if (topic.kind === 'planet') return [topic.signKey, topic.houseKey].filter((k): k is string => !!k);
+    if (topic.kind === 'planet') {
+      const redom = deo === 'kuca' ? [topic.houseKey, topic.signKey] : [topic.signKey, topic.houseKey];
+      return redom.filter((k): k is string => !!k);
+    }
     if (topic.kind === 'ascendant') return [topic.signKey];
     return [topic.aspect.key];
-  }, [topic]);
+  }, [topic, deo]);
   const { texts, loading } = useNatalTexts(kljucevi);
 
   if (!resolved) return <Redirect href="/" />;
@@ -74,6 +86,7 @@ export default function NatalTumacenje() {
     zaglavlje = (
       <Glava
         tacke={[{ key: p.key, glyph: p.glyph }]}
+        slika={{ key: p.key, glyph: p.glyph }}
         oznaka={[neznan ? p.name : `${p.name} u ${SIGN_CASES[p.position.sign.key].loc}`, topic.houseKey ? `${p.house}. kuća` : null].filter(Boolean).join(' · ')}
         naslov={prvi?.subtitle || p.name}
         traka={neznan ? null : trakaZnaka(p.position)}
@@ -107,6 +120,8 @@ export default function NatalTumacenje() {
     // Nativni list odozdo, kao sva tumacenja (`_layout.tsx`, Ivan 28.9.2026).
     <SheetScroll>
       {zaglavlje}
+
+      <Simbolika stavke={simbolikaTeme(topic, chart)} />
 
       {/* Mesec bez vremena rodjenja: tog dana je presao iz znaka u znak — ne pogadja se. */}
       {topic.kind === 'planet' && topic.moon && !topic.moon.certain && (
@@ -152,6 +167,8 @@ export default function NatalTumacenje() {
 
 /** Precnik crnih ikonica tacaka — isti kao na tumacenju tranzita (`transit.tsx`). */
 const SIMBOL = 26;
+/** Slika planete desno od naslova na tumacenju planete (Saturn sa prstenom se sam smanji u okvir). */
+const SLIKA_PLANETE = 96;
 
 type Traka = { levo: string; desno: string; udeo: number };
 
@@ -174,9 +191,14 @@ function trakaZnaka(pos: SignPosition): Traka {
  * ista lila traka. Traka ovde NIJE trajanje (natalna karta se ne menja) nego
  * polozaj u znaku, odnosno tacnost aspekta.
  */
-function Glava({ tacke, aspekt, oznaka, naslov, traka }: {
+function Glava({ tacke, aspekt, slika, oznaka, naslov, traka }: {
   tacke: { key: string; glyph: string }[];
   aspekt?: string;
+  /**
+   * Planeta u znaku i kuci (Ivan, 28.9.2026): SLIKA planete desno od naslova,
+   * bez crne ikonice gore levo. Aspekt i podznak ostaju kao ranije.
+   */
+  slika?: { key: string; glyph: string };
   oznaka: string;
   naslov: string;
   traka: Traka | null;
@@ -184,18 +206,22 @@ function Glava({ tacke, aspekt, oznaka, naslov, traka }: {
   const ilustracija = !!aspekt && imaAspekt(aspekt) && tacke.length === 2;
   return (
     <>
-      <View className="flex-row gap-5">
+      <View className={cn('flex-row gap-5', slika && 'items-center')}>
         <View className="flex-1 justify-between">
-          <View className="flex-row items-center gap-2">
-            <TamnaTacka tacka={tacke[0]} size={SIMBOL} />
-            {aspekt && imaAspekt(aspekt) && (
-              <AspektIkona aspekt={aspekt as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
-            )}
-            {tacke[1] && <TamnaTacka tacka={tacke[1]} size={SIMBOL} />}
-          </View>
-          <View className="mt-7">
-            <Text variant="oznaka">{oznaka}</Text>
-            <Text variant="display" className="mt-2">{naslov}</Text>
+          {!slika && (
+            <View className="flex-row items-center gap-2">
+              <TamnaTacka tacka={tacke[0]} size={SIMBOL} />
+              {aspekt && imaAspekt(aspekt) && (
+                <AspektIkona aspekt={aspekt as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
+              )}
+              {tacke[1] && <TamnaTacka tacka={tacke[1]} size={SIMBOL} />}
+            </View>
+          )}
+          <View className={slika ? undefined : 'mt-7'}>
+            <Text variant="oznaka" className="text-foreground">{oznaka}</Text>
+            {/* Cele reci, kao na tranzitu: duga rec ("Samoobmanjivanje") u uskoj koloni pored
+                ilustracije smanji naslov umesto da se prelomi usred reci (32 -> najmanje 22). */}
+            <NaslovCeleReci size={32} lineHeight={38} min={22} className="mt-2">{naslov}</NaslovCeleReci>
           </View>
         </View>
         {ilustracija && (
@@ -203,6 +229,7 @@ function Glava({ tacke, aspekt, oznaka, naslov, traka }: {
             <AspektIlustracija aspekt={aspekt as AspektKljuc} tranzitna={tacke[0]} natalna={tacke[1]} width={120} />
           </View>
         )}
+        {slika && <Planeta t={slika} size={SLIKA_PLANETE} />}
       </View>
       {traka && <TrakaNapretka {...traka} boja={OBLAST_BOJA} className="mt-8" />}
       <View className="mb-2" />
@@ -221,10 +248,7 @@ function Odeljak({ tekst, loading, zakljucan, prvi }: { tekst?: NatalText; loadi
     <View className="mt-7">
       {tekst ? (
         <>
-          {/* Linija ispod naslova: list je beo, pa `border-border` (pravilo 17). */}
-          <View className="mb-3 border-b border-border pb-2">
-            <Text variant="label">{tekst.title}</Text>
-          </View>
+          <NaslovSekcije>{tekst.title}</NaslovSekcije>
           {!prvi && !!tekst.subtitle && <Text variant="h3" className="mb-2">{tekst.subtitle}</Text>}
           <TumacenjeTekst tekst={tekst.body} />
         </>
@@ -235,6 +259,67 @@ function Odeljak({ tekst, loading, zakljucan, prvi }: { tekst?: NatalText; loadi
         // je problem veze ili prijave, ne nenapisan tekst.
         <Text variant="muted">Tumačenje trenutno ne može da se učita. Proveri vezu sa internetom.</Text>
       )}
+    </View>
+  );
+}
+
+type StavkaSimbolike = { key: string; ikona: React.ReactNode; ime: string; reci: string };
+
+/**
+ * Stavke "Simbolike" za temu (kao na sajtu): planeta, znak i kuca, odnosno obe
+ * tacke i aspekt. Stavka bez reci se preskace; znak Meseca bez vremena
+ * rodjenja se ne pogadja.
+ */
+function simbolikaTeme(topic: NatalTopic, chart: NatalChart): StavkaSimbolike[] {
+  const out: (StavkaSimbolike | null)[] = [];
+  const tacka = (key: string, glyph: string, ime: string) =>
+    SIMBOLIKA_PLANETA[key] ? { key, ikona: <TamnaTacka tacka={{ key, glyph }} size={SIMBOL} />, ime, reci: SIMBOLIKA_PLANETA[key] } : null;
+  const znak = (pos: SignPosition) =>
+    SIMBOLIKA_ZNAKA[pos.sign.key]
+      ? { key: pos.sign.key, ikona: <ZnakIkona znak={pos.sign.key} element={pos.sign.element} size={SIMBOL} />, ime: pos.sign.name, reci: SIMBOLIKA_ZNAKA[pos.sign.key] }
+      : null;
+  if (topic.kind === 'planet') {
+    const p = chart.planets.find((x) => x.key === topic.planet)!;
+    out.push(tacka(p.key, p.glyph, p.name));
+    if (!topic.moon || topic.moon.certain) out.push(znak(p.position));
+    if (topic.houseKey && SIMBOLIKA_KUCE[p.house]) {
+      out.push({ key: `kuca${p.house}`, ikona: <KucaBroj kuca={p.house} size={SIMBOL} />, ime: `${p.house}. kuća`, reci: SIMBOLIKA_KUCE[p.house] });
+    }
+  } else if (topic.kind === 'ascendant') {
+    out.push(tacka('ascendant', 'ASC', 'Ascendent'));
+    out.push(znak(chart.ascendantSign));
+  } else {
+    const a = topic.aspect;
+    out.push(tacka(a.a.key, a.a.glyph, a.a.name));
+    out.push(tacka(a.b.key, a.b.glyph, a.b.name));
+    const sim = SIMBOLIKA_ASPEKTA[a.aspect.key];
+    if (sim && imaAspekt(a.aspect.key)) {
+      out.push({
+        key: a.aspect.key,
+        ikona: <AspektIkona aspekt={a.aspect.key} size={18} potez={PLANETA_POTEZ * SIMBOL} />,
+        // "Konjunkcija – Borba", kao u tekstu astrologa (`files/simbolika/`).
+        ime: `${a.aspect.name.charAt(0).toUpperCase() + a.aspect.name.slice(1)} – ${sim.tema}`,
+        reci: sim.opis,
+      });
+    }
+  }
+  return out.filter((x): x is StavkaSimbolike => !!x);
+}
+
+/** "Simbolika" iznad teksta: ikonica, ime verzalom, kljucne reci astrologa (`lib/simbolika.ts`). */
+function Simbolika({ stavke }: { stavke: StavkaSimbolike[] }) {
+  if (stavke.length === 0) return null;
+  return (
+    <View className="mt-6 gap-4">
+      {stavke.map((s) => (
+        <View key={s.key} className="flex-row items-center gap-3">
+          <View className="items-center justify-center" style={{ width: SIMBOL, height: SIMBOL }}>{s.ikona}</View>
+          <View className="flex-1">
+            <Text variant="oznaka" className="text-foreground">{s.ime}</Text>
+            <Text variant="muted" className="mt-0.5">{s.reci}</Text>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }

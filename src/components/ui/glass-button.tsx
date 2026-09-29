@@ -53,8 +53,9 @@ export function GlassIconButton({ onPress, disabled, accessibilityLabel, childre
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={disabled ? { disabled: true } : undefined}
-      style={style}
-      className="active:opacity-70">
+      style={style}>
+      {/* Bez `active:opacity-*` na ovom omotacu: providan roditelj kvari staklo na
+          iOS-u (vidi `ui/kapsule.tsx`). Odziv na dodir daje `isInteractive`. */}
       <GlassView glassEffectStyle="regular" colorScheme="light" isInteractive={!disabled} style={mehur}>
         <View>{children}</View>
       </GlassView>
@@ -66,8 +67,14 @@ export function GlassIconButton({ onPress, disabled, accessibilityLabel, childre
  * Mehur proizvoljne sirine, visine dugmeta zaglavlja (40pt), za vise kontrola
  * u jednom staklu — npr. strelice za dan. Gde stakla nema: bela pilula sa
  * ivicom i mekom senkom.
+ *
+ * `interaktivno={false}` za neaktivno dugme: staklo ostaje, ali ne reaguje na dodir.
  */
-export function GlassBubble({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+export function GlassBubble({ children, style, interaktivno = true }: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  interaktivno?: boolean;
+}) {
   const pilula: ViewStyle = { height: D, borderRadius: D / 2, overflow: 'hidden', flexDirection: 'row', alignItems: 'center' };
   if (!isLiquidGlassAvailable()) {
     return (
@@ -77,7 +84,7 @@ export function GlassBubble({ children, style }: { children: React.ReactNode; st
     );
   }
   return (
-    <GlassView glassEffectStyle="regular" colorScheme="light" isInteractive style={[pilula, style]}>
+    <GlassView glassEffectStyle="regular" colorScheme="light" isInteractive={interaktivno} style={[pilula, style]}>
       {children}
     </GlassView>
   );

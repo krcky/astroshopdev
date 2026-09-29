@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
+import { MapPin } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { useDraft } from '@/store/draft';
-import { neutral } from '@/theme/tokens';
 
 export default function BirthPlace() {
   const draft = useDraft();
@@ -25,18 +26,18 @@ export default function BirthPlace() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      question="Gde si rođen?"
+      icon={MapPin}
+      title="Mesto rođenja"
       center={false}
       primary={{ label: 'Nastavi', onPress: next, disabled: !city }}>
 
-      <TextInput
+      <Input
+        povrsina="siva"
         value={city ? `${city.name}, ${city.country}` : query}
         onChangeText={(t) => { setQuery(t); setCity(null); }}
-        placeholder="grad"
-        placeholderTextColor={neutral.inkSubtle}
+        placeholder="Grad"
         autoFocus
         autoCorrect={false}
-        className="border-b border-fill-strong pb-3 text-center text-3xl text-foreground font-sans"
       />
 
       <View className="mt-4">

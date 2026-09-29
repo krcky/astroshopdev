@@ -51,6 +51,11 @@ const toRow = (p: Profile, userId: string) => ({
   time_zone: p.timeZone ?? null,
 });
 
+/**
+ * Karta sa servera, ili null ako je nema. Greska (mreza) BACA: "nema karte" i
+ * "nismo uspeli da pitamo" nisu isto. Da vrati null, prijava postojecim emailom
+ * bez mreze bi zakljucila da karte nema i upisala draft preko nje.
+ */
 export async function pullProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
@@ -58,8 +63,8 @@ export async function pullProfile(userId: string): Promise<Profile | null> {
     .eq('id', userId)
     .maybeSingle();
 
-  if (error || !data) return null;
-  return toProfile(data as Row);
+  if (error) throw error;
+  return data ? toProfile(data as Row) : null;
 }
 
 export async function pushProfile(userId: string, profile: Profile) {

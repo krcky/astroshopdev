@@ -7,12 +7,9 @@ import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 import { TONE_LABEL, type Tone } from '@/lib/tone';
 
-/**
- * Boje ikonica "Ide ti" (plus) i "Koci te" (minus) na pocetnoj — Ivanove.
- * Ton na tabu "Tranziti" koristi ISTE ikonice, pa je znacenje jedno.
- */
-export const PLUS_BOJA = '#7ACCEA';
-export const MINUS_BOJA = '#F8B3C3';
+/* Boje "Ide ti" (plus) i "Koci te" (minus) su u `lib/tocak-stil.ts` — deli ih tocak. */
+import { MINUS_BOJA, PLUS_BOJA } from '@/lib/tocak-stil';
+export { MINUS_BOJA, PLUS_BOJA };
 
 /**
  * Ton bez obojene kapsule (Ivan, 28.9.2026): ikonica pa rec, u redu sa

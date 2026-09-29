@@ -12,7 +12,9 @@
  * greska se na ekranu ne vidi — broj i dalje izgleda kao broj.
  */
 import { planetPositions } from '../src/lib/astro';
-import { buildSky, shiftDays, zoneClock, zoneShift } from '../src/lib/sky';
+import {
+  buildSky, danZaKalendar, istiDanUKalendaru, izKalendara, naDan, shiftDays, zoneClock, zoneShift,
+} from '../src/lib/sky';
 import { formatDate } from '../src/lib/horoscope';
 import { trueNodeLongitude, meanLilithLongitude, nodeSpeed } from '../src/lib/points';
 import {
@@ -130,7 +132,7 @@ ok(zoneClock(TRENUTAK, ZONA) === '00:00', 'sat nad Beogradom', zoneClock(TRENUTA
 // 22:00 UTC je vec 24. septembar po beogradskom letnjem vremenu. Datum mora da
 // prati sat, inace bi korisniku u drugoj zoni pisalo "00:00" uz juceresnji dan.
 const datum = formatDate(zoneShift(TRENUTAK, ZONA), true);
-ok(datum === 'Četvrtak, 24. septembar', 'datum prati sat, ne uredjaj', datum);
+ok(datum === 'Čet, 24. sep', 'datum prati sat, ne uredjaj', datum);
 
 console.log('\n=== 5. Drugo mesto posmatranja ===');
 // Ekran dozvoljava da se nebo gleda iz drugog grada. Pozicije tela su
@@ -189,6 +191,29 @@ const sutraSky = buildSky(shiftDays(obican, ZONA, 1), BEOGRAD.latitude, BEOGRAD.
 const mesecPomak = ((sutraSky.chart.planets.find((p) => p.key === 'moon')!.longitude -
   danas.chart.planets.find((p) => p.key === 'moon')!.longitude) + 360) % 360;
 ok(mesecPomak > 11 && mesecPomak < 16, 'Mesec za dan predje 11—16°', `${mesecPomak.toFixed(1)}°`);
+
+// Dan iz kalendara (Ivan, 28.9.2026): isti zid-sat i preko letnjeg vremena.
+// 15. mart u 12:00 je zimsko (UTC+1), 15. jul u 12:00 letnje (UTC+2).
+const zid = (d: Date) => zoneShift(d, ZONA).toISOString().slice(0, 16);
+const mart = new Date('2026-03-15T11:00:00Z'); // 12:00 po beogradskom zimskom
+ok(zid(naDan(mart, ZONA, 2026, 7, 15)) === '2026-07-15T12:00', 'dan iz kalendara zadrzava sat preko prelaska',
+   zid(naDan(mart, ZONA, 2026, 7, 15)));
+ok(zid(naDan(mart, ZONA, 1990, 1, 1)) === '1990-01-01T12:00', 'kalendar ide i u proslost',
+   zid(naDan(mart, ZONA, 1990, 1, 1)));
+
+// Kalendar radi u zoni UREDJAJA: nosilac dana mora da vrati isti dan u koji
+// god zoni je uredjaj — i oko ponoci, kad su zid-sat mesta i UTC u razlicitim
+// danima (00:30 u Beogradu je jos prethodni dan po UTC-u).
+const ponoc = new Date('2026-09-27T22:30:00Z'); // 28.9. u 00:30 po beogradskom
+ok(danZaKalendar(ponoc, ZONA).getDate() === 28, 'nosilac dana je dan na zid-satu mesta',
+   `${danZaKalendar(ponoc, ZONA).getDate()}.`);
+ok(izKalendara(ponoc, ZONA, danZaKalendar(ponoc, ZONA)).getTime() === ponoc.getTime(),
+   'kalendar bez promene vraca isti trenutak');
+ok(istiDanUKalendaru(ponoc, ZONA, danZaKalendar(ponoc, ZONA)), 'isti dan se prepoznaje');
+const sutraNosilac = danZaKalendar(shiftDays(ponoc, ZONA, 1), ZONA);
+ok(!istiDanUKalendaru(ponoc, ZONA, sutraNosilac), 'drugi dan se razlikuje');
+ok(zid(izKalendara(ponoc, ZONA, sutraNosilac)) === '2026-09-29T00:30', 'izabran sutrasnji dan, isti sat',
+   zid(izKalendara(ponoc, ZONA, sutraNosilac)));
 
 console.log('\n=== 7. Simboli na tocku se ne preklapaju ===');
 // Sa tri izvedene tacke tocak crta 13 simbola umesto 10 — provera da ih

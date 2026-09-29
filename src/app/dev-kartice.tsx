@@ -42,7 +42,7 @@ export default function DevKartice() {
     <Screen label="Pregled kartica" tabBarSpace={false} pushed>
       <Text variant="muted" className="pt-2">
         Test karta: Beograd, {chart.birth.date.toISOString().slice(0, 16).replace('T', ' ')} UT, Ascendent {chart.ascendantSign.formatted}.
-        Dan: {formatDate(date)}.
+        Dan: {formatDate(date)}
       </Text>
       <View className="mt-4">
         {pick ? (
@@ -52,7 +52,6 @@ export default function DevKartice() {
         )}
       </View>
       <View className="mt-9">
-        <Text variant="label" className="mb-3">Mesec danas</Text>
         <MesecDanasCard date={date} offset={0} chart={chart} timeUnknown={false} name="Test" excludeKey={pick?.contentKey ?? null} />
       </View>
     </Screen>

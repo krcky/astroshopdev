@@ -34,18 +34,10 @@ drop policy if exists "duga verzija: samo placen pristup" on public.transit_text
 create policy "kratka verzija: svi prijavljeni" on public.transit_texts
   for select using (auth.uid() is not null and version = 'short');
 
--- Placeno: duga verzija. Provera ide direktno nad tabelom entitlements,
--- koju korisnik ne moze da menja (nema politiku za upis).
+-- Placeno: duga verzija. `ima_premium()` (pokloni.sql) = aktivan red u
+-- `entitlements` ILI u `pokloni`; korisnik ne moze da menja nijednu.
 create policy "duga verzija: samo placen pristup" on public.transit_texts
-  for select using (
-    version = 'long'
-    and exists (
-      select 1 from public.entitlements e
-      where e.user_id = auth.uid()
-        and e.active
-        and (e.expires_at is null or e.expires_at > now())
-    )
-  );
+  for select using (version = 'long' and public.ima_premium());
 
 -- NEMA politike za upis. Korpus unosi samo vlasnik, kroz uvoz CSV-a.
 

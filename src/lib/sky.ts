@@ -115,3 +115,40 @@ export function shiftDays(date: Date, tz: TimeZoneInfo, days: number): Date {
     tz
   );
 }
+
+/**
+ * Isti sat, dan izabran u kalendaru — po ZID-SATU tog mesta, kao `shiftDays`.
+ * `mesec` je 1—12. Sat i minut ostaju oni koji su bili na ekranu.
+ */
+export function naDan(date: Date, tz: TimeZoneInfo, godina: number, mesec: number, dan: number): Date {
+  const zid = zoneShift(date, tz);
+  return localBirthToUtc(godina, mesec, dan, zid.getUTCHours(), zid.getUTCMinutes(), tz);
+}
+
+/*
+ * Kalendar (`@react-native-community/datetimepicker`) radi u zoni UREDJAJA, a
+ * ekran u zoni MESTA POSMATRANJA — korisniku u dijaspori to nisu iste zone.
+ * Zato se kalendaru ne daje trenutak nego NOSILAC DANA: `Date` ciji su
+ * lokalni dan, mesec i godina bas dan na zid-satu mesta. Iz kalendara se
+ * cita samo taj dan (`izKalendara`), a sat se uzima sa ekrana. Nosilac nije
+ * trenutak i ne sme u racun.
+ */
+
+/** Nosilac dana za kalendar. Podne, da ga letnje vreme uredjaja ne prebaci u drugi dan. */
+export function danZaKalendar(date: Date, tz: TimeZoneInfo): Date {
+  const zid = zoneShift(date, tz);
+  return new Date(zid.getUTCFullYear(), zid.getUTCMonth(), zid.getUTCDate(), 12);
+}
+
+/** Dan izabran u kalendaru (nosilac) -> isti zid-sat mesta tog dana. */
+export function izKalendara(date: Date, tz: TimeZoneInfo, izabrano: Date): Date {
+  return naDan(date, tz, izabrano.getFullYear(), izabrano.getMonth() + 1, izabrano.getDate());
+}
+
+/** Da li je u kalendaru izabran bas dan koji je vec na ekranu. */
+export function istiDanUKalendaru(date: Date, tz: TimeZoneInfo, izabrano: Date): boolean {
+  const nosilac = danZaKalendar(date, tz);
+  return nosilac.getFullYear() === izabrano.getFullYear()
+    && nosilac.getMonth() === izabrano.getMonth()
+    && nosilac.getDate() === izabrano.getDate();
+}

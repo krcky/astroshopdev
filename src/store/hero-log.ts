@@ -8,6 +8,9 @@
  *
  * Upisuje se pri prvom prikazu dana. Kljuc prikazan danas nikad nije na pauzi,
  * pa upis ne menja izbor koji korisnik vec gleda.
+ *
+ * PRIPADA NALOGU (29.9.2026), kao i `tvoj-dan-log.ts`: dnevnik tudjeg naloga se
+ * cita kao prazan i zamenjuje pri prvom upisu; pri odjavi se brise.
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -18,18 +21,24 @@ import { daysBetween, type HeroHistory } from '@/lib/transits';
 /** Posle ovoliko dana zapis vise nista ne znaci i brise se. */
 const KEEP_DAYS = 30;
 
+const PRAZAN: HeroHistory = {};
+
 type HeroLogState = {
+  /** Nalog kome dnevnik pripada. */
+  userId: string | null;
   shown: HeroHistory;
   /** Zabelezi da je tranzit prikazan tog dana (`dayKey`). Idempotentno za isti dan. */
-  record: (contentKey: string, day: string) => void;
+  record: (userId: string, contentKey: string, day: string) => void;
+  clear: () => void;
 };
 
 export const useHeroLog = create<HeroLogState>()(
   persist(
     (set, get) => ({
+      userId: null,
       shown: {},
-      record: (contentKey, day) => {
-        const prev = get().shown;
+      record: (userId, contentKey, day) => {
+        const prev = get().userId === userId ? get().shown : PRAZAN;
         if (prev[contentKey] === day) return;
         const today = new Date();
         const next: HeroHistory = {};
@@ -37,13 +46,18 @@ export const useHeroLog = create<HeroLogState>()(
           if (daysBetween(d, today) <= KEEP_DAYS) next[k] = d;
         }
         next[contentKey] = day;
-        set({ shown: next });
+        set({ userId, shown: next });
       },
+      clear: () => set({ userId: null, shown: {} }),
     }),
     {
       name: 'astroshop-hero-log',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (s) => ({ shown: s.shown }) as any,
+      partialize: (s) => ({ userId: s.userId, shown: s.shown }) as any,
     }
   )
 );
+
+/** Dnevnik naloga `userId`; tudji ili bez naloga — prazan. */
+export const heroShownFor = (userId: string | null) => (s: HeroLogState): HeroHistory =>
+  userId && s.userId === userId ? s.shown : PRAZAN;

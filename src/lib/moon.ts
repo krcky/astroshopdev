@@ -94,6 +94,25 @@ export function moonLitPath(angle: number, r: number): string {
   return `M ${top} A ${r} ${r} 0 0 ${outerSweep} ${bottom} A ${rx} ${r} 0 0 ${innerSweep} ${top} Z`;
 }
 
+/**
+ * Ilustracije Meseca: 30 slika, po jedna na svakih 12°. Slika n (1—30) je
+ * napravljena za ugao sredine n-tog dana srednjeg ciklusa (`scripts/mesec-faze.ts`).
+ * Bira se po UGLU, ne po `lunarDay`, da oblik na slici odgovara procentu pored nje.
+ */
+const SINODICKI = 29.530588;
+export const MESEC_SLIKA_UGLOVI = Array.from({ length: 30 }, (_, i) => ((i + 0.5) / SINODICKI) * 360);
+
+/** Redni broj slike 1—30 za ugao faze. */
+export function mesecSlika(angle: number): number {
+  const a = ((angle % 360) + 360) % 360;
+  let najbliza = 1, razlika = Infinity;
+  MESEC_SLIKA_UGLOVI.forEach((u, i) => {
+    const d = Math.min(Math.abs(a - u), 360 - Math.abs(a - u));
+    if (d < razlika) { razlika = d; najbliza = i + 1; }
+  });
+  return najbliza;
+}
+
 /** Znak u trenutku `date`: posle prelaska tog dana je sledeci. */
 export function moonSignAt(
   day: { sign: ZodiacSign; ingress: { at: Date; sign: ZodiacSign } | null },

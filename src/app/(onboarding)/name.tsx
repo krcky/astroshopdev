@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { TextInput, View } from 'react-native';
 import { router } from 'expo-router';
+import { UserRound } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
-import { Text } from '@/components/ui/text';
+import { Input } from '@/components/ui/input';
 import { useProfileStore } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
-import { neutral } from '@/theme/tokens';
 
 export default function Name() {
   const profile = useProfileStore((s) => s.profile);
@@ -32,23 +31,27 @@ export default function Name() {
 
   return (
     <OnboardingStep
-      question="Kako da te zovemo?"
-      note="Tako ti se horoskop obraća direktno, umesto kao oglasna tabla."
+      icon={UserRound}
+      title="Kako da te zovemo?"
+      subtitle="Tako ti se horoskop obraća direktno, umesto kao oglasna tabla."
+      center={false}
+      note={null}
       primary={{ label: busy ? 'Čuvam…' : 'Nastavi', onPress: next, disabled: !valid || busy }}>
-      <View className="items-center">
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="tvoje ime"
-          placeholderTextColor={neutral.inkSubtle}
-          autoCapitalize="words"
-          autoCorrect={false}
-          autoFocus
-          selectTextOnFocus
-          maxLength={60}
-          className="w-full border-b border-fill-strong pb-3 text-center text-3xl text-foreground font-sans"
-        />
-      </View>
+      <Input
+        povrsina="siva"
+        value={name}
+        onChangeText={setName}
+        placeholder="Tvoje ime"
+        autoCapitalize="words"
+        autoCorrect={false}
+        autoComplete="given-name"
+        textContentType="givenName"
+        returnKeyType="done"
+        onSubmitEditing={next}
+        autoFocus
+        selectTextOnFocus
+        maxLength={60}
+      />
     </OnboardingStep>
   );
 }

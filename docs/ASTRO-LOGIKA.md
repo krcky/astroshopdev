@@ -125,6 +125,7 @@ Za Premium korisnike **zamenjuje Hero** (4.1). Besplatni i dalje vide Hero po st
 - Mesec: rezerva, samo na dan kad je aspekt tačan.
 - Nijedan kandidat: kartica se ne prikazuje.
 - Kad se isti tranzit vrati, iz svakog odeljka duge verzije („Pozitivni efekti", „Izazovi", „Saveti") ide **sledeća stavka**.
+- Odmor i rotacija gledaju šta je **taj nalog na tom telefonu** već video (29.9.2026). Zato dve osobe sa istom kartom ponekad istog dana dobiju različit tranzit. Češći razlog je vreme rođenja: Saturn je sad skoro stacionaran, pa 15 minuta razlike pomeri dan tačnog kvadrata na Mesec za dva dana.
 
 **Vladar horoskopa** = vladar znaka Ascendenta, **tradicionalni** (astrolog, 27.9.2026: „svih 12 znakova ima jednako živ protok dnevnih tekstova"). Moderni i oba su podešavanje u kodu (`RULER_SYSTEM`). Bez vremena rođenja nema Ascendenta, pa ni vladara.
 
@@ -256,6 +257,12 @@ Dodir na planetu, Ascendent ili aspekt otvara tekst astrologa:
 - nema podznaka, kuća ni aspekata na Ascendent;
 - **Mesec**: znak se tumači samo ako je Mesec ceo dan rođenja bio u istom znaku. Ako je tog dana prešao u sledeći, aplikacija kaže da ne zna i nudi unos vremena. ⏳
 - **Mesečevi aspekti se ne tumače** (red ostaje u tabeli, bez teksta), jer orbis može da odstupa i do ±7° pa aspekt možda i ne postoji. ⏳ Povezano sa pitanjem 10 u poglavlju 9.
+
+**Ekran „Ti" (od 28.9.2026, po uzoru na sajt):**
+- **Velika trojka** ispod imena: Sunce, Mesec i podznak, svaki vodi na besplatno tumačenje. Bez vremena rođenja podznak piše „Nepoznat", a Mesec koji je tog dana promenio znak piše oba znaka („Blizanci ili Rak").
+- **Lista planeta** se rasklapa: „u Raku" i „u 2. kući", uz **podnaslov tumačenja** i katanac kad je tekst plaćen. Naslovi zaključanih tekstova stižu kroz funkciju `natal_naslovi` (samo naslov, nikad tekst). Ascendent i MC su na kraju liste.
+- **Aspekti**: podnaslov tumačenja je glavni red, ispod ime aspekta i orbis.
+- **Simbolika** na vrhu tumačenja (planeta, znak, kuća, aspekt): ključne reči astrologa iz `files/simbolika/` (`src/lib/simbolika.ts`): planete i znakovi po 7 reči, kuće iz „Kuće značenje", aspekti tema + rečenica („Konjunkcija – Borba"). Ispravljene samo slovne greške (spisak u vrhu fajla).
 
 ## 6. Profil: „velika trojka"
 

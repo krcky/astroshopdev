@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -13,7 +14,6 @@ import { useCitySearch } from '@/lib/city-search';
 import { placeFields, useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
-import { neutral } from '@/theme/tokens';
 
 /**
  * Izmena podataka o rodjenju — SVE na jednom ekranu, ne kroz cetiri koraka.
@@ -67,14 +67,12 @@ export default function EditBirthData() {
       pushed
       keyboardShouldPersistTaps="handled">
           <Section title="Ime">
-            <TextInput
+            <Input
               value={name}
               onChangeText={setName}
-              placeholder="tvoje ime"
-              placeholderTextColor={neutral.inkSubtle}
+              placeholder="Tvoje ime"
               autoCapitalize="words"
               maxLength={60}
-              className="border-b border-border pb-2 text-center text-2xl text-foreground font-sans"
             />
           </Section>
 
@@ -101,13 +99,11 @@ export default function EditBirthData() {
           </Section>
 
           <Section title="Mesto">
-            <TextInput
+            <Input
               value={city ? `${city.name}, ${city.country}` : query}
               onChangeText={(t) => { setQuery(t); setCity(null); }}
-              placeholder="grad"
-              placeholderTextColor={neutral.inkSubtle}
+              placeholder="Grad"
               autoCorrect={false}
-              className="border-b border-border pb-2 text-center text-2xl text-foreground font-sans"
             />
             {!city && (
               <View className="mt-3">

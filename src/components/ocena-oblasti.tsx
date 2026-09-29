@@ -47,8 +47,9 @@ export function OceneOblasti({ rez, bare = false }: {
       className={cn(!bare && CARD_SURFACE, 'pl-4 pr-[22px] py-3.5 active:opacity-80')}>
       {ocene.map((o) => (
         <View key={o.key} className="flex-row items-center gap-2 py-1">
-          <OblastIkona oblast={o.key} size={16} />
-          <Text variant="oznaka" className="flex-1">{o.name}</Text>
+          <OblastIkona oblast={o.key} size={20} />
+          {/* Isto pismo kao recenice "Ide ti / Koči te" ispod (`default`, Ivan 28.9.2026; ranije `oznaka`). */}
+          <Text variant="default" className="flex-1">{o.name}</Text>
           <OcenaTackice ocena={o.ocena} />
         </View>
       ))}

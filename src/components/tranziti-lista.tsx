@@ -92,18 +92,23 @@ export type KarticaRed = Pick<TranzitRed, 'key' | 'transiting' | 'aspect' | 'nat
  * Kartica jednog tranzita — tab "Tranziti" i slajd "Tema perioda" na pocetnoj
  * (Ivan, 28.9.2026: "ovakve iste kartice i na stranici tema perioda").
  */
-export function KarticaTranzita({ red, ton, naslov, loading, trajanje }: {
+export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, oznaka }: {
   red: KarticaRed;
-  ton: Tone;
+  /** Bez tona i trajanja kad je dat `opis`. */
+  ton?: Tone;
   naslov: string;
   loading: boolean;
-  trajanje: string;
+  trajanje?: string;
+  /** Dva reda teksta UMESTO tona i trajanja — "Za tebe" na slajdu Mesec danas (Ivan, 28.9.2026). */
+  opis?: string;
+  /** Oznaka iznad naslova umesto imena tranzita ("Za tebe", Ivan 28.9.2026). */
+  oznaka?: string;
 }) {
   const r = red;
   const tekst = tekstReda(r, naslov);
   const ime = tekstReda(r, '').veci;
   const ceka = loading && tekst.zaProveru; // naslov mozda jos stize
-  const a11y = [ceka ? ime : tekst.veci, tekst.manji, TONE_LABEL[ton], trajanje].filter(Boolean).join('. ') + '.';
+  const a11y = [ceka ? ime : tekst.veci, tekst.manji, opis ?? (ton && TONE_LABEL[ton]), !opis && trajanje].filter(Boolean).join('. ') + '.';
 
   return (
     <Pressable
@@ -120,7 +125,7 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje }: {
             <>
               <TekstSaStrelicom strelica={false} numberOfLines={2}
                 variant="oznaka">
-                {ime}
+                {oznaka ?? ime}
               </TekstSaStrelicom>
               {ceka ? (
                 <TextPlaceholder lines={1} className="mt-3" />
@@ -133,12 +138,16 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje }: {
             </>
           );
         })()}
-      {/* Ton pa trajanje u ISTOM redu (Ivan, 28.9.2026). */}
-      <View className="mt-2 flex-row items-center gap-1.5">
-        <TonOznaka tone={ton} />
-        {!!trajanje && <Text variant="caption">·</Text>}
-        <Text variant="caption" className="flex-shrink" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{trajanje}</Text>
-      </View>
+      {opis ? (
+        <Text variant="caption" className="mt-2" numberOfLines={2}>{opis}</Text>
+      ) : ton ? (
+        // Ton pa trajanje u ISTOM redu (Ivan, 28.9.2026).
+        <View className="mt-2 flex-row items-center gap-1.5">
+          <TonOznaka tone={ton} />
+          {!!trajanje && <Text variant="caption">·</Text>}
+          <Text variant="caption" className="flex-shrink" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{trajanje}</Text>
+        </View>
+      ) : null}
       </View>
       {/* Ilustracija DESNO, tekst levo (Ivan, 28.9.2026). Slike planeta preko tackica:
           tranzitna van kruga, natalna unutra. Ako aspekt nema ilustraciju,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Host, Image, Menu, Picker, Text } from '@expo/ui/swift-ui';
-import { accessibilityLabel as a11yLabel, tag } from '@expo/ui/swift-ui/modifiers';
+import { accessibilityLabel as a11yLabel, contentShape, frame, shapes, tag } from '@expo/ui/swift-ui/modifiers';
 
 import type { NativeDayMenuProps } from './native-day-menu';
 
@@ -16,11 +16,15 @@ import type { NativeDayMenuProps } from './native-day-menu';
  * "Danas", "Sutra"… bez datuma: podnaslov (dva `Text`-a u stavci) Picker na
  * iOS-u 18 ne prikazuje, a datum u istom redu lomi stavku u dva reda.
  */
-export function NativeDayMenu({ systemImage, accessibilityLabel, color, options, selected, onChange }: NativeDayMenuProps) {
-  // Okidac je ikona kalendara sa brojem dana, u mehuru zajedno sa profilom (Ivan, 28.9.2026).
+export function NativeDayMenu({ systemImage, povrsina, accessibilityLabel, color, options, selected, onChange }: NativeDayMenuProps) {
+  // Okidac je ikona kalendara, u svom krugu pored profila (Ivan, 28.9.2026). Dodir
+  // hvata ceo krug (`povrsina`), ne samo ikona.
+  const okvir = povrsina ? [frame({ width: povrsina, height: povrsina }), contentShape(shapes.circle())] : [];
   return (
     <Host matchContents>
-      <Menu modifiers={[a11yLabel(accessibilityLabel)]} label={<Image systemName={systemImage as never} size={19} color={color} />}>
+      <Menu
+        modifiers={[a11yLabel(accessibilityLabel)]}
+        label={<Image systemName={systemImage as never} size={19} color={color} modifiers={okvir} />}>
         <Picker selection={selected} onSelectionChange={(v: number) => onChange(v)}>
           {options.map((o) => (
             <Text key={o.value} modifiers={[tag(o.value)]}>{o.title}</Text>

@@ -1,39 +1,44 @@
 import * as React from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
-import { Apple, Carrot, ChevronRight, Flower2, Leaf } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
-import { Chip } from '@/components/ui/chip';
-import { OblastIkona, OBLAST_BOJA } from '@/components/oblast-ikona';
+import { OblastIkona } from '@/components/oblast-ikona';
+import { KapsuleRed } from '@/components/ui/kapsule';
+import { ZnakIkona } from '@/components/znak-ikona';
+import { OZNAKA_12 } from '@/components/tvoj-dan-card';
+import { KarticaTranzita } from '@/components/tranziti-lista';
+import { chartRulers, rulerRole } from '@/lib/rulers';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { cn } from '@/lib/utils';
-import { neutral } from '@/theme/tokens';
-import { SIGN_CASES, signFromLongitude, type Element } from '@/lib/zodiac';
+import { SIGN_CASES, signFromLongitude } from '@/lib/zodiac';
 import type { NatalChart } from '@/lib/natal';
 import {
-  LUNAR_AREAS, PHASE_SUMMARY_PRIVREMENO, PLANT_PART, lunationHouse, phaseDay, type LunarArea,
+  LUNAR_AREAS, PHASE_SUMMARY_PRIVREMENO, phaseDay, type LunarArea,
 } from '@/lib/moon';
 import { useLunarText } from '@/lib/lunar-texts';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { moonDay, strongestMoonHit } from '@/lib/transits';
-import { lunarneStavke, type Stavka } from '@/lib/tumacenje';
+import { lunarneStavke, prveRecenice, type Stavka } from '@/lib/tumacenje';
 import { tezina } from '@/theme/tipografija';
+import { useNaMrezi } from '@/lib/mreza';
 
 /** Nazivi tabova na kartici (brief). "Ljubav" je u tekstovima "Ljubav i odnosi". */
 const TAB: Record<LunarArea, string> = {
   ljubav: 'Ljubav', zdravlje: 'Zdravlje i lepota', karijera: 'Karijera i finansije', kuca: 'Kuća', basta: 'Bašta',
 };
 
-const PLANT_ICON: Record<Element, typeof Apple> = { vatra: Apple, zemlja: Carrot, vazduh: Flower2, voda: Leaf };
-/** "Dan ploda" — genitiv dela biljke. */
-const DAN_BILJKE: Record<Element, string> = { vatra: 'Dan ploda', zemlja: 'Dan korena', vazduh: 'Dan cveta', voda: 'Dan lista' };
+/** Ilustracija Meseca desno od naslova i znak dole desno na njoj. */
+const MESEC = 96;
+const ZNAK = 28;
+
+// Red "Dan ploda / korena…" na Basti izbacen (Ivan, 28.9.2026); deo biljke ostaje na ekranu Mesec.
 
 /**
- * "Mesec danas" — Premium kartica: faza (ne znak) kao crtez, lunarni savet
+ * "Mesec danas" — Premium slajd: faza kao ilustracija, lunarni savet
  * isti za sve znakove po oblastima, i jedan licni red za Mlad i Pun Mesec.
  * Faza i znak se racunaju u `phaseDay` (`lib/moon.ts`); tekst je astrologov
  * lunarni kalendar po paru faza + znak (`lib/lunar-texts.ts`).
@@ -50,12 +55,14 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
   /** Tranzit vec prikazan u "Tvom danu" — ne ponavlja se ovde. */
   excludeKey?: string | null;
 }) {
+  const naMrezi = useNaMrezi();
   const faza = React.useMemo(() => phaseDay(date), [date]);
   const znak = signFromLongitude(faza.moonLongitude).sign;
   const [oblast, setOblast] = React.useState<LunarArea>('ljubav');
   const { body, loading } = useLunarText(faza.textPhase, znak.key, oblast);
   // Jedna stavka po oblasti (Ivan, 28.9.2026); Basta i dalje Uradi / Izbegavaj.
-  const s = body ? lunarneStavke(body, oblast === 'basta' ? 3 : 1) : null;
+  // Jedna stavka po oblasti, i za Baštu (Ivan, 28.9.2026) — bez Uradi / Izbegavaj.
+  const s = body ? lunarneStavke(body, 1) : null;
   const smer = faza.waxing ? 'raste' : 'opada';
   const naslov = `${faza.name} u ${SIGN_CASES[znak.key].loc}`;
 
@@ -69,128 +76,109 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
   // Bez imena tranzita i sata (Ivan, 28.9.2026) — red postoji samo kad ima tekst.
   const hitTekst = hit ? texts.get(hit.contentKey) : undefined;
 
-  const kuca = lunationHouse(faza, chart, timeUnknown);
-  // Tekst "faza u kuci" jos ne postoji; red se ne prikazuje dok ga astrolog ne posalje.
-  const licniTekst: string | null = null;
+  // Red "Mlad/Pun Mesec u tvojoj N. kuci" (`lunationHouse`) ceka tekst astrologa;
+  // kad stigne, ide u karticu "Za tebe".
 
-  const BiljkaIkona = PLANT_ICON[znak.element];
 
+  // Raspored kao prvi slajd (Ivan, 28.9.2026): bez kartice oko vrha — oznaka,
+  // veliki naslov sa ilustracijom desno, recenica, dugme; ispod dve kartice.
   return (
-    <View className={CARD_SURFACE}>
-      <View className="p-5">
-        <View className="flex-row items-center gap-4">
-          <View
-            accessible
-            accessibilityRole="image"
-            accessibilityLabel={`${faza.name}, osvetljenost ${faza.illuminationPct} posto, ${smer}`}>
-            <MoonDisc angle={faza.angle} size={64} />
-          </View>
-          <View className="flex-1">
-            <Text variant="h2">{naslov}</Text>
-            <Text variant="muted" className="mt-0.5">Osvetljenost {faza.illuminationPct}% · {smer}</Text>
+    <View>
+      <View className="flex-row items-start gap-4">
+        <View className="flex-1">
+          {/* Osvetljenost uz oznaku, ne ispod ilustracije; mala tacka, po dva razmaka (Ivan, 28.9.2026). */}
+          <Text variant="oznaka" className={OZNAKA_12}>Mesec danas{'\u00A0\u00A0·\u00A0\u00A0'}{faza.illuminationPct}%</Text>
+          <Text variant="display" className="mt-3">{naslov}</Text>
+          {/* PRIVREMENA recenica faze dok astrolog ne posalje prave (`PHASE_SUMMARY_PRIVREMENO`).
+              U koloni naslova, pored ilustracije, blizu naslova (Ivan, 28.9.2026). Ista mera
+              kao sazetak na prvom slajdu (17/24). */}
+          <Text variant="body" className="mt-2 text-[17px] leading-[24px]">{PHASE_SUMMARY_PRIVREMENO[faza.key]}</Text>
+          {/* "Saznaj više" odmah ispod opisa (Ivan, 29.9.2026; ranije u kartici, ispod saveta).
+              Poravnanje na omotacu (`istaknuto` dugme ima omotac sa senkom). */}
+          <View className="mt-4 self-start">
+            <Button
+              size="compact"
+              istaknuto
+              className="h-auto px-5 py-[10px]"
+              onPress={() => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } })}>
+              <Text className="text-[16px] leading-[20px]">Saznaj više</Text>
+            </Button>
           </View>
         </View>
-
-        {/* PRIVREMENA recenica faze dok astrolog ne posalje prave (`PHASE_SUMMARY_PRIVREMENO`). */}
-        <Text variant="body" className="mt-4">{PHASE_SUMMARY_PRIVREMENO[faza.key]}</Text>
-      </View>
-
-      {/* Oblasti — vodoravni niz kapsula, da duzi nazivi i Dynamic Type ne lome red. */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        accessibilityRole="tablist"
-        contentContainerClassName="gap-2 px-5">
-        {LUNAR_AREAS.map((a) => (
-          <Chip
-            key={a.key}
-            label={TAB[a.key]}
-            // Ivanove ikonice oblasti, kao na ekranu Mesec: izabrana lila, ostale sive.
-            icon={<OblastIkona oblast={a.key} size={16} color={a.key === oblast ? OBLAST_BOJA : neutral.inkSubtle} />}
-            selected={a.key === oblast}
-            onPress={() => setOblast(a.key)}
-          />
-        ))}
-      </ScrollView>
-
-      <View className="px-5 pt-4">
-        {oblast === 'basta' && (
-          <View className="mb-3 flex-row items-center gap-2">
-            <BiljkaIkona size={18} color={neutral.ink} strokeWidth={1.8} />
-            <Text variant="row" accessibilityLabel={`Odgovarajući deo biljke: ${PLANT_PART[znak.element].toLowerCase()}`}>
-              {DAN_BILJKE[znak.element]}
-            </Text>
-          </View>
-        )}
-        {s && oblast === 'basta' ? (
-          <>
-            <Lista naslov="Uradi" stavke={s.uradi} />
-            <Lista naslov="Izbegavaj" stavke={s.izbegavaj} className="mt-3" />
-          </>
-        ) : s && s.stavke.length ? (
-          <Lista stavke={s.stavke} />
-        ) : loading ? (
-          <TextPlaceholder lines={2} />
-        ) : (
-          <Text variant="muted">Saveti za ovu oblast još nisu stigli.</Text>
-        )}
-      </View>
-
-      {((hit && hitTekst) || (kuca && licniTekst)) && (
-        <>
-          <View className="h-px bg-border" />
-          <View className="px-5 pt-5">
-            <Text variant="caption">Za tebe</Text>
-          </View>
-          {kuca && licniTekst && (
-            <View className="px-5 pt-1">
-              <Text variant="row">{faza.name} pada u tvoju {kuca.house}. kuću: {kuca.theme}.</Text>
-              <Text variant="body" className="mt-1">{licniTekst}</Text>
+        {/* Ilustracija faze, znak u kom je Mesec dole desno. */}
+        <View
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel={`${naslov}, osvetljenost ${faza.illuminationPct} posto, ${smer}`}
+          // Spusteno u visinu naslova, ne uz oznaku (Ivan, 28.9.2026).
+          className="mt-6 items-center">
+          <View>
+            <MoonDisc angle={faza.angle} size={MESEC} />
+            <View className="absolute -bottom-1 -right-1 rounded-pill bg-grouped p-[2px]">
+              <ZnakIkona znak={znak.key} element={znak.element} size={ZNAK} />
             </View>
-          )}
-          {hit && hitTekst && (
-            <Pressable
-              onPress={() => router.push({ pathname: '/transit', params: { key: hit.contentKey } })}
-              accessibilityRole="button"
-              accessibilityLabel={hitTekst.title || 'Tumačenje'}
-              className="flex-row items-center gap-3 px-5 pt-2 active:opacity-60">
-              <View className="flex-1">
-                {!!hitTekst.title && <Text variant="row">{hitTekst.title}</Text>}
-                {!!hitTekst.body && <Text variant="body" className="mt-1" numberOfLines={3}>{hitTekst.body}</Text>}
-              </View>
-              <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />
-            </Pressable>
-          )}
-        </>
-      )}
-
-      {/* Crno dugme, ne preko cele sirine (Ivan, 28.9.2026) — ista mera kao na "Tvom danu". */}
-      <View className="px-5 pb-5 pt-5">
-        <Button
-          size="compact"
-          className="h-auto self-start px-5 py-[10px]"
-          onPress={() => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } })}>
-          <Text className="text-[16px] leading-[20px]">Saznaj više</Text>
-        </Button>
+          </View>
+        </View>
       </View>
+
+      {/* Kartica sa oblastima: kapsule u staklu, izabrana svetlo lila. */}
+      <Kartica className="mt-5">
+        <KapsuleRed
+          stavke={LUNAR_AREAS.map((a) => ({
+            key: a.key,
+            label: TAB[a.key],
+            icon: <OblastIkona oblast={a.key} size={20} aktivna={a.key === oblast} />,
+          }))}
+          izabrana={oblast}
+          onIzbor={setOblast}
+        />
+
+        <View className="pt-4">
+          {s && s.stavke.length ? (
+            <Savet stavka={s.stavke[0]} />
+          ) : loading ? (
+            <TextPlaceholder lines={2} />
+          ) : (
+            // Bez interneta se ne tvrdi da saveti nisu stigli — mozda samo nisu sacuvani.
+            <Text variant="muted">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
+          )}
+        </View>
+      </Kartica>
+
+      {/* "Za tebe" — kartica kao u tabu "Tranziti" (Ivan, 28.9.2026): "Za tebe" umesto
+          imena tranzita, dva reda teksta umesto tona i trajanja. Dodir otvara ceo tekst. */}
+      {hit && hitTekst && (
+        <View className="mt-3">
+          <KarticaTranzita
+            red={{
+              key: hit.contentKey,
+              transiting: hit.transiting,
+              aspect: hit.aspect,
+              natal: hit.natal,
+              ruler: rulerRole(hit.transiting.key, hit.natal.key, chartRulers(chart, timeUnknown)),
+            }}
+            oznaka="Za tebe"
+            naslov={hitTekst.title ?? ''}
+            loading={false}
+            opis={hitTekst.body ? prveRecenice(hitTekst.body) : undefined}
+          />
+        </View>
+      )}
     </View>
   );
 }
 
-function Lista({ naslov, stavke, className }: { naslov?: string; stavke: Stavka[]; className?: string }) {
-  if (stavke.length === 0) return null;
+/** Kartica ispod vrha: uvek bela (Ivan, 28.9.2026: staklo samo na kapsulama). */
+function Kartica({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <View className={cn(CARD_SURFACE, 'p-4', className)}>{children}</View>;
+}
+
+/** Savet oblasti — samo tekst, bez tacke (Ivan, 28.9.2026); naslov stavke podebljan. */
+function Savet({ stavka }: { stavka: Stavka }) {
   return (
-    <View className={cn('gap-2', className)}>
-      {naslov && <Text variant="caption">{naslov}</Text>}
-      {stavke.map((x, i) => (
-        <View key={i} className="flex-row gap-2">
-          <Text variant="body">•</Text>
-          <Text variant="default" className="flex-1">
-            {x.naslov ? <Text variant="default" className={tezina('naslovUTekstu')}>{x.naslov} – </Text> : null}
-            {x.tekst}
-          </Text>
-        </View>
-      ))}
-    </View>
+    <Text variant="default">
+      {stavka.naslov ? <Text variant="default" className={tezina('naslovUTekstu')}>{stavka.naslov} – </Text> : null}
+      {stavka.tekst}
+    </Text>
   );
 }

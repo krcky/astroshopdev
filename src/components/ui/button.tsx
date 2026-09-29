@@ -156,19 +156,23 @@ function SjajIvice() {
 
 /*
  * Ivan, 28.9.2026: crno dugme "previse flat — da ima neke sjajeve, senku".
- * Samo uz `istaknuto`; ostala crna dugmad ostaju kakva su bila.
+ * Od 29.9.2026 (Ivan: "sva crna dugmad da budu fensi, svuda") ovako izgleda
+ * SVAKO crno dugme — `istaknuto` je podrazumevano ukljuceno.
  *
  *   1. Ispuna nije ravna: svetlija crna gore, tamnija dole (kao zakrivljena povrsina).
  *   2. Sjaj preko gornje polovine — providna bela koja se gubi ka sredini.
  *   3. Tanka svetla linija na samom vrhu (odsjaj ivice) — pojacan `SjajIvice`.
  *   4. Tiha crna senka ispod, da dugme malo lebdi.
- *      Senka ide na OMOTAC: dugme ima `overflow-hidden` (zbog zaobljenja
- *      sjaja), a iOS ne crta senku pogleda koji secka svoj sadrzaj.
+ *      Senka ide na SAMO dugme, a sjajevi su u svom zaobljenom sloju koji secka
+ *      (`SjajCrnogDugmeta`): iOS ne crta senku pogleda koji secka svoj sadrzaj,
+ *      pa dugme ne sme da ima `overflow-hidden`. Ranije je senku nosio omotac
+ *      oko dugmeta — margine i poravnanje iz `className` su tada ostajali na
+ *      unutrasnjem dugmetu, pa je svaki ekran morao da ga umota u svoj View.
  */
 // Ublazeno (Ivan: "prejak sjaj"): ispuna blizu ravne, sjaj i linija na vrhu upola tisi.
 const ISTAKNUTO_ISPUNA = ['#26262A', '#18181A', '#111112'] as const;
 const ISTAKNUTO_ISPUNA_TACKE = [0, 0.55, 1] as const;
-const ISTAKNUTO_SENKA = {
+export const ISTAKNUTO_SENKA = {
   // Prvo je bila indigo 0,35 / 14 — "previse naglaseno, i da nije ljubicasta" (Ivan):
   // sada crna, tisa i bliza dugmetu.
   shadowColor: '#000000',
@@ -200,9 +204,32 @@ function SjajIstaknuto() {
   );
 }
 
+/**
+ * Svi sjajevi crnog dugmeta u jednom sloju zaobljenom kao dugme, koji ih secka —
+ * dugme samo ne secka, da bi mu se videla senka. Izvezen za crna dugmad koja nisu
+ * `Button` (okruglo play dugme u `glasovna-poruka.tsx`); senka je `ISTAKNUTO_SENKA`.
+ * `istaknuto` false: samo odsjaj ivice, kao ravno crno dugme ranije.
+ */
+export function SjajCrnogDugmeta({ istaknuto = true }: { istaknuto?: boolean }) {
+  return (
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, overflow: 'hidden' }]}>
+      {istaknuto ? <SjajIstaknuto /> : null}
+      <SjajIvice />
+    </View>
+  );
+}
+
 type ButtonProps = React.ComponentProps<typeof Pressable> & VariantProps<typeof buttonVariants> & {
-  /** Crno dugme sa prelivom, sjajem i indigo senkom (`SjajIstaknuto`). */
+  /**
+   * Crno dugme sa prelivom, sjajem i senkom (`SjajIstaknuto`). Podrazumevano
+   * UKLJUCENO (Ivan, 29.9.2026) — `false` vraca ravno crno dugme.
+   */
   istaknuto?: boolean;
+  /**
+   * Ugaseno dugme SIVO umesto belog — za bele povrsine (list odozdo), gde belo
+   * dugme sa senkom nestane i ostane samo sivi natpis (Ivan, 29.9.2026).
+   */
+  ugasenoSivo?: boolean;
 };
 
 export function Button({
@@ -212,7 +239,8 @@ export function Button({
   disabled,
   style,
   children,
-  istaknuto = false,
+  istaknuto = true,
+  ugasenoSivo = false,
   ...props
 }: ButtonProps) {
   /*
@@ -221,12 +249,12 @@ export function Button({
    * dalje vuce oko kao glavna akcija, a belo jasno kaze "jos ne moze".
    */
   const ugaseno = Boolean(disabled);
-  const stvarni = ugaseno ? 'soft' : (variant ?? 'default');
+  const stvarni = ugaseno ? (ugasenoSivo ? 'secondary' : 'soft') : (variant ?? 'default');
   const meka = stvarni === 'soft';
   const crno = stvarni === 'default' || stvarni === 'destructive';
   const sjajno = istaknuto && stvarni === 'default';
 
-  const dugme = (
+  return (
     <TextClassContext.Provider
       value={cn(buttonTextVariants({ variant: stvarni, size }), ugaseno && 'text-subtle')}>
       <Pressable
@@ -236,28 +264,28 @@ export function Button({
         // kao funkcija — senka mekog dugmeta i boja poslata spolja nisu stizale do
         // ekrana (izmereno na vebu, 28.9.2026). Funkcija ostaje samo kad ju je
         // pozivalac sam dao.
+        // Senka istaknutog dugmeta je na samom dugmetu (vidi `ISTAKNUTO_SENKA`); na
+        // Androidu `elevation` prati pozadinu i zaobljenje dugmeta.
         style={typeof style === 'function'
-          ? (stanje) => [meka ? shadow.soft : null, style(stanje)]
-          : [meka ? shadow.soft : null, style]}
-        className={cn(buttonVariants({ variant: stvarni, size }), className)}
+          ? (stanje) => [meka ? shadow.soft : null, sjajno ? ISTAKNUTO_SENKA : null, style(stanje)]
+          : [meka ? shadow.soft : null, sjajno ? ISTAKNUTO_SENKA : null, style]}
+        className={cn(
+          buttonVariants({ variant: stvarni, size }),
+          // Bez seckanja, inace iOS ne crta senku; sjajeve secka njihov sloj.
+          sjajno && 'overflow-visible',
+          ugaseno && ugasenoSivo && 'bg-fill-strong',
+          className,
+        )}
         {...props}>
         {(stanje) => (
           <>
             {/* PRVI u stablu, da natpis ostane iznad njega. */}
-            {sjajno ? <SjajIstaknuto /> : null}
-            {crno ? <SjajIvice /> : null}
+            {crno ? <SjajCrnogDugmeta istaknuto={sjajno} /> : null}
             {typeof children === 'function' ? children(stanje) : children}
           </>
         )}
       </Pressable>
     </TextClassContext.Provider>
-  );
-  if (!sjajno) return dugme;
-  // Omotac nosi senku (vidi `ISTAKNUTO_SENKA`); na Androidu `elevation` trazi pozadinu i oblik.
-  return (
-    <View style={[ISTAKNUTO_SENKA, { borderRadius: 999, backgroundColor: '#111112' }]}>
-      {dugme}
-    </View>
   );
 }
 

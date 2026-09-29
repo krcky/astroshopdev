@@ -7,6 +7,13 @@
  * Bez toga bi se desilo ovo: neko zapocne onboarding na tudjem telefonu, pa se
  * ulancano prijavi postojecim nalogom — i njegova prava karta bude prepisana
  * podacima koje je uneo neko drugi.
+ *
+ * "NAPRAVI NALOG" SA EMAILOM KOJI VEC IMA KARTU (Ivan, 29.9.2026): ovde se ne
+ * stize. Ekran sa kodom (`?nov=1`, iz reveal-a) posle potvrde kaze da je email
+ * zauzet i nudi drugi email ili ulazak u postojeci nalog. Ranije je tok tiho
+ * usao u stari nalog, a upravo uneti podaci su nestali bez ijedne poruke.
+ * Pita se tek POSLE koda: pre njega bi odgovor "zauzeto" svakome otkrivao ciji
+ * email koristi aplikaciju; posle koda je jasno da je email njegov.
  */
 import { useDraft } from '@/store/draft';
 import { placeFields, useProfileStore, type Profile } from '@/store/profile';
@@ -26,11 +33,17 @@ export type SignupOutcome =
   /** Nema ni gore ni dole — korisnik mora da unese podatke o rodjenju. */
   | 'incomplete';
 
+/** Karta sa servera postaje lokalna, a draft se baca. */
+export function adoptRemote(remote: Profile) {
+  useProfileStore.getState().setProfile(remote);
+  useDraft.getState().reset();
+}
+
+/** Baca ako server ne odgovori (`pullProfile`) — tada se nista ne upisuje. */
 export async function completeSignup(userId: string, email: string): Promise<SignupOutcome> {
   const remote = await pullProfile(userId);
   if (remote) {
-    useProfileStore.getState().setProfile(remote);
-    useDraft.getState().reset();
+    adoptRemote(remote);
     return 'existing';
   }
 

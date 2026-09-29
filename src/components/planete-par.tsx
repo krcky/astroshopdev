@@ -34,6 +34,11 @@ const SLIKA: Partial<Record<string, ImageSourcePropType>> = {
  */
 const SKALA: Partial<Record<string, number>> = { saturn: 1.5, uranus: 1.5 };
 
+/** Koliko je slika veca od precnika tela (prstenovi); 1 za ostale. Za mesto oko slike. */
+export function skalaSlike(key: string): number {
+  return SKALA[key] ?? 1;
+}
+
 /** Mesto za prstenove desne planete, isto za svaki par — da tekst uvek pocne na istoj liniji. */
 const PRSTENOVI = (Math.max(...Object.values(SKALA).map((x) => x ?? 1)) - 1) / 2;
 

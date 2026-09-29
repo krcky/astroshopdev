@@ -121,6 +121,7 @@ Sud piši kratko i direktno: šta ne valja, zašto, i šta konkretno promeniti.
 
 ## Kad hoćeš da vidiš ekran
 
-Xcode NIJE instaliran na mašini, pa iOS simulator ne radi. Ekran se gleda preko
-`npm start` i Expo Go na pravom telefonu, ili `npm run web` za grubu proveru
-rasporeda (web verzija nije merodavna za fontove i bezbednu zonu).
+Xcode je instaliran (26.6, od 28.9.2026), pa postoji iOS simulator. Ekran se
+gleda preko `npm start` i Expo Go na pravom telefonu, u simulatoru, ili
+`npm run web` za grubu proveru rasporeda (web verzija nije merodavna za fontove
+i bezbednu zonu). Merodavan je telefon.

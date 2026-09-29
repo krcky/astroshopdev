@@ -52,7 +52,9 @@ već stoje i čekaju dev build. Ne puštati Google bez Apple-a.
 
 ## Build
 
-Xcode **nije instaliran** na mašini. Build ide isključivo preko **EAS**:
+Xcode **je instaliran** (26.6, od 28.9.2026), ali služi za simulator i
+besplatnu instalaciju na sopstvene telefone. Build za prodavnicu ide preko
+**EAS**:
 
 ```bash
 npx eas build --platform ios --profile production

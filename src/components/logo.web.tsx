@@ -18,6 +18,38 @@ const GAP = 12;
 
 const FULL_ASPECT = 621 / 168;
 
+/** Krug loga bez natpisa (dobrodoslica) — na vebu staticna slika. */
+export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: string }) {
+  return (
+    <Image
+      source={require('@/assets/images/logo-krug.png')}
+      style={{ width: size, height: size }}
+      contentFit="contain"
+      tintColor={color}
+      accessibilityElementsHidden
+      importantForAccessibility="no"
+    />
+  );
+}
+
+export type LogoKrugRef = { zavrti: () => void };
+
+/** Krug za uvod (`uvod.tsx`) — na vebu staticna slika, pa se ne vrti. */
+export function LogoKrug({ size, onSpreman }: {
+  ref?: React.Ref<LogoKrugRef>;
+  size: number;
+  onSpreman?: () => void;
+}) {
+  return (
+    <Image
+      source={require('@/assets/images/logo-krug.png')}
+      style={{ width: size, height: size }}
+      contentFit="contain"
+      onLoad={onSpreman}
+    />
+  );
+}
+
 /** `title` — ime strane; `full` — pun logo iz brend PNG-a (staticno na vebu). */
 /** `color` — preboja kruga (PNG je indigo na providnom, pa `tintColor` radi). */
 export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {

@@ -38,6 +38,15 @@
         "8082"
       ],
       "port": 8082
+    },
+    {
+      "name": "astroshop-panel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "panel"
+      ],
+      "port": 5180
     }
   ]
 }

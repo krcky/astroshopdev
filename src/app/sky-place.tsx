@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import { Check } from 'lucide-react-native';
 
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { Screen } from '@/components/screen';
+import { SheetScroll } from '@/components/sheet';
 import { CARD_SURFACE } from '@/components/ui/card';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
@@ -15,7 +16,9 @@ import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 /**
- * Izbor mesta odakle se gleda nebo.
+ * Izbor mesta odakle se gleda nebo. Od 28.9.2026 LIST ODOZDO (Ivan), sa
+ * staklenog dugmeta sa imenom grada na Nebu — `_layout.tsx`. Zatvara se
+ * povlacenjem nadole ili izborom grada.
  *
  * Menja SAMO ekran "Trenutno na nebu". Podaci o rodjenju se ne diraju — mesto
  * rodjenja se menja kroz `/edit` i to je jedina stvar koja pomera natalnu
@@ -41,34 +44,37 @@ export default function SkyPlace() {
   };
 
   return (
-    <Screen
-      label="Odakle gledaš"
-      tabBarSpace={false}
-      pushed
-      keyboardShouldPersistTaps="handled">
-          <Text variant="display" className="pb-1 pt-2">{aktivan.name}</Text>
-          <Text variant="muted" className="mb-6">
+    <SheetScroll keyboardShouldPersistTaps="handled">
+          {/* Naslov lista kao na ostalim listovima; izabran grad je red sa kvacicom ispod. */}
+          <Text variant="naslovLista">Odakle gledaš</Text>
+          <Text variant="body" className="mb-6 mt-2">
             Kuće i ascendent zavise od mesta — nebo iznad Beograda i iznad
             Sidneja u istom trenutku nije isto.
           </Text>
 
-          <TextInput
+          <Input
             value={query}
             onChangeText={setQuery}
-            placeholder="traži grad"
-            placeholderTextColor={neutral.inkSubtle}
+            placeholder="Traži grad"
             autoCorrect={false}
-            className="border-b border-fill-strong pb-3 text-2xl text-foreground font-sans"
+            returnKeyType="search"
           />
 
           <View className="mt-4">
             {query.trim().length === 0 ? (
-              <Izbor
-                naslov={rodni.name}
-                opis="Grad iz tvog profila"
-                aktivno={izabran === null}
-                onPress={() => izaberi(null)}
-              />
+              <>
+                {/* Izabran drugi grad stoji iznad grada iz profila — na listu nema
+                    velikog imena grada kao nekad na strani, pa se vidi ovde. */}
+                {izabran !== null && izabran.id !== rodni.id && (
+                  <Izbor naslov={izabran.name} opis={izabran.country} aktivno onPress={() => izaberi(izabran)} />
+                )}
+                <Izbor
+                  naslov={rodni.name}
+                  opis="Grad iz tvog profila"
+                  aktivno={izabran === null || izabran.id === rodni.id}
+                  onPress={() => izaberi(null)}
+                />
+              </>
             ) : (
               <>
                 {results.map((c) => (
@@ -106,7 +112,7 @@ export default function SkyPlace() {
             Ovim se menja samo ekran „Trenutno na nebu". Tvoja natalna karta
             ostaje računata za mesto rođenja — ono se menja u profilu.
           </Text>
-    </Screen>
+    </SheetScroll>
   );
 }
 

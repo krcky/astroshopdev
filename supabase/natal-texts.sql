@@ -4,8 +4,9 @@
 -- aplikaciju, aplikacija trazi samo kljuceve iz karte korisnika.
 --
 -- Paywall je OVDE (pravilo 8). Besplatno je samo ono sto ima `free = true` —
--- Sunce, Mesec i podznak U ZNAKU (Ivan, 28.9.2026); sve ostalo trazi aktivan
--- red u `entitlements`. Kolonu postavlja `scripts/korpus/natal.py` (`besplatno`).
+-- Sunce, Mesec i podznak U ZNAKU (Ivan, 28.9.2026); sve ostalo trazi
+-- `ima_premium()` — kupovina ili poklon (`pokloni.sql`). Kolonu postavlja
+-- `scripts/korpus/natal.py` (`besplatno`).
 -- Neprijavljen korisnik ne dobija nista.
 
 create table if not exists public.natal_texts (
@@ -29,14 +30,7 @@ create policy "besplatni: svi prijavljeni" on public.natal_texts
   for select using (auth.uid() is not null and free);
 
 create policy "ostalo: samo placen pristup" on public.natal_texts
-  for select using (
-    exists (
-      select 1 from public.entitlements e
-      where e.user_id = auth.uid()
-        and e.active
-        and (e.expires_at is null or e.expires_at > now())
-    )
-  );
+  for select using (public.ima_premium());
 
 -- NEMA politike za upis. Tekstove uvozi vlasnik iz files/natal-texts.csv
 -- (truncate pa import — CSV je ceo korpus, ne dopuna).

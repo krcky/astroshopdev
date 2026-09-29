@@ -22,7 +22,8 @@ src/
   app/
     index.tsx        KAPIJA — jedino mesto koje odlucuje gde korisnik ide
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
-    sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil)
+    sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
+    sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
@@ -30,8 +31,12 @@ src/
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
+    natalna-karta-info.tsx  list "Šta je natalna karta" (ikonica "i" pored tocka): sazetak, legenda aspekata, elementi
+    nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
     moon.tsx         ekran Mesec — otvara se sa kartice na pocetnoj (?day=pomeraj)
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
+    pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
+    pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
   theme/
     tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
@@ -39,8 +44,11 @@ src/
     screen.tsx           okvir ekrana — preliv, zamucena traka, skrol, siva pozadina
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
-    moon-disc.tsx        crtez Meseca u trenutnoj fazi (crno-belo, ne lila)
+    karta-lista.tsx      redovi ispod tocka (trojka, planeta, aspekt) i "i" uz tocak — ZAJEDNICKI za "Ti" i "Nebo"
+    info-list.tsx        delovi listova sa objasnjenjem tocka (odeljak, stavka, aspekti) — oba "i" lista
+    moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca)
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
+    uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
     ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
   store/
@@ -48,6 +56,7 @@ src/
     profile.ts       podaci o rodjenju, kes servera
     auth.ts          sesija + pravo pristupa
     sky-place.ts     mesto posmatranja, null = grad iz profila
+    sky-time.ts      pomeren trenutak na Nebu (null = sadasnjost) — BEZ persist
   lib/
     zodiac.ts        12 znakova, longituda -> znak
     astro.ts         ephemeris + aspekti        <- engine
@@ -59,13 +68,21 @@ src/
     sky-events.ts    sledeci ulazak u znak / promena smera + kuca od podznaka
     timezone.ts      lokalno vreme -> UTC
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
+    tocak-stil.ts    izgled tocka (boje, crtice, aspekti) — deli ga panel
+    znak-oblici.ts   oblici i boje ikonica znakova — deli ih panel
+    uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — PRIVREMENO, ceka astrologa
     horoscope.ts     composer                   <- ovde ulazi korpus
     supabase.ts      klijent
     sync.ts          profil <-> server
+    pitanja.ts       Pitaj astrologa: cist racun, snimak karte   <- pravilo 21
+    pitanja-api.ts   upiti (TanStack Query); kupovina.ts = mesto za RevenueCat
 supabase/
   schema.sql         tabele + RLS politike
+  pitanja.sql        pitanja, krediti, astrolozi, skladiste `odgovori`
+  pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
+panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
 scripts/
   check-*.ts         provere tacnosti
   font/              sklapanje AstroGlyphs.ttf iz Noto izvora
@@ -101,6 +118,11 @@ Android bi je vestacki podebljao. Skala velicina (merena sa SF Pro-a) je ostala.
 — nigde drugde, da paywall ostane jedina stvar koja "svetli" na stranici. Tamna
 tema je i dalje definisana pod `.dark:root` ako je ikad budemo ponudili kao
 opciju; `_layout.tsx` je zakljucan na `colorScheme.set('light')`.
+
+DATUM je svuda istog oblika, "Uto, 29. sep 2026" (Ivan, 29.9.2026): skracen dan i mesec,
+godina bez tacke; mesta se razlikuju samo po tome da li nose dan i godinu. Sklapa ga
+ISKLJUCIVO `datum()` u `lib/horoscope.ts` (i omotaci `formatDate`, `formatDatum`,
+`formatDay`, `opsegDatuma`, `datumRodjenja`) — ekran ne pise imena meseci sam.
 
 Svaki kljuc dodat u `tailwind.config.js` MORA da se pojavi i u spisku u
 `src/lib/utils.ts`. Bez toga `tailwind-merge` svrsta klasu u pogresnu grupu —
@@ -156,6 +178,11 @@ dan. Korpus je jedina stvar koju konkurencija ne moze da kopira.
 samo da CITA. Upis ide iskljucivo preko RevenueCat webhook-a sa service_role
 kljucem na serveru. Da postoji politika za upis, svako bi sebi mogao da upise
 `active = true`.
+POKLONJEN PREMIUM (28.9.2026) je zasebna tabela `pokloni` — vlasnik ga daje iz SQL
+Editora (`select admin.daj_premium('email', do_datuma)`, `supabase/pokloni.sql`).
+Odvojena je da RevenueCat webhook ne bi obrisao poklon. Paywall politike pitaju
+`public.ima_premium()` = kupovina ILI poklon; nova placena tabela ide kroz nju.
+Kod koji korisnik ukuca u aplikaciji NE (Apple 3.1.1) — za kampanje su Offer Codes.
 Kad stigne backend: API mora da vraca SKRACEN tekst korisniku bez prava
 pristupa — nikad pun tekst pa sakriven u UI-ju.
 
@@ -187,6 +214,10 @@ sa istim id-jem = vidljivi ostaje bez ispune. Uvek `React.useId()`.
 **14. Nekadasnje pravilo — nalog nije uslov — VISE NE VAZI.**
 Zid je uveden namerno, ali je postavljen POSLE ekrana sa velikom trojkom —
 korisnik prvo vidi vrednost pa se onda trazi nalog. Ne pomerati ga na pocetak.
+"NAPRAVI NALOG" SA EMAILOM KOJI VEC IMA KARTU (Ivan, 29.9.2026): posle koda ekran kaze
+"Ovaj email vec ima nalog" — drugi email (odjava samo sa ovog telefona, draft ostaje) ili
+ulazak u postojeci. Nikad tiho u stari nalog. Put nosi `?nov=1` (reveal -> account -> code);
+"Vec imam nalog" ga nema. Pita se POSLE koda, ne pre — pre bi otkrivalo ciji je email.
 
 **15. Dva podesenja u Supabase-u su spregnuta sa kodom.**
 Ako se razidju, prijava pada — i to za sve odjednom, tiho.
@@ -260,10 +291,15 @@ ANDROID TIHO OSTANE BEZ ZAMUCENJA. `ExpoBlurView.kt` radi
 providna traka. Zato je sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide
 traci. Na iOS-u je `BlurTargetView` obican `View` i ne kosta nista.
 
-UNUTRASNJE STRANE (`pushed`: profil, tumacenje, Mesec, mesto, izmena) imaju svoje
+UNUTRASNJE STRANE (`pushed`: profil, Mesec, izmena) imaju svoje
 zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
 BEZ loga i BEZ preliva (izuzetak: Mesec ima ljubicasti, `tint="purple"`). Strelicu
 crta `Screen` sam — ekran je ne salje.
+
+ZIVI PRELIV STAJE KAD KORISNIK MIRUJE (baterija, 28.9.2026): mrlje teku samo na ekranu u
+fokusu, 20 s posle poslednjeg dodira uspore do nule (`store/budnost.ts`, dodir hvata koren u
+`_layout.tsx`, tab i povratak u app bude). U Low Power Mode / usteda baterije (`expo-battery`)
+pokreta nema. Nov ukrasni pokret koji traje ide kroz istu `useBudnost`.
 
 Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 
@@ -292,6 +328,10 @@ Mesec, ASC, MC i VLADARA) x blizina x momenat; brze odmor 3 dana, spore samo na 
 pocetka/egzaktnosti/kraja uz odmor 7, Mesec samo egzaktan. Vladar = TRADICIONALNI vladar
 Ascendenta (`lib/rulers.ts`, `RULER_SYSTEM`). Ton: `lib/tone.ts`. Dnevnik:
 `store/tvoj-dan-log.ts` (dan -> tranzit; broj prikaza bira stavku iz duge verzije).
+DNEVNICI (oba) PRIPADAJU NALOGU, ne telefonu (29.9.2026): nose `userId`, tudji se cita kao
+prazan, pri odjavi se brisu — ranije je drugi nalog na istom telefonu nasledjivao pauze.
+DANAS na tabovima je `useDanas()` (`store/danas.ts`), NE `useMemo(() => new Date(), [])`:
+tab ostaje montiran, pa je aplikacija ostavljena preko noci ujutru pokazivala jucerasnji dan.
 Testovi: `npm run check:tvoj-dan`. Pregled sa ASC u Ribama: `/dev-kartice` (samo dev).
 BESPLATNI — staro pravilo, ostaje zapisano ispod:
 `pickHero` u `lib/transits.ts` (specifikacija 26.9.2026): 1) jak aspekt (orb <= 1,5°,
@@ -318,6 +358,87 @@ sekstil skladni, kvadrat i opozicija napeti, konjunkciju deli tranzitna planeta
 ASTROLOGA). Prikazuje `positive` odnosno `challenge` recenicu kratkog teksta, bez
 Hero-a i bez Meseca, po orbisu; tranzit bez teksta se preskace. Testovi: deo 9b.
 
+**19. Bez interneta aplikacija radi sa onim sto je vec stiglo (29.9.2026).**
+Racun je ionako lokalan. Tri stvari su zavisile od mreze i sad imaju rezervu:
+SESIJA — `useAuthListener` cita sacuvanu sesiju sa diska ODMAH; `getSession()` bez
+mreze ~25 s ponavlja obnovu tokena i onda vrati `null`, pa je kapija slala korisnika
+na welcome. Greska MREZE (`isAuthRetryableFetchError`) sesiju ne brise; brise je samo
+pravi odgovor servera. TEKSTOVI — `lib/kes-na-disku.ts`: sve sto je server vec poslao
+(tranziti, ton, lunarni, natalni), do 300 stavki i 14 dana, kljuc sadrzi nalog i pravo
+pristupa. Disk je REZERVA: upit ide pri svakom pokretanju, "nema teksta" se ne pamti.
+PRAVO PRISTUPA — poslednje sa servera, najvise 7 dana i nikad posle `expiresAt`, SAMO za
+prikaz; `fetchEntitlement` vraca `null` na gresku mreze (ne "besplatno"). Ne otkljucava
+nista novo — duge tekstove i dalje salje samo server (pravilo 8). Sve troje se brise
+pri odjavi i brisanju naloga. Traku "Nema interneta" crtaju `Screen` i `SheetScroll`
+(`components/bez-interneta.tsx`); mreza je `lib/mreza.ts` — BEZ nativnog modula
+(`expo-network` Expo Go NEMA): zakljucuje se iz Supabase zahteva (`pratiFetch`). Bez mreze se ne pise "tekst nije napisan" — kaze se da ce stici.
+
+**20. Uvod pri pokretanju: prvi kadar = sistemski splash (28.9.2026).**
+`components/uvod.tsx`, racun u `lib/uvod.ts` (varijanta "Krug se otvori", po Lumi):
+krug loga se zavrti brzo (~1,2 s), pa uspori i vrti se polako DOK SE CEKA (Ivan,
+29.9.2026), na vrhu se pojavi preliv (isti kao na pocetnoj); kad je aplikacija spremna — zalet, krug se pretopi a iz sredine se siri
+krug-prozor BEZ OBODA kroz koji je vec aplikacija. Bez cekanja ~1,3 s. Vrtenje je
+`logo-krug-uvod.json` (`python3 scripts/logo/build-krug-uvod.py`): isti krug kao
+logo, okret koji ne staje. Ivan je istog dana ODBIO, ne vracati: sjaj IZA kruga,
+dvostruki prsten loga kao ivicu prozora, i talas znakova oko kruga (pokret iz
+loadera sa sajta) dok se ceka. Tri stvari se ne krse:
+SPLASH = PRVI KADAR. `app.json` splash je `#F6F7F8` + `splash-krug.png` sirine
+`UVOD_KRUG` (180); slika se crta iz `logo-krug.json` (`swift scripts/logo/build-splash.swift`),
+ne iz brend SVG-a. Splash se sklanja tek kad Lottie javi da je ucitan. Menja se
+krug ili velicina -> ponovo obe skripte; `check:uvod` drzi app.json, krug i prozor.
+UVOD SAMO POKRIVA. Ne preusmerava (pravilo 11), ceka isto sto i kapija (pismo,
+sesija i profil sa diska) i NIKAD mrezu. APLIKACIJA SE MONTIRA TEK KAD UVOD KRENE
+(`onPocetak`): njeno prvo crtanje zauzme JS, pa je krug u simulatoru stajao 1,5 s pre
+okreta. Zato je vrtenje ceo u Lottie JSON-u, a zalet i otvaranje se zakazuju na
+niti za animaciju — nista od pokreta ne ceka JS.
+Uz "Smanji pokrete" uvod se samo pretopi. U Expo Go-u je splash Expo Go-ov (ikonica +
+ime); spoj splash -> uvod se vidi tek u dev buildu.
+
+**21. Pitaj astrologa (29.9.2026): pitanje -> placanje -> glasovni odgovor.**
+Tab "Pitaj" ima dve strane: "Pitaj čoveka" (Boban Vujović, `ASTROLOG` u `lib/pitanja.ts`)
+i "Pitaj AI" (uskoro). ROKA NEMA (Ivan): "obicno za 2—3 radna dana" je samo tekst —
+nema kolone za rok, statusa "kasni" ni kredita za zakasneli odgovor. Ne dodavati.
+TOK: `draft` -> `paid` -> `answered` (+ `refunded`). Pitanje se PRVO cuva kao nacrt
+(`sacuvaj_nacrt`, sa snimkom karte), pa ide placanje; jedan nacrt po nalogu. Dok se kuca,
+tekst je i na telefonu (`pitanje-lokalno.ts`, brise se pri odjavi).
+KO STA PISE (kao pravilo 8): korisnik samo kroz `sacuvaj_nacrt` i `posalji_kreditom`;
+za tabele NEMA politike za upis i prava su oduzeta. `paid` upisuje server (webhook, jos
+ne postoji) ili kredit. Astrolog (`astrolozi`, `je_astrolog()`) vidi SAMO poslata pitanja
+i odgovara kroz `odgovori_na_pitanje`, koja proveri da snimak postoji.
+ZVUK: privatno skladiste `odgovori/<korisnik>/<pitanje>.m4a|mp3`, u bazi PUTANJA (ne
+link); aplikacija pusta preko potpisanog linka (sat). SAMO m4a, mp3 ili aac — iPhone ne
+pusta WebM ni ogg/opus; panel snima u MP4, ili astrolog OTPREMI snimak sa telefona
+(Diktafon, Android snimac; `vrstaSnimka` u `panel/src/pomoc.ts` kaze zasto format ne prolazi). iOS
+plejer trazi fajl deo po deo (HTTP Range) — Supabase to ume, obican probni server ne.
+Brisanje naloga brise i snimke (`delete-account`, pre naloga).
+STRANA (Ivan, 29.9.2026): bez pitanja stoji uvod (`components/pitaj-uvod.tsx`: astrolog,
+uslovi, cena) i "Pitaj"; sa pitanjima samo "Postavi pitanje" + "Moja pitanja", a uvod je
+prvi korak lista (`/pitanje-novo?korak=uvod`). NOV ODGOVOR = snimak bez `procitano_at`:
+broj u indigo krugu na tabu (`NativeTabs.Trigger.Badge`; kad je 0 ne salje se tekst —
+`hidden` sam ostavlja "0") i indigo tackica u listi (`brand.indigo`). `oznaci_procitano` pri otvaranju
+pitanja; bez push-a se lista osvezava kad se aplikacija vrati u prvi plan.
+PLACANJE JOS NIJE UKLJUCENO: `lib/kupovina.ts` vraca `nedostupno`, cena se ne prikazuje
+(dolazi SAMO iz RevenueCat Offerings, `question` / `question_member`; Premium po
+`useEntitlement()`, da i poklon dobije nizu cenu). PRIVREMENO: u razvoju (`__DEV__`)
+stoji probna cena `PROBNA_CENA` u `kupovina.ts`, samo za izgled — ide napolje sa RevenueCat-om. Do tada se salje samo kreditom:
+`select admin.daj_pitanje('email')`. Push jos nema — ekran zato ne kaze "javicemo ti".
+MEJL ASTROLOGU (Ivan, 29.9.2026): pitanje predje u `paid` -> okidac (`pitanja-obavestenja.sql`,
+`pg_net`) -> funkcija `obavesti-astrologa` -> SendGrid, svim astrolozima. Samo ime, vreme i
+link — bez teksta pitanja i podataka o rodjenju; bez pracenja klikova. Tacno jednom po
+pitanju: funkcija ga "zauzme" upisom `obavesteno_at`; neuspeh vrati NULL (log funkcije).
+Funkcija je bez tokena (`--no-verify-jwt`) — telu veruje samo id. Sadrzaj: `_shared/obavestenje.ts`.
+PANEL (`panel/`, `npm run panel`): prijava kodom (`shouldCreateUser: false`), Turnstile
+kao u aplikaciji — widget za `astroshop.rs` vazi i za poddomen, za `localhost` se mora
+dodati u Cloudflare-u. `#/proba` = izmisljena pitanja bez prijave, samo u razvoju.
+NATALNI KRUG u panelu (`panel/src/tocak.tsx`, Ivan 29.9.2026): isti crtez kao
+`natal-wheel.tsx`, ali u SVG-u pregledaca. Geometrija (`wheel.ts`), izgled
+(`tocak-stil.ts`) i znakovi (`znak-oblici.ts`) su zajednicki; kad se RASPORED tocka u
+aplikaciji promeni, ista izmena ide i u panel. Karta se racuna iz podataka o rodjenju
+(`buildNatalChart`, kao `resolveProfile`); bez vremena rodjenja bez kuca, ASC/MC i
+Mesecevih aspekata, a bez pouzdane zone tocka nema.
+Uloga u panelu se samo prikazuje; kapija je RLS. Testovi: `check:pitanja`,
+`check:pitanja-baza` (SQL u PGlite-u, sa Supabase delovima napravljenim u testu).
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -340,14 +461,20 @@ npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
 npm run check:cities      predlozi gradova + da se pretraga nije suzila
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
 npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
+npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor
+npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpisi
+npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)
+npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
+npm run panel:build       panel za objavu -> panel/dist
 ```
 
 ## Jos nije uradjeno
 
 - [x] Auth (Supabase) — registracija, prijava, odjava, sinhronizacija profila
 - [x] `supabase/schema.sql` pokrenut — tabele postoje, RLS provoren (anon ne vidi tudje redove)
-- [ ] Apple i Google prijava — dugmad postoje, ceka dev build. Xcode nije instaliran
-      na masini, pa ide ili preko App Store-a ili preko EAS Build-a.
+- [ ] Apple i Google prijava — dugmad postoje, ceka dev build. Xcode JE instaliran
+      (26.6, od 28.9.2026), ali Sign in with Apple trazi placeni Apple nalog — besplatni
+      tim tu mogucnost nema. Build za prodavnicu ide preko EAS Build-a.
 - [x] SMTP (SendGrid) + `{{ .Token }}` u sablonu **Magic Link** — dok je "Confirm
       email" iskljucen, Supabase salje samo taj sablon, "Confirm signup" se ne koristi
 - [x] Turnstile — widget, `captchaToken` u oba poziva, provera upaljena u Supabase-u
@@ -375,12 +502,20 @@ npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacen
       ali u zasebnom store-u: mesto rodjenja se menja jedino u `/edit`, jer od njega
       zavisi natalna karta. Pozicije tela su geocentricne i sa mestom se ne menjaju;
       menjaju se uglovi, kuce i dnevna/nocna formula za Tacku srece.
-- [x] Pomeranje vremena na tom ekranu — dugmad za SAT i DAN, plus "Trenutno" za
-      povratak. Cim se vreme pomeri, minutno osvezavanje staje i naslov se menja u
-      "Nebo u izabranom trenutku" — ekran ne sme da tvrdi da je sadasnjost.
-      Dan ide preko ZID-SATA (`shiftDays`), pa u noci kad se pomera sat i dalje
-      pogadja isti sat; sat je prostih 60 minuta stvarnog vremena, jer u satu koji
-      se ponovi isti zid-sat postoji dvaput. Mesec i godina nisu dodati.
+- [x] Pomeranje vremena na tom ekranu (Ivan, 28.9.2026): ispod sata DVA STAKLENA
+      DUGMETA — datum (sa godinom) otvara KALENDAR (`sky-datum.tsx`, list odozdo; na
+      Androidu sistemski dijalog), mesto otvara izbor grada (`sky-place.tsx`, list
+      odozdo). Ispod njih "‹ dan  ‹ sat  Trenutno  sat ›  dan ›" u staklu (`GlassBubble`).
+      Cim se vreme pomeri, minutno osvezavanje staje i "Trenutno" postaje aktivno —
+      ekran ne sme da tvrdi da je sadasnjost. Pomeren trenutak je u `store/sky-time.ts`
+      (menja ga i kalendar), BEZ persist: posle pokretanja opet sadasnjost.
+      Dan i dan iz kalendara idu preko ZID-SATA (`shiftDays`, `naDan`), pa u noci kad
+      se pomera sat i dalje pogadjaju isti sat; sat je prostih 60 minuta stvarnog
+      vremena, jer u satu koji se ponovi isti zid-sat postoji dvaput. Kalendar radi u
+      zoni UREDJAJA, pa dobija NOSILAC DANA (`danZaKalendar`), ne trenutak — korisniku
+      u dijaspori zone se razlikuju. Provera: `check:sky`, deo 6.
+      Ekran je stilizovan kao natalna karta (redovi iz `components/karta-lista.tsx`),
+      ali BEZ velike trojke — samo lista (Ivan, 28.9.2026).
 - [ ] Kiron — jedino telo sa referentnog snimka koje ne prikazujemo. Nema ga u
       `astronomy-engine` (nije ni geometrijska tacka kao cvor), pa mu treba zasebna
       efemerida. Kad stigne: i font se mora presloziti, ⚷ u njemu ne postoji
@@ -391,6 +526,15 @@ npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacen
       Besplatno Sunce, Mesec i podznak u znaku. FALI: podznak 0/12, aspekti na MC.
       Jos nije: uvoz u bazu, lektura, prikaz u tabu "Ti".
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
+- [ ] Pitaj astrologa (pravilo 21) — URADJENO: baza (`pitanja.sql`), tab, pisanje, odgovor
+      sa plejerom, panel. FALI: pokrenuti `pitanja.sql` + deploy `delete-account`; nalog za
+      Bobana + `admin.dodaj_astrologa`; RevenueCat (consumable `question`/`question_member`,
+      webhook NON_RENEWING_PURCHASE -> nacrt u `paid`, bez nacrta -> kredit, jedinstven
+      transaction_id, povracaj -> `refunded`); push kad stigne odgovor; MEJL: SendGrid kljuc
+      (Mail Send) kao tajna `SENDGRID_API_KEY`, deploy `obavesti-astrologa --no-verify-jwt`,
+      pa `pitanja-obavestenja.sql` (i `PANEL_URL` dok panel nije na panel.astroshop.rs); objava panela
+      (`panel.astroshop.rs`); politika privatnosti i uslovi (astrolog vidi podatke o
+      rodjenju, cuva se snimak).
 - [x] Brisanje naloga u aplikaciji — Edge Function `delete-account` deplojovana,
       dugme u `profile.tsx`. Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
       cita ISKLJUCIVO iz tokena; anon kljuc je validan JWT i prolazi platformsku

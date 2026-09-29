@@ -14,6 +14,7 @@ import { buildPersonalDaily } from '@/lib/horoscope';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore, useEntitlement } from '@/store/auth';
+import { useDanas } from '@/store/danas';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 import { TranzitiLista } from '@/components/tranziti-lista';
@@ -38,7 +39,8 @@ function DailyPremium() {
   const hydrated = useProfileStore((s) => s.hydrated);
   const authLoading = useAuthStore((s) => s.loading);
   const resolved = useResolvedProfile();
-  const today = React.useMemo(() => new Date(), []);
+  // Tab ostaje montiran: dan se menja u ponoc i pri povratku u aplikaciju.
+  const today = useDanas();
   const rez = useOblastiDana(resolved, today);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
@@ -56,7 +58,8 @@ function DailyBesplatno({ isPremium }: { isPremium: boolean }) {
   const authLoading = useAuthStore((s) => s.loading);
   const resolved = useResolvedProfile();
 
-  const today = React.useMemo(() => new Date(), []);
+  // Tab ostaje montiran: dan se menja u ponoc i pri povratku u aplikaciju.
+  const today = useDanas();
   const daily = React.useMemo(
     () => (resolved ? buildPersonalDaily(resolved, today) : null),
     [resolved, today]

@@ -13,11 +13,20 @@ Ovde je ono što `CLAUDE.md` ne pokriva: zanat platforme i redosled poteza.
 
 ## Stanje mašine — proveri pre nego što obećaš
 
-- **Xcode NIJE instaliran** (samo Command Line Tools; nema Homebrew ni CocoaPods).
-  `expo run:ios` ne može da prođe. iOS simulator ne radi. Folder `ios/` je
-  ostatak prebuild-a, gitignorisan je i može da se obriše.
-- Zato: razvoj ide kroz **`npm start` + Expo Go na pravom telefonu**. Dev build
-  ide preko **EAS Build**, ne lokalno.
+- **Xcode JE instaliran** (26.6, iOS 26.5 SDK; od 28.9.2026), uz Homebrew i
+  CocoaPods. iOS simulator postoji (iOS 18.6 i 26.5). Folder `ios/` je proizvod
+  prebuild-a, gitignorisan je — pravi se iznova sa
+  `npx expo prebuild --platform ios --clean`.
+- **Plaćenog Apple naloga NEMA.** Svakodnevni razvoj i dalje ide kroz
+  **`npm start` + Expo Go na pravom telefonu**. Build za prodavnicu i TestFlight
+  ide preko **EAS Build-a** i čeka nalog.
+- Instalacija na telefon preko besplatnog Apple ID-a (Personal Team) radi, uz tri
+  obavezne izmene u Xcode-u: build u **Release** konfiguraciji (Debug traži Mac
+  sa serverom), Bundle Identifier **`com.krcky.astroshop.test`** (pravi ostaje
+  slobodan za plaćeni nalog) i **obrisana "Push Notifications"** mogućnost
+  (dodaje je `expo-notifications`, besplatni tim je ne podržava i potpisivanje
+  pada). Aplikacija ističe posle 7 dana, najviše 3 takve po telefonu. Posle
+  `prebuild --clean` izmene se ponavljaju.
 - `npm run web` je dobar samo za grubu proveru rasporeda i logike. Fontovi,
   bezbedna zona, gestovi i native moduli se na webu ne ponašaju isto — nikad ne
   tvrdi da nešto radi zato što radi na webu.

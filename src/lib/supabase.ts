@@ -11,6 +11,8 @@ import { AppState, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
+import { pratiFetch } from '@/lib/mreza';
+
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -29,6 +31,9 @@ export const supabase = createClient(url ?? 'https://unset.supabase.co', anonKey
     // Nema URL callback-a kao na vebu; sesija stize iz storage-a.
     detectSessionInUrl: false,
   },
+  // Svaki zahtev javlja da li je stigao do servera — odatle aplikacija zna da
+  // li ima interneta, bez nativnog modula (`lib/mreza.ts`).
+  global: { fetch: pratiFetch },
 });
 
 // Osvezavanje tokena mora da stane kad aplikacija ode u pozadinu, inace

@@ -66,6 +66,76 @@ const KRUG_SLOJEVI = [
   'Prsten', 'Lice', 'Zraci',
   ...['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'].map((z) => `znak ${z}`),
 ];
+const KRUG_INDIGO_FILTERI = KRUG_SLOJEVI.map((keypath) => ({ keypath, color: KRUG_INDIGO }));
+
+/** Upravljanje krugom uvoda: `zavrti()` pokrene vrtenje. */
+export type LogoKrugRef = { zavrti: () => void };
+
+/**
+ * SAMO KRUG, bez natpisa i bez `useFocusEffect` — za uvod pri pokretanju
+ * (`components/uvod.tsx`), koji stoji IZNAD navigacije, pa fokusa nema. Crta
+ * `logo-krug-uvod.json`: isti krug, ali okret ne staje nego se vrti dok se ceka
+ * (`scripts/logo/build-krug-uvod.py`). Miruje na kadru 0 (isti kadar kao
+ * sistemski splash) dok ga uvod ne pokrene. `onSpreman` javlja da je animacija
+ * ucitana i da se krug vidi.
+ */
+export function LogoKrug({ ref, size, onSpreman }: {
+  ref?: React.Ref<LogoKrugRef>;
+  size: number;
+  onSpreman?: () => void;
+}) {
+  const lottie = React.useRef<LottieView>(null);
+  React.useImperativeHandle(ref, () => ({ zavrti: () => lottie.current?.play() }), []);
+  return (
+    <LottieView
+      ref={lottie}
+      source={require('@/assets/lottie/logo-krug-uvod.json')}
+      autoPlay={false}
+      loop={false}
+      resizeMode="contain"
+      onAnimationLoaded={onSpreman}
+      colorFilters={KRUG_INDIGO_FILTERI}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
+/**
+ * SAMO KRUG LOGA, onaj iz zaglavlja: pri svakom fokusu ekrana uvodni okret, pa
+ * jedan krug u minut. Koriste ga zaglavlje (`Logo`) i dobrodoslica, iznad naslova
+ * (Ivan, 29.9.2026). Ukras je — ime cita natpis pored ili ispod njega.
+ */
+export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: string }) {
+  const krug = React.useRef<LottieView>(null);
+  const pusti = React.useCallback(() => krug.current?.play(), []);
+  React.useEffect(() => { pusti(); }, [pusti]);
+
+  // Svaki put kad ekran dodje u fokus (promena taba, povratak sa drugog ekrana)
+  // krug krece ISPOCETKA, sa uvodnim okretom (Ivan, 26.9.2026). Tabovi ostaju
+  // montirani, pa bez ovoga animacija samo nastavlja gde je bila.
+  useFocusEffect(
+    React.useCallback(() => {
+      krug.current?.reset();
+      krug.current?.play();
+    }, [])
+  );
+
+  return (
+    // Omotac nosi skrivanje od citaca ekrana — LottieView ta svojstva ne prima.
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <LottieView
+        ref={krug}
+        source={require('@/assets/lottie/logo-krug.json')}
+        autoPlay
+        loop
+        resizeMode="contain"
+        onLayout={pusti}
+        colorFilters={KRUG_SLOJEVI.map((keypath) => ({ keypath, color: color ?? KRUG_INDIGO }))}
+        style={{ width: size, height: size }}
+      />
+    </View>
+  );
+}
 
 /**
  * `title` — ime strane umesto "Astro Shop"; isti krug, drugi natpis.
@@ -75,13 +145,11 @@ const KRUG_SLOJEVI = [
  * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
 export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
+  // Pun logo ima svoj Lottie; krug sam (`KrugLoga`) vodi svoje okretanje. Kuke su
+  // ovde bezuslovne (pravilo kuka), a bez punog loga ref je prazan pa ne rade nista.
   const krug = React.useRef<LottieView>(null);
   const pusti = React.useCallback(() => krug.current?.play(), []);
   React.useEffect(() => { pusti(); }, [pusti]);
-
-  // Svaki put kad ekran dodje u fokus (promena taba, povratak sa drugog ekrana)
-  // krug krece ISPOCETKA, sa uvodnim okretom (Ivan, 26.9.2026). Tabovi ostaju
-  // montirani, pa bez ovoga animacija samo nastavlja gde je bila.
   useFocusEffect(
     React.useCallback(() => {
       krug.current?.reset();
@@ -119,16 +187,7 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
       style={{ gap: GAP, transform: [{ translateY: -5 }] }}
       accessibilityRole="header"
       accessibilityLabel={title}>
-      <LottieView
-        ref={krug}
-        source={require('@/assets/lottie/logo-krug.json')}
-        autoPlay
-        loop
-        resizeMode="contain"
-        onLayout={pusti}
-        colorFilters={KRUG_SLOJEVI.map((keypath) => ({ keypath, color: color ?? KRUG_INDIGO }))}
-        style={{ width: LOGO_SIZE, height: LOGO_SIZE }}
-      />
+      <KrugLoga color={color} />
       <Text className={cn('text-[24px] leading-[30px] tracking-[-0.3px]', tezina('naslovStrane'))} numberOfLines={1}>{title}</Text>
     </View>
   );

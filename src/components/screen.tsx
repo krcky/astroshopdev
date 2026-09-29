@@ -31,9 +31,11 @@ import { ChevronLeft } from 'lucide-react-native';
 
 import { Logo } from '@/components/logo';
 import { Text } from '@/components/ui/text';
+import { BezInterneta } from '@/components/bez-interneta';
 import { backdrop, headerBar, neutral, space, type BackdropTint } from '@/theme/tokens';
 import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
 import { STARI_IOS } from '@/lib/platform';
+import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
 
 /**
  * Zajednicki okvir ekrana — preliv na vrhu, zamucena traka, sadrzaj koji klizi
@@ -301,6 +303,8 @@ export function Screen({
           {...scrollProps}
           onScroll={prati}
           scrollEventThrottle={16}>
+          {/* Bez interneta: jedna traka na vrhu SVAKOG ekrana, ne na svakom posebno. */}
+          <BezInterneta className={padded ? 'mb-4' : 'mx-screen mb-4'} />
           {children}
           {tabBarSpace && <TabBarSpacer />}
         </Animated.ScrollView>
@@ -411,15 +415,34 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
    * skacu. Jedan sat za oba sloja pretapanja, da se ne raziđu.
    */
   const sat = useSharedValue(0);
+  /*
+   * BATERIJA (Ivan, 28.9.2026): pokret tece samo dok je korisnik tu — posle
+   * `MIROVANJE_MS` bez dodira mrlje uspore do nule i sat se ugasi, pa telefon
+   * prestane da crta kadrove. Prvi dodir ih ponovo zaleti. U rezimu ustede
+   * baterije pokreta nema uopste. Vidi `store/budnost.ts`.
+   */
+  const budan = useBudnost((s) => s.budan);
+  const usteda = useUstedaBaterije();
+  const brzina = useSharedValue(1);
   const kadar = useFrameCallback((f) => {
-    sat.set(sat.get() + (f.timeSincePreviousFrame ?? 0) / backdrop.drift.cycleMs);
+    sat.set(sat.get() + ((f.timeSincePreviousFrame ?? 0) / backdrop.drift.cycleMs) * brzina.get());
   }, false);
+  // Promena taba ide kroz nativnu traku, mimo JS dodira — fokus je zato budjenje.
+  // Pre efekta ispod, da on vec vidi budno stanje.
+  useFocusEffect(React.useCallback(() => { probudi(); }, []));
   useFocusEffect(
     React.useCallback(() => {
-      if (bezPokreta || backdrop.blobs[tint].length === 0) return;
+      if (bezPokreta || usteda || backdrop.blobs[tint].length === 0) return;
       kadar.setActive(true);
-      return () => kadar.setActive(false);
-    }, [bezPokreta, tint, kadar])
+      if (budan) {
+        brzina.set(withTiming(1, { duration: ZALET_MS }));
+        return () => kadar.setActive(false);
+      }
+      // Meko zaustavljanje — naglo stajanje mrlje u pokretu se vidi.
+      brzina.set(withTiming(0, { duration: KOCENJE_MS }));
+      const t = setTimeout(() => kadar.setActive(false), KOCENJE_MS + 50);
+      return () => { clearTimeout(t); kadar.setActive(false); };
+    }, [bezPokreta, usteda, budan, tint, kadar, brzina])
   );
 
   useFocusEffect(
@@ -480,8 +503,12 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
   );
 }
 
-/** Jedna nijansa preliva: mirni preliv + mrlje koje plove preko njega. */
-function PrelivSloj({ tint, sat }: { tint: BackdropTint; sat: SharedValue<number> }) {
+/**
+ * Jedna nijansa preliva: mirni preliv + mrlje koje plove preko njega. Izvezen za
+ * uvod pri pokretanju (`uvod.tsx`), koji stoji van navigacije pa `ScreenBackdrop`
+ * (vezan za fokus ekrana) ne moze da koristi.
+ */
+export function PrelivSloj({ tint, sat }: { tint: BackdropTint; sat: SharedValue<number> }) {
   const mrlje: readonly (readonly [string, number])[] = backdrop.blobs[tint];
   return (
     <>
@@ -498,6 +525,10 @@ function PrelivSloj({ tint, sat }: { tint: BackdropTint; sat: SharedValue<number
  * krugu sata i pomeraj faze. Razliciti tempovi, da se sklop mrlja ne ponavlja
  * vidljivo; razlicita faza, da ne krenu obe iz sredine u istom smeru.
  */
+/** Mrlje se posle mirovanja zaustave za 1,5 s, a na dodir zalete za 0,8 s. */
+const KOCENJE_MS = 1500;
+const ZALET_MS = 800;
+
 const MRLJE = [
   { x: 0.2, puta: 2, faza: 0 },
   { x: 0.8, puta: 3, faza: 2 },

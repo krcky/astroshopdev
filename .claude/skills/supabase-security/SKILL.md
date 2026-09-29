@@ -24,6 +24,7 @@ je isključivo na serveru (Edge Functions, webhook-ovi).
 |---|---|---|
 | `profiles` | svoj red (`auth.uid() = id`) | svoj red, insert i update. **Namerno nema delete** — profil se briše brisanjem naloga, kroz `on delete cascade` |
 | `entitlements` | svoj red | **niko.** Ni jedne politike za upis. Puni ga isključivo RevenueCat webhook sa `service_role` ključem |
+| `pokloni` | svoj red | **niko.** Vlasnik kroz `admin.daj_premium` / `admin.oduzmi_premium` iz SQL Editora. Šema `admin` nije izložena API-ju, a `execute` je oduzet `anon` i `authenticated` |
 | `transit_texts` | `short` — svaki prijavljen; `long` — samo aktivan `entitlements` red | **niko.** Korpus uvozi vlasnik kroz CSV |
 
 **Paywall je u bazi, ne u aplikaciji.** Aplikacija ne može da ga zaobiđe izmenom
@@ -107,7 +108,9 @@ Ne verovati konzoli, poslati zahtev:
 
 ## Šta ne raditi
 
-- Ne dodavati politiku za upis u `entitlements` ni u `transit_texts`.
+- Ne dodavati politiku za upis u `entitlements`, `pokloni` ni u `transit_texts`.
+- Paywall politika ne proverava `entitlements` direktno nego `public.ima_premium()` —
+  inače poklonjeni korisnik ostane bez teksta.
 - Ne slati pun tekst pa ga kriti u UI-ju — API mora da vraća **skraćen** tekst
   korisniku bez prava pristupa (pravilo 8).
 - Ne seliti bazu na RDS ni composer na Lambdu. AWS je za backup korpusa (S3 +

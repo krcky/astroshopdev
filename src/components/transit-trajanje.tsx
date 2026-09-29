@@ -11,7 +11,7 @@ import { trajanjeTekst, type Trajanje } from '@/lib/oblasti';
  * Trajanje tranzita: pocetak, "Jos N dana" i traka napretka. Pocetak i kraj su
  * ulazak u orbis i izlazak iz njega; racuna ih ISKLJUCIVO `trajanjeTranzita`
  * (`lib/oblasti.ts`), a natpis desno je isti kao na listi (`trajanjeTekst`).
- * Stoji u listu "Na osnovu cega je ovaj tekst"; sa kartice na pocetnoj je izbacena (Ivan, 28.9.2026).
+ * Stoji u listu "Zašto baš ovaj tekst"; sa kartice na pocetnoj je izbacena (Ivan, 28.9.2026).
  */
 export function TransitTrajanje({ trajanje, date, className, boja, opseg = false }: {
   trajanje: Trajanje;
@@ -20,7 +20,7 @@ export function TransitTrajanje({ trajanje, date, className, boja, opseg = false
   className?: string;
   /** Boja ispune trake; bez nje crna (`foreground`). */
   boja?: string;
-  /** Levo opseg "13 SEP – 26 SEP" umesto "Od 13. septembra" (list tranzita). */
+  /** Levo opseg "13. sep – 26. sep" umesto "Od 13. sep" (list tranzita i "Zašto baš ovaj tekst"). */
   opseg?: boolean;
 }) {
   const { start, end, mesec } = trajanje;

@@ -4,6 +4,7 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
+import { formatDatum } from '@/lib/horoscope';
 
 /**
  * Native tockic za datum/vreme.
@@ -21,7 +22,6 @@ type Props = {
   minimumDate?: Date;
 };
 
-const MESECI = ['januar','februar','mart','april','maj','jun','jul','avgust','septembar','oktobar','novembar','decembar'];
 const pad = (n: number) => String(n).padStart(2, '0');
 
 export function WheelPicker({ mode, value, onChange, maximumDate, minimumDate }: Props) {
@@ -56,7 +56,7 @@ export function WheelPicker({ mode, value, onChange, maximumDate, minimumDate }:
 function AndroidField({ mode, value, onChange, maximumDate, minimumDate }: Props) {
   const [open, setOpen] = React.useState(false);
   const label = mode === 'date'
-    ? `${value.getDate()}. ${MESECI[value.getMonth()]} ${value.getFullYear()}`
+    ? formatDatum(value)
     : `${pad(value.getHours())}:${pad(value.getMinutes())}`;
 
   return (

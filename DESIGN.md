@@ -206,6 +206,13 @@ namerno: prigusena crna i dalje vuce oko kao glavna akcija, belo jasno kaze
 
 Ekran nikad nema dva primarna dugmeta.
 
+**Svako crno dugme je "istaknuto"** (Ivan, 29.9.2026): blagi preliv crne
+odozgo nadole, sjaj preko gornje polovine, svetla linija na vrhu i tiha crna
+senka ispod (`istaknuto` je u `Button`-u podrazumevano ukljuceno; `false` vraca
+ravno crno). Senka je na samom dugmetu, pa margine i poravnanje iz `className`
+rade kao na svakom drugom dugmetu — ne treba ga umotavati. Crno dugme koje nije
+`Button` (okruglo play dugme) uzima isto: `SjajCrnogDugmeta` + `ISTAKNUTO_SENKA`.
+
 #### Crno dugme nije ravna povrsina
 
 Poprecni presek kroz sva cetiri crna dugmeta na snimcima daje ISTI niz
@@ -237,6 +244,27 @@ Najverovatnije je u pitanju iOS 26 Liquid Glass sa crnim tonom. Namerno ga ne
 crtamo preko `expo-glass-effect` — tamo bi postojao samo na iOS-u 26, a ovako
 izgleda isto na Androidu, starijem iOS-u i vebu. Crtaju ga dva
 `LinearGradient`-a u `button.tsx`, sa neprovidnostima prepisanim iz preseka.
+
+### Polje za unos
+
+Polje je **ispunjena kapsula od 48pt**, nikad podvlaka i nikad okvir (Ivan,
+29.9.2026). Sve ide kroz `Input`; boja zavisi od toga na cemu stoji:
+
+```tsx
+<Input placeholder="Traži grad" />                  // na beloj kartici/listu: siva #F5F5F5
+<Input povrsina="siva" placeholder="Email adresa" /> // direktno na sivoj pozadini: bela
+```
+
+Siva kapsula na `#F6F7F8` se ne vidi — isto obrtanje kao bela kartica na sivom.
+Kod za prijavu je kapsula sa sest crtica i kursorom koji trepce
+(`PoljeZaKod` u `(onboarding)/code.tsx`).
+
+Koraci onboardinga imaju zaglavlje po referentnoj prijavi emailom: ikonica u
+belom krugu, naslov (`naslovLista`), siv podnaslov — `icon`/`title`/`subtitle`
+u `OnboardingStep`. Izlaz je stakleni krug gore levo (strelica ili X); korak
+koji nije obavezan ima staklenu kapsulu „Preskoči" gore desno (`skip`, npr.
+obavestenja). Naslovi koraka su rodno neutralni ("Datum rođenja", ne "Kad si
+rođen?").
 
 ### Grupisana lista
 

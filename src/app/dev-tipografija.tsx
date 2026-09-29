@@ -5,6 +5,7 @@ import { Lightbulb, Minus, Plus, Sparkles } from 'lucide-react-native';
 
 import { Screen } from '@/components/screen';
 import { Text } from '@/components/ui/text';
+import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/chip';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
@@ -133,17 +134,14 @@ export default function DevTipografija() {
       </View>
       <Text variant="caption" className="mt-2">Kartica tranzita: /dev-tranziti</Text>
 
-      {/* 5. Tumacenje (list /transit): display naslov, odeljci kroz `label` sa linijom */}
+      {/* 5. Tumacenje (list /transit): display naslov, odeljci kroz `NaslovSekcije` (h2) sa linijom */}
       <Text variant="label" className="mb-2 mt-8">List tumačenja</Text>
       <View className="rounded-xl bg-background p-5">
         <Text variant="label">Venera konjunkcija natalni MC</Text>
         <Text variant="display" className="mb-5 mt-1">Pozitivne tendencije</Text>
         <TumacenjeTekst tekst={TUMACENJE.split('\n\n')[0]} />
         <View className="mt-7">
-          <View className="mb-3 flex-row items-center gap-2 border-b border-border pb-2">
-            <Sparkles size={17} color={neutral.inkSubtle} />
-            <Text variant="label" className="flex-1">Pozitivni efekti</Text>
-          </View>
+          <NaslovSekcije ikona={<Sparkles size={20} color={neutral.inkSubtle} />}>Pozitivni efekti</NaslovSekcije>
           <TumacenjeTekst tekst={TUMACENJE.split('\n\n')[1]} />
         </View>
       </View>
@@ -189,7 +187,7 @@ export default function DevTipografija() {
 
       {/* 7. Onboarding korak */}
       <Text variant="label" className="mb-2 mt-8">Onboarding</Text>
-      <Text variant="question">Kada si rođen?</Text>
+      <Text variant="question">Datum rođenja</Text>
       <Text variant="display" className="mt-2 text-center">10. jul 1990.</Text>
       <Text variant="note" className="mb-3 mt-6">Tačan datum je dovoljan za znak i Mesec.</Text>
       <Button><Text>Nastavi</Text></Button>

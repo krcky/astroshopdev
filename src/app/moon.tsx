@@ -12,7 +12,7 @@ import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Screen } from '@/components/screen';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
-import { OblastIkona, OBLAST_BOJA } from '@/components/oblast-ikona';
+import { OblastIkona } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
 import { moonPhase } from '@/lib/astro';
 import { moonDay } from '@/lib/transits';
@@ -27,6 +27,7 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
+import { useNaMrezi } from '@/lib/mreza';
 
 const PLANT_ICON: Record<Element, typeof Apple> = { vatra: Apple, zemlja: Carrot, vazduh: Flower2, voda: Leaf };
 const ELEMENT_ICON: Record<Element, typeof Apple> = { vatra: Flame, zemlja: Mountain, vazduh: Wind, voda: Droplet };
@@ -44,6 +45,7 @@ const ELEMENT_ICON: Record<Element, typeof Apple> = { vatra: Flame, zemlja: Moun
  * odnosi ("Pun mesec u Biku"). Bez teksta tab to kaze, ne izmislja.
  */
 export default function MoonScreen() {
+  const naMrezi = useNaMrezi();
   const { day, area } = useLocalSearchParams<{ day?: string; area?: string }>();
   const resolved = useResolvedProfile();
   // Otvara se na oblasti koja je bila izabrana na pocetnoj.
@@ -134,7 +136,7 @@ export default function MoonScreen() {
                 accessibilityState={{ selected: aktivna }}
                 className={cn('flex-1 items-center gap-1 pb-2 pt-2', aktivna && 'border-b-2 border-foreground')}>
                 {/* Ivanove ikonice (28.9.2026): izabrana u lila, ostale sive. */}
-                <OblastIkona oblast={a.key} size={20} color={aktivna ? OBLAST_BOJA : neutral.inkSubtle} />
+                <OblastIkona oblast={a.key} size={24} aktivna={aktivna} />
                 <Text variant="caption" className={cn('text-[11px]', aktivna && 'text-foreground')}>{a.name}</Text>
               </Pressable>
             );
@@ -148,7 +150,7 @@ export default function MoonScreen() {
         ) : lunarniLoading ? (
           <TextPlaceholder lines={4} className="mt-4" />
         ) : (
-          <Text variant="muted" className="mt-4">Saveti za ovu oblast još nisu stigli.</Text>
+          <Text variant="muted" className="mt-4">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
         )}
       </View>
 

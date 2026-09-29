@@ -8,7 +8,7 @@ import { norm360, SIGNS, SIGN_CASES } from '../src/lib/zodiac';
 const SIGNS_IDX = (key: string) => SIGNS.findIndex((s) => s.key === key);
 import { bodyLongitude } from '../src/lib/astro';
 import { upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
-import { moonState, moonLitPath, formatIllumination, PLANT_PART, moonSignAt } from '../src/lib/moon';
+import { moonState, moonLitPath, mesecSlika, MESEC_SLIKA_UGLOVI, formatIllumination, PLANT_PART, moonSignAt } from '../src/lib/moon';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
   pickHero, pickHeroFrom, heroRulers, localMidnight, dayKey, daysBetween,
@@ -477,6 +477,13 @@ console.log('\n=== 9g. Mesec: procenat, crtez, lunarni dan ===');
   ok(moonLitPath(90, 10).includes('A 0.000 10'), 'prva cetvrt: terminator je prava linija');
   ok(moonLitPath(45, 10).includes('0 0 1 10 20') && moonLitPath(45, 10).endsWith('0 0 0 10 0 Z'), 'mladi srp: svetlo desno, terminator ka desno');
   ok(moonLitPath(315, 10).includes('0 0 0 10 20') && moonLitPath(315, 10).endsWith('0 0 1 10 0 Z'), 'stari srp: svetlo levo, terminator ka levo');
+  // Ilustracije: 30 slika, svaka svoj ugao, mlad i pun na pravom mestu, procenat odgovara slici.
+  ok(MESEC_SLIKA_UGLOVI.every((u, i) => mesecSlika(u) === i + 1), 'svaka slika se bira za svoj ugao');
+  ok([1, 30].includes(mesecSlika(0)) && mesecSlika(3) === 1 && mesecSlika(359.9) === 30 && mesecSlika(-0.1) === 30 && mesecSlika(180) === 15, 'mlad = 1 ili 30, pun = 15');
+  ok(Array.from({ length: 3600 }, (_, i) => i / 10).every((a) => {
+    const f = (x: number) => (1 - Math.cos((x * Math.PI) / 180)) / 2;
+    return Math.abs(f(a) - f(MESEC_SLIKA_UGLOVI[mesecSlika(a) - 1])) < 0.07;
+  }), 'osvetljenost slike odstupa od prave manje od 7 procentnih poena');
   const md = moonDay(chart, new Date(2026, 8, 26, 12));
   if (md.ingress) {
     ok(moonSignAt(md, new Date(md.ingress.at.getTime() - 60_000)).key === md.sign.key &&

@@ -14,7 +14,7 @@ export const UGAO: Record<string, string> = { ascendant: 'Asc', midheaven: 'MC' 
 
 /**
  * Simbol tela ili ugla u kruzicu, sa krunicom kad je vladar horoskopa — ista
- * oznaka vladara kao u listu "Na osnovu cega" kartice "Tvoj dan"
+ * oznaka vladara kao u listu "Zašto baš ovaj tekst" kartice "Tvoj dan"
  * (`app/tvoj-dan-info.tsx`), samo manja, za red na ekranu "Tranziti".
  *
  * Kad za tacku postoji Ivanova ikonica (`planeta-ikona.tsx`, 28.9.2026) crta

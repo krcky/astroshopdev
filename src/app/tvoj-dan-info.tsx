@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { Crown } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +15,7 @@ import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { tvojDanInfo } from '@/lib/tvoj-dan';
 import { trajanjeTranzita } from '@/lib/oblasti';
 import { TransitTrajanje } from '@/components/transit-trajanje';
-import { SheetGrabber } from '@/components/sheet';
+import { SheetGrabber, dnoLista } from '@/components/sheet';
 import { useResolvedProfile } from '@/store/profile';
 
 /** Precnik crnih ikonica — isti kao u zaglavlju tumacenja tranzita (`transit.tsx`). */
@@ -49,20 +49,22 @@ export default function TvojDanInfo() {
     // prostor ispod sadrzaja (UIKit detent se meri bez njega) — snimak: 24 + ~32
     // = 56pt. Zato se ovde odbija: sadrzaj ulazi u taj prostor toliko da vidljivo
     // dno bude 24 (`dnoLista`). Android: modal do dna, pa umetak + 24.
-    <View className="bg-background px-6 pt-6" style={dnoLista(insets.bottom)}>
+    <View className="bg-background px-6 pt-8" style={dnoLista(insets.bottom)}>
       <SheetGrabber />
-      <Text variant="h2">Na osnovu čega je ovaj tekst</Text>
+      {/* Ista velicina kao naslov lista "Šta je natalna karta" (Ivan, 28.9.2026). */}
+      <Text variant="naslovLista">Zašto baš ovaj tekst?</Text>
 
       {info ? (
         <>
-          <Text variant="body" className="mt-2">
+          {/* Razmaci veci nego ranije, da list "prodise" (Ivan, 28.9.2026: "sve je mnogo zbijeno"). */}
+          <Text variant="body" className="mt-3">
             Tekst je napisan za tranzit koji je danas najvažniji u tvojoj natalnoj karti.
           </Text>
 
           {/* Koji tranzit — u obliku zaglavlja tumacenja tranzita (Ivan, 28.9.2026:
               "iste ikonice, isti progress bar"): levo crne ikonice sa znakom aspekta
               izmedju, oznaka i ime; desno ilustracija aspekta, dnom u ravni sa imenom. */}
-          <View className="mt-5 flex-row gap-4">
+          <View className="mt-8 flex-row gap-4">
             <View
               className="flex-1 justify-between"
               accessible
@@ -74,9 +76,9 @@ export default function TvojDanInfo() {
                 )}
                 <Tacka tacka={info.natal} vladar={info.ruler === 'natal'} />
               </View>
-              <View className="mt-4">
+              <View className="mt-5">
                 <Text variant="oznaka">Tranzit dana</Text>
-                <Text variant="h2" className="mt-1">
+                <Text variant="h2" className="mt-1.5">
                   {info.transiting.name} {info.aspect.name} natalni {info.natal.name}
                 </Text>
               </View>
@@ -93,24 +95,25 @@ export default function TvojDanInfo() {
             )}
           </View>
 
-          {/* Trajanje tranzita — ista lila traka kao na tumacenju tranzita. */}
+          {/* Trajanje tranzita — ista lila traka i isti opseg datuma ("13 SEP – 26 SEP")
+              kao na tumacenju tranzita (Ivan, 28.9.2026; ranije "Od 13. septembra"). */}
           {prozor && (
-            <TransitTrajanje trajanje={prozor} date={date} className="mt-5" boja={OBLAST_BOJA} />
+            <TransitTrajanje trajanje={prozor} date={date} className="mt-7" boja={OBLAST_BOJA} opseg />
           )}
 
-          <Text variant="muted" className="mt-3">
+          <Text variant="muted" className="mt-4">
             Planeta sa današnjeg neba i ugao od {info.aspect.angle}° koji zaklapa sa tačkom iz tvoje natalne karte.
           </Text>
 
           {info.rulerText && info.ruler && (
             // Naslov gore levo; ispod slika planete vladara SA ZNAKOM levo, tekst
             // desno (Ivan, 28.9.2026), slika poravnata uz VRH teksta. Planeta bez te slike: stara slika.
-            <View className="mt-4 rounded-lg bg-fill p-4">
+            <View className="mt-8 rounded-lg bg-fill p-5">
               <View className="flex-row items-center gap-1.5">
                 <Crown size={15} color={neutral.ink} strokeWidth={2} />
                 <Text variant="h3">Tranzit tvog vladara</Text>
               </View>
-              <View className="mt-3 flex-row items-start gap-3">
+              <View className="mt-4 flex-row items-start gap-4">
                 {(() => {
                   const vladar = info.ruler === 'transiting' ? info.transiting : info.natal;
                   return imaSlikuSaZnakom(vladar.key)
@@ -123,7 +126,7 @@ export default function TvojDanInfo() {
           )}
         </>
       ) : (
-        <Text variant="muted" className="mt-3">Ovaj tranzit nije deo tvoje karte.</Text>
+        <Text variant="muted" className="mt-4">Ovaj tranzit nije deo tvoje karte.</Text>
       )}
     </View>
   );
@@ -145,16 +148,3 @@ function Tacka({ tacka, vladar }: { tacka: { key: string; glyph: string }; vlada
   );
 }
 
-/** Vidljivi vazduh na dnu lista — kao bokovi (`px-6`). */
-const DNO = 24;
-
-/**
- * Donji razmak lista. iOS sam dodaje `bottom` ispod sadrzaja; kad je veci od
- * `DNO`, visak se odbija negativnom marginom (sadrzaj koji iOS meri je kraci,
- * pa je i list toliko nizi), a kad je manji, dopunjuje se paddingom.
- */
-function dnoLista(bottom: number) {
-  if (Platform.OS === 'android') return { paddingBottom: bottom + DNO };
-  const razlika = DNO - bottom;
-  return razlika >= 0 ? { paddingBottom: razlika } : { marginBottom: razlika };
-}

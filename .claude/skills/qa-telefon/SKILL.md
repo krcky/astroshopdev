@@ -7,11 +7,11 @@ description: Provera aplikacije na pravom telefonu — koji tokovi se prolaze, k
 
 ## Zašto ovaj skill postoji
 
-**Xcode nije instaliran** na mašini (samo Command Line Tools, nema Homebrew ni
-CocoaPods). iOS simulator ne radi, `expo run:ios` ne prolazi. Jedini pravi
-uređaj za proveru je **Ivanov telefon**.
+**Xcode je instaliran** (26.6, od 28.9.2026), pa postoji iOS simulator. Simulator
+nije telefon: nema vibracije, drugačije se ponašaju tastatura, performanse i
+dodir. Merodavan uređaj za proveru ostaje **Ivanov telefon**.
 
-Posledica: **ja ne mogu sam da proverim UI.** Moj posao je da pripremim tačan,
+Posledica: **ono što nije viđeno na telefonu nije provereno.** Moj posao je da pripremim tačan,
 kratak spisak koraka i da posle jasno razdvojim **šta je provereno** od **šta
 nije**. Nikad ne pisati "radi" za nešto što nije viđeno na telefonu.
 

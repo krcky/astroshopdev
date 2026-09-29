@@ -3,6 +3,7 @@ import { Platform, ScrollView, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BezInterneta } from '@/components/bez-interneta';
 
 /**
  * Blagi prelaz na vrhu lista, ispod rucice (Ivan, 28.9.2026): tekst koji se
@@ -31,13 +32,17 @@ export function SheetGrabber() {
 /**
  * Okvir za sadrzaj NATIVNOG LISTA odozdo (`presentation: 'formSheet'` u
  * `app/_layout.tsx`) — sva tumacenja se otvaraju tako (Ivan, 28.9.2026), isto
- * kao list "Na osnovu cega je ovaj tekst".
+ * kao list "Zašto baš ovaj tekst".
  *
  * Bez zaglavlja i strelice nazad: list ima rucicu i zatvara se povlacenjem
  * nadole. List ide odmah do vrha (`TUMACENJE_LIST`), a dugacak tekst se
  * skroluje unutra.
  */
-export function SheetScroll({ children }: { children: React.ReactNode }) {
+export function SheetScroll({ children, keyboardShouldPersistTaps }: {
+  children: React.ReactNode;
+  /** Lista sa poljem za pretragu: `handled`, da prvi dodir na rezultat izabere, a ne samo spusti tastaturu. */
+  keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
+}) {
   const insets = useSafeAreaInsets();
   return (
     // ScrollView MORA biti koren: iOS formSheet sadrzaju ne daje visinu (pozicija bez
@@ -48,6 +53,7 @@ export function SheetScroll({ children }: { children: React.ReactNode }) {
     <ScrollView
       className="flex-1 bg-background"
       stickyHeaderIndices={[0]}
+      keyboardShouldPersistTaps={keyboardShouldPersistTaps}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       showsVerticalScrollIndicator={false}>
       <View pointerEvents="none" style={{ height: FADE }}>
@@ -58,7 +64,10 @@ export function SheetScroll({ children }: { children: React.ReactNode }) {
         />
         <SheetGrabber />
       </View>
-      <View style={{ paddingHorizontal: 24 }}>{children}</View>
+      <View style={{ paddingHorizontal: 24 }}>
+        <BezInterneta className="mb-6" />
+        {children}
+      </View>
     </ScrollView>
   );
 }
@@ -70,4 +79,19 @@ export function SheetScroll({ children }: { children: React.ReactNode }) {
 export function leaveSheetTo(href: Parameters<typeof router.push>[0]) {
   if (router.canGoBack()) router.back();
   router.push(href);
+}
+
+/** Vidljivi vazduh na dnu lista visine po sadrzaju (`fitToContents`) — kao bokovi (`px-6`). */
+const DNO = 24;
+
+/**
+ * Donji razmak lista visine po sadrzaju ("Zašto baš ovaj tekst", kalendar na
+ * Nebu). iOS sam dodaje `bottom` ispod sadrzaja; kad je veci od `DNO`, visak se
+ * odbija negativnom marginom (sadrzaj koji iOS meri je kraci, pa je i list
+ * toliko nizi), a kad je manji, dopunjuje se paddingom. Android: modal do dna.
+ */
+export function dnoLista(bottom: number) {
+  if (Platform.OS === 'android') return { paddingBottom: bottom + DNO };
+  const razlika = DNO - bottom;
+  return razlika >= 0 ? { paddingBottom: razlika } : { marginBottom: razlika };
 }

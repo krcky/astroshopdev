@@ -1,19 +1,22 @@
 import * as React from 'react';
-import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, useWindowDimensions, View } from 'react-native';
 import { Redirect, router, useFocusEffect } from 'expo-router';
-import { ChevronRight } from 'lucide-react-native';
+import { CalendarDays, ChevronLeft, ChevronRight, MapPin } from 'lucide-react-native';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
-import { AspectRow, Row, RowHead } from '@/components/ui/row';
-import { ZnakIkona } from '@/components/znak-ikona';
-import { buildSky, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
-import { formatDate } from '@/lib/horoscope';
+import { GlassBubble } from '@/components/ui/glass-button';
+import { OZNAKA_12 } from '@/components/tvoj-dan-card';
+import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
+import { buildSky, danZaKalendar, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
+import { formatDatum } from '@/lib/horoscope';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
+import { useSkyTimeStore } from '@/store/sky-time';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 
@@ -23,9 +26,14 @@ import { neutral } from '@/theme/tokens';
  * Razlika u odnosu na tab "Karta": tamo je nebo zamrznuto na trenutak rodjenja
  * i tice se samo korisnika, ovde se pomera dok gledas i isto je za sve.
  *
+ * Izgleda kao natalna karta (Ivan, 28.9.2026): tocak, ispod njega sat i mesto
+ * kao ime i podaci o rodjenju, lista sa ikonicama tacaka i kolonama znaka i
+ * kuce, aspekti. Velike trojke NEMA — samo lista. Delovi su zajednicki (`karta-lista.tsx`),
+ * da se dva ekrana ne razidju.
+ *
  * Nista se ne tumaci. Ekran prikazuje IZRACUNATO stanje — znak, stepen, kucu,
- * retrogradnost — a ne tekst astrologa. Tumacenja tranzita na licnu kartu su
- * i dalje u tabu "Tranziti", jer se tamo placaju.
+ * retrogradnost — a ne tekst astrologa, pa redovi nigde ne vode. Tumacenja
+ * tranzita na licnu kartu su i dalje u tabu "Tranziti", jer se tamo placaju.
  */
 export default function Sky() {
   const hydrated = useProfileStore((s) => s.hydrated);
@@ -35,13 +43,17 @@ export default function Sky() {
   // Mesto posmatranja je zaseban izbor; `null` znaci grad iz profila. Ceka se i
   // njegova hidratacija, inace bi ekran nakratko pokazao kartu za pogresan grad
   // i onda je zamenio — a razlika je ceo ascendent.
+  // Isti izbor kao `useMestoNeba()` (list sa kalendarom), ali bez drugog
+  // `useResolvedProfile()` — on pri svakom pozivu racuna natalnu kartu.
   const izabranGrad = useSkyPlaceStore((s) => s.city);
   const mestoHydrated = useSkyPlaceStore((s) => s.hydrated);
   const grad = izabranGrad ?? resolved?.city ?? null;
 
   const [sada, setSada] = React.useState(() => new Date());
-  /** null = prati sat. Cim se pomeri vreme, trenutak se zamrzava. */
-  const [izabran, setIzabran] = React.useState<Date | null>(null);
+  // Pomeren trenutak je u store-u: menja ga i list sa kalendarom (`sky-datum.tsx`).
+  const izabran = useSkyTimeStore((s) => s.izabran);
+  const setIzabran = useSkyTimeStore((s) => s.setIzabran);
+  const izaberiDan = useSkyTimeStore((s) => s.izaberiDan);
   const now = izabran ?? sada;
 
   // Osvezavanje ide SAMO dok je ekran u fokusu i dok se gleda sadasnjost.
@@ -78,68 +90,93 @@ export default function Sky() {
     setIzabran(new Date(now.getTime() + smer * 3_600_000));
   const pomeriDan = (smer: number) =>
     setIzabran(shiftDays(now, grad.tz, smer));
+  // Kalendar: na iOS-u (i vebu) list odozdo, na Androidu sistemski dijalog —
+  // Android nema kalendar koji se ugradjuje u list.
+  const otvoriKalendar = () => {
+    if (Platform.OS === 'android') {
+      DateTimePickerAndroid.open({
+        value: danZaKalendar(now, grad.tz),
+        mode: 'date',
+        onValueChange: (_e, d) => izaberiDan(d, grad.tz),
+      });
+      return;
+    }
+    router.push('/sky-datum');
+  };
+  // Zid-sat mesta posmatranja — samo za ispis (vidi `zoneShift`).
+  const zid = zoneShift(now, grad.tz);
+  const datum = formatDatum(zid, true);
 
-  const { chart, points, aspects, retrograde } = sky;
-  const moon = chart.planets.find((p) => p.key === 'moon')!;
+  const { chart, points } = sky;
+  // Najtesnji prvi, kao na natalnoj karti. `findAspects` ih vraca po skoru
+  // (tesnoca x tezina tela), sto je redosled za izbor teksta, ne za citanje.
+  const aspects = [...sky.aspects].sort((x, y) => x.orb - y.orb);
   const wheelSize = Math.min(width - 16, 430);
 
   return (
     <Screen label="Trenutno na nebu" padded={false} tint="pink" right={<ProfileButton />}>
-      <View className="px-5 pb-5 pt-6">
-        <Text variant="display">{zoneClock(now, grad.tz)}</Text>
-        <Pressable
-          onPress={() => router.push('/sky-place')}
-          accessibilityRole="button"
-          accessibilityLabel={`Mesto posmatranja: ${grad.name}. Dodirni da promeniš.`}
-          className="mt-1.5 flex-row items-center gap-1 self-start active:opacity-60">
-          <Text variant="muted">
-            {formatDate(zoneShift(now, grad.tz), true)} · {grad.name}
-          </Text>
-          <ChevronRight size={15} color={neutral.inkSubtle} />
-        </Pressable>
-      </View>
-
-      <View className={cn(CARD_SURFACE, 'mx-5 mb-5 self-start rounded-full px-4 py-2')}>
-        <Text className="text-xs text-muted-foreground">
-          Mesec u znaku {moon.position.sign.name} · {sky.moonPhaseName}
-          {retrograde.length
-            ? ` · retrogradni: ${retrograde.map((r) => r.name).join(', ')}`
-            : ' · nijedna planeta nije retrogradna'}
-        </Text>
-      </View>
-
-      <View className="items-center">
+      {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"). */}
+      <View className="-mt-3 items-center">
         <NatalWheel chart={chart} size={wheelSize} points={points} />
+        {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
+            linija, pa je legenda ispod liste uklonjena. */}
+        <TockInfo velicina={wheelSize} onPress={() => router.push('/nebo-info')}
+          accessibilityLabel="Šta je trenutno nebo?" />
       </View>
 
-      {/* Pomeranje vremena. Dan ide preko zid-sata (`shiftDays`) da bi u noci
-          kad se sat pomera i dalje pogadjao isti sat; sat je prostih 60
-          minuta stvarnog vremena — vidi komentar u `lib/sky.ts`. */}
-      <View className="mt-5 flex-row justify-center gap-2 px-5">
-        <Korak label="‹ dan" onPress={() => pomeriDan(-1)} />
-        <Korak label="‹ sat" onPress={() => pomeriSat(-1)} />
-        <Korak label="sat ›" onPress={() => pomeriSat(1)} />
-        <Korak label="dan ›" onPress={() => pomeriDan(1)} />
+      {/* Sat ISPOD tocka, centrirano — na mestu imena na natalnoj karti.
+          Veliki, `display` (Ivan, 28.9.2026: "font za vreme povecati"). */}
+      <View className="-mt-4 items-center px-5">
+        <Text variant="display" className="text-center">{zoneClock(now, grad.tz)}</Text>
       </View>
 
-      <View className="mt-3 items-center">
-        <Pressable
-          onPress={() => setIzabran(null)}
-          disabled={!izabran}
-          accessibilityRole="button"
-          accessibilityLabel="Vrati se na sadašnji trenutak"
-          className={cn(
-            'rounded-full border px-6 py-2.5',
-            izabran ? 'border-foreground active:opacity-60' : 'border-border'
-          )}>
-          <Text
-            variant="label"
-            className={cn('text-xs', !izabran && 'text-muted-foreground')}>
-            Trenutno
-          </Text>
-        </Pressable>
+      {/* Datum i mesto u staklu, JEDNO PORED DRUGOG, malo odmaknuti od sata
+          (Ivan, 29.9.2026): datum otvara kalendar, mesto list sa gradovima. Sa
+          godinom — kalendar skace i u druge godine. Kad dugo ime grada ne stane,
+          prelazi u sledeci red, centrirano. */}
+      <View className="mx-5 mt-5 flex-row flex-wrap justify-center gap-2">
+        <StakloDugme
+          ikona={<CalendarDays size={IKONA} color={neutral.ink} strokeWidth={2} />}
+          tekst={datum}
+          onPress={otvoriKalendar}
+          accessibilityLabel={`Datum: ${datum} Dodirni da izabereš dan.`}
+        />
+        <StakloDugme
+          ikona={<MapPin size={IKONA} color={neutral.ink} strokeWidth={2} />}
+          tekst={grad.name}
+          onPress={() => router.push('/sky-place')}
+          accessibilityLabel={`Mesto posmatranja: ${grad.name}. Dodirni da promeniš.`}
+        />
       </View>
 
+      {/* Sat i dan napred i nazad, "Trenutno" u sredini (Ivan, 28.9.2026). Dan
+          ide preko zid-sata (`shiftDays`) da bi u noci kad se sat pomera i dalje
+          pogadjao isti sat; sat je prostih 60 minuta stvarnog vremena — vidi
+          komentar u `lib/sky.ts`. Mesec i godinu pokriva kalendar. */}
+      <View className="mx-5 mt-3 flex-row gap-2">
+        <Korak smer="nazad" jedinica="dan" onPress={() => pomeriDan(-1)} />
+        <Korak smer="nazad" jedinica="sat" onPress={() => pomeriSat(-1)} />
+        {/* Ivice nema, pa neaktivno "Trenutno" (vec gledas sadasnjost) razlikuje samo siv natpis. */}
+        <GlassBubble interaktivno={!!izabran}>
+          <Pressable
+            onPress={() => setIzabran(null)}
+            disabled={!izabran}
+            accessibilityRole="button"
+            accessibilityLabel="Vrati se na sadašnji trenutak"
+            accessibilityState={{ disabled: !izabran }}
+            hitSlop={{ top: 2, bottom: 2 }}
+            className="h-full justify-center px-3 active:opacity-60">
+            <Text variant="chip" className={cn(!izabran && 'text-muted-foreground')}>
+              Trenutno
+            </Text>
+          </Pressable>
+        </GlassBubble>
+        <Korak smer="napred" jedinica="sat" onPress={() => pomeriSat(1)} />
+        <Korak smer="napred" jedinica="dan" onPress={() => pomeriDan(1)} />
+      </View>
+
+      {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
+          Ascendent su prvi redovi liste. */}
       {chart.houses.fellBack && (
         <View className={cn(CARD_SURFACE, 'mx-5 mt-4 p-4')}>
           <Text variant="muted">
@@ -150,99 +187,99 @@ export default function Sky() {
         </View>
       )}
 
-      {/* Legenda aspekata — ista kao na natalnoj karti. */}
-      <View className="mx-5 mt-6 flex-row flex-wrap gap-x-5 gap-y-2">
-        <LegendItem color="#C4453A" label="napeti — kvadrat, opozicija" />
-        <LegendItem color="#3B6FA8" label="skladni — trigon, sekstil" />
-        <LegendItem color="#8A8A8A" label="konjunkcija" dashed />
-      </View>
-
-      {/* Uglovi nad gradom iz profila */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-7')}>
-        <RowHead>Uglovi nad mestom {grad.name}</RowHead>
-        <Row glyph={chart.ascendantSign.sign.glyph} name="Ascendent"
-             icon={<ZnakIkona znak={chart.ascendantSign.sign.key} element={chart.ascendantSign.sign.element} size={22} />}
-             value={chart.ascendantSign.formatted} />
-        <Row glyph={chart.midheavenSign.sign.glyph} name="MC"
-             icon={<ZnakIkona znak={chart.midheavenSign.sign.key} element={chart.midheavenSign.sign.element} size={22} />}
-             value={chart.midheavenSign.formatted} last />
-      </View>
-
-      {/* Planete */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-4')}>
-        <RowHead>
-          Planete · {chart.houses.system === 'placidus' ? 'Placidus kuće' : 'Whole Sign kuće'}
-        </RowHead>
-        {chart.planets.map((p, i) => (
-          <Row
+      {/* Jedna tabela (Ivan, 29.9.2026: tacke spojene sa planetama): Ascendent,
+          Sunce, Mesec, ostale planete, cvor, Lilit, Tacka srece, MC — MC ostaje
+          poslednji, kao na natalnoj karti. Iste kolone, bez rasklapanja i strelica. */}
+      <View className={cn(CARD_SURFACE, 'mx-5 mt-4 overflow-hidden')}>
+        <TackaRed tacka="ascendant" glyph="ASC" ime="Ascendent" pos={chart.ascendantSign} />
+        {redosledPlaneta(chart.planets).map((p) => (
+          <TackaRed
             key={p.key}
+            tacka={p.key}
             glyph={p.glyph}
-            name={p.name}
-            value={p.position.formatted}
-            extra={`${p.house}. kuća`}
+            ime={p.name}
+            pos={p.position}
             retro={p.retrograde}
-            last={i === chart.planets.length - 1}
+            kuca={p.house}
           />
         ))}
-      </View>
-
-      {/* Izvedene tacke */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-4')}>
-        <RowHead>Tačke</RowHead>
-        {points.map((t, i) => (
-          <Row
+        {points.map((t) => (
+          <TackaRed
             key={t.key}
+            tacka={t.key}
             glyph={t.glyph}
-            name={t.name}
-            value={t.position.formatted}
-            extra={t.house ? `${t.house}. kuća` : undefined}
+            ime={t.name}
+            pos={t.position}
             retro={t.retrograde}
-            last={i === points.length - 1}
+            kuca={t.house}
           />
         ))}
+        <TackaRed tacka="midheaven" glyph="MC" ime="MC" pos={chart.midheavenSign} last />
       </View>
-      <Text variant="muted" className="mx-5 mt-2 text-xs">
-        Čvor je pravi (ne srednji), Lilit je srednji apogej. Tačka sreće se
-        računa po {sky.dayChart ? 'dnevnoj' : 'noćnoj'} formuli, jer je Sunce
-        sada {sky.dayChart ? 'iznad' : 'ispod'} horizonta.
-      </Text>
 
-      {/* Aspekti */}
-      <View className={cn(CARD_SURFACE, 'mx-5 mt-4')}>
-        <RowHead>Aspekti · {aspects.length}</RowHead>
+      {/* Aspekti — bez tumacenja, pa bez strelice; ime nije sivo jer ovde
+          nijedan aspekt nema tekst i sivo ne bi nista razlikovalo. */}
+      <View className={cn(CARD_SURFACE, 'mx-5 mt-4 overflow-hidden')}>
+        {/* Naslov istim pismom kao datum na pocetnoj (`oznaka` 12pt, verzali —
+            Ivan, 29.9.2026), ne `RowHead`. */}
+        <View className="border-b border-border px-4 py-3">
+          <Text variant="oznaka" className={OZNAKA_12} accessibilityRole="header">
+            Aspekti{'\u00A0\u00A0·\u00A0\u00A0'}{aspects.length}
+          </Text>
+        </View>
         {aspects.map((a, i) => (
-          <AspectRow
-            key={a.contentKey}
-            glyphs={`${a.a.glyph} ${a.aspect.glyph} ${a.b.glyph}`}
-            label={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
-            orb={a.orb}
-            last={i === aspects.length - 1}
-          />
+          <AspektRed key={a.contentKey} aspekt={a} muted={false} last={i === aspects.length - 1} />
         ))}
       </View>
     </Screen>
   );
 }
 
-/** Jedno dugme za pomeranje vremena. Namerno bez `Button`: traka od cetiri
- *  jednaka, uska dugmeta trazi `flex-1`, a ne visinu od 48px. */
-function Korak({ label, onPress }: { label: string; onPress: () => void }) {
+/** Ikonice u staklenim dugmadima (kalendar, mesto) i strelice — uz natpis od 15pt. */
+const IKONA = 18;
+
+/**
+ * Stakleno dugme sa ikonicom i natpisom (datum, mesto) — isti mehur kao
+ * dugmad u zaglavlju (`GlassBubble`); bez stakla (iOS pre 26, Android, veb)
+ * bela pilula sa mekom senkom.
+ */
+function StakloDugme({ ikona, tekst, onPress, accessibilityLabel }: {
+  ikona: React.ReactNode; tekst: string; onPress: () => void; accessibilityLabel: string;
+}) {
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label.replace('‹', 'nazad').replace('›', 'napred')}
-      className={cn(CARD_SURFACE, 'flex-1 items-center py-2.5 active:opacity-60')}>
-      <Text variant="label" className="text-xs">{label}</Text>
-    </Pressable>
+    <GlassBubble>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        hitSlop={{ top: 2, bottom: 2 }}
+        className="h-full flex-row items-center gap-2 px-4 active:opacity-60">
+        {ikona}
+        <Text variant="chip" numberOfLines={1}>{tekst}</Text>
+      </Pressable>
+    </GlassBubble>
   );
 }
 
-function LegendItem({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
+/**
+ * Jedan korak vremena ("‹ dan", "sat ›") u staklu, kao nekad cetiri dugmeta,
+ * samo sa vecim natpisom i pravom strelicom (Ivan, 28.9.2026).
+ */
+function Korak({ smer, jedinica, onPress }: {
+  smer: 'nazad' | 'napred'; jedinica: string; onPress: () => void;
+}) {
+  const Strelica = smer === 'nazad' ? ChevronLeft : ChevronRight;
   return (
-    <View className="flex-row items-center gap-2">
-      <View style={{ width: 16, height: 2, backgroundColor: color, opacity: dashed ? 0.6 : 1 }} />
-      <Text variant="muted" className="text-xs">{label}</Text>
-    </View>
+    <GlassBubble style={{ flex: 1 }}>
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${jedinica.charAt(0).toUpperCase()}${jedinica.slice(1)} ${smer}`}
+        hitSlop={{ top: 2, bottom: 2 }}
+        className={cn('h-full w-full items-center justify-center active:opacity-60', smer === 'nazad' ? 'flex-row' : 'flex-row-reverse')}>
+        <Strelica size={IKONA} color={neutral.ink} strokeWidth={2.2} />
+        <Text variant="chip">{jedinica}</Text>
+      </Pressable>
+    </GlassBubble>
   );
 }

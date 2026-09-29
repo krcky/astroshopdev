@@ -142,7 +142,7 @@ export type Trajanje = { start: Date | null; end: Date | null; preostalo: number
 
 /**
  * JEDINO mesto koje racuna trajanje za prikaz — lista "Tranziti", "Tema perioda",
- * ceo tekst tranzita i list "Na osnovu cega". Do 29.9.2026 su lista i ceo tekst
+ * ceo tekst tranzita i list "Zašto baš ovaj tekst". Do 29.9.2026 su lista i ceo tekst
  * isti tranzit merili razlicitim orbisom (3° naspram 1,5°) i pokazivali razlicit
  * broj dana (Ivan). Orbis je orbis liste (`LISTA_ORB`), jer je njime tranzit usao
  * na ekran; orbisi "Tvog dana" vaze samo za izbor, ne za trajanje.

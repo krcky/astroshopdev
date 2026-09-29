@@ -82,7 +82,7 @@ Tranzite i lunarni kalendar ne treba dirati.
 
 ### Korak 5 — pristup za testiranje na telefonu
 
-Duge verzije tranzita i plaćeni natal server šalje samo nalogu koji ima red u `entitlements`. Za tvoj nalog: SQL Editor → sadržaj `supabase/daj-pristup.sql` → **Run**. Poslednji upit mora da vrati `active = true`.
+Duge verzije tranzita i plaćeni natal server šalje samo nalogu koji ima kupovinu (`entitlements`) ili poklon (`pokloni`). Jednom pokreni `supabase/pokloni.sql` u SQL Editoru, pa za svaki nalog: `select admin.daj_premium('email');`. Spisak: `select * from admin.spisak_poklona;`.
 
 Prekidač za Premium u profilu (dev) menja samo prikaz. Duge tekstove ne otključava, to radi ovaj korak.
 

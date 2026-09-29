@@ -2,6 +2,11 @@
 export type NativeDayMenuProps = {
   /** Okidac je SF simbol (`calendar`), bez natpisa. */
   systemImage: string;
+  /**
+   * Stranica kvadrata koji hvata dodir, pt — ceo krug oko ikone, ne samo sama
+   * ikona od 19pt (bez ovoga se u krugu od 40pt lako promasi).
+   */
+  povrsina?: number;
   /** Za VoiceOver: "Izabran dan: Danas…". */
   accessibilityLabel: string;
   color: string;

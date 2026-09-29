@@ -1,12 +1,27 @@
 import * as React from 'react';
-import { Platform, View } from 'react-native';
+import { Image, Platform, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import { BellRing } from 'lucide-react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { OnboardingStep } from '@/components/onboarding-step';
+import { AstrologSlika } from '@/components/astrolog-slika';
 import { Text } from '@/components/ui/text';
-import { CelestialOrb } from '@/components/celestial-orb';
+import { ASTROLOG } from '@/lib/pitanja';
+import { shadow } from '@/theme/tokens';
 
+const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
+
+/**
+ * Ukljucivanje obavestenja (Ivan, 29.9.2026, po referentnom "Get Notified"):
+ * "Preskoči" gore desno, zvonce, naslov, pa obris telefona sa tri primera
+ * obavestenja preko njega — korisnik vidi STA ce dobijati pre nego sto
+ * sistem pita.
+ *
+ * Primeri pokazuju samo ono sto zaista planiramo da saljemo: jutarnji
+ * horoskop i odgovor astrologa (CLAUDE.md, pravilo 21 — push jos ne postoji).
+ */
 export default function Push() {
   const [busy, setBusy] = React.useState(false);
 
@@ -32,22 +47,118 @@ export default function Push() {
 
   return (
     <OnboardingStep
-      question="Da te podsetimo?"
-      note={Platform.OS === 'web'
+      skip={{ label: 'Preskoči', onPress: done, disabled: busy }}
+      icon={BellRing}
+      title="Da ti javimo?"
+      subtitle={Platform.OS === 'web'
         ? 'Notifikacije rade na telefonu; na vebu ovaj korak preskačemo.'
-        : 'Jedna poruka ujutru, sa horoskopom za taj dan. Ništa drugo ti nećemo slati.'}
-      primary={{ label: busy ? 'Trenutak…' : 'Uključi podsetnik', onPress: ask, disabled: busy }}
-      secondary={{ label: 'Ne, hvala', onPress: done }}>
+        : 'Jednom ujutru, sa horoskopom za taj dan, i kad ti astrolog odgovori. Ništa drugo ti ne šaljemo.'}
+      center={false}
+      note={null}
+      primary={{ label: busy ? 'Trenutak…' : 'Uključi obaveštenja', onPress: ask, disabled: busy }}>
 
-      <View className="items-center">
-        <CelestialOrb size={150} seed={29} />
-        <Text variant="display" className="mt-10 text-center text-3xl">
-          Horoskop te čeka{'\n'}svakog jutra
-        </Text>
-        <Text variant="muted" className="mt-4 px-6 text-center">
-          Nebo se menja svakog dana. Podsetnik ti javi šta je novo za tvoju kartu.
-        </Text>
-      </View>
+      <PrimeriObavestenja />
     </OnboardingStep>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* ILUSTRACIJA                                                         */
+/* ------------------------------------------------------------------ */
+
+/** Obris telefona iza kartica: sirina, visina (do polovine trece kartice), debljina ivice. */
+const TELEFON = { sirina: 250, visina: 280, ivica: 10 };
+/** Koliko obrisa telefona viri iznad prve kartice. */
+const IZNAD_KARTICA = 92;
+
+/*
+ * Obris je BEO, a ne svetlosiv kao na referenci: stoji na sivoj pozadini, gde
+ * bi se siva ivica izgubila (isto obrtanje kao polje i krug ikonice).
+ * Ukras je — citac ekrana cita samo kartice.
+ */
+function PrimeriObavestenja() {
+  return (
+    <View className="mt-6">
+      <View
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        className="absolute top-0 items-center self-center border-card"
+        style={{
+          width: TELEFON.sirina,
+          height: TELEFON.visina,
+          borderWidth: TELEFON.ivica,
+          borderBottomWidth: 0,
+          borderTopLeftRadius: 48,
+          borderTopRightRadius: 48,
+        }}>
+        {/* Ostrvo na vrhu ekrana. */}
+        <View className="mt-3 h-7 w-24 rounded-pill bg-card" />
+      </View>
+
+      <View className="gap-3" style={{ marginTop: IZNAD_KARTICA }}>
+        <Obavestenje
+          redosled={0}
+          slika={<IkonicaAplikacije />}
+          naslov="Tvoj dan"
+          tekst="Horoskop za danas je spreman."
+          vreme="sada"
+        />
+        <Obavestenje
+          redosled={1}
+          slika={<AstrologSlika velicina={SLIKA} />}
+          naslov={ASTROLOG.ime}
+          tekst="Odgovorio je na tvoje pitanje."
+          vreme="1 h"
+        />
+        <Obavestenje
+          redosled={2}
+          slika={<IkonicaAplikacije />}
+          naslov="Tvoj dan"
+          tekst="Venera je u trigonu sa tvojim Suncem."
+          vreme="juče"
+        />
+      </View>
+    </View>
+  );
+}
+
+/** Jedno obavestenje kao na zakljucanom ekranu. Kartice ulaze jedna za drugom, jednom. */
+function Obavestenje({ redosled, slika, naslov, tekst, vreme }: {
+  redosled: number;
+  slika: React.ReactNode;
+  naslov: string;
+  tekst: string;
+  vreme: string;
+}) {
+  return (
+    // Ulazak nosi Reanimated omotac, izgled obican `View` — NativeWind klase na
+    // `Animated.View` iz Reanimated-a nisu nigde provereno da stizu.
+    <Animated.View entering={FadeInDown.delay(200 + redosled * 120).duration(450)}>
+      <View style={shadow.soft} className="flex-row items-center gap-3 rounded-xl bg-card px-4 py-3.5">
+        {slika}
+        <View className="flex-1">
+          <View className="flex-row items-baseline gap-2">
+            <Text variant="row" numberOfLines={1} className="flex-1">{naslov}</Text>
+            <Text variant="caption" className="text-subtle">{vreme}</Text>
+          </View>
+          <Text variant="body" numberOfLines={1}>{tekst}</Text>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
+/** Ista mera kao slika astrologa u drugoj kartici — `h-10` bi bio 35pt (NativeWind rem = 14). */
+const SLIKA = 40;
+
+function IkonicaAplikacije() {
+  return (
+    <Image
+      source={IKONICA}
+      accessibilityIgnoresInvertColors
+      style={{ width: SLIKA, height: SLIKA }}
+      className="rounded-tile border border-border"
+    />
   );
 }

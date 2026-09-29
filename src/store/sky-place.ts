@@ -15,6 +15,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { City } from '@/lib/cities';
+import { useResolvedProfile } from '@/store/profile';
 
 type SkyPlaceState = {
   /** Izabrano mesto posmatranja, ili null za grad iz profila. */
@@ -43,3 +44,14 @@ export const useSkyPlaceStore = create<SkyPlaceState>()(
     }
   )
 );
+
+/**
+ * Grad nad kojim se gleda nebo: izabran, ili grad iz profila. Isti izbor na
+ * ekranu i na listu sa kalendarom (`app/sky-datum.tsx`) — ne sme da se razidje,
+ * jer zona tog grada odredjuje koji je dan na zid-satu.
+ */
+export function useMestoNeba(): City | null {
+  const izabran = useSkyPlaceStore((s) => s.city);
+  const resolved = useResolvedProfile();
+  return izabran ?? resolved?.city ?? null;
+}

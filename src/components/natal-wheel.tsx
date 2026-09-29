@@ -4,6 +4,9 @@ import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 import { GLYPH_FONT } from '@/components/ui/glyph';
 import { ZNAK_VIEWBOX, ZnakOblik } from '@/components/znak-ikona';
 import { fontUloge } from '@/theme/tipografija';
+import {
+  ASPECT_STYLE, CENTAR, DEGREES_MIN_SIZE, OKVIR, TICK, TICK_STYLE, TOCAK_BOJE as COLORS, VIEW, ZNAK_TOCAK,
+} from '@/lib/tocak-stil';
 import { SIGNS, norm360, signFromLongitude } from '@/lib/zodiac';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
@@ -13,37 +16,11 @@ import {
 } from '@/lib/wheel';
 
 /* Poluprecnici i velicine ispisa stoje u `lib/wheel.ts` — proverava ih
-   `npm run check:sky`, sekcija 10. */
+   `npm run check:sky`, sekcija 10. Boje, crtice i linije aspekata su u
+   `lib/tocak-stil.ts` (deli ih tocak u panelu za astrologa). */
 
-/*
- * Crtice za stepene, ka centru od `R.zodiacIn`.
- *
- * Bez stepena se crtaju samo 5° i 10°, tacno kao ranije — bledo, jer su tamo
- * samo orijentir. Sa stepenima se dodaje crtica na SVAKI stepen, 360 komada,
- * pa idu kao tri putanje umesto kao 360 `<Line>` cvorova (`degreeTickPaths`).
- *
- * Tada boje moraju da potamne. Prva verzija je crtala 1° sa sirinom 0.35 u
- * `faint` (#ECECEC) — na belom je to kontrast 1.1:1 i crtice se nisu videle
- * uopste. Druga je bila #E4E4E4 i na telefonu je i dalje bila presvetla:
- * crtica od 0.5 jedinice je na 359 tacaka 0.43 piksela, pa je antialiasing
- * pojede. Zato su crtice i tamnije I deblje. Lenjir ima smisla samo ako se
- * tri nivoa razlikuju: 1° jedva vidljivo, 5° jasno, 10° najjace.
- */
-const TICK = { d1: 2.5, d5: 5, d10: 8 };
-const TICK_STYLE = {
-  /** Sa stepenima — tri nivoa koja se stvarno razlikuju. */
-  fine: {
-    d1: { color: '#D6D6D6', width: 0.6 },
-    d5: { color: '#BABABA', width: 0.8 },
-    d10: { color: '#9E9E9E', width: 1.1 },
-  },
-  /** Bez stepena — zatecen izgled, ne dirati. */
-  plain: {
-    d5: { color: '#ECECEC', width: 0.6 },
-    d10: { color: '#ECECEC', width: 1 },
-  },
-};
-
+/** Legenda "Šta je natalna karta" uvozi linije aspekata odavde. */
+export { ASPECT_STYLE };
 
 /*
  * Zasto minut stoji DESNO od stepena, a ne u svom prstenu.
@@ -71,40 +48,12 @@ const TICK_STYLE = {
  */
 
 /**
- * Ispod koje velicine prikaza se stepeni gase.
- *
- * ViewBox je sirok 420 jedinica, pa je jedna jedinica `size / 420` tacaka na
- * ekranu. Minut se crta sa 7 jedinica; na 340 tacaka to je ~5.7 tacaka —
- * donja granica citljivosti za indeks. Ispod toga brojevi postaju sum.
+ * Koliko je donja ivica spoljnog kruga udaljena od vrha crteza, u tackama, za
+ * tocak velicine `size`. Za dugme "i" koje stoji u liniji sa dnom kruga (`chart.tsx`).
  */
-const DEGREES_MIN_SIZE = 340;
-
-/** Precnik ikonice znaka u prstenu zodijaka (prsten je sirok 30 jedinica). */
-const ZNAK_TOCAK = 22;
-
-const COLORS = {
-  ink: '#141414',
-  line: '#D8D8D8',
-  faint: '#ECECEC',
-  muted: '#8A8A8A',
-  /** Brojevi kuca kad se crtaju i stepeni — svetliji, da se dve grupe cifara ne mesaju. */
-  houseNum: '#B4B4B4',
-  gold: '#A7731B',
-  /** Napeti aspekti — kvadrat, opozicija. */
-  tense: '#C4453A',
-  /** Skladni aspekti — trigon, sekstil. */
-  easy: '#3B6FA8',
-  /** Ispuna kruga — bela na svakoj pozadini, da tocak ne bude providan (Ivan, 28.9.2026). */
-  disk: '#FFFFFF',
-};
-
-const ASPECT_STYLE: Record<string, { color: string; width: number; dash?: string }> = {
-  conjunction: { color: COLORS.muted, width: 1, dash: '3 3' },
-  sextile: { color: COLORS.easy, width: 0.8, dash: '4 3' },
-  trine: { color: COLORS.easy, width: 1.1 },
-  square: { color: COLORS.tense, width: 1.1 },
-  opposition: { color: COLORS.tense, width: 1.3 },
-};
+export function dnoKruga(size: number): number {
+  return (size * (OKVIR + CENTAR + R.outer)) / VIEW;
+}
 
 /** Sve sto se crta na prstenu planeta — telo ili izvedena tacka. */
 type Simbol = {
@@ -146,8 +95,8 @@ type Props = {
 };
 
 export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points }: Props) {
-  const cx = 180;
-  const cy = 180;
+  const cx = CENTAR;
+  const cy = CENTAR;
   const asc = chart.houses.ascendant;
   const degrees = showDegrees ?? size >= DEGREES_MIN_SIZE;
   // Brojevi kuca bi upali u drugi red brojeva, pa se sklanjaju unutar prstena.
@@ -194,7 +143,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   );
 
   return (
-    <Svg width={size} height={size} viewBox="-30 -30 420 420">
+    <Svg width={size} height={size} viewBox={`${-OKVIR} ${-OKVIR} ${VIEW} ${VIEW}`}>
       {/* --- prstenovi --- */}
       {/* Bela ispuna ispod svega: na sivoj pozadini ekrana tocak inace prosijava. */}
       <Circle cx={cx} cy={cy} r={R.outer} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
@@ -278,7 +227,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
               stroke={st.color}
               strokeWidth={st.width}
               strokeDasharray={st.dash}
-              opacity={0.45 + 0.45 * (1 - a.orb / a.aspect.orb)}
+              opacity={0.65 + 0.35 * (1 - a.orb / a.aspect.orb)}
             />
           );
         })}
@@ -371,9 +320,9 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           const t = at(lon, R.outer + 16);
           return (
             <G key={label}>
-              <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.gold} strokeWidth={1.5} />
+              <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ugao} strokeWidth={1.5} />
               <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontFamily={fontUloge('tockUgao')}
-                       fill={COLORS.gold} textAnchor="middle">
+                       fill={COLORS.ugao} textAnchor="middle">
                 {label}
               </SvgText>
             </G>
