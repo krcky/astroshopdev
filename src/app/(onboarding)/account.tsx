@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Keyboard, LayoutAnimation, Platform, TextInput, type KeyboardEvent } from 'react-native';
 import { Mail } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { useTurnstile } from '@/components/turnstile';
 import { Input } from '@/components/ui/input';
+import { PrijavaDugme } from '@/components/prijava-dugme';
 import { Text } from '@/components/ui/text';
-import { CARD_SURFACE } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { AUTH_MODE } from '@/lib/auth-mode';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
@@ -26,6 +25,7 @@ export default function Account() {
   const [socialNote, setSocialNote] = React.useState(false);
   const captcha = useTurnstile();
   const lozinka = React.useRef<TextInput>(null);
+  const tastatura = useTastaturaOtvorena();
 
   const emailOk = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email.trim());
   const valid = AUTH_MODE === 'otp' ? emailOk : emailOk && password.length >= 6;
@@ -111,7 +111,7 @@ export default function Account() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      icon={Mail}
+      icon={tastatura ? undefined : Mail}
       title={AUTH_MODE === 'otp' ? 'Koji ti je email?' : 'Napravi nalog'}
       subtitle={AUTH_MODE === 'otp'
         ? 'Šaljemo ti kod za prijavu. Bez lozinke, bez reklama, i email ne delimo ni sa kim.'
@@ -157,19 +157,16 @@ export default function Account() {
 
       {poruka && <Text className="mt-4 px-2 text-center text-sm text-destructive">{poruka}</Text>}
 
-      <View className="items-center">
-        <Text variant="muted" className="mt-10">Ili nastavi preko</Text>
-        <View className="mt-4 flex-row gap-3">
-          <SocialButton label="Apple" onPress={() => setSocialNote(true)} />
-          <SocialButton label="Google" onPress={() => setSocialNote(true)} />
-        </View>
+      {/* Odmah ispod polja, jedno ispod drugog (Ivan, 29.9.2026). Zajedno sa poljem
+          moraju da stanu iznad tastature — zato zaglavlje gubi ikonicu dok je ona otvorena. */}
+      <PrijavaDugme vrsta="apple" onPress={() => setSocialNote(true)} className="mt-3" />
+      <PrijavaDugme vrsta="google" onPress={() => setSocialNote(true)} className="mt-3" />
 
-        {socialNote && (
-          <Text variant="muted" className="mt-4 px-6 text-center text-xs">
-            Prijava preko Apple i Google naloga uključuje se kad napravimo dev build.
-          </Text>
-        )}
-      </View>
+      {socialNote && (
+        <Text variant="muted" className="mt-4 px-6 text-center text-xs">
+          Prijava preko Apple i Google naloga uključuje se kad napravimo dev build.
+        </Text>
+      )}
 
       {captcha.gate}
 
@@ -177,14 +174,26 @@ export default function Account() {
   );
 }
 
-function SocialButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Nastavi preko ${label} naloga`}
-      className={cn(CARD_SURFACE, 'h-14 w-28 items-center justify-center active:opacity-60')}>
-      <Text variant="label" className="text-foreground">{label}</Text>
-    </Pressable>
-  );
+/**
+ * Da li je tastatura otvorena. Na iOS-u stize PRE njenog pokreta (`Will`), pa
+ * zaglavlje menja oblik zajedno sa njom; Android javlja tek posle (`Did`).
+ * Svoj `configureNext` postavlja POSLE KeyboardAvoidingView-a (on se pretplati
+ * pri montiranju, pre ekrana), pa vazi za oba — i nestanak ikonice je glatko.
+ */
+function useTastaturaOtvorena() {
+  const [otvorena, setOtvorena] = React.useState(() => Keyboard.isVisible());
+  React.useEffect(() => {
+    const ios = Platform.OS === 'ios';
+    const promena = (vidljiva: boolean) => (e: KeyboardEvent) => {
+      if (ios && e.duration) {
+        const tip = { type: e.easing || LayoutAnimation.Types.keyboard, property: LayoutAnimation.Properties.opacity };
+        LayoutAnimation.configureNext({ duration: e.duration, update: { type: tip.type }, create: tip, delete: tip });
+      }
+      setOtvorena(vidljiva);
+    };
+    const pokaz = Keyboard.addListener(ios ? 'keyboardWillShow' : 'keyboardDidShow', promena(true));
+    const skriv = Keyboard.addListener(ios ? 'keyboardWillHide' : 'keyboardDidHide', promena(false));
+    return () => { pokaz.remove(); skriv.remove(); };
+  }, []);
+  return otvorena;
 }

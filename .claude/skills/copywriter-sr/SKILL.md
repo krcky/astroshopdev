@@ -99,5 +99,5 @@ Posebno za ovaj projekat — **poruka mora da prizna neznanje kad ga ima**:
 
 Pre nego što napišeš nov tekst, pogledaj kako je već rešeno na sličnom mestu:
 `src/app/(onboarding)/` za tok, `onboarding-step.tsx` za `PRIVACY_NOTE`,
-`(tabs)/daily.tsx` i `profile.tsx` za tekst oko sadržaja. Doslednost je važnija
+`(tabs)/daily/index.tsx` i `profile.tsx` za tekst oko sadržaja. Doslednost je važnija
 od toga da je nova formulacija malo lepša.

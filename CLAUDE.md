@@ -38,6 +38,7 @@ src/
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
+                     svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
   theme/
     tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
   components/
@@ -295,6 +296,18 @@ UNUTRASNJE STRANE (`pushed`: profil, Mesec, izmena) imaju svoje
 zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
 BEZ loga i BEZ preliva (izuzetak: Mesec ima ljubicasti, `tint="purple"`). Strelicu
 crta `Screen` sam — ekran je ne salje.
+
+STAKLENO DUGME = NATIVE STAVKA TRAKE (Ivan, 29.9.2026). Svako glass dugme gore
+(nazad, X, profil, kalendar, "Preskoči") se na iOS-u 26 pravi ISTO kao kalendar i
+profil na pocetnoj: providna native traka (`headerShown` samo za `!STARI_IOS`,
+`headerTransparent`) + `unstable_headerLeftItems` / `unstable_headerRightItems`.
+Traka svih tabova je `components/tab-stack.tsx` (`TabStack`, u `_layout.tsx` svakog
+taba); profil gore desno je `ProfileButton` (sam bira native stavku ili rezervu).
+Onboarding: `(onboarding)/_layout.tsx` + `onboarding-step.tsx`.
+`GlassView` (`ui/glass-button.tsx`) "lici na Apple glass, nije to" — ostaje samo kao
+rezerva za Android / iOS < 26 i tamo gde trake nema (kapsule u karticama). Providan
+roditelj (`active:opacity`) kvari staklo — nikad oko `GlassView`. `@expo/ui`
+SwiftUI dugme sa `RNHostView` sadrzajem je u Expo Go-u oborilo ceo bundle.
 
 ZIVI PRELIV STAJE KAD KORISNIK MIRUJE (baterija, 28.9.2026): mrlje teku samo na ekranu u
 fokusu, 20 s posle poslednjeg dodira uspore do nule (`store/budnost.ts`, dodir hvata koren u

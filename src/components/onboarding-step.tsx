@@ -1,20 +1,30 @@
 import * as React from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Stack } from 'expo-router';
 import { ChevronLeft, X, type LucideIcon } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { Text } from '@/components/ui/text';
 import { ScreenBackdrop } from '@/components/screen';
+import { STARI_IOS } from '@/lib/platform';
+import { FONT } from '@/theme/font';
 import { neutral } from '@/theme/tokens';
 
 /**
  * Zajednicki okvir svih koraka onboardinga.
  *
- * Svi koraci imaju isti raspored: izlaz gore levo (stakleni krug, kao dugme
- * profila), zaglavlje, sadrzaj, glavno dugme, po potrebi sporedna radnja
- * ispod. Drzi se na jednom mestu da se ekrani ne raziđu.
+ * Svi koraci imaju isti raspored: izlaz gore levo, "Preskoči" gore desno kad
+ * korak nije obavezan, zaglavlje, sadrzaj, glavno dugme, po potrebi sporedna
+ * radnja ispod. Drzi se na jednom mestu da se ekrani ne raziđu.
+ *
+ * DUGMAD GORE su na iOS-u 26 NATIVE STAVKE TRAKE (`unstable_headerLeftItems` /
+ * `unstable_headerRightItems`), isto kao kalendar i profil na pocetnoj — pravo
+ * sistemsko staklo (Ivan, 29.9.2026: `GlassView` "lici na Apple glass, nije
+ * to"). Traku pali `(onboarding)/_layout.tsx`. Android i stariji iOS: nasa
+ * dugmad u redu ispod (`GlassIconButton`, `GlassBubble`).
  *
  * ZAGLAVLJE (Ivan, 29.9.2026, po referentnoj prijavi emailom): ikonica u krugu,
  * naslov, siv podnaslov — sve centrirano, na vrhu. Koraci sa poljem za unos
@@ -45,13 +55,25 @@ type Props = {
   secondary?: Action;
   /** Sadrzaj centriran po visini (tockici) ili poravnat na vrh (unos, liste). */
   center?: boolean;
+  /**
+   * Dno sadrzaja se pretapa u pozadinu — za listu koja ide ispod ivice (gradovi,
+   * Ivan 29.9.2026): delimicno vidljiv red se tada cita kao "ima jos", ne kao odsecen.
+   */
+  pretapanje?: boolean;
 };
+
+/** Visina pretapanja na dnu sadrzaja (`pretapanje`). */
+const PRETAPANJE = 32;
+
+/** Native traka postoji samo na iOS-u 26 (vidi `(onboarding)/_layout.tsx`). */
+const NATIVE_TRAKA = Platform.OS === 'ios' && !STARI_IOS;
 
 export const PRIVACY_NOTE =
   'Koristimo ovo da izračunamo tvoju natalnu kartu. Ne delimo i ne prodajemo tvoje podatke.';
 
 export function OnboardingStep({
   exit, skip, icon, title, subtitle, question, children, note = PRIVACY_NOTE, primary, secondary, center = true,
+  pretapanje = false,
 }: Props) {
   return (
     <View className="flex-1 bg-grouped">
@@ -60,8 +82,30 @@ export function OnboardingStep({
           className="flex-1"
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
+          {NATIVE_TRAKA && (
+            <Stack.Screen
+              options={{
+                unstable_headerLeftItems: () => exit ? [{
+                  type: 'button',
+                  label: exit.kind === 'cancel' ? 'Odustani' : 'Nazad',
+                  icon: { type: 'sfSymbol', name: exit.kind === 'cancel' ? 'xmark' : 'chevron.left' },
+                  accessibilityLabel: exit.kind === 'cancel' ? 'Odustani' : 'Nazad',
+                  onPress: exit.onPress,
+                }] : [],
+                unstable_headerRightItems: () => skip ? [{
+                  type: 'button',
+                  label: skip.label,
+                  labelStyle: { fontFamily: FONT.medium, fontSize: 17, color: neutral.ink },
+                  disabled: skip.disabled,
+                  onPress: skip.onPress,
+                }] : [],
+              }}
+            />
+          )}
+
+          {/* Na iOS-u 26 ovaj red je samo razmak ispod native trake. */}
           <View className="h-14 flex-row items-center px-5">
-            {exit && (
+            {!NATIVE_TRAKA && exit && (
               <GlassIconButton
                 onPress={exit.onPress}
                 accessibilityLabel={exit.kind === 'cancel' ? 'Odustani' : 'Nazad'}>
@@ -70,7 +114,7 @@ export function OnboardingStep({
                   : <ChevronLeft size={22} color={neutral.ink} />}
               </GlassIconButton>
             )}
-            {skip && (
+            {!NATIVE_TRAKA && skip && (
               <GlassBubble style={{ marginLeft: 'auto' }} interaktivno={!skip.disabled}>
                 <Pressable
                   onPress={skip.onPress}
@@ -90,14 +134,24 @@ export function OnboardingStep({
           )}
 
           {title ? (
-            <ScrollView
-              className="flex-1"
-              contentContainerClassName="flex-grow px-5 pb-4"
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}>
-              <Zaglavlje icon={icon} title={title} subtitle={subtitle} />
-              <View className={center ? 'flex-1 justify-center' : 'pt-7'}>{children}</View>
-            </ScrollView>
+            <View className="flex-1">
+              <ScrollView
+                className="flex-1"
+                contentContainerClassName="flex-grow px-5 pb-4"
+                contentContainerStyle={pretapanje ? { paddingBottom: PRETAPANJE } : undefined}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <Zaglavlje icon={icon} title={title} subtitle={subtitle} />
+                <View className={center ? 'flex-1 justify-center' : 'pt-7'}>{children}</View>
+              </ScrollView>
+              {pretapanje && (
+                <LinearGradient
+                  pointerEvents="none"
+                  colors={[`${neutral.grouped}00`, neutral.grouped]}
+                  style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: PRETAPANJE }}
+                />
+              )}
+            </View>
           ) : (
             <ScrollView
               className="flex-1"

@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { MapPin } from 'lucide-react-native';
 
-import { OnboardingStep } from '@/components/onboarding-step';
+import { OnboardingStep, PRIVACY_NOTE } from '@/components/onboarding-step';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
@@ -29,6 +29,11 @@ export default function BirthPlace() {
       icon={MapPin}
       title="Mesto rođenja"
       center={false}
+      // Dok se bira, lista treba svaki red iznad tastature — objasnjenje o
+      // privatnosti se vrati kad je grad izabran i liste vise nema (Ivan,
+      // 29.9.2026: treci grad je bio odsecen). Red koji ide ispod ivice se pretapa.
+      note={city ? PRIVACY_NOTE : null}
+      pretapanje
       primary={{ label: 'Nastavi', onPress: next, disabled: !city }}>
 
       <Input

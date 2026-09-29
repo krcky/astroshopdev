@@ -5,6 +5,13 @@ import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { Button } from '@/components/ui/button';
 import { neutral, shadow, size } from '@/theme/tokens';
 
+/*
+ * PRVO PROBAJ NATIVE TRAKU (Ivan, 29.9.2026, CLAUDE.md pravilo 17): dugme gore
+ * na iOS-u 26 ide kao native stavka trake (`unstable_headerRightItems`), kao
+ * kalendar i profil na pocetnoj — to je pravo sistemsko staklo. `GlassView` ovde
+ * samo lici na njega; koristi ga tamo gde trake nema, i kao rezervu.
+ */
+
 /**
  * Kruzno dugme sa ikonom u Liquid Glass mehuru (iOS 26+), 40pt kao dugme u
  * zaglavlju. Gde stakla nema — Android, stariji iOS, veb — pada na `Button`
