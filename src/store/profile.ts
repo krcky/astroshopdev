@@ -5,6 +5,7 @@
  * na server; lokalna kopija ostaje da app radi offline i da se karta ne racuna
  * ponovo pri svakom otvaranju.
  */
+import * as React from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -96,9 +97,11 @@ export type ResolvedProfile = {
   zoneUnreliable: boolean;
 };
 
-/** Sklapa sve: profil -> grad -> UTC -> natalna karta. */
-export function resolveProfile(profile: Profile | null): ResolvedProfile | null {
-  if (!profile) return null;
+/**
+ * Grad rodjenja iz profila — iz SACUVANIH koordinata i zone, ne iz ugradjene
+ * liste: grad dijaspore (iz baze) u listi ne postoji, a mora da ostane isti.
+ */
+export function gradProfila(profile: Profile): City | null {
   // Prvo po ID-ju; ime je rezerva za profile sacuvane pre uvodjenja ID-ja.
   // Podaci iz profila su izvor istine. Lokalna lista se konsultuje samo za
   // profile sacuvane pre nego sto su koordinate poceli da se cuvaju uz grad.
@@ -108,7 +111,7 @@ export function resolveProfile(profile: Profile | null): ResolvedProfile | null 
   const zoneName = profile.timeZone ?? stari?.tz.name;
   if (latitude === undefined || longitude === undefined || !zoneName) return null;
 
-  const city: City = {
+  return {
     id: profile.cityId,
     name: profile.cityName,
     country: stari?.country ?? '',
@@ -120,6 +123,13 @@ export function resolveProfile(profile: Profile | null): ResolvedProfile | null 
       europeanDst: zoneName.startsWith('Europe/'),
     },
   };
+}
+
+/** Sklapa sve: profil -> grad -> UTC -> natalna karta. */
+export function resolveProfile(profile: Profile | null): ResolvedProfile | null {
+  if (!profile) return null;
+  const city = gradProfila(profile);
+  if (!city) return null;
 
   const timeUnknown = profile.time === null;
   const t = profile.time ?? { hour: 12, minute: 0 };
@@ -142,8 +152,12 @@ export function resolveProfile(profile: Profile | null): ResolvedProfile | null 
   return { profile, city, utc, chart, timeUnknown, zoneUnreliable: !isOffsetReliable(utc, city.tz) };
 }
 
-/** Hook: razresen profil ili null ako korisnik jos nije prosao onboarding. */
+/**
+ * Hook: razresen profil ili null ako korisnik jos nije prosao onboarding.
+ * Racuna se jednom po profilu, ne pri svakom crtanju (29.9.2026) — objekat u
+ * store-u se menja samo kad se profil zaista promeni.
+ */
 export function useResolvedProfile(): ResolvedProfile | null {
   const profile = useProfileStore((s) => s.profile);
-  return resolveProfile(profile);
+  return React.useMemo(() => resolveProfile(profile), [profile]);
 }

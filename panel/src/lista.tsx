@@ -69,6 +69,12 @@ export function Lista({ email }: { email: string }) {
           <div className="stavka-vrh">
             <strong>
               {p.karta?.ime ?? 'Bez imena'}
+              {/* Pitanje o drugoj osobi: ko pita (snimak v2). */}
+              {p.karta?.drugaOsoba && (
+                <span className="siv sitno" style={{ fontWeight: 'normal' }}>
+                  {' '}· pita {p.karta.drugaOsoba.pita}{p.karta.drugaOsoba.mojaKarta ? ', o odnosu' : ''}
+                </span>
+              )}
               {p.sandbox && <span className="oznaka" title="Probna kupovina (sandbox) — i Apple-ovi recenzenti kupuju ovako">TEST</span>}
             </strong>
             <span className="siv sitno">

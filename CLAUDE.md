@@ -37,6 +37,8 @@ src/
     moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
                      i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
     profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
+    osoba.tsx        strana DRUGE OSOBE (?id=): "Karta | Danas" + pitanje o njoj (pravilo 22)
+    osoba-uredi.tsx  unos/izmena druge osobe (bez id = nova), sve na jednom ekranu + pristanak
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
@@ -47,6 +49,9 @@ src/
     screen.tsx           okvir ekrana — preliv, zamucena traka, skrol, siva pozadina
     onboarding-step.tsx  zajednicki okvir svih koraka
     natal-wheel.tsx      SVG tocak natalne karte
+    natalna-karta-prikaz.tsx  cela natalna karta (tocak, trojka, planete, aspekti) — tab "Ti" i strana osobe
+    tvoji-ljudi.tsx      kartica "Tvoji ljudi" na tabu "Ti" (druge osobe, "Dodaj osobu")
+    rodjenje-forma.tsx   podaci o rodjenju na jednom ekranu — `/edit` i `/osoba-uredi`
     karta-lista.tsx      redovi ispod tocka (trojka, planeta, aspekt) i "i" uz tocak — ZAJEDNICKI za "Ti" i "Nebo"
     info-list.tsx        delovi listova sa objasnjenjem tocka (odeljak, stavka, aspekti) — oba "i" lista
     moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca)
@@ -60,6 +65,7 @@ src/
     auth.ts          sesija + pravo pristupa
     sky-place.ts     mesto posmatranja, null = grad iz profila
     sky-time.ts      pomeren trenutak na Nebu (null = sadasnjost) — BEZ persist
+    osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
   lib/
     zodiac.ts        12 znakova, longituda -> znak
     astro.ts         ephemeris + aspekti        <- engine
@@ -75,6 +81,7 @@ src/
     znak-oblici.ts   oblici i boje ikonica znakova — deli ih panel
     uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
     pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
+    osobe.ts         druge osobe: odnosi, granica, ko je otvoren (cist racun); osobe-api.ts = server + `useKarta`
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — PRIVREMENO, ceka astrologa
     horoscope.ts     composer                   <- ovde ulazi korpus
@@ -84,6 +91,7 @@ src/
     pitanja-api.ts   upiti (TanStack Query); kupovina.ts = mesto za RevenueCat
 supabase/
   schema.sql         tabele + RLS politike
+  osobe.sql          druge osobe + okidac za granicu (1 / 10) — PRE pitanja.sql
   pitanja.sql        pitanja, krediti, astrolozi, skladiste `odgovori`
   pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
 panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
@@ -481,6 +489,31 @@ Mesecevih aspekata, a bez pouzdane zone tocka nema.
 Uloga u panelu se samo prikazuje; kapija je RLS. Testovi: `check:pitanja`,
 `check:pitanja-baza` (SQL u PGlite-u, sa Supabase delovima napravljenim u testu).
 
+**22. Druge osobe (Ivan, 29.9.2026): partner, dete, prijatelj — njihova karta, tranziti i pitanje o njima.**
+Tab "Ti" ima "Tvoji ljudi" (`components/tvoji-ljudi.tsx`) posle velike trojke; dodir otvara POSEBNU
+stranu osobe (`app/osoba.tsx`: "Karta | Danas" + "Pitaj astrologa"). NIKAD prekidac "ja / ona" na
+tabovima — "Danas", "Tvoj dan" i "Tranziti" su uvek korisnikovi (kod konkurencije su najteze zalbe
+mesanje "ja" i druge osobe). Karta i lista su ISTE komponente kao tabovi "Ti" i "Tranziti"
+(`NatalnaKartaPrikaz`, `TranzitiLista`), sa istim granicama za besplatne. Listovi tumacenja
+(`/transit`, `/natal`) primaju `?osoba=` — bez njega crtaju KORISNIKOVU kartu, pa svaki nov ulaz u
+tumacenje sa strane osobe mora da ga prosledi. Karta za ekran: `useKarta(osobaId)` (`lib/osobe-api.ts`).
+GRANICA: besplatno 1, Premium 10 (`BESPLATNO.osobe`, `PREMIUM.osobe`); sprovodi je BAZA okidacem
+(`supabase/osobe.sql`, pravilo 8), `check:osobe-baza` drzi da se brojke nisu razisle. Premium istekao:
+NISTA se ne brise, otvorena ostaje PRVA dodata (`otvoreneOsobe`), ostale pod katancem; izmena i brisanje
+uvek rade. Osoba se NE prodaje pojedinacno (odluceno 29.9.2026: kupovina "slota" se ne vraca kroz
+"Vrati kupovine" — kod konkurencije zalba broj jedan).
+PODACI: tabela `osobe`, isti oblik kao `profiles`; korisnik cita, menja i brise samo svoje. Upis ide
+PRVO na server (granica + id) — bez mreze se ne dodaje ni ne menja. Na telefonu je kes (`store/osobe.ts`)
+koji PRIPADA NALOGU (nosi `uid`, brise se pri odjavi); osvezava se pri svakom dolasku na tab "Ti".
+PITANJE o osobi ili "o nama dvoma" je ISTE cene kao o sebi (Ivan). `pitanje-novo` bira "O kome je
+pitanje"; `sacuvaj_nacrt(tekst, karta, p_osoba)` proverava da je osoba svoja (`nema_osobe`); snimak je
+v2 (`snimakODrugoj`, polje `drugaOsoba`: odnos, ko pita, i karta onoga ko pita kod pitanja o odnosu).
+Panel pise ko pita i crta obe karte. Obrisana osoba: `pitanja.osoba_id` postaje NULL, snimak ostaje.
+PRISTANAK pri dodavanju ("Osoba zna da unosim njene podatke; za dete sam roditelj ili staratelj") —
+konacan tekst ide pravniku uz politiku privatnosti. Imena se NE sklanjaju: natpisi drze uneto ime u
+nominativu ("Ja i Ana", "Pita Ana"), pol se ne pita.
+REDOSLED SQL-a: schema -> pokloni -> osobe -> pitanja (pitanja.sql pamti `osoba_id`).
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -507,6 +540,8 @@ npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacen
 npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor
 npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpisi
 npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)
+npm run check:osobe       druge osobe: granica, ko je otvoren, osoba = profil (ista karta, grad dijaspore)
+npm run check:osobe-baza  osobe.sql u PGlite-u: RLS, granica 1/10 sa pravim `ima_premium()`, brisanje naloga
 npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
 npm run panel:build       panel za objavu -> panel/dist
 ```
@@ -593,6 +628,11 @@ npm run panel:build       panel za objavu -> panel/dist
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
+- [ ] Druge osobe (pravilo 22) — URADJENO (faza 1, 29.9.2026): baza (`osobe.sql` i nov
+      `pitanja.sql` pokrenuti 29.9.2026), "Tvoji ljudi", strana osobe, unos/izmena, granica 1/10,
+      pitanje o osobi i o odnosu, panel. FALI: politika privatnosti i App Privacy (podaci trece
+      osobe, astrolog ih vidi); pitanja za astrologa (ASTRO-LOGIKA, pogl. 9, tacke 14 i 15).
+      Faza 2: kompatibilnost/sinastrija (novi korpus), "Tvoj dan" za osobe, "Posalji joj kartu".
 - [x] Kartica MESEC na pocetnom ekranu, posle "Danas ukratko" — faza, znak (i sat
       prelaska u sledeci), najjaci Mesecev tranzit DANA: `moonDay` u `transits.ts`
       trazi aspekte koji postaju egzaktni izmedju dve lokalne ponoci, pa je kartica

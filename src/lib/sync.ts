@@ -9,7 +9,8 @@
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/store/profile';
 
-type Row = {
+/** Podaci o rodjenju u bazi — isti oblik u `profiles` i `osobe` (`supabase/osobe.sql`). */
+export type RodjenjeRed = {
   name: string;
   birth_year: number;
   birth_month: number;
@@ -23,7 +24,7 @@ type Row = {
   time_zone: string | null;
 };
 
-const toProfile = (r: Row): Profile => ({
+export const profilIzReda = (r: RodjenjeRed): Profile => ({
   name: r.name,
   birth: { year: r.birth_year, month: r.birth_month, day: r.birth_day },
   time: r.birth_hour !== null && r.birth_minute !== null
@@ -36,8 +37,7 @@ const toProfile = (r: Row): Profile => ({
   timeZone: r.time_zone ?? undefined as unknown as string,
 });
 
-const toRow = (p: Profile, userId: string) => ({
-  id: userId,
+export const redIzProfila = (p: Profile): RodjenjeRed => ({
   name: p.name,
   birth_year: p.birth.year,
   birth_month: p.birth.month,
@@ -51,6 +51,11 @@ const toRow = (p: Profile, userId: string) => ({
   time_zone: p.timeZone ?? null,
 });
 
+/** Kolone podataka o rodjenju, za `select`. */
+export const RODJENJE_POLJA = 'name, birth_year, birth_month, birth_day, birth_hour, birth_minute, city_id, city_name, latitude, longitude, time_zone';
+
+const toRow = (p: Profile, userId: string) => ({ id: userId, ...redIzProfila(p) });
+
 /**
  * Karta sa servera, ili null ako je nema. Greska (mreza) BACA: "nema karte" i
  * "nismo uspeli da pitamo" nisu isto. Da vrati null, prijava postojecim emailom
@@ -59,12 +64,12 @@ const toRow = (p: Profile, userId: string) => ({
 export async function pullProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('name, birth_year, birth_month, birth_day, birth_hour, birth_minute, city_id, city_name, latitude, longitude, time_zone')
+    .select(RODJENJE_POLJA)
     .eq('id', userId)
     .maybeSingle();
 
   if (error) throw error;
-  return data ? toProfile(data as Row) : null;
+  return data ? profilIzReda(data as RodjenjeRed) : null;
 }
 
 export async function pushProfile(userId: string, profile: Profile) {

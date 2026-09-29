@@ -14,6 +14,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { obrisiKes } from '@/lib/kes-na-disku';
 import { obrisiLokalno as obrisiPitanjeLokalno } from '@/lib/pitanje-lokalno';
 import { useProfileStore } from '@/store/profile';
+import { useOsobeStore } from '@/store/osobe';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useHeroLog } from '@/store/hero-log';
 import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
@@ -170,8 +171,9 @@ export async function signOut(scope: 'global' | 'local' = 'global') {
   return result;
 }
 
-/** Sacuvani tekstovi, poslednje pravo pristupa, pitanje u pisanju i dnevnici prikaza pripadaju nalogu — ne ostaju posle odjave. */
+/** Sacuvani tekstovi, poslednje pravo pristupa, pitanje u pisanju, druge osobe i dnevnici prikaza pripadaju nalogu — ne ostaju posle odjave. */
 async function ocistiLokalno() {
+  useOsobeStore.getState().clear();
   useTvojDanLog.getState().clear();
   useHeroLog.getState().clear();
   await obrisiKes();

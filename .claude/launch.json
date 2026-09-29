@@ -47,6 +47,18 @@
         "panel"
       ],
       "port": 5180
+    },
+    {
+      "name": "astroshop-web-8083",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8083"
+      ],
+      "port": 8083
     }
   ]
 }

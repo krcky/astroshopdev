@@ -29,8 +29,12 @@ export function Pitanje({ id }: { id: string }) {
 
   useEffect(() => { setP(undefined); setRanija([]); setZvuk(null); ucitaj(); }, [ucitaj]);
 
+  const druga = p?.karta?.drugaOsoba ?? null;
+  // Odgovor slusa onaj ko pita — kod pitanja o drugoj osobi to nije vlasnik karte.
+  const kome = druga?.pita ?? p?.karta?.ime;
+
   const poslato = () => {
-    sessionStorage.setItem(USPEH_KLJUC, `Odgovor je poslat${p?.karta?.ime ? ` (${p.karta.ime})` : ''}.`);
+    sessionStorage.setItem(USPEH_KLJUC, `Odgovor je poslat${kome ? ` (${kome})` : ''}.`);
     idi('/');
   };
 
@@ -49,6 +53,14 @@ export function Pitanje({ id }: { id: string }) {
               {p.karta?.ime ?? 'Bez imena'}
               {p.sandbox && <span className="oznaka" title="Probna kupovina (sandbox)">TEST</span>}
             </h1>
+            {/* Pitanje o DRUGOJ osobi (snimak v2, 29.9.2026): karta je njena, a pita vlasnik naloga. */}
+            {druga && (
+              <p style={{ marginBottom: 4 }}>
+                Pita <strong>{druga.pita}</strong>
+                {druga.odnos ? ` · odnos: ${druga.odnos.toLowerCase()}` : ''}
+                {druga.mojaKarta ? ' · pitanje o njihovom odnosu, obe karte su ispod' : ''}
+              </p>
+            )}
             <p className="siv" style={{ marginBottom: 16 }}>
               Poslato {datumIVreme(p.paid_at ?? p.created_at)}
               {p.status === 'paid' && ` · čeka ${preKoliko(p.paid_at ?? p.created_at).replace(/^pre /, '')}`}
@@ -74,8 +86,14 @@ export function Pitanje({ id }: { id: string }) {
           </div>
 
           <div>
-            <h2>Karta</h2>
+            <h2>{druga ? `Karta: ${p.karta?.ime}` : 'Karta'}</h2>
             <Karta k={p.karta} />
+            {druga?.mojaKarta && (
+              <div className="odeljak">
+                <h2>Karta: {druga.mojaKarta.ime} (pita)</h2>
+                <Karta k={druga.mojaKarta} />
+              </div>
+            )}
 
             {ranija.length > 0 && (
               <div className="odeljak">

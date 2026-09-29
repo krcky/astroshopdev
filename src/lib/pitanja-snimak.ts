@@ -12,8 +12,12 @@
 export type SnimakPolozaj = { znak: string; stepen: string };
 
 export type SnimakKarte = {
-  verzija: 1;
-  /** Ime iz profila u trenutku slanja. */
+  /**
+   * 1 — karta vlasnika naloga. 2 (29.9.2026) — uz to `drugaOsoba` kad je
+   * pitanje o nekom drugom; bez nje je v2 isto sto i v1.
+   */
+  verzija: 1 | 2;
+  /** Ime osobe CIJA je karta, u trenutku slanja (iz profila ili sa spiska osoba). */
   ime: string;
   rodjenje: {
     /** "1990-07-10" */
@@ -51,4 +55,16 @@ export type SnimakKarte = {
   /** Kuspide 1—12, redom. */
   kuce: SnimakPolozaj[] | null;
   aspekti: { a: string; aspekt: string; b: string; orbis: string }[];
+  /**
+   * v2: pitanje je o DRUGOJ osobi (tab "Ti", "Tvoji ljudi") — karta iznad je
+   * njena, a ne karta onoga ko pita. Nema je kad je pitanje o vlasniku naloga.
+   */
+  drugaOsoba?: {
+    /** Ko je ona onome ko pita ("Partner", "Dete"…); null kad nije receno. */
+    odnos: string | null;
+    /** Ime onoga ko pita (vlasnik naloga). */
+    pita: string;
+    /** Pitanje o ODNOSU ("Ja i Ana"): i karta onoga ko pita; inace null. */
+    mojaKarta: SnimakKarte | null;
+  };
 };

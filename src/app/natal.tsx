@@ -27,7 +27,7 @@ import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { useNatalTexts, type NatalText } from '@/lib/natal-texts';
-import { useResolvedProfile } from '@/store/profile';
+import { useKarta } from '@/lib/osobe-api';
 import { useEntitlement } from '@/store/auth';
 
 
@@ -43,8 +43,9 @@ import { useEntitlement } from '@/store/auth';
  */
 export default function NatalTumacenje() {
   // `deo=kuca`: otvoreno sa reda "u 2. kući" na ekranu "Ti" — kuca ide prva.
-  const { tema, deo } = useLocalSearchParams<{ tema: string; deo?: string }>();
-  const resolved = useResolvedProfile();
+  // `osoba`: karta druge osobe (strana osobe, 29.9.2026) — bez njega korisnikova.
+  const { tema, deo, osoba } = useLocalSearchParams<{ tema: string; deo?: string; osoba?: string }>();
+  const resolved = useKarta(osoba);
   const premium = !!useEntitlement()?.active;
 
   const topic = React.useMemo(
@@ -62,11 +63,15 @@ export default function NatalTumacenje() {
   }, [topic, deo]);
   const { texts, loading } = useNatalTexts(kljucevi);
 
-  if (!resolved) return <Redirect href="/" />;
+  if (!resolved) {
+    // Osoba je u medjuvremenu obrisana (ili je drugi nalog) — list to kaze, ne salje na kapiju.
+    if (osoba) return <SheetScroll><Text variant="muted">Ova osoba više nije na tvojoj listi.</Text></SheetScroll>;
+    return <Redirect href="/" />;
+  }
   if (!topic) {
     return (
       <SheetScroll>
-        <Text variant="muted">Ovo tumačenje nije deo tvoje karte.</Text>
+        <Text variant="muted">{osoba ? 'Ovo tumačenje nije deo ove karte.' : 'Ovo tumačenje nije deo tvoje karte.'}</Text>
       </SheetScroll>
     );
   }
@@ -125,10 +130,13 @@ export default function NatalTumacenje() {
       {topic.kind === 'planet' && topic.moon && !topic.moon.certain && (
         <View className={cn(CARD_SURFACE, 'mt-6 p-5')}>
           <Text variant="body">
-            Na dan tvog rođenja Mesec je bio u {SIGN_CASES[topic.moon.from.key].loc}, pa prešao u {SIGN_CASES[topic.moon.to.key].acc}.
-            Bez vremena rođenja ne znamo u kom je znaku bio kad si se rodio, pa tumačenje ne prikazujemo.
+            {osoba ? 'Na dan rođenja' : 'Na dan tvog rođenja'} Mesec je bio u {SIGN_CASES[topic.moon.from.key].loc}, pa prešao u {SIGN_CASES[topic.moon.to.key].acc}.
+            {osoba
+              ? ' Bez vremena rođenja ne znamo u kom je znaku bio u trenutku rođenja, pa tumačenje ne prikazujemo.'
+              : ' Bez vremena rođenja ne znamo u kom je znaku bio kad si se rodio, pa tumačenje ne prikazujemo.'}
           </Text>
-          <Button variant="secondary" className="mt-4 self-start" onPress={() => leaveSheetTo('/edit')}>
+          <Button variant="secondary" className="mt-4 self-start"
+            onPress={() => leaveSheetTo(osoba ? { pathname: '/osoba-uredi', params: { id: osoba } } : '/edit')}>
             <Text>Dodaj vreme rođenja</Text>
           </Button>
         </View>
@@ -150,7 +158,7 @@ export default function NatalTumacenje() {
           izLista
           className="mt-8"
           naslov="Cela natalna karta"
-          opis="Sve planete u znakovima i kućama i svi aspekti tvoje karte. Sunce, Mesec i podznak su besplatni."
+          opis={`Sve planete u znakovima i kućama i svi aspekti ${osoba ? 'ove' : 'tvoje'} karte. Sunce, Mesec i podznak su besplatni.`}
         />
       )}
     </SheetScroll>

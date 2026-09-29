@@ -70,8 +70,8 @@ export default function Sky() {
     }, [izabran])
   );
 
-  // Zavisnosti su BROJEVI, ne `resolved` — `useResolvedProfile()` pravi nov
-  // objekat pri svakom renderu, pa bi se cela karta racunala iznova bez
+  // Zavisnosti su BROJEVI, ne `resolved` — profil ponovo stigao sa servera je
+  // nov objekat sa istim podacima, pa bi se cela karta racunala iznova bez
   // ikakvog povoda.
   const latitude = grad?.latitude;
   const longitude = grad?.longitude;

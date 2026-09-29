@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, ScrollView, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { BezInterneta } from '@/components/bez-interneta';
 import { PitajUvod } from '@/components/pitaj-uvod';
+import { KapsuleRed } from '@/components/ui/kapsule';
 import {
-  ASTROLOG, OKVIRNI_ROK, PITANJE_MAX, pitanjeSpremno, porukaGreske, snimakKarte,
+  ASTROLOG, OKVIRNI_ROK, PITANJE_MAX, pitanjeSpremno, porukaGreske, snimakKarte, snimakODrugoj,
 } from '@/lib/pitanja';
+import { useKarta, useOsobe, useOtvoreneOsobe } from '@/lib/osobe-api';
 import { posaljiKreditom, sacuvajNacrt, useKrediti, useMojaPitanja, useOsveziPitanja } from '@/lib/pitanja-api';
 import { obrisiLokalno, procitajLokalno, upisiLokalno } from '@/lib/pitanje-lokalno';
 import { kupiPitanje, useCenaPitanja, type IshodKupovine } from '@/lib/kupovina';
@@ -20,6 +22,10 @@ import { useAuthStore, useEntitlement } from '@/store/auth';
 import { useResolvedProfile } from '@/store/profile';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { Check } from 'lucide-react-native';
+
+/** Izbor "Ja" u redu "O kome je pitanje". */
+const JA = 'ja';
 
 /** Poruka posle kupovine koja nije zavrsena. Pitanje je u svakom slucaju sacuvano. */
 const POSLE_KUPOVINE: Record<Exclude<IshodKupovine, 'placeno'>, string> = {
@@ -48,10 +54,23 @@ const POSLE_KUPOVINE: Record<Exclude<IshodKupovine, 'placeno'>, string> = {
  * otvara odmah polje.
  */
 export default function PitanjeNovo() {
-  const { korak: pocetniKorak } = useLocalSearchParams<{ korak?: string }>();
+  // `osoba`: otvoreno sa strane osobe (29.9.2026) — pitanje je o njoj.
+  const { korak: pocetniKorak, osoba: pocetnaOsoba } = useLocalSearchParams<{ korak?: string; osoba?: string }>();
   const [korak, setKorak] = React.useState<'uvod' | 'pisanje'>(pocetniKorak === 'uvod' ? 'uvod' : 'pisanje');
   const uid = useAuthStore((s) => s.user?.id);
   const resolved = useResolvedProfile();
+
+  // O KOME JE PITANJE (29.9.2026): o sebi, o drugoj osobi, ili o vama dvoma.
+  // Nude se samo otvorene osobe (`otvoreneOsobe`) — zakljucane su zakljucane svuda.
+  const sveOsobe = useOsobe();
+  const otvorene = useOtvoreneOsobe();
+  const izbor = React.useMemo(() => sveOsobe.filter((o) => otvorene.has(o.id)), [sveOsobe, otvorene]);
+  const [osobaId, setOsobaId] = React.useState<string | null>(
+    pocetnaOsoba && otvorene.has(pocetnaOsoba) ? pocetnaOsoba : null
+  );
+  const [oOdnosu, setOOdnosu] = React.useState(false);
+  const osoba = izbor.find((o) => o.id === osobaId) ?? null;
+  const kartaOsobe = useKarta(osoba?.id ?? null);
   const premium = !!useEntitlement()?.active;
   const cena = useCenaPitanja(premium);
   const pitanja = useMojaPitanja();
@@ -68,7 +87,8 @@ export default function PitanjeNovo() {
 
   // Pocetni tekst: ono sto je kucano na telefonu, a ako toga nema, nacrt sa servera.
   // Ceka odgovor servera (ili gresku), da nacrt ne stigne posle praznog polja.
-  const nacrt = pitanja.data?.find((p) => p.status === 'draft')?.tekst ?? null;
+  const nacrtRed = pitanja.data?.find((p) => p.status === 'draft') ?? null;
+  const nacrt = nacrtRed?.tekst ?? null;
   const serverGotov = pitanja.isFetched || pitanja.isError || !uid;
   React.useEffect(() => {
     if (ucitano || !serverGotov) return;
@@ -76,9 +96,15 @@ export default function PitanjeNovo() {
     (uid ? procitajLokalno(uid) : Promise.resolve(null)).then((lokalno) => {
       if (otkazano) return;
       setTekst(lokalno ?? nacrt ?? '');
+      // Nacrt o drugoj osobi vraca i izbor — osim kad je list otvoren sa strane osobe.
+      if (!pocetnaOsoba && nacrtRed?.osoba_id && otvorene.has(nacrtRed.osoba_id)) {
+        setOsobaId(nacrtRed.osoba_id);
+        setOOdnosu(!!nacrtRed.karta_par);
+      }
       setUcitano(true);
     });
     return () => { otkazano = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ucitano, serverGotov, uid, nacrt]);
 
   // Cuvanje na telefonu dok se kuca — pola sekunde posle poslednjeg slova.
@@ -96,7 +122,8 @@ export default function PitanjeNovo() {
   }));
 
   const kreditom = krediti > 0;
-  const spremno = pitanjeSpremno(tekst) && naMrezi && !saljem && !!uid;
+  // Pitanje o drugoj osobi ide samo sa njenom kartom (bez karte astrolog ne zna o kome je).
+  const spremno = pitanjeSpremno(tekst) && naMrezi && !saljem && !!uid && (!osoba || !!kartaOsobe);
 
   const zavrsi = async () => {
     await obrisiLokalno();
@@ -110,7 +137,10 @@ export default function PitanjeNovo() {
     setSaljem(true);
     setPoruka(null);
     try {
-      const id = await sacuvajNacrt(tekst.trim(), resolved ? snimakKarte(resolved) : null);
+      const karta = osoba && kartaOsobe && resolved
+        ? snimakODrugoj(kartaOsobe, osoba.odnos, resolved, oOdnosu)
+        : resolved ? snimakKarte(resolved) : null;
+      const id = await sacuvajNacrt(tekst.trim(), karta, osoba?.id ?? null);
       if (kreditom) {
         await posaljiKreditom(id);
         await zavrsi();
@@ -172,10 +202,38 @@ export default function PitanjeNovo() {
         <View className="flex-1">
           <Text variant="h3">Pitanje za {ASTROLOG.genitiv}</Text>
           <Text variant="caption">
-            {ASTROLOG.kratko} vidi tvoju kartu, pa ne moraš da pišeš datum ni mesto rođenja.
+            {!osoba
+              ? `${ASTROLOG.kratko} vidi tvoju kartu, pa ne moraš da pišeš datum ni mesto rođenja.`
+              : oOdnosu
+                ? `${ASTROLOG.kratko} vidi obe karte, pa ne moraš da pišeš podatke o rođenju.`
+                : `${ASTROLOG.kratko} vidi kartu osobe o kojoj pitaš, pa ne moraš da pišeš njene podatke.`}
           </Text>
         </View>
       </View>
+
+      {/* O kome je pitanje — samo kad korisnik ima druge osobe ("Tvoji ljudi" na tabu "Ti"). */}
+      {izbor.length > 0 && (
+        <View className="mt-5 px-6">
+          <Text variant="label" className="mb-2">O kome je pitanje</Text>
+          <KapsuleRed
+            stavke={[{ key: JA, label: 'Ja', icon: null }, ...izbor.map((o) => ({ key: o.id, label: o.name, icon: null }))]}
+            izabrana={osobaId ?? JA}
+            onIzbor={(k) => { setOsobaId(k === JA ? null : k); if (k === JA) setOOdnosu(false); }}
+          />
+          {osoba && (
+            <Pressable
+              onPress={() => setOOdnosu(!oOdnosu)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: oOdnosu }}
+              className="mt-3 flex-row items-center gap-3 py-1 active:opacity-60">
+              <View className={cn('h-6 w-6 items-center justify-center rounded-md border-2 border-foreground', oOdnosu && 'bg-foreground')}>
+                {oOdnosu && <Check size={16} color={neutral.white} strokeWidth={3} />}
+              </View>
+              <Text variant="default" className="flex-1">Pitanje je o nama dvoma — pošalji i moju kartu</Text>
+            </Pressable>
+          )}
+        </View>
+      )}
 
       <BezInterneta className="mx-6 mt-4" />
 
@@ -187,7 +245,11 @@ export default function PitanjeNovo() {
         autoFocus
         maxLength={PITANJE_MAX}
         textAlignVertical="top"
-        placeholder="Npr. Razmišljam da promenim posao ove jeseni. Šta moja karta kaže o tom periodu?"
+        placeholder={!osoba
+          ? 'Npr. Razmišljam da promenim posao ove jeseni. Šta moja karta kaže o tom periodu?'
+          : oOdnosu
+            ? 'Npr. Kako da se bolje razumemo kad se ne slažemo?'
+            : 'Npr. Na šta da obratim pažnju ove jeseni? Šta kaže karta ove osobe?'}
         placeholderTextColor={neutral.inkSubtle}
         accessibilityLabel="Tvoje pitanje"
         // Bez okvira i bez sive podloge — polje je papir, kursor je jedini znak.

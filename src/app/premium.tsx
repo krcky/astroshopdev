@@ -11,6 +11,8 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { Planeta } from '@/components/planete-par';
 import { MoonDisc } from '@/components/moon-disc';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
+import { ZnakIkona } from '@/components/znak-ikona';
+import { PREMIUM as PREMIUM_GRANICE } from '@/lib/pristup';
 import {
   cenaPoMesecu, kupiPremium, usePaketiPremium, ustedaGodisnje, vratiKupovine, type PaketPremium,
 } from '@/lib/kupovina';
@@ -147,6 +149,19 @@ export default function Premium() {
             slika={<MoonDisc angle={60} size={48} />}
             naslov="Sledeća dva dana"
             tekst="Pogledaj tumačenja za dva dana unapred."
+          />
+          {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
+          <Stavka
+            slika={
+              <View className="flex-row items-center">
+                <ZnakIkona znak="libra" element="vazduh" size={40} />
+                <View className="-ml-3 rounded-full bg-background p-0.5">
+                  <ZnakIkona znak="cancer" element="voda" size={32} />
+                </View>
+              </View>
+            }
+            naslov="Tvoji ljudi"
+            tekst={`Karte i tranziti do ${PREMIUM_GRANICE.osobe} bliskih osoba.`}
           />
         </View>
 

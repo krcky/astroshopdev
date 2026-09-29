@@ -36,9 +36,11 @@ const ILUSTRACIJA = 88; // Ivan, 28.9.2026: "povecati malo" (bilo 80); dugo traj
  * dolazi iz DUGE verzije (Premium je dobija od servera, pravilo 8), inace iz
  * kratke. Tranzit bez naslova se prikazuje imenom i belezi se za proveru.
  */
-export function TranzitiLista({ rez, date, onZaProveru, besplatno }: {
+export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
   rez: OblastiDana;
   date: Date;
+  /** Tranziti na kartu druge osobe (strana osobe, 29.9.2026) — ide uz ceo tekst (`/transit?osoba=`). */
+  osobaId?: string;
   /**
    * Besplatni: koliko kartica je otvoreno (`BESPLATNO.tranzitiDana`); ostali su
    * zakljucani redovi sa imenom i trajanjem, pa kartica "Otključaj". Premium: bez granice.
@@ -78,13 +80,13 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno }: {
     // traci ekrana, a kartice pocinju odmah ispod.
     <View className="pt-6">
       {rez.poVaznosti.length === 0 && (
-        <Text variant="body">Danas nema tvojih tranzita.</Text>
+        <Text variant="body">{osobaId ? 'Danas nema tranzita na ovu kartu.' : 'Danas nema tvojih tranzita.'}</Text>
       )}
 
       <View className="gap-3">
         {otvoreni.map((t) => (
           <KarticaTranzita key={t.red.key} red={t.red} ton={t.ton} naslov={naslov(t.red.key)} loading={loading}
-            trajanje={trajanja.get(t.red.key) ?? ''} />
+            trajanje={trajanja.get(t.red.key) ?? ''} osobaId={osobaId} />
         ))}
       </View>
 
@@ -122,8 +124,10 @@ export type KarticaRed = Pick<TranzitRed, 'key' | 'transiting' | 'aspect' | 'nat
  * Kartica jednog tranzita — tab "Tranziti" i slajd "Tema perioda" na pocetnoj
  * (Ivan, 28.9.2026: "ovakve iste kartice i na stranici tema perioda").
  */
-export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, oznaka }: {
+export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, oznaka, osobaId }: {
   red: KarticaRed;
+  /** Karta druge osobe: ceo tekst se racuna za nju, ne za korisnika. */
+  osobaId?: string;
   /** Bez tona i trajanja kad je dat `opis`. */
   ton?: Tone;
   naslov: string;
@@ -142,7 +146,7 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, ozn
 
   return (
     <Pressable
-      onPress={() => router.push({ pathname: '/transit', params: { key: r.key } })}
+      onPress={() => router.push({ pathname: '/transit', params: osobaId ? { key: r.key, osoba: osobaId } : { key: r.key } })}
       accessibilityRole="button"
       accessibilityLabel={a11y}
       accessibilityHint="Otvara ceo tekst tranzita"

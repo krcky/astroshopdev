@@ -50,6 +50,10 @@ async function main() {
     grant select, insert, update, delete on storage.objects to authenticated;
   `);
   await db.exec(sql('schema.sql'));
+  // `osobe.sql` ide PRE `pitanja.sql` (pitanje pamti o kojoj je osobi). Granica
+  // osoba pita `ima_premium()` (pokloni.sql) — ovde je dovoljna zamena: niko nema Premium.
+  await db.exec(`create or replace function public.ima_premium() returns boolean language sql stable as $$ select false $$;`);
+  await db.exec(sql('osobe.sql'));
   await db.exec(sql('pitanja.sql'));
   await db.exec(sql('pitanja.sql')); // drugi put: fajl mora smeti da se pokrene ponovo
 
@@ -110,6 +114,26 @@ async function main() {
   const nacrt2: string = (await jedan(A, `select public.sacuvaj_nacrt('Drugo pitanje') as id`))?.id;
   ok(nacrt2 && nacrt2 !== nacrt1, 'posle slanja nov nacrt je nov red');
 
+  console.log('\n3b. Pitanje o drugoj osobi (osobe.sql)');
+  const novaOsoba = async (uid: string, ime: string) => (await jedan(uid,
+    `insert into public.osobe (user_id, name, birth_year, birth_month, birth_day, city_name)
+     values ('${uid}', '${ime}', 1990, 1, 1, 'Beograd') returning id`))?.id as string;
+  const osobaA = await novaOsoba(A, 'Ana');
+  const osobaB = await novaOsoba(B, 'Bojan');
+  ok(osobaA && osobaB, 'svako dodaje svoju osobu');
+  x = await kao(A, `select public.sacuvaj_nacrt('Drugo pitanje', '{"ime":"Ana","verzija":2}'::jsonb, '${osobaA}') as id`);
+  ok(x.rows?.[0]?.id === nacrt2, 'nacrt o svojoj osobi — isti jedini nacrt', x.e);
+  ok((await jedan(A, `select osoba_id from public.pitanja where id = '${nacrt2}'`))?.osoba_id === osobaA, 'nacrt pamti osobu');
+  ok(/nema_osobe/.test((await kao(A, `select public.sacuvaj_nacrt('x', null, '${osobaB}')`)).e ?? ''), 'tudja osoba odbijena (nema_osobe)');
+  ok(/nema_osobe/.test((await kao(A, `select public.sacuvaj_nacrt('x', null, gen_random_uuid())`)).e ?? ''), 'nepostojeca osoba odbijena');
+  ok((await jedan(A, `select osoba_id, tekst from public.pitanja where id = '${nacrt2}'`))?.tekst === 'Drugo pitanje', 'odbijen poziv ne dira nacrt');
+  await kao(A, `delete from public.osobe where id = '${osobaA}'`);
+  const posle = await jedan(A, `select osoba_id, karta->>'ime' as ime from public.pitanja where id = '${nacrt2}'`);
+  ok(posle?.osoba_id === null && posle?.ime === 'Ana', 'obrisana osoba: osoba_id NULL, snimak ostaje');
+  x = await kao(A, `select public.sacuvaj_nacrt('Drugo pitanje', null) as id`);
+  ok(x.rows?.[0]?.id === nacrt2 && (await jedan(A, `select osoba_id from public.pitanja where id = '${nacrt2}'`))?.osoba_id === null,
+    'nacrt bez osobe je opet o vlasniku');
+
   console.log('\n4. Astrolog');
   ok((await jedan(B, `select count(*)::int n from public.pitanja`))?.n === 0, 'B ne vidi tudja pitanja');
   ok((await jedan(C, `select public.je_astrolog() j`))?.j === false, 'C pre dodavanja nije astrolog');
@@ -167,6 +191,15 @@ async function main() {
   try { await db.exec(sql('pitanja.sql')); } catch (e) { ponovo = (e as Error).message; }
   ok(!ponovo, 'pitanja.sql prolazi i kad postoji starije pitanje od 800 znakova', ponovo ?? '');
   ok(/predugo_pitanje/.test((await kao(B, `select public.sacuvaj_nacrt(repeat('a', 501))`)).e ?? ''), 'posle toga nova pitanja i dalje do 500');
+  await vlasnik(`delete from public.pitanja where user_id = '${B}'`);
+  // Baza sa starim potpisom (pre osoba, 29.9.2026): posle pokretanja ostaje JEDAN
+  // `sacuvaj_nacrt`, inace je RPC poziv bez `p_osoba` dvosmislen.
+  await vlasnik(`create or replace function public.sacuvaj_nacrt(p_tekst text, p_karta jsonb default null)
+    returns uuid language sql as $$ select null::uuid $$`);
+  await db.exec(sql('pitanja.sql'));
+  ok((await vlasnik(`select count(*)::int n from pg_proc where proname = 'sacuvaj_nacrt'`))[0]?.n === 1,
+    'stari potpis sacuvaj_nacrt(text, jsonb) uklonjen, ostaje jedan');
+  ok(!(await kao(B, `select public.sacuvaj_nacrt('posle migracije', null)`)).e, 'poziv bez osobe radi posle migracije');
   await vlasnik(`delete from public.pitanja where user_id = '${B}'`);
 
   console.log('\n7. Mejl astrologu (okidac, pitanja-obavestenja.sql)');

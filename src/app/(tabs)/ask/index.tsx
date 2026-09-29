@@ -9,8 +9,9 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { PitajUvod } from '@/components/pitaj-uvod';
+import { PodvuceniTabovi } from '@/components/ui/podvuceni-tabovi';
 import { cn } from '@/lib/utils';
-import { datumPitanja, natpisStatusa, neprocitan, type Pitanje } from '@/lib/pitanja';
+import { datumPitanja, natpisStatusa, neprocitan, oKome, type Pitanje } from '@/lib/pitanja';
 import { useKrediti, useMojaPitanja } from '@/lib/pitanja-api';
 import { mnozina } from '@/lib/mnozina';
 import { brand, neutral } from '@/theme/tokens';
@@ -36,30 +37,14 @@ export default function AskScreen() {
   );
 }
 
-/** Dve strane, podvucena izabrana — isti oblik kao tabovi oblasti na ekranu Mesec. */
+const STRANE = [
+  { key: 'covek', natpis: 'Pitaj čoveka' },
+  { key: 'ai', natpis: 'Pitaj AI', oznaka: 'uskoro' },
+] as const;
+
+/** Dve strane, podvucena izabrana (`ui/podvuceni-tabovi.tsx`). */
 function Tabovi({ strana, onChange }: { strana: Strana; onChange: (s: Strana) => void }) {
-  const tab = (s: Strana, natpis: string, oznaka?: string) => {
-    const aktivna = s === strana;
-    return (
-      <Pressable
-        key={s}
-        onPress={() => onChange(s)}
-        accessibilityRole="tab"
-        accessibilityState={{ selected: aktivna }}
-        accessibilityLabel={oznaka ? `${natpis}, ${oznaka}` : natpis}
-        className={cn('-mb-px flex-1 flex-row items-center justify-center gap-1.5 pb-3 pt-2', aktivna && 'border-b-2 border-foreground')}>
-        <Text variant="row" className={cn(!aktivna && 'text-muted-foreground')}>{natpis}</Text>
-        {oznaka && <Text variant="caption" className="text-subtle">{oznaka}</Text>}
-      </Pressable>
-    );
-  };
-  return (
-    // Linija stoji direktno na sivom, pa `border-fill-strong` (pravilo 17).
-    <View accessibilityRole="tablist" className="mt-2 flex-row border-b border-fill-strong">
-      {tab('covek', 'Pitaj čoveka')}
-      {tab('ai', 'Pitaj AI', 'uskoro')}
-    </View>
-  );
+  return <PodvuceniTabovi stavke={STRANE} izabrana={strana} onIzbor={onChange} className="mt-2" />;
 }
 
 function PitajCoveka() {
@@ -128,6 +113,8 @@ function PitajCoveka() {
  */
 function RedPitanja({ p }: { p: Pitanje }) {
   const novo = neprocitan(p);
+  // Pitanje o drugoj osobi: "Ana" ili "Ja i Ana" ispred stanja (29.9.2026).
+  const o = oKome(p);
   return (
     <Pressable
       onPress={() => (p.status === 'draft'
@@ -141,7 +128,7 @@ function RedPitanja({ p }: { p: Pitanje }) {
         <View className="mt-1 flex-row items-center gap-1.5">
           {novo && <View className="h-2 w-2 rounded-full" style={{ backgroundColor: brand.indigo }} />}
           <Text variant="caption" className={cn(novo && cn('text-foreground', tezina('izabranRed')))}>
-            {natpisStatusa(p)} · {datumPitanja(p)}
+            {o ? `${o} · ` : ''}{natpisStatusa(p)} · {datumPitanja(p)}
           </Text>
         </View>
       </View>

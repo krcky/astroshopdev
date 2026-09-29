@@ -14,7 +14,12 @@ import { brojNeprocitanih, neprocitan, type Pitanje } from '@/lib/pitanja';
 import type { SnimakKarte } from '@/lib/pitanja-snimak';
 import { useAuthStore } from '@/store/auth';
 
-const POLJA = 'id, tekst, status, created_at, paid_at, answered_at, audio_putanja, audio_trajanje, procitano_at';
+/**
+ * Iz snimka karte se citaju samo imena (JSON putanja u PostgREST-u), ne ceo snimak:
+ * lista pise "Ana" / "Ja i Ana" uz pitanje o drugoj osobi (`oKome`).
+ */
+const POLJA = 'id, tekst, status, created_at, paid_at, answered_at, audio_putanja, audio_trajanje, procitano_at, osoba_id, '
+  + 'karta_ime:karta->>ime, karta_pita:karta->drugaOsoba->>pita, karta_par:karta->drugaOsoba->mojaKarta->>ime';
 
 /** Koliko dugo vazi link za slusanje. Novi se trazi pri svakom otvaranju pitanja. */
 const LINK_SEKUNDI = 60 * 60;
@@ -30,7 +35,8 @@ export function useMojaPitanja() {
     queryFn: async (): Promise<Pitanje[]> => {
       const { data, error } = await supabase.from('pitanja').select(POLJA).order('created_at', { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Pitanje[];
+      // JSON putanje u `POLJA` supabase-js ne ume da protumaci u tip — oblik je `Pitanje`.
+      return (data ?? []) as unknown as Pitanje[];
     },
   });
 }
@@ -100,9 +106,12 @@ export function useOsveziPitanja() {
   ]);
 }
 
-/** Cuva JEDINI nacrt korisnika i vraca njegov id. Baca gresku sa porukom servera. */
-export async function sacuvajNacrt(tekst: string, karta: SnimakKarte | null): Promise<string> {
-  const { data, error } = await supabase.rpc('sacuvaj_nacrt', { p_tekst: tekst, p_karta: karta });
+/**
+ * Cuva JEDINI nacrt korisnika i vraca njegov id. Baca gresku sa porukom servera.
+ * `osobaId`: pitanje je o drugoj osobi (`osobe.sql`) — server proveri da je njegova.
+ */
+export async function sacuvajNacrt(tekst: string, karta: SnimakKarte | null, osobaId: string | null = null): Promise<string> {
+  const { data, error } = await supabase.rpc('sacuvaj_nacrt', { p_tekst: tekst, p_karta: karta, p_osoba: osobaId });
   if (error) throw new Error(error.message);
   return data as string;
 }

@@ -1,24 +1,19 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Screen } from '@/components/screen';
-import { CARD_SURFACE } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { WheelPicker } from '@/components/ui/wheel-picker';
-import { cityById, cityByName, type City } from '@/lib/cities';
-import { useCitySearch } from '@/lib/city-search';
-import { placeFields, useProfileStore, useResolvedProfile } from '@/store/profile';
+import { RodjenjeForma, pocetniUnos, profilIzUnosa } from '@/components/rodjenje-forma';
+import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
 
 /**
  * Izmena podataka o rodjenju — SVE na jednom ekranu, ne kroz cetiri koraka.
  * Onboarding vodi kroz korake jer korisnik tada ne zna sta ga ceka; kod izmene
- * zna tacno sta menja i hoce da stigne do toga u jednom dodiru.
+ * zna tacno sta menja i hoce da stigne do toga u jednom dodiru. Polja su ista
+ * kao kod unosa druge osobe (`components/rodjenje-forma.tsx`).
  */
 export default function EditBirthData() {
   const profile = useProfileStore((s) => s.profile);
@@ -26,34 +21,16 @@ export default function EditBirthData() {
   const user = useAuthStore((s) => s.user);
   const resolved = useResolvedProfile();
 
-  const [name, setName] = React.useState(profile?.name ?? '');
-  const [date, setDate] = React.useState(() =>
-    profile ? new Date(profile.birth.year, profile.birth.month - 1, profile.birth.day, 12) : new Date(2000, 0, 1, 12)
-  );
-  const [time, setTime] = React.useState(() => {
-    const d = new Date(2000, 0, 1, 12, 0);
-    if (profile?.time) { d.setHours(profile.time.hour); d.setMinutes(profile.time.minute); }
-    return d;
-  });
-  const [timeKnown, setTimeKnown] = React.useState(Boolean(profile?.time));
-  const [city, setCity] = React.useState<City | null>(profile ? cityById(profile.cityId) ?? cityByName(profile.cityName) ?? null : null);
-  const [query, setQuery] = React.useState('');
+  const [unos, setUnos] = React.useState(() => pocetniUnos(profile));
   const [busy, setBusy] = React.useState(false);
-  const { results: cityResults, loading: cityLoading } = useCitySearch(city ? '' : query, 6);
 
   if (!profile || !resolved) return <Redirect href="/" />;
 
-  const valid = name.trim().length > 0 && city !== null;
+  const updated = profilIzUnosa(unos);
 
   const save = async () => {
-    if (!valid || !city || busy) return;
+    if (!updated || busy) return;
     setBusy(true);
-    const updated = {
-      name: name.trim(),
-      birth: { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() },
-      time: timeKnown ? { hour: time.getHours(), minute: time.getMinutes() } : null,
-      ...placeFields(city),
-    };
     setProfile(updated);
     if (user) await pushProfile(user.id, updated);
     setBusy(false);
@@ -66,77 +43,11 @@ export default function EditBirthData() {
       tabBarSpace={false}
       pushed
       keyboardShouldPersistTaps="handled">
-          <Section title="Ime">
-            <Input
-              value={name}
-              onChangeText={setName}
-              placeholder="Tvoje ime"
-              autoCapitalize="words"
-              maxLength={60}
-            />
-          </Section>
+      <RodjenjeForma unos={unos} onChange={setUnos} imePlaceholder="Tvoje ime" />
 
-          <Section title="Datum">
-            <WheelPicker mode="date" value={date} onChange={setDate} maximumDate={new Date()} />
-          </Section>
-
-          <Section title="Vreme">
-            {timeKnown ? (
-              <WheelPicker mode="time" value={time} onChange={setTime} />
-            ) : (
-              <Text variant="muted" className="py-4 text-center">
-                Vreme nije uneto — ascendent i kuće nisu pouzdani.
-              </Text>
-            )}
-            <Pressable
-              onPress={() => setTimeKnown(!timeKnown)}
-              accessibilityRole="button"
-              className="mt-2 items-center py-2 active:opacity-60">
-              <Text variant="label" className="text-foreground underline">
-                {timeKnown ? 'Ne znam vreme' : 'Znam vreme, hoću da ga unesem'}
-              </Text>
-            </Pressable>
-          </Section>
-
-          <Section title="Mesto">
-            <Input
-              value={city ? `${city.name}, ${city.country}` : query}
-              onChangeText={(t) => { setQuery(t); setCity(null); }}
-              placeholder="Grad"
-              autoCorrect={false}
-            />
-            {!city && (
-              <View className="mt-3">
-                {cityResults.map((c) => (
-                  <Pressable
-                    key={`${c.name}-${c.country}`}
-                    onPress={() => { setCity(c); setQuery(''); }}
-                    className="flex-row items-center justify-between border-b border-border py-3 active:opacity-60">
-                    <Text className="text-base">{c.name}</Text>
-                    <Text variant="muted">{c.country}</Text>
-                  </Pressable>
-                ))}
-                {cityLoading && (
-                  <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
-                )}
-              </View>
-            )}
-          </Section>
-
-          <Button className="mt-8" size="lg" disabled={!valid} ucitava={busy} onPress={save}>
-            <Text>Sačuvaj</Text>
-          </Button>
+      <Button className="mt-8" size="lg" disabled={!updated} ucitava={busy} onPress={save}>
+        <Text>Sačuvaj</Text>
+      </Button>
     </Screen>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View className="mt-7">
-      <Text variant="label" className="mb-3">{title}</Text>
-      {/* Sadrzaj sekcije ide na BELU karticu. Na sivoj pozadini podvlaka polja
-          (#F0F0F0) skoro nestane — razlika prema #F6F7F8 je sest nivoa. */}
-      <View className={cn(CARD_SURFACE, 'px-4 py-4')}>{children}</View>
-    </View>
   );
 }

@@ -9,8 +9,8 @@ import { buildNatalChart } from '../src/lib/natal';
 import { natalAspects } from '../src/lib/natal-keys';
 import { localBirthToUtc } from '../src/lib/timezone';
 import {
-  PITANJE_MAX, brojNeprocitanih, datumPitanja, imaOdgovor, natpisStatusa, neprocitan, pitanjeSpremno, porukaGreske,
-  snimakKarte, trajanjeZvuka,
+  PITANJE_MAX, brojNeprocitanih, datumPitanja, imaOdgovor, natpisStatusa, neprocitan, oKome, pitanjeSpremno, porukaGreske,
+  snimakKarte, snimakODrugoj, trajanjeZvuka,
 } from '../src/lib/pitanja';
 import type { ResolvedProfile, Profile } from '../src/store/profile';
 import { vrstaSnimka } from '../panel/src/pomoc';
@@ -111,6 +111,25 @@ ok(!bez.aspekti.some((a) => a.b === 'Ascendent'), 'bez vremena: nema aspekata na
 const zona = snimakKarte(razresi({ hour: 14, minute: 30 }, true));
 ok(zona.zonaNepouzdana && zona.planete.length === 0 && zona.aspekti.length === 0 && zona.kuce === null, 'nepouzdana zona: karta se ne salje');
 ok(zona.rodjenje.datum === '1990-07-10', 'nepouzdana zona: podaci o rodjenju ostaju');
+
+// --- 5b. Pitanje o drugoj osobi (snimak v2, 29.9.2026) ----------------------
+console.log('\n5b. Pitanje o drugoj osobi');
+const marko = { ...razresi(null), profile: { ...razresi(null).profile, name: 'Marko' } };
+const oMarku = snimakODrugoj(marko, 'partner', r, false);
+ok(oMarku.verzija === 2 && oMarku.ime === 'Marko', 'v2, karta je osobe o kojoj se pita', oMarku.ime);
+ok(oMarku.drugaOsoba?.pita === 'Ana' && oMarku.drugaOsoba?.odnos === 'Partner', 'ko pita i odnos', JSON.stringify({ ...oMarku.drugaOsoba, mojaKarta: null }));
+ok(oMarku.drugaOsoba?.mojaKarta === null, 'samo o njemu: bez karte onoga ko pita');
+ok(oMarku.vremeNepoznato && oMarku.ascendent === null, 'pravila 4 i 5 vaze i za drugu osobu (bez vremena nema ascendenta)');
+const par = snimakODrugoj(marko, 'drugo', r, true);
+ok(par.drugaOsoba?.mojaKarta?.ime === 'Ana' && par.drugaOsoba.mojaKarta.verzija === 1, 'o odnosu: i karta onoga ko pita');
+ok(par.drugaOsoba?.odnos === null, '"Neko drugi" se astrologu ne pise kao odnos');
+ok(snimakKarte(r).drugaOsoba === undefined && snimakKarte(r).verzija === 1, 'pitanje o sebi ostaje v1, bez `drugaOsoba`');
+const vel2 = Buffer.byteLength(JSON.stringify(snimakODrugoj(razresi({ hour: 14, minute: 30 }), 'dete', r, true)));
+ok(vel2 < 40000, 'dve karte staju u ogranicenje baze (40 000 bajtova)', `${vel2} B`);
+ok(oKome({ karta_pita: null, karta_ime: 'Ana', karta_par: null }) === null, 'lista: pitanje o sebi bez oznake');
+ok(oKome({ karta_pita: 'Ana', karta_ime: 'Marko', karta_par: null }) === 'Marko', 'lista: o drugoj osobi — njeno ime');
+ok(oKome({ karta_pita: 'Ana', karta_ime: 'Marko', karta_par: 'Ana' }) === 'Ja i Marko', 'lista: o odnosu — "Ja i Marko"');
+ok(/više nije na tvojoj listi/.test(porukaGreske('nema_osobe')), 'greska nema_osobe na srpskom');
 
 // --- 6. Otpremanje snimka sa telefona (panel) -------------------------------
 console.log('\n6. Formati snimka sa telefona');

@@ -15,8 +15,8 @@ type Profil = { chart: NatalChart; timeUnknown: boolean } | null | undefined;
 
 export function useOblastiDana(profil: Profil, date: Date): OblastiDana | null {
   const timeUnknown = profil?.timeUnknown ?? false;
-  // `useResolvedProfile` pravi novu kartu pri svakom crtanju — racun se vezuje
-  // za PODATKE o rodjenju, ne za referencu, inace bi se ponavljao stalno.
+  // Ista karta ume da stigne kao nov objekat (profil ponovo stigao sa servera,
+  // osoba iz `useKarta`) — racun se vezuje za PODATKE o rodjenju, ne za referencu.
   const b = profil?.chart.birth;
   const potpisKarte = b ? `${b.date.getTime()}|${b.latitude}|${b.longitude}|${profil!.chart.houses.system}` : '';
   const chartRef = React.useRef(profil?.chart ?? null);

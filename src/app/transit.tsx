@@ -10,7 +10,7 @@ import { SheetScroll } from '@/components/sheet';
 import { PremiumKartica } from '@/components/zakljucano';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
-import { useResolvedProfile } from '@/store/profile';
+import { useKarta } from '@/lib/osobe-api';
 import { useEntitlement } from '@/store/auth';
 import { tvojDanInfo } from '@/lib/tvoj-dan';
 import { trajanjeTranzita } from '@/lib/oblasti';
@@ -49,8 +49,9 @@ const IKONA_SEKCIJE: Record<VrstaSekcije, SymbolViewProps['name']> = {
  * placen — i tada se prikazuje kratka verzija sa pozivom na otkljucavanje.
  */
 export default function TransitDetail() {
-  const { key } = useLocalSearchParams<{ key: string }>();
-  const resolved = useResolvedProfile();
+  // `osoba`: tranzit na kartu druge osobe (strana osobe, 29.9.2026) — bez njega korisnikova karta.
+  const { key, osoba } = useLocalSearchParams<{ key: string; osoba?: string }>();
+  const resolved = useKarta(osoba);
   const entitlement = useEntitlement();
   const naMrezi = useNaMrezi();
 
@@ -67,7 +68,11 @@ export default function TransitDetail() {
   );
   const prozor = React.useMemo(() => (tranzit ? trajanjeTranzita(tranzit, danas) : null), [tranzit, danas]);
 
-  if (!resolved) return <Redirect href="/" />;
+  if (!resolved) {
+    // Osoba je u medjuvremenu obrisana (ili je drugi nalog) — list to kaze, ne salje na kapiju.
+    if (osoba) return <SheetScroll><Text variant="muted">Ova osoba više nije na tvojoj listi.</Text></SheetScroll>;
+    return <Redirect href="/" />;
+  }
 
   const puna = duga.get(String(key));
   const sazeta = kratka.get(String(key));

@@ -23,4 +23,16 @@ export const BESPLATNO = {
    * vidi: ostali dani stoje u meniju sa katancem i vode na paywall (Ivan, 29.9.2026).
    */
   danMeni: false,
+  /**
+   * Druge osobe (tab "Ti", "Tvoji ljudi"): koliko ih besplatni ima. Kad Premium
+   * istekne, otvorena ostaje PRVA dodata, ostale su pod katancem (`otvoreneOsobe`).
+   * Istu brojku proverava baza pri upisu (`supabase/osobe.sql`, pravilo 8).
+   */
+  osobe: 1,
+} as const;
+
+/** Granice i uz Premium — samo gde postoje. */
+export const PREMIUM = {
+  /** Druge osobe; ista brojka je u `supabase/osobe.sql` (`check:osobe-baza`). */
+  osobe: 10,
 } as const;

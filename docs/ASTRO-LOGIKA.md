@@ -260,6 +260,10 @@ Besplatni i Premium vide **iste ekrane**; Premium otključava dubinu. Sve granic
 | Tumačenje tranzita | kratko | dugo |
 | Natalna karta | Sunce, Mesec, podznak u znaku | sve |
 | Nebo, ekran Mesec, lunarni kalendar | sve | sve |
+| Druge osobe („Tvoji ljudi", tab „Ti") | 1 osoba; njena karta i tranziti sa istim granicama kao gore | do 10 osoba |
+| Pitanje astrologu o drugoj osobi ili o odnosu | ista cena kao pitanje o sebi | ista (niža) cena kao pitanje o sebi |
+
+**Druge osobe (29.9.2026).** Karta druge osobe računa se **istim pravilima** kao korisnikova (poglavlja 1–3): bez vremena rođenja Whole Sign i bez ascendenta i kuća, bez pouzdane vremenske zone nema ni karte ni tranzita. Tranziti na njenu kartu su ista lista po važnosti kao tab „Tranziti" (poglavlje 5), a vladar karte je vladar NJENOG podznaka. „Tvoj dan" i ocene oblasti postoje samo za korisnika. Kad Premium istekne, osobe se ne brišu: otvorena ostaje prva dodata. Uz pitanje o drugoj osobi astrolog dobija njenu kartu, odnos („Partner", „Dete"…) i ime onoga ko pita; uz pitanje o odnosu i kartu onoga ko pita.
 
 Ono što se računa na telefonu (izbor, ocene, redosled) sakriva samo prikaz. Tekstovi koji se plaćaju stižu samo sa servera.
 
@@ -327,6 +331,8 @@ Tačan spisak onoga što nedostaje: `python3 scripts/korpus/izvestaj.py`
 11. **Ton tranzita** (4.0): pravilo po prirodi planeta, dok ne postoji ručna oznaka.
 12. **Teme kuća** za red „Za tebe" (4.3).
 13. **Ocene oblasti** (poglavlje 11): veza kuća i planeta sa oblašću, jačine, formula ocene, ton Mladog i Punog Meseca.
+14. **Pitanja o drugoj osobi** (5c): da li prima pitanja o trećoj osobi koja ona možda ne bi želela („da li me vara", njeno zdravlje) — to mora da piše i u uslovima; i da li je pitanje o odnosu (dve karte) iste cene kao obično.
+15. **Tumačenja za drugu osobu**: tekstovi su pisani sa „Vi". Ima li tekstova (npr. teški tranziti) koje ne bi trebalo prikazivati kao tumačenje tuđe karte?
 
 ---
 

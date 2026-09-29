@@ -9,6 +9,7 @@
 import { natalAspects } from '@/lib/natal-keys';
 import { formatDay } from '@/lib/horoscope';
 import { signFromLongitude, type SignPosition } from '@/lib/zodiac';
+import { nazivOdnosa, type OdnosKljuc } from '@/lib/osobe';
 import type { SnimakKarte } from '@/lib/pitanja-snimak';
 import type { ResolvedProfile } from '@/store/profile';
 
@@ -42,7 +43,24 @@ export type Pitanje = {
   audio_trajanje: number | null;
   /** Kad je odgovor prvi put otvoren; null uz snimak = nov odgovor. */
   procitano_at: string | null;
+  /** Pitanje o drugoj osobi: njen id (NULL i kad je osoba posle obrisana). */
+  osoba_id: string | null;
+  /** Iz snimka (`karta->drugaOsoba`): pitanje je o drugoj osobi — ime onoga ko pita, inace null. */
+  karta_pita: string | null;
+  /** Iz snimka: ime osobe cija je karta. */
+  karta_ime: string | null;
+  /** Iz snimka: pitanje o odnosu — ime onoga ko pita iz njegove karte; inace null. */
+  karta_par: string | null;
 };
+
+/**
+ * O kome je pitanje, za listu "Moja pitanja": "Ana" ili "Ja i Ana"; null kad je
+ * o vlasniku naloga. Ime se ne sklanja (ne znamo padeze unetog imena).
+ */
+export function oKome(p: Pick<Pitanje, 'karta_pita' | 'karta_ime' | 'karta_par'>): string | null {
+  if (!p.karta_pita || !p.karta_ime) return null;
+  return p.karta_par ? `Ja i ${p.karta_ime}` : p.karta_ime;
+}
 
 /** Pitanje moze da se posalje: posle obrezivanja ima 1—`PITANJE_MAX` znakova. */
 export function pitanjeSpremno(tekst: string): boolean {
@@ -101,6 +119,7 @@ export function porukaGreske(poruka: string | undefined | null): string {
   if (/predugo_pitanje/.test(m)) return `Pitanje je duže od ${PITANJE_MAX} znakova. Skrati ga pa pošalji.`;
   if (/nema_kredita/.test(m)) return 'Plaćeno pitanje je već iskorišćeno. Osveži stranu pa probaj ponovo.';
   if (/nema_nacrta/.test(m)) return 'Ovo pitanje je već poslato.';
+  if (/nema_osobe/.test(m)) return 'Ova osoba više nije na tvojoj listi. Izaberi o kome je pitanje pa pošalji.';
   if (/nema_naloga|JWT/i.test(m)) return 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.';
   if (/fetch|network|timed? ?out/i.test(m)) return 'Nema veze sa serverom. Pitanje je sačuvano na telefonu — probaj kad se internet vrati.';
   return 'Pitanje nije sačuvano. Probaj ponovo za minut.';
@@ -156,5 +175,27 @@ export function snimakKarte(r: ResolvedProfile): SnimakKarte {
     aspekti: natalAspects(chart, timeUnknown)
       .filter((a) => a.interpreted)
       .map((a) => ({ a: a.a.name, aspekt: a.aspect.name, b: a.b.name, orbis: `${a.orb.toFixed(1).replace('.', ',')}°` })),
+  };
+}
+
+/**
+ * Snimak za pitanje o DRUGOJ osobi (v2): njena karta, ko je ona onome ko pita, i
+ * — kad je pitanje o odnosu ("Ja i Ana") — i karta onoga ko pita. Astrolog tako
+ * vidi o kome je pitanje i ko ga postavlja, a ne mesa ih.
+ */
+export function snimakODrugoj(
+  osoba: ResolvedProfile,
+  odnos: OdnosKljuc | null,
+  ja: ResolvedProfile,
+  oOdnosu: boolean,
+): SnimakKarte {
+  return {
+    ...snimakKarte(osoba),
+    verzija: 2,
+    drugaOsoba: {
+      odnos: nazivOdnosa(odnos),
+      pita: ja.profile.name,
+      mojaKarta: oOdnosu ? snimakKarte(ja) : null,
+    },
   };
 }

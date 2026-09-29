@@ -1,6 +1,7 @@
 -- PITAJ ASTROLOGA — pitanje, placanje, glasovni odgovor (29.9.2026).
 -- Pokreni u Supabase: SQL Editor -> New query -> nalepi ovo -> Run.
--- Pokrece se POSLE schema.sql (koristi `public.touch_updated_at()`). Moze vise puta.
+-- Pokrece se POSLE schema.sql (koristi `public.touch_updated_at()`) i POSLE osobe.sql
+-- (pitanje o drugoj osobi pamti `osoba_id`). Moze vise puta.
 --
 -- TOK
 --   draft     korisnik je napisao pitanje (jedan nacrt po nalogu, `sacuvaj_nacrt`)
@@ -106,6 +107,11 @@ create table if not exists public.pitanja (
 -- Za bazu u kojoj je tabela vec napravljena pre ove kolone (29.9.2026).
 alter table public.pitanja add column if not exists procitano_at timestamptz;
 
+-- Pitanje o DRUGOJ osobi (`osobe.sql`, 29.9.2026): o kome je. NULL = o vlasniku
+-- naloga, ili je osoba u medjuvremenu obrisana — snimak u `karta` ostaje i tada
+-- (ime, podaci o rodjenju, odnos; `drugaOsoba` u `src/lib/pitanja-snimak.ts`).
+alter table public.pitanja add column if not exists osoba_id uuid references public.osobe(id) on delete set null;
+
 -- Kad je astrologu poslat mejl o ovom pitanju (`functions/obavesti-astrologa`,
 -- okidac u `pitanja-obavestenja.sql`). NULL = jos nije; upisuje samo server.
 alter table public.pitanja add column if not exists obavesteno_at timestamptz;
@@ -173,7 +179,11 @@ revoke insert, update, delete on public.pitanja_krediti from anon, authenticated
 -- Greske su kratke reci (`nema_kredita`…) — aplikacija ih prevodi na srpski.
 
 -- Cuva JEDINI nacrt korisnika (pravi ga ili prepravlja). Vraca njegov id.
-create or replace function public.sacuvaj_nacrt(p_tekst text, p_karta jsonb default null)
+-- `p_osoba`: pitanje je o drugoj osobi — mora biti SVOJA (tudji id = `nema_osobe`).
+-- Stari potpis (bez `p_osoba`) se brise: dva potpisa sa podrazumevanim
+-- vrednostima bi RPC poziv bez `p_osoba` ucinila dvosmislenim.
+drop function if exists public.sacuvaj_nacrt(text, jsonb);
+create or replace function public.sacuvaj_nacrt(p_tekst text, p_karta jsonb default null, p_osoba uuid default null)
 returns uuid
 language plpgsql
 security definer
@@ -187,11 +197,15 @@ begin
   if uid is null then raise exception 'nema_naloga'; end if;
   if char_length(t) < 1 then raise exception 'prazno_pitanje'; end if;
   if char_length(t) > 500 then raise exception 'predugo_pitanje'; end if;
+  if p_osoba is not null
+     and not exists (select 1 from public.osobe o where o.id = p_osoba and o.user_id = uid) then
+    raise exception 'nema_osobe';
+  end if;
 
-  insert into public.pitanja (user_id, tekst, karta)
-  values (uid, t, p_karta)
+  insert into public.pitanja (user_id, tekst, karta, osoba_id)
+  values (uid, t, p_karta, p_osoba)
   on conflict (user_id) where status = 'draft'
-  do update set tekst = excluded.tekst, karta = excluded.karta
+  do update set tekst = excluded.tekst, karta = excluded.karta, osoba_id = excluded.osoba_id
   returning id into id_;
 
   return id_;
@@ -247,10 +261,10 @@ as $$
      and procitano_at is null;
 $$;
 
-revoke all on function public.sacuvaj_nacrt(text, jsonb) from public, anon;
+revoke all on function public.sacuvaj_nacrt(text, jsonb, uuid) from public, anon;
 revoke all on function public.posalji_kreditom(uuid) from public, anon;
 revoke all on function public.oznaci_procitano(uuid) from public, anon;
-grant execute on function public.sacuvaj_nacrt(text, jsonb) to authenticated;
+grant execute on function public.sacuvaj_nacrt(text, jsonb, uuid) to authenticated;
 grant execute on function public.posalji_kreditom(uuid) to authenticated;
 grant execute on function public.oznaci_procitano(uuid) to authenticated;
 
