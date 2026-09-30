@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       // Svako dobija svoj mejl — astrolozi ne vide jedni druge adrese.
       personalizations: adrese.map((email) => ({ to: [{ email }] })),
-      from: { email: Deno.env.get('MAIL_FROM') ?? 'info@astroshop.rs', name: 'Astroshop' },
+      from: { email: Deno.env.get('MAIL_FROM') ?? 'info@astroshop.rs', name: 'Astro Shop' },
       subject: m.naslov,
       content: [{ type: 'text/plain', value: m.tekst }, { type: 'text/html', value: m.html }],
       // Bez pracenja: aplikacija nema analitiku, pa ni mejl (i link ostaje citljiv).

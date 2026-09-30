@@ -113,7 +113,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
           // Spusteno u visinu naslova, ne uz oznaku (Ivan, 28.9.2026).
           className="mt-6 items-center">
           <View>
-            <MoonDisc angle={faza.angle} size={MESEC} />
+            <MoonDisc angle={faza.angle} size={MESEC} vrti />
             <View className="absolute -bottom-1 -right-1 rounded-pill bg-grouped p-[2px]">
               <ZnakIkona znak={znak.key} element={znak.element} size={ZNAK} />
             </View>
@@ -126,15 +126,16 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
       {/* Odmaknuto od crnog dugmeta (Ivan, 29.9.2026). */}
       <Kartica className="mt-8">
         <KapsuleRed
+          pravoStaklo
           stavke={LUNAR_AREAS.map((a) => ({
             key: a.key,
             label: TAB[a.key],
-            icon: <OblastIkona oblast={a.key} size={20} aktivna={a.key === oblast} />,
+            // Sve ikonice pune, i neizabrane (Ivan, 29.9.2026).
+            icon: <OblastIkona oblast={a.key} size={20} />,
           }))}
           izabrana={oblast}
           onIzbor={setOblast}
         />
-
         <View className="pt-4">
           {s && s.stavke.length ? (
             <Savet stavka={s.stavke[0]} />

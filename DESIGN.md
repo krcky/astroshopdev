@@ -129,6 +129,20 @@ uvek beo — boja oznacava vrstu stavke, ne privlaci paznju na sebe.
 Zlatna (`--gold`) ostaje izvan ovog sistema — po pravilu 2 u `CLAUDE.md` sluzi
 ISKLJUCIVO kao akcenat na placenom sadrzaju.
 
+### "Svetlo plava" i "roze" (Ivan, 29.9.2026)
+
+Kad Ivan kaze **svetlo plava** ili **roze**, misli na OVE dve boje — ne na `blue`
+ni `pink` iz tabele gore. Izvor je jedan: `lib/tocak-stil.ts`, izvoz i kroz
+`components/ton.tsx`.
+
+| rec | hex | konstanta | gde je nastala |
+|---|---|---|---|
+| svetlo plava | `#7ACCEA` | `PLUS_BOJA` | plus ikonica "Ide ti", skladan ton |
+| roze | `#F8B3C3` | `MINUS_BOJA` | minus ikonica "Koči te", napet ton |
+
+U kodu se uvek uvozi konstanta, nikad se ne prepisuje hex. Koriste ih i oznake
+EFEKAT (svetlo plava) i PAZI (roze) na kartici "Tvoj dan".
+
 ---
 
 ## 3. Mere

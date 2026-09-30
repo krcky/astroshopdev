@@ -13,6 +13,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { brojNeprocitanih, neprocitan, type Pitanje } from '@/lib/pitanja';
 import type { SnimakKarte } from '@/lib/pitanja-snimak';
 import { useAuthStore } from '@/store/auth';
+import { kesProcitaj, kesUpisi, useKesUcitan } from '@/lib/kes-na-disku';
 
 /**
  * Iz snimka karte se citaju samo imena (JSON putanja u PostgREST-u), ne ceo snimak:
@@ -26,9 +27,19 @@ const LINK_SEKUNDI = 60 * 60;
 
 export function useMojaPitanja() {
   const uid = useAuthStore((s) => s.user?.id);
-  return useQuery({
+  // Poslednja lista sa diska (`kes-na-disku`, brise se pri odjavi): tab "Pitaj" zna
+  // ODMAH da li da pokaze uvod ili listu, umesto da ceka server (Ivan, 29.9.2026:
+  // "uvod se ne ucita odmah"). Upit ide svejedno; disk je samo prvi kadar.
+  useKesUcitan();
+  const kesKljuc = `pitanja|${uid}`;
+  // Prvi upit ide sa sesijom sa diska, cesto pre nego sto se istekli token obnovi, i
+  // padne — pa je lista ostajala u gresci do sledeceg dolaska na tab. Nov token = nov
+  // pokusaj, odmah (29.9.2026).
+  const token = useAuthStore((s) => s.session?.access_token);
+  const q = useQuery({
     queryKey: ['pitanja', uid],
     enabled: !!uid && isSupabaseConfigured,
+    placeholderData: () => kesProcitaj<Pitanje[]>(kesKljuc),
     // Odgovor stize bez push-a (jos ga nema): lista se osvezava pri svakom
     // povratku na tab (`refetch` u `ask.tsx`), pa kratko vazi.
     staleTime: 15_000,
@@ -36,9 +47,14 @@ export function useMojaPitanja() {
       const { data, error } = await supabase.from('pitanja').select(POLJA).order('created_at', { ascending: false });
       if (error) throw error;
       // JSON putanje u `POLJA` supabase-js ne ume da protumaci u tip — oblik je `Pitanje`.
-      return (data ?? []) as unknown as Pitanje[];
+      const lista = (data ?? []) as unknown as Pitanje[];
+      kesUpisi(kesKljuc, lista);
+      return lista;
     },
   });
+  const { isError, refetch } = q;
+  React.useEffect(() => { if (token && isError) refetch(); }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  return q;
 }
 
 /**

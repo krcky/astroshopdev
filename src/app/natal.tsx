@@ -136,7 +136,7 @@ export default function NatalTumacenje() {
               : ' Bez vremena rođenja ne znamo u kom je znaku bio kad si se rodio, pa tumačenje ne prikazujemo.'}
           </Text>
           <Button variant="secondary" className="mt-4 self-start"
-            onPress={() => leaveSheetTo(osoba ? { pathname: '/osoba-uredi', params: { id: osoba } } : '/edit')}>
+            onPress={() => leaveSheetTo({ pathname: '/rodjenje-polje', params: osoba ? { osoba, polje: 'vreme' } : { polje: 'vreme' } })}>
             <Text>Dodaj vreme rođenja</Text>
           </Button>
         </View>

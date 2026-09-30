@@ -3,15 +3,14 @@ import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { Info } from 'lucide-react-native';
 
-import { OdeljakIkona, type Odeljak } from '@/components/odeljak-ikona';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { Planeta, skalaSlike } from '@/components/planete-par';
+import { Okret } from '@/components/okret';
 import { UlazUPricu } from '@/components/prica/ulaz';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { KapsuleRed } from '@/components/ui/kapsule';
 import { cn } from '@/lib/utils';
 import { formatDatumKratko } from '@/lib/horoscope';
 import type { NatalChart } from '@/lib/natal';
@@ -22,9 +21,13 @@ import { dayKey } from '@/lib/transits';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useAuthStore } from '@/store/auth';
 import { tezina } from '@/theme/tipografija';
+import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 
-/** Ikonice odeljaka na kartici — Ivanove 3D slike (`odeljak-ikona.tsx`, 28.9.2026). */
-const ODELJAK: Record<string, Odeljak> = { Efekat: 'efekat', Pazi: 'pazi', Savet: 'savet' };
+/**
+ * Boja oznake stavke (Ivan, 29.9.2026): EFEKAT "svetlo plava" kao plus u "Ide ti",
+ * PAZI "roze" kao minus u "Koči te" (`DESIGN.md`, 2); SAVET ostaje lila (`OBLAST_BOJA`).
+ */
+const ODELJAK_BOJA: Record<string, string> = { Efekat: PLUS_BOJA, Pazi: MINUS_BOJA };
 /** Varijanta `oznaka` je 11/15; na ovoj kartici datum i oznake odeljaka idu 12/16 (Ivan, 28.9.2026). */
 export const OZNAKA_12 = 'text-[12px] leading-[16px]';
 
@@ -130,8 +133,8 @@ export function TvojDanCard({ pick, date, isToday }: {
                 // Dodirna povrsina 44pt preko `hitSlop`; red ne raste.
                 hitSlop={14}
                 // Ugradjen element stoji na osnovnoj liniji teksta; podignut da bude u
-                // visini slova, ne na dnu reda (Ivan, 28.9.2026).
-                style={{ transform: [{ translateY: -5 }] }}
+                // visini slova, ne na dnu reda (Ivan, 28.9.2026); -5 -> -3, 2pt nize (29.9.2026).
+                style={{ transform: [{ translateY: -3 }] }}
                 className="active:opacity-60">
                 {/* Svetla lila, kao "Savet" i izabrani tab (Ivan, 28.9.2026). */}
                 <Info size={20} color={OBLAST_BOJA} strokeWidth={2} />
@@ -175,48 +178,34 @@ export function TvojDanCard({ pick, date, isToday }: {
 
       {/* Trajanje (traka) je samo u listu "Zašto baš ovaj tekst" — sa pocetne izbaceno (Ivan, 28.9.2026). */}
 
-      {/* Efekat, Pazi, Savet kao staklene kapsule u beloj kartici, "Saznaj više" ispod
-          teksta U kartici — isto kao oblasti na slajdu "Mesec danas" (Ivan, 28.9.2026).
-          Ranije: dugme ispod sazetka i kartica koja sama smenjuje stavke. */}
+      {/* Efekat, Pazi, Savet kao lista u beloj kartici (Ivan, 29.9.2026). */}
       <Odeljci stavke={stavke.filter((x): x is { oznaka: string; s: Stavka } => !!x.s)} />
     </View>
   );
 }
 
 /**
- * Bela kartica: Efekat / Pazi / Savet kao staklene kapsule (`ui/kapsule.tsx`),
- * ispod tekst izabrane stavke, pa `children` (dugme "Saznaj više"). Prva je
- * izabrana; kad se stavke promene (drugi dan, stigao tekst) — opet prva.
- * Bez ijedne stavke ostaje samo dugme, u istoj kartici.
+ * Bela kartica: Efekat / Pazi / Savet kao LISTA, jedno ispod drugog, bez ikonica
+ * (Ivan, 29.9.2026; ranije staklene kapsule koje biraju jednu stavku). Svaki red:
+ * oznaka, podebljan naslov stavke, tekst. Bez ijedne stavke kartice nema.
  */
 function Odeljci({ stavke }: { stavke: { oznaka: string; s: Stavka }[] }) {
-  const [izabrana, setIzabrana] = React.useState(stavke[0]?.oznaka ?? '');
-  const potpis = stavke.map((x) => x.oznaka).join('|');
-  React.useEffect(() => { setIzabrana(stavke[0]?.oznaka ?? ''); }, [potpis]); // eslint-disable-line react-hooks/exhaustive-deps
-  const tekuca = stavke.find((x) => x.oznaka === izabrana) ?? stavke[0];
-
-  // Bez stavki nema kartice — dugme je iznad nje, pa ne bi ostalo nista u njoj.
-  if (!tekuca) return null;
+  if (stavke.length === 0) return null;
   return (
-    <View className={cn(CARD_SURFACE, 'mt-5 p-4')}>
-      {tekuca && (
-        <>
-          <KapsuleRed
-            stavke={stavke.map((x) => ({
-              key: x.oznaka,
-              label: x.oznaka,
-              icon: <OdeljakIkona odeljak={ODELJAK[x.oznaka]} size={20} />,
-            }))}
-            izabrana={tekuca.oznaka}
-            onIzbor={setIzabrana}
-          />
-          {/* Podebljani deo u SVOM redu, tekst ispod njega (Ivan, 28.9.2026). */}
-          <Text variant="default" className="mt-4">
-            {tekuca.s.naslov ? <Text variant="default" className={tezina('naslovUTekstu')}>{`${tekuca.s.naslov}\n`}</Text> : null}
-            {tekuca.s.tekst}
-          </Text>
-        </>
-      )}
+    // Linija od ivice do ivice kartice: kartica bez bocnog razmaka, red ga nosi sam.
+    // Samo tekst, bez ikonica (Ivan, 29.9.2026).
+    <View className={cn(CARD_SURFACE, 'mt-8 overflow-hidden py-1')}>
+      {stavke.map((x, i) => (
+        <View key={x.oznaka} className={cn('flex-row items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+          <View className="flex-1">
+            {/* Oznaka u lila boji ikonica i strelica (Ivan, 29.9.2026: "da budu ljubicasti"). */}
+            <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.oznaka] ?? OBLAST_BOJA }}>{x.oznaka}</Text>
+            {/* Podebljani deo u SVOM redu, tekst ispod njega (Ivan, 28.9.2026). */}
+            {!!x.s.naslov && <Text variant="default" className={cn('mt-1', tezina('naslovUTekstu'))}>{x.s.naslov}</Text>}
+            <Text variant="default" className={x.s.naslov ? undefined : 'mt-1'}>{x.s.tekst}</Text>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
@@ -248,7 +237,11 @@ function PlanetaSaBedzom({ tranzitna, natalna }: {
   const gore = PLANETA / 2 + r * 0.75 - spolja / 2;
   return (
     <View style={{ width: sirina, height: PLANETA }} className="items-center justify-center">
-      <Planeta t={tranzitna} size={velika} />
+      {/* Planeta se polako okrece kao Mesec (Ivan, 30.9.2026) — osim onih sa prstenom
+          (Saturn, Uran): okrenut prsten izgleda kao da se planeta prevrce. */}
+      {p
+        ? <Planeta t={tranzitna} size={velika} />
+        : <Okret><Planeta t={tranzitna} size={velika} /></Okret>}
       <View
         style={{ left: levo, top: gore }}
         className="absolute items-center justify-center rounded-pill bg-grouped p-[2px]">

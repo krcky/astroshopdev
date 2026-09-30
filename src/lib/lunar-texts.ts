@@ -45,12 +45,16 @@ export function useLunarTexts(phase: LunarTextPhase | null, sign: string | null)
     const kljuc = `lunar|${korisnik}|${phase}|${sign}`;
     let otkazano = false;
     let server = false;
-    setTexts(new Map());
+    let disk = false;
+    // PRETHODNI TEKST OSTAJE dok novi ne stigne (Ivan, 29.9.2026: "nije smooth") — pri
+    // promeni dana nema sivih traka pa skoka visine; ekran ga za to vreme priguši
+    // (`loading`). Tekst se brise samo kad za novi dan zaista nema nicega.
     setLoading(true);
     ucitajKes().then(() => {
-      const disk = kesProcitaj<[LunarArea, string][]>(kljuc);
-      if (otkazano || server || !disk) return;
-      setTexts(new Map(disk));
+      const d = kesProcitaj<[LunarArea, string][]>(kljuc);
+      if (otkazano || server || !d) return;
+      disk = true;
+      setTexts(new Map(d));
       setLoading(false);
     });
     fetchLunarTexts(phase, sign).then((m) => {
@@ -59,6 +63,9 @@ export function useLunarTexts(phase: LunarTextPhase | null, sign: string | null)
         server = true;
         setTexts(m);
         if (m.size) kesUpisi(kljuc, [...m]);
+      } else if (!disk) {
+        // Bez mreze i bez diska: stari tekst bi bio za drugi dan.
+        setTexts(new Map());
       }
       setLoading(false);
     });

@@ -1,4 +1,4 @@
--- Astroshop — sema baze.
+-- Astro Shop — sema baze.
 -- Pokreni u Supabase: SQL Editor -> New query -> nalepi ovo -> Run.
 --
 -- KLJUCNI PRINCIP: anon kljuc je javan i ugradjen u aplikaciju. Podatke NE

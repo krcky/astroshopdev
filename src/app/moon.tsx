@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Pressable, View, type ScrollView } from 'react-native';
+import Animated, { FadeIn, FadeInDown, Keyframe, LinearTransition } from 'react-native-reanimated';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
@@ -9,10 +10,13 @@ import { ElementIkona } from '@/components/element-ikona';
 import { BiljkaIkona } from '@/components/biljka-ikona';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { SheetScroll } from '@/components/sheet';
+import { GlassIconButton } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { OblastIkona } from '@/components/oblast-ikona';
 import { KapsuleRed, LILA_SVETLA } from '@/components/ui/kapsule';
+import { KarticaTranzita } from '@/components/tranziti-lista';
+import { chartRulers, rulerRole } from '@/lib/rulers';
 import { cn } from '@/lib/utils';
 import { moonPhase } from '@/lib/astro';
 import { dayKey, moonDay } from '@/lib/transits';
@@ -33,6 +37,21 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { useResolvedProfile } from '@/store/profile';
 import { brand, neutral } from '@/theme/tokens';
 import { useNaMrezi } from '@/lib/mreza';
+
+/** Klizanje blokova na novo mesto kad se visina iznad promeni (tekst, oblast, dan). */
+const KLIZANJE = LinearTransition.duration(260);
+
+/** Ulazak bez providnosti — za blokove sa staklom. Nov objekat svaki put: `delay` menja Keyframe. */
+const doplovi = (kasnjenje: number) => new Keyframe({
+  0: { transform: [{ translateY: 16 }] },
+  100: { transform: [{ translateY: 0 }] },
+}).duration(320).delay(kasnjenje);
+
+/** Nov dan: crtez i tekst se pretope i malo "doplove" (kao listanje). */
+const PROMENA_DANA = new Keyframe({
+  0: { opacity: 0.2, transform: [{ scale: 0.97 }] },
+  100: { opacity: 1, transform: [{ scale: 1 }] },
+}).duration(240);
 
 /** Crtez Meseca na vrhu i znak u belom prstenu dole desno (kao velika trojka na tabu "Ti"). */
 const DISK = 128;
@@ -77,13 +96,41 @@ export default function MoonScreen() {
   // (Ivan, 29.9.2026). Otvara ga dodir na datum gore ili "Ceo mesec" ispod nedelje;
   // izbor dana ga zatvara i vraca na taj dan.
   const [samoKalendar, setSamoKalendar] = React.useState(false);
+
+  // POKRET (Ivan, 29.9.2026: "nesto ne izgleda smooth"). Ulazak blokova jedan za drugim
+  // samo pri PRVOM otvaranju lista; posle toga promene idu pretapanjem i klizanjem.
+  // Reanimated po podrazumevanom postuje "Smanji pokrete" (ReduceMotion.System).
+  // Stanje, ne ref (ref se ne cita tokom crtanja): posle prvog kadra je `false`.
+  const [prviPut, setPrviPut] = React.useState(true);
+  React.useEffect(() => { const t = setTimeout(() => setPrviPut(false), 0); return () => clearTimeout(t); }, []);
+  // Blok se montira ponovo i pri prelazu dan <-> kalendar: tada se samo pretopi.
+  const ulaz = (i: number) => (prviPut ? FadeInDown.duration(320).delay(i * 45) : FadeIn.duration(220));
+  // Blokovi sa STAKLOM (strelice, oblasti) ulaze BEZ providnosti: providan roditelj
+  // kvari staklo na iOS-u i ono se ne vrati (`ui/kapsule.tsx`) — samo doplove odozdo.
+  const ulazStaklo = (i: number) => (prviPut ? doplovi(i * 45) : undefined);
+
+  // Kalendar se otvara od vrha; povratak vraca na mesto gde je dan bio skrolovan.
+  const skrol = React.useRef<ScrollView>(null);
+  const skrolY = React.useRef(0);
+  const skrolDana = React.useRef(0);
+  const otvoriKalendar = () => { skrolDana.current = skrolY.current; setSamoKalendar(true); };
+  const prviPrikaz = React.useRef(true);
+  React.useEffect(() => {
+    if (prviPrikaz.current) { prviPrikaz.current = false; return; }
+    const y = samoKalendar ? 0 : skrolDana.current;
+    requestAnimationFrame(() => skrol.current?.scrollTo({ y, animated: false }));
+  }, [samoKalendar]);
   const dan = React.useMemo(
     () => (resolved ? moonDay(resolved.chart, date, resolved.timeUnknown) : null),
     [resolved, date]
   );
   const stanje = React.useMemo(() => moonState(date), [date]);
   const kljucevi = React.useMemo(() => (dan ? dan.hits.map((h) => h.contentKey) : []), [dan]);
-  const { texts } = useTransitTexts(kljucevi);
+  const { texts, loading: tekstoviLoading } = useTransitTexts(kljucevi);
+  const vladari = React.useMemo(
+    () => (resolved ? chartRulers(resolved.chart, resolved.timeUnknown) : []),
+    [resolved]
+  );
   const faza = React.useMemo(() => phaseDay(date), [date]);
   const lunarniZnak = signFromLongitude(faza.moonLongitude).sign;
   const { texts: lunarni, loading: lunarniLoading } = useLunarTexts(faza.textPhase, lunarniZnak.key);
@@ -100,20 +147,28 @@ export default function MoonScreen() {
       : `Do ${formatTime(dan.ingress.at)}, zatim u ${SIGN_CASES[dan.ingress.sign.key].loc}`;
   const savet = lunarni.get(oblast);
 
+  // Oba prikaza su ISTI `SheetScroll` (isti koren), pa skrol zivi; sadrzaj se pretopi.
+  const skrolProps = { siva: true, skrolRef: skrol, onScrollY: (y: number) => { skrolY.current = y; } };
+
   if (samoKalendar) {
     return (
-      <SheetScroll siva>
+      <SheetScroll {...skrolProps}>
         {/* Samo kalendar: strelica nazad gore levo vraca na dan (Ivan, 29.9.2026). */}
-        <View className="flex-row items-center">
-          <DanDugme smer={-1} onPress={() => setSamoKalendar(false)} label="Nazad" />
-          <Text variant="h3" className="ml-3" accessibilityRole="header">Lunarni kalendar</Text>
+        {/* Naslov na sredini lista, `h2` (Ivan, 29.9.2026); strelica ostaje levo, preko reda. */}
+        <View className="h-11 justify-center">
+          <Text variant="h2" className="text-center" accessibilityRole="header">Lunarni kalendar</Text>
+          <View className="absolute left-0">
+            <DanDugme smer={-1} onPress={() => setSamoKalendar(false)} label="Nazad" />
+          </View>
         </View>
-        <Kalendar
-          izabran={date}
-          danas={danas}
-          onIzbor={(d) => { setDate(naDan(d, new Date())); setSamoKalendar(false); }}
-          otvoren
-        />
+        <Animated.View entering={FadeIn.duration(220)}>
+          <Kalendar
+            izabran={date}
+            danas={danas}
+            onIzbor={(d) => { setDate(naDan(d, new Date())); setSamoKalendar(false); }}
+            otvoren
+          />
+        </Animated.View>
       </SheetScroll>
     );
   }
@@ -121,14 +176,14 @@ export default function MoonScreen() {
   return (
     // List odozdo do vrha, bez zaglavlja i strelice nazad — zatvara se povlacenjem
     // (Ivan, 29.9.2026; ranije unutrasnja strana sa ljubicastim prelivom).
-    <SheetScroll siva>
+    <SheetScroll {...skrolProps}>
       {/* Dan: strelice za dan unazad/unapred, "Danas" kad je izabran drugi dan. */}
-      <View className="flex-row items-center justify-between">
+      <Animated.View entering={ulazStaklo(0)} className="flex-row items-center justify-between">
         <DanDugme smer={-1} onPress={() => setDate((d) => pomeriDan(d, -1))} />
         <View className="items-center">
           {/* Dodir na datum otvara kalendar celog meseca. */}
           <Pressable
-            onPress={() => setSamoKalendar(true)}
+            onPress={otvoriKalendar}
             accessibilityRole="button"
             accessibilityLabel={`${formatDatumKratko(date)}. Otvori kalendar`}
             hitSlop={8}
@@ -145,12 +200,14 @@ export default function MoonScreen() {
           )}
         </View>
         <DanDugme smer={1} onPress={() => setDate((d) => pomeriDan(d, 1))} />
-      </View>
+      </Animated.View>
 
+      {/* Crtez i tekst dana: nov dan se kratko pretopi i "doplovi" (key = dan). */}
+      <Animated.View key={dayKey(date)} entering={prviPut ? ulaz(1) : PROMENA_DANA} layout={KLIZANJE}>
       <View className="items-center pt-6">
         {/* Znak dole desno uz crtez, u belom prstenu — kao velika trojka na tabu "Ti". */}
         <View style={{ width: DISK, height: DISK }}>
-          <MoonDisc angle={stanje.angle} size={DISK} />
+          <MoonDisc angle={stanje.angle} size={DISK} vrti />
           <View
             className="absolute items-center justify-center rounded-full bg-grouped"
             // Dno znaka na dnu Meseca (Ivan, 29.9.2026): beli prsten viri ispod za svoju debljinu.
@@ -175,69 +232,74 @@ export default function MoonScreen() {
           <ElementIkona element={znak.element} size={PODATAK_IKONA} />
         </Podatak>
       </View>
+      </Animated.View>
 
-      <Kalendar
-        izabran={date}
-        danas={danas}
-        onIzbor={(d) => setDate(naDan(d, new Date()))}
-        otvoren={false}
-        onCeoMesec={() => setSamoKalendar(true)}
-      />
+      <Animated.View entering={ulaz(2)} layout={KLIZANJE}>
+        <Kalendar
+          izabran={date}
+          danas={danas}
+          onIzbor={(d) => setDate(naDan(d, new Date()))}
+          otvoren={false}
+          onCeoMesec={otvoriKalendar}
+        />
+      </Animated.View>
 
       {/* Saveti po oblastima (Ivan, 29.9.2026): staklene plocice IZNAD kartice, na sivoj
-          pozadini, bez naslova — svih pet odjednom, izabrana svetlo lila. U kartici je
+          pozadini, bez naslova — svih pet odjednom, pravo staklo, izabrana svetlo lila. U kartici je
           samo tekst. */}
-      <View className="mt-6">
+      <Animated.View entering={ulazStaklo(3)} layout={KLIZANJE} className="mt-6">
         <KapsuleRed
           sveVidljive
           stavke={LUNAR_AREAS.map((a) => ({
             key: a.key,
             label: a.name,
-            icon: <OblastIkona oblast={a.key} size={24} aktivna={a.key === oblast} />,
+            // Sve ikonice pune, i neizabrane (Ivan, 29.9.2026) — izbor pokazuje lila plocica.
+            icon: <OblastIkona oblast={a.key} size={24} />,
           }))}
           izabrana={oblast}
           onIzbor={setOblast}
         />
-      </View>
-      <View className={cn(CARD_SURFACE, 'mt-3 p-4')}>
-        {savet ? (
-          <TumacenjeTekst tekst={savet} />
-        ) : lunarniLoading ? (
-          <TextPlaceholder lines={4} />
-        ) : (
-          <Text variant="muted">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
-        )}
-      </View>
+      </Animated.View>
+      {/* Kartica klizi na novu visinu; nov tekst se pretopi (key = pocetak teksta). Dok
+          stize tekst za drugi dan, stari ostaje prigusen (`useLunarTexts`). */}
+      <Animated.View entering={ulaz(4)} layout={KLIZANJE} className={cn(CARD_SURFACE, 'mt-3 overflow-hidden p-4')}>
+        <Animated.View key={savet ? `${oblast}|${savet.slice(0, 48)}` : lunarniLoading ? 'ceka' : 'nema'} entering={FadeIn.duration(220)}
+          style={{ opacity: savet && lunarniLoading ? 0.45 : 1 }}>
+          {savet ? (
+            <TumacenjeTekst tekst={savet} listePrvo />
+          ) : lunarniLoading ? (
+            <TextPlaceholder lines={4} />
+          ) : (
+            <Text variant="muted">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
+          )}
+        </Animated.View>
+      </Animated.View>
 
-      {/* Mesecevi tranziti na kartu tog dana, po satu. */}
+      {/* Mesecevi tranziti na kartu tog dana, po satu — iste kartice kao na tabu
+          "Tranziti" (Ivan, 29.9.2026), sa satom tacnosti umesto tona i trajanja. */}
       {dan.hits.length > 0 && (
-        <View className="mt-9">
-          <Text variant="label" className="mb-3">{jeDanas ? 'Za tebe danas' : `Za tebe · ${formatDay(date, danas)}`}</Text>
-          <View className={CARD_SURFACE}>
-            {dan.hits.map((h, i) => {
-              const tekst = texts.get(h.contentKey);
-              const ime = `${h.transiting.name} ${h.aspect.name} natalni ${h.natal.name}`;
-              return (
-                <React.Fragment key={h.contentKey}>
-                  {i > 0 && <View className="h-px bg-border" />}
-                  <Pressable
-                    disabled={!tekst}
-                    onPress={() => router.push({ pathname: '/transit', params: { key: h.contentKey } })}
-                    accessibilityRole={tekst ? 'button' : undefined}
-                    className="min-h-row flex-row items-center gap-3 px-gutter py-3 active:opacity-60">
-                    <View className="flex-1">
-                      <Text variant="row">{tekst?.title || ime}</Text>
-                      <Text variant="caption">
-                        {[tekst?.title ? ime : null, `tačan u ${formatTime(h.exactAt)}`].filter(Boolean).join(' · ')}
-                      </Text>
-                    </View>
-                    {tekst && <ChevronRight size={20} color={neutral.inkSubtle} strokeWidth={2.2} />}
-                  </Pressable>
-                </React.Fragment>
-              );
-            })}
+        <Animated.View entering={ulaz(5)} layout={KLIZANJE} className="mt-9">
+          <Text variant="label" className="mb-3 text-foreground" accessibilityRole="header">
+            {jeDanas ? 'Za tebe danas' : `Za tebe · ${formatDay(date, danas)}`}
+          </Text>
+          <View className="gap-3">
+            {dan.hits.map((h) => (
+              <KarticaTranzita
+                key={h.contentKey}
+                red={{
+                  key: h.contentKey,
+                  transiting: h.transiting,
+                  aspect: h.aspect,
+                  natal: h.natal,
+                  ruler: rulerRole(h.transiting.key, h.natal.key, vladari),
+                }}
+                naslov={texts.get(h.contentKey)?.title ?? ''}
+                loading={tekstoviLoading}
+                opis={`Tačan u ${formatTime(h.exactAt)}`}
+              />
+            ))}
           </View>
-        </View>
+        </Animated.View>
       )}
     </SheetScroll>
   );
@@ -253,17 +315,13 @@ function Podatak({ oznaka, vrednost, children }: { oznaka: string; vrednost: str
   );
 }
 
+/** Stakleno okruglo dugme (Ivan, 29.9.2026) — isto kao nazad u onboardingu (`GlassIconButton`). */
 function DanDugme({ smer, onPress, label }: { smer: 1 | -1; onPress: () => void; label?: string }) {
   const Ikona = smer < 0 ? ChevronLeft : ChevronRight;
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label ?? (smer < 0 ? 'Dan ranije' : 'Dan kasnije')}
-      hitSlop={6}
-      className="h-11 w-11 items-center justify-center rounded-full bg-card active:opacity-60">
+    <GlassIconButton onPress={onPress} accessibilityLabel={label ?? (smer < 0 ? 'Dan ranije' : 'Dan kasnije')}>
       <Ikona size={22} color={neutral.ink} strokeWidth={2} />
-    </Pressable>
+    </GlassIconButton>
   );
 }
 

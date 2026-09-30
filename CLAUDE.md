@@ -1,6 +1,13 @@
-# Astroshop
+# Astro Shop
 
 Mobilna aplikacija za horoskop (iOS + Android), Expo + React Native.
+
+IME JE "ASTRO SHOP" — dve reci, oba velika slova (Ivan, 29.9.2026). Tako pise svuda gde ga
+covek vidi: ime ispod ikonice (`app.json` `name`), tekstovi, mejl sa kodom (naslov i telo su u
+Supabase-u: Authentication -> Emails, sablon Magic Link; posiljalac "Astro Shop"), veb strane,
+panel. TEHNICKA imena ostaju "astroshop" i NE MENJAJU SE: slug, `scheme`, bundle id
+`com.krcky.astroshop`, kljucevi na disku (`astroshop-profile`...) — promena bi obrisala
+sacuvane podatke ili napravila novu aplikaciju u prodavnici — i domen `astroshop.rs`.
 
 ## Stack
 
@@ -21,7 +28,6 @@ Mobilna aplikacija za horoskop (iOS + Android), Expo + React Native.
 src/
   app/
     index.tsx        KAPIJA — jedino mesto koje odlucuje gde korisnik ide
-    edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
     sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, push, ponuda, prva-prica
@@ -39,9 +45,12 @@ src/
     moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
                      i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
     profile.tsx      profil — NIJE tab, LIST odozdo (29.9.2026) sa dugmeta gore desno: slika, Premium, rodjenje, nalog
-    nalog.tsx        list sa profila: email, nacin prijave, BRISANJE NALOGA (namerno korak dalje od profila)
-    osoba.tsx        strana DRUGE OSOBE (?id=): "Karta | Danas" + pitanje o njoj (pravilo 22)
-    osoba-uredi.tsx  unos/izmena druge osobe (bez id = nova), sve na jednom ekranu + pristanak
+    osoba.tsx        strana DRUGE OSOBE (?id=): tabovi Natalna karta / Tranziti / Pitaj (pravilo 22)
+    osoba-uredi.tsx  izmena druge osobe: TABELA svih podataka + brisanje; red otvara `rodjenje-polje`
+    rodjenje-polje.tsx LIST odozdo sa JEDNIM podatkom o rodjenju (?polje=…; `&osoba=` za drugu osobu, bez = svoj)
+    email.tsx        promena emaila (list sa "Nalog"): nova adresa -> kod sa mejla
+    nova-osoba/      nova osoba KORAK PO KORAK, kao onboarding: ime, ko ti je, datum, vreme, mesto, pregled
+    nalog.tsx        list sa profila: email, PODACI O RODJENJU (tabela), BRISANJE NALOGA (namerno korak dalje od profila)
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
@@ -55,7 +64,9 @@ src/
     natal-wheel.tsx      SVG tocak natalne karte
     natalna-karta-prikaz.tsx  cela natalna karta (tocak, trojka, planete, aspekti) — tab "Ti" i strana osobe
     tvoji-ljudi.tsx      kartica "Tvoji ljudi" na tabu "Ti" (druge osobe, "Dodaj osobu")
-    rodjenje-forma.tsx   podaci o rodjenju na jednom ekranu — `/edit` i `/osoba-uredi`
+    polje-mesto.tsx      pretraga grada rodjenja — korak nove osobe, list jednog podatka (`rodjenje-polje`)
+    polje-za-kod.tsx     sest cifara koda sa mejla (`DUZINA_KODA`) — prijava (`code.tsx`) i promena emaila
+    izbor-odnosa.tsx     "Ko ti je" (redovi sa kvacicom) — korak nove osobe i list izmene
     karta-lista.tsx      redovi ispod tocka (trojka, planeta, aspekt) i "i" uz tocak — ZAJEDNICKI za "Ti" i "Nebo"
     info-list.tsx        delovi listova sa objasnjenjem tocka (odeljak, stavka, aspekti) — oba "i" lista
     moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca)
@@ -71,6 +82,7 @@ src/
     sky-place.ts     mesto posmatranja, null = grad iz profila
     sky-time.ts      pomeren trenutak na Nebu (null = sadasnjost) — BEZ persist
     osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
+    nova-osoba.ts    nova osoba dok se unosi po koracima — BEZ persist (kao draft.ts)
     prica-log.ts     koji dan je prica pogledana — PRIPADA NALOGU, brise se pri odjavi
   lib/
     zodiac.ts        12 znakova, longituda -> znak
@@ -150,6 +162,10 @@ godina bez tacke; mesta se razlikuju samo po tome da li nose dan i godinu. Sklap
 ISKLJUCIVO `datum()` u `lib/horoscope.ts` (i omotaci `formatDate`, `formatDatum`,
 `formatDay`, `opsegDatuma`, `datumRodjenja`) — ekran ne pise imena meseci sam.
 
+UGASENO DUGME (Ivan, 29.9.2026) je SVUDA ista siva kapsula (`bg-fill-strong`, sivi natpis) —
+radi ga sam `ui/button.tsx` cim dobije `disabled`. Ekran NE dodaje svoj izgled (`opacity-40`,
+belo dugme): belo ugaseno dugme na belom listu je izgledalo kao sam tekst.
+
 Svaki kljuc dodat u `tailwind.config.js` MORA da se pojavi i u spisku u
 `src/lib/utils.ts`. Bez toga `tailwind-merge` svrsta klasu u pogresnu grupu —
 `text-button` prodje kao boja teksta i pojede belu na crnom dugmetu.
@@ -218,9 +234,10 @@ Za anon (publishable) kljuc to je u redu — podatke stiti RLS. `service_role`
 kljuc zaobilazi RLS i njegovo mesto je iskljucivo na serveru.
 
 **10. Podaci o rodjenju moraju biti izmenjivi.**
-Izmena ide kroz `/edit` — SVE na jednom ekranu, ne kroz cetiri koraka.
-Onboarding vodi korak po korak jer korisnik tada ne zna sta ga ceka; kod izmene
-zna tacno sta menja.
+Izmena je TABELA na listu "Nalog" (profil -> Nalog; Ivan, 29.9.2026 — do tada `/edit`, sve na
+jednom ekranu): svaki podatak je jedan red, a dodir otvara list samo sa tim podatkom
+(`rodjenje-polje`), koji cuva odmah — prvo na server, pa na telefon. Ne kroz korake:
+onboarding vodi korak po korak jer korisnik tada ne zna sta ga ceka; kod izmene zna tacno sta menja.
 
 **11. Bez naloga se ne vidi nista.**
 `app/index.tsx` je jedina kapija: nema sesije -> welcome, ima sesiju bez karte
@@ -248,10 +265,14 @@ ulazak u postojeci. Nikad tiho u stari nalog. Put nosi `?nov=1` (reveal -> accou
 **15. Dva podesenja u Supabase-u su spregnuta sa kodom.**
 Ako se razidju, prijava pada — i to za sve odjednom, tiho.
 
-`Email OTP length` mora biti **6**. Toliko prima `/code` ekran (`LENGTH` u
-`code.tsx`), a visak odseca i na `maxLength` i na `slice` — korisnik onda nikad
+`Email OTP length` mora biti **6**. Toliko prima `/code` ekran i promena emaila
+(`DUZINA_KODA` u `components/polje-za-kod.tsx`), a visak odseca i na `maxLength` i na `slice` — korisnik onda nikad
 ne moze da unese osmocifreni kod i dobija "Kod nije tacan". Zatecena vrednost je
 bila 8 i tako je i otkriveno.
+
+Promena emaila (`app/email.tsx`) trazi kod iz sablona "Change Email Address" — i on mora da
+nosi `{{ .Token }}`, kao Magic Link. Uz ukljucen "Secure email change" kod stize na obe adrese i
+aplikacija trazi oba.
 
 CAPTCHA prekidac (Authentication -> Attack Protection) se ukljucuje **poslednji**,
 tek kad je verzija koja salje `captchaToken` na telefonima. Obrnutim redosledom
@@ -364,7 +385,9 @@ upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 **18b. Premium tab "Tranziti" = lista po VAZNOSTI; ocene oblasti SAMO na pocetnoj (28.9.2026).**
 Tab "Tranziti" (`components/tranziti-lista.tsx`): svi tranziti dana, najjaci prvi, svaki u
 svojoj kartici — BEZ oblasti i BEZ ocena (Ivan: "to je ok za homepage"). Ocena 1—5 po oblasti
-je samo na pocetnoj: 4 reda bez linija, u ISTOJ kartici iznad "Ide ti / Koci te" na slajdu "Danas ukratko". Racun `lib/oblasti.ts` (`poVaznosti` za listu,
+je samo na pocetnoj: 4 reda bez linija, u ISTOJ kartici iznad "Ide ti / Koci te" ("Danas ukratko", tab "Danas" na pocetnoj).
+POCETNA NEMA KARUSEL (Ivan, 29.9.2026): stakleni tabovi Danas / Mesec / Promene / Teme
+(`KapsuleRed tabovi`), izabran lila; sadrzaj taba ulazi bez providnosti (staklo). Racun `lib/oblasti.ts` (`poVaznosti` za listu,
 `oblasti` za ocene), SVE vrednosti za astrologa u `lib/oblasti-config.ts`. Oba ekrana idu
 kroz ISTI `useOblastiDana`. Mnozina ("21 dan", "5 meseci") samo kroz `lib/mnozina.ts`.
 Interesovanja iz onboardinga jos ne postoje: `redosled`/`iskljucene` su parametri sa
@@ -435,6 +458,8 @@ na welcome. Greska MREZE (`isAuthRetryableFetchError`) sesiju ne brise; brise je
 pravi odgovor servera. TEKSTOVI — `lib/kes-na-disku.ts`: sve sto je server vec poslao
 (tranziti, ton, lunarni, natalni), do 300 stavki i 14 dana, kljuc sadrzi nalog i pravo
 pristupa. Disk je REZERVA: upit ide pri svakom pokretanju, "nema teksta" se ne pamti.
+Isti kes drzi i LISTU PITANJA (`pitanja|<nalog>`, `useMojaPitanja`): tab "Pitaj" odmah zna
+da li da pokaze uvod ili listu, umesto praznog ekrana dok server ne odgovori (29.9.2026).
 PRAVO PRISTUPA — poslednje sa servera, najvise 7 dana i nikad posle `expiresAt`, SAMO za
 prikaz; `fetchEntitlement` vraca `null` na gresku mreze (ne "besplatno"). Ne otkljucava
 nista novo — duge tekstove i dalje salje samo server (pravilo 8). Sve troje se brise
@@ -511,8 +536,9 @@ Uloga u panelu se samo prikazuje; kapija je RLS. Testovi: `check:pitanja`,
 `check:pitanja-baza` (SQL u PGlite-u, sa Supabase delovima napravljenim u testu).
 
 **22. Druge osobe (Ivan, 29.9.2026): partner, dete, prijatelj — njihova karta, tranziti i pitanje o njima.**
-Tab "Ti" ima "Tvoji ljudi" (`components/tvoji-ljudi.tsx`) posle velike trojke; dodir otvara POSEBNU
-stranu osobe (`app/osoba.tsx`: "Karta | Danas" + "Pitaj astrologa"). NIKAD prekidac "ja / ona" na
+PROFIL ima "Tvoji ljudi" kao prvu sekciju (`components/tvoji-ljudi.tsx`; Ivan, 29.9.2026 — ne na tabu
+"Ti"); dodir otvara POSEBNU
+stranu osobe (`app/osoba.tsx`: staklene kapsule kao na pocetnoj — Natalna karta / Tranziti / Pitaj). NIKAD prekidac "ja / ona" na
 tabovima — "Danas", "Tvoj dan" i "Tranziti" su uvek korisnikovi (kod konkurencije su najteze zalbe
 mesanje "ja" i druge osobe). Karta i lista su ISTE komponente kao tabovi "Ti" i "Tranziti"
 (`NatalnaKartaPrikaz`, `TranzitiLista`), sa istim granicama za besplatne. Listovi tumacenja
@@ -523,14 +549,18 @@ GRANICA: besplatno 1, Premium 10 (`BESPLATNO.osobe`, `PREMIUM.osobe`); sprovodi 
 NISTA se ne brise, otvorena ostaje PRVA dodata (`otvoreneOsobe`), ostale pod katancem; izmena i brisanje
 uvek rade. Osoba se NE prodaje pojedinacno (odluceno 29.9.2026: kupovina "slota" se ne vraca kroz
 "Vrati kupovine" — kod konkurencije zalba broj jedan).
+UNOS I IZMENA (Ivan, 29.9.2026): nova osoba KORAK PO KORAK kao onboarding (`app/nova-osoba/`,
+isti `OnboardingStep`; nacrt `store/nova-osoba.ts` bez diska, na server tek u pregledu, gde je i
+pristanak). Izmena je TABELA (`osoba-uredi`), a red otvara list odozdo samo sa tim podatkom
+(`rodjenje-polje`), koji cuva odmah — isto kao svoji podaci na listu "Nalog" (pravilo 10).
 PODACI: tabela `osobe`, isti oblik kao `profiles`; korisnik cita, menja i brise samo svoje. Upis ide
 PRVO na server (granica + id) — bez mreze se ne dodaje ni ne menja. Na telefonu je kes (`store/osobe.ts`)
-koji PRIPADA NALOGU (nosi `uid`, brise se pri odjavi); osvezava se pri svakom dolasku na tab "Ti".
+koji PRIPADA NALOGU (nosi `uid`, brise se pri odjavi); osvezava se kad se "Tvoji ljudi" pokazu na profilu.
 PITANJE o osobi ili "o nama dvoma" je ISTE cene kao o sebi (Ivan). `pitanje-novo` bira "O kome je
 pitanje"; `sacuvaj_nacrt(tekst, karta, p_osoba)` proverava da je osoba svoja (`nema_osobe`); snimak je
 v2 (`snimakODrugoj`, polje `drugaOsoba`: odnos, ko pita, i karta onoga ko pita kod pitanja o odnosu).
 Panel pise ko pita i crta obe karte. Obrisana osoba: `pitanja.osoba_id` postaje NULL, snimak ostaje.
-PRISTANAK pri dodavanju ("Osoba zna da unosim njene podatke; za dete sam roditelj ili staratelj") —
+PRISTANAK u poslednjem koraku ("Osoba zna da unosim njene podatke; za dete sam roditelj ili staratelj") —
 konacan tekst ide pravniku uz politiku privatnosti. Imena se NE sklanjaju: natpisi drze uneto ime u
 nominativu ("Ja i Ana", "Pita Ana"), pol se ne pita.
 REDOSLED SQL-a: schema -> pokloni -> osobe -> pitanja (pitanja.sql pamti `osoba_id`).
@@ -640,7 +670,7 @@ npm run panel:build       panel za objavu -> panel/dist
       razlika izmedju dva grada u Srbiji se na ekranu ni ne vidi, a sistemska
       dozvola bi trazila razlog i objasnjenje u prodavnici. Grad se moze promeniti
       rucno (`/sky-place`, `store/sky-place.ts`) — kroz ISTU pretragu kao onboarding,
-      ali u zasebnom store-u: mesto rodjenja se menja jedino u `/edit`, jer od njega
+      ali u zasebnom store-u: mesto rodjenja se menja jedino na listu "Nalog", jer od njega
       zavisi natalna karta. Pozicije tela su geocentricne i sa mestom se ne menjaju;
       menjaju se uglovi, kuce i dnevna/nocna formula za Tacku srece.
 - [x] Pomeranje vremena na tom ekranu (Ivan, 28.9.2026): ispod sata DVA STAKLENA

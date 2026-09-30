@@ -70,7 +70,7 @@ TestFlight: **interno testiranje ne traži review, eksterno traži.**
 
 - **PDV je uslov za Android u Srbiji.** Google izričito prebacuje PDV na
   programera za domaće kupce: za kupca iz Srbije PDV obračunavaš i plaćaš ti.
-  Za kupce van Srbije obračunava Google. Pošto je Astroshop na srpskom za srpsku
+  Za kupce van Srbije obračunava Google. Pošto je Astro Shop na srpskom za srpsku
   publiku — to pogađa glavno tržište.
 - **Apple strana nije potvrđena.** Sekundarni izvori kažu da je Srbija u
   Exhibit B (Apple je merchant of record), ali se to ne vidi iz Apple-ovog

@@ -1,14 +1,16 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { Lock } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import { brand } from '@/theme/tokens';
+import { brand, neutral, shadow } from '@/theme/tokens';
 import { leaveSheetTo } from '@/components/sheet';
 import { cn } from '@/lib/utils';
+import { tezina } from '@/theme/tipografija';
 
 /**
  * BOJA PREMIUM-A (Ivan, 29.9.2026: "umesto gold boje koristi indigo za sve premium"):
@@ -39,25 +41,105 @@ export function otvoriPremium(izLista = false) {
 }
 
 /** Kartica sa katancem i dugmetom "Otključaj" — ispod zakljucane liste ili teksta. */
-export function PremiumKartica({ naslov, opis, izLista = false, className }: {
+export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = false, ilustracija = false, className }: {
   naslov: string;
   opis: string;
+  /** Natpis na dugmetu; podrazumevano "Otključaj". */
+  dugme?: string;
   izLista?: boolean;
+  /**
+   * Ilustracija kruga u pozadini, zalepljena uz gornju ivicu, i meka senka (Ivan,
+   * 30.9.2026; "Detaljno tumačenje" na tranzitu). Slika je `files/footer-illustration@2x.png`
+   * rotirana za 90° (`assets/images/kartica-premium-krug.png`).
+   */
+  ilustracija?: boolean;
   className?: string;
 }) {
-  return (
-    <View className={cn(CARD_SURFACE, 'p-6', className)} style={{ borderColor: PREMIUM_OBOD }}>
-      <View className="h-12 w-12 items-center justify-center self-center rounded-full" style={{ backgroundColor: PREMIUM_POVRSINA }}>
-        <Lock size={20} color={PREMIUM} />
-      </View>
-      <Text variant="h3" className="mt-4 text-center">{naslov}</Text>
+  const [sirina, setSirina] = React.useState(0);
+  const tekstIDugme = (
+    <>
+      {/* Uz ilustraciju naslov veci i deblji (21pt, Bold — Ivan, 30.9.2026). */}
+      <Text variant={ilustracija ? 'title' : 'h3'} className={cn('mt-4 text-center', ilustracija && tezina('naslovStrane'))}>{naslov}</Text>
       <Text variant="muted" className="mt-2 text-center">{opis}</Text>
       <Button className="mt-5 w-full" onPress={() => otvoriPremium(izLista)}>
-        <Text>Otključaj</Text>
+        <Text>{dugme}</Text>
       </Button>
+    </>
+  );
+  if (!ilustracija) {
+    return (
+      <View className={cn(CARD_SURFACE, 'p-6', className)} style={{ borderColor: PREMIUM_OBOD }}>
+        <View className="h-12 w-12 items-center justify-center self-center rounded-full" style={{ backgroundColor: PREMIUM_POVRSINA }}>
+          <Lock size={20} color={PREMIUM} />
+        </View>
+        {tekstIDugme}
+      </View>
+    );
+  }
+  // Senka na SPOLJNOM sloju (puna bela, bez `overflow-hidden` — iOS inace ne crta senku),
+  // a slika se sece na UNUTRASNJEM, po zaobljenju kartice. Sirina slike se racuna iz
+  // IZMERENE sirine kartice: `width: '100%'` + `aspectRatio` na apsolutnoj slici ju je
+  // crtao ~2x vecom.
+  //
+  // Ivan, 30.9.2026: slika 70% sirine kartice, na sredini (+4pt udesno, 3pt ispod ivice);
+  // krug sa katancem INDIGO (`PREMIUM`), katanac beo, a pola kruga viri IZNAD kartice —
+  // zato je krug na spoljnom sloju (unutrasnji sece), a tekst ima mesta za donju polovinu.
+  const sirinaSlike = sirina * SLIKA_UDEO;
+  return (
+    // `className` (razmak od teksta iznad) na OMOTACU: `marginTop` za krug u `style` bi ga pregazio.
+    <View className={className}>
+    <View className="rounded-lg bg-card" style={[shadow.soft, { marginTop: KATANAC / 2 }]}>
+      <View
+        className="overflow-hidden rounded-lg border px-6 pb-6"
+        style={{ borderColor: PREMIUM_OBOD, paddingTop: KATANAC / 2 + SPUSTI_TEKST }}
+        onLayout={(e) => setSirina(e.nativeEvent.layout.width)}>
+        {sirina > 0 && (
+          <>
+            <Image
+              source={KRUG}
+              style={{
+                position: 'absolute', top: POMERI_DOLE, left: (sirina - sirinaSlike) / 2 + POMERI_DESNO,
+                width: sirinaSlike, height: sirinaSlike * KRUG_RAZMERA,
+              }}
+              accessible={false}
+            />
+            {/* Slika PUNA (Ivan, 30.9.2026), a preko nje, ispod teksta, preliv od providnog
+                ka beloj — da se tekst cita. Belo je boja kartice (`bg-card`). */}
+            <LinearGradient
+              pointerEvents="none"
+              colors={[BELA_PROVIDNA, BELA_POLA, neutral.white]}
+              locations={[0, 0.4, 0.8]}
+              style={{ position: 'absolute', top: POMERI_DOLE, left: 0, width: sirina, height: sirinaSlike * KRUG_RAZMERA }}
+            />
+          </>
+        )}
+        {tekstIDugme}
+      </View>
+      <View
+        className="absolute items-center justify-center self-center rounded-full"
+        style={{ top: -KATANAC / 2, width: KATANAC, height: KATANAC, backgroundColor: PREMIUM }}>
+        <Lock size={20} color={neutral.white} strokeWidth={2.2} />
+      </View>
+    </View>
     </View>
   );
 }
+
+/** Precnik indigo kruga sa katancem na kartici sa ilustracijom; pola viri iznad kartice. */
+const KATANAC = 48;
+/** Sirina pozadinske slike kao udeo sirine kartice (Ivan: "smanji za 30%"). */
+const SLIKA_UDEO = 0.7;
+/** Slika malo desno od sredine i malo ispod ivice (Ivan: "za 2px", pa jos 2 udesno i 3 dole). */
+const POMERI_DESNO = 4;
+const POMERI_DOLE = 3;
+/** Koliko je tekst spusten ispod kruga sa katancem (Ivan: "spusti malo dole"). */
+const SPUSTI_TEKST = 16;
+/** Preliv preko slike: bela kartice, providna pa napola pa puna. */
+const BELA_PROVIDNA = 'rgba(255,255,255,0)';
+const BELA_POLA = 'rgba(255,255,255,0.7)';
+const KRUG = require('../../assets/images/kartica-premium-krug.png');
+/** Visina / sirina slike (676 x 358 px). */
+const KRUG_RAZMERA = 358 / 676;
 
 /**
  * Zakljucani redovi u jednoj beloj kartici: ime (i sitno ispod) levo, katanac

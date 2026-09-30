@@ -1,17 +1,18 @@
 import * as React from 'react';
-import { Modal, Platform, Pressable, ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Modal, Platform, Pressable, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Redirect, Stack, router } from 'expo-router';
 import type { NativeStackHeaderItem } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
-import { Screen, useTabBarSpace } from '@/components/screen';
+import { Screen } from '@/components/screen';
+import { KapsuleRed } from '@/components/ui/kapsule';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { GlassBubble } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { buildPersonalDaily, formatDate, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Calendar, Check, ChevronRight, Lock, Minus, Plus, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { headerBar, neutral, shadow, size, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
 import { fetchTransitTones, useTransitTexts, type TransitText } from '@/lib/transit-texts';
@@ -60,9 +61,9 @@ export default function Home() {
   React.useEffect(() => { setOffset(0); }, [today]);
   // Dnevnici prikaza pripadaju nalogu (`store/tvoj-dan-log.ts`).
   const userId = useAuthStore((s) => s.user?.id ?? null);
-  // Slajd karusela; indikator je van skrola pa stanje zivi ovde.
-  const [slide, setSlide] = React.useState(0);
-  const dno = useDnoKarusela();
+  // Tab strane (Ivan, 29.9.2026: umesto karusela — stakleni tabovi gore, izabran lila).
+  const [tab, setTab] = React.useState<TabPocetne>('danas');
+  const izaberiTab = (t: TabPocetne) => setTab(t);
   const date = React.useMemo(() => {
     const d = new Date(today); d.setDate(today.getDate() + offset); return d;
   }, [today, offset]);
@@ -128,39 +129,37 @@ export default function Home() {
     />
   ) : null;
 
-  const slides: Slide[] = [
-        // Prvi slajd: "Tvoj dan" (`lib/tvoj-dan.ts`), a ISPOD njega "Danas ukratko" —
-        // do 29.9.2026 je sazetak bio zaseban drugi slajd (Ivan). Dan bez kandidata za
-        // "Tvoj dan": na prvom slajdu ostaje samo sazetak.
-        ...(tvojDan || ukratko
-          ? [{
-              key: 'day',
-              node: (
-                <View>
-                  {tvojDan && <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} aktivan={slide === 0} />}
-                  {ukratko && <View className={tvojDan ? 'mt-3' : undefined}>{ukratko}</View>}
-                </View>
-              ),
-            }]
-          : []),
-        // "Mesec danas" — posle sazetka (Ivan, 27.9.2026); nosi svoju oznaku, kao datum
-        // na prvom slajdu (Ivan, 28.9.2026). Lunarni kalendar je besplatan za sve.
-        { key: 'moon', node: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} /> },
-        // Sledece promene na nebu i kuca u koju ulaze (Ivanov plan).
-        ...(daily.skyEvents.length > 0
-          ? [{ key: 'sky', label: 'Promene na nebu', nadnaslov: 'Šta te čeka u narednom periodu', veliki: true, node: <SkyEvents daily={daily} today={date} /> }]
-          : []),
-        // Spori tranziti — tema perioda. "Ovih dana" (brzi) je izbacen 27.9.2026
-        // (Ivan): ponavljao je sazetak, a Mesecevi tranziti su presli u karticu Mesec.
-        // Svi brzi tranziti ostaju u tabu "Tranziti".
-        ...(daily.bySpeed.slow.length > 0
-          ? [{ key: 'slow', label: 'Tema perioda', nadnaslov: 'Tranziti koji traju nedeljama', veliki: true, node: <TransitList list={daily.bySpeed.slow} texts={texts} today={date} chart={resolved.chart} timeUnknown={resolved.timeUnknown} besplatno={premium ? undefined : BESPLATNO.temaPerioda} /> }]
-          : []),
-  ];
+  // Sadrzaj svakog taba — redosled isti kao nekadasnji slajdovi karusela.
+  // Tab bez sadrzaja kaze to recenicom; tabovi se ne sklanjaju (red bi skakao).
+  const sadrzaj: Record<TabPocetne, React.ReactNode> = {
+    // "Tvoj dan" (`lib/tvoj-dan.ts`), a ispod njega "Danas ukratko".
+    danas: tvojDan || ukratko ? (
+      <View>
+        {tvojDan && <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} aktivan={tab === 'danas'} />}
+        {ukratko && <View className={tvojDan ? 'mt-3' : undefined}>{ukratko}</View>}
+      </View>
+    ) : <Prazno>Za ovaj dan nema izraženih tranzita.</Prazno>,
+    // Lunarni kalendar je besplatan za sve.
+    mesec: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} />,
+    // Sledece promene na nebu i kuca u koju ulaze.
+    promene: (
+      <Odeljak nadnaslov="Šta te čeka u narednom periodu" naslov="Promene na nebu">
+        {daily.skyEvents.length > 0
+          ? <SkyEvents daily={daily} today={date} />
+          : <Prazno>Nijedna planeta uskoro ne menja znak ni smer.</Prazno>}
+      </Odeljak>
+    ),
+    // Spori tranziti — tema perioda. Svi brzi tranziti su u tabu "Tranziti".
+    teme: (
+      <Odeljak nadnaslov="Tranziti koji traju nedeljama" naslov="Tema perioda">
+        {daily.bySpeed.slow.length > 0
+          ? <TransitList list={daily.bySpeed.slow} texts={texts} today={date} chart={resolved.chart} timeUnknown={resolved.timeUnknown} besplatno={premium ? undefined : BESPLATNO.temaPerioda} />
+          : <Prazno>Ovih dana nijedna spora planeta nije u aspektu sa tvojom kartom.</Prazno>}
+      </Odeljak>
+    ),
+  };
 
   return (
-    // Indikator slajdova stoji VAN skrola, vezan za dno ekrana (`SlideDots`), pa je
-    // uvek isto iznad trake tabova — ne zavisi od visine kartica ni ekrana (Ivan, 28.9.2026).
     <View style={{ flex: 1 }}>
     {/* Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`. */}
     <Screen
@@ -262,168 +261,52 @@ export default function Home() {
         />
       )}
       {/* Bez naslova i bez datuma (Ivan, 26.9.2026): dan se vidi i bira u zaglavlju. */}
-      {/* Karusel malo ispod zaglavlja (Ivan, 29.9.2026: 32 -> 0 -> 16pt). */}
-      <View className="pt-4" />
-
-      {/* Sve kartice su karusel, jedna po slajdu (Ivan, 28.9.2026). Redosled je
-          isti kao kad su stajale jedna ispod druge. Kartica bez sadrzaja ne dobija
-          slajd — prazan slajd bi izgledao kao greska. */}
-      <Carousel page={slide} onPage={setSlide} slides={slides} />
-      {/* Vazduh ispod kartica: kraj kartice na dnu skrola staje tacno na vrh
-          preliva, ne ispod pune sive (`useDnoKarusela`). */}
-      <View style={{ height: dno.prostor }} />
+      {/* Tabovi strane ispod zaglavlja (Ivan, 29.9.2026, umesto karusela): staklene
+          kapsule sirine natpisa, izabrana svetlo lila — kao oblasti na "Mesec danas".
+          Na promenu taba sadrzaj ulazi sa strane taba, BEZ pretapanja: u sadrzaju ima
+          stakla, a providan roditelj ga kvari na iOS-u (`ui/kapsule.tsx`). */}
+      <View className="pt-4">
+        <KapsuleRed tabovi stavke={TABOVI} izabrana={tab} onIzbor={izaberiTab} />
+      </View>
+      <Animated.View key={tab} entering={ODOZDO} className="pt-7">
+        {sadrzaj[tab]}
+      </Animated.View>
     </Screen>
-    <DnoPreliv visina={dno.vrh} />
-    <SlideDots count={slides.length} active={Math.min(slide, slides.length - 1)} bottom={dno.tackice} />
     </View>
   );
 }
 
-/**
- * Razmak izmedju slajdova = dve margine ekrana: susedni slajd tada pocinje tacno
- * na ivici ekrana i ne viri (Ivan, 28.9.2026). Sa 12pt je virio 8pt sa strane.
- */
-const SLIDE_GAP = space.screen * 2;
+type TabPocetne = 'danas' | 'mesec' | 'promene' | 'teme';
+const TABOVI: { key: TabPocetne; label: string }[] = [
+  { key: 'danas', label: 'Tvoj dan' },
+  { key: 'mesec', label: 'Mesec' },
+  { key: 'promene', label: 'Promene' },
+  { key: 'teme', label: 'Teme' },
+];
+
+/** Promena taba: sadrzaj ulazi sa strane, bez providnosti (staklo), kao listanje. */
+/** Sadrzaj taba ulazi ODOZDO NAGORE uz pretapanje (Ivan, 29.9.2026; do tada zdesna/sleva po smeru taba). */
+const ODOZDO = FadeInDown.duration(280);
 
 /**
- * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
- * sam karusel izlazi do ivica ekrana da kartica pri pomeranju ne bude odsecena
- * na margini. Visina je visina NAJVISE kartice; kartice ostaju svoje visine
- * (poravnate gore), jer rastegnuta kartica sa praznim dnom izgleda kao greska.
+ * Naslov taba "Promene" i "Teme": veliki naslov, pa ispod kratko objasnjenje istim
+ * slovima kao datum na "Tvom danu" (Ivan, 29.9.2026).
  */
-/** `veliki`: naslov slajda crn i krupan — `display`, ISTI kao naslov "Tvog dana"
- *  (Ivan, 29.9.2026) — umesto sive oznake u verzalu. */
-type Slide = { key: string; label?: string; veliki?: boolean; nadnaslov?: string; node: React.ReactNode };
-
-/** Razmak od vrha trake tabova do tackica (Ivan, 28.9.2026: 32). */
-const DOTS_ABOVE_TAB_BAR = 32;
-/** Visina tackica (`h-1.5`). */
-const DOTS_HEIGHT = 6;
-/** Pun sivi pojas iznad tackica, pre nego sto preliv pocne da bledi. */
-const DNO_PUNO_IZNAD = 12;
-/** Koliko preliv bledi — od pune sive do providnog. */
-const DNO_BLEDI = 40;
-
-/**
- * Mere dna pocetne: gde stoje tackice, gde pocinje preliv i koliko praznog
- * prostora skrol ostavlja ispod kartica. Jedno mesto, da se tri broja ne raziđu.
- *
- *   tackice  od dna prostora ekrana do tackica (vidi `SlideDots` za iOS/Android)
- *   vrh      od dna prostora ekrana do vrha preliva
- *   prostor  vazduh na kraju skrola, POVRH onog sto `Screen` vec dodaje za traku —
- *            kraj poslednje kartice tada staje na vrh preliva. iOS: 28, kao ranije.
- */
-function useDnoKarusela() {
-  const insets = useSafeAreaInsets();
-  const traka = useTabBarSpace();
-  const tackice = (Platform.OS === 'ios' ? insets.bottom : traka) + DOTS_ABOVE_TAB_BAR;
-  const vrh = tackice + DOTS_HEIGHT + DNO_PUNO_IZNAD + DNO_BLEDI;
-  return { tackice, vrh, prostor: Math.max(0, vrh - traka) };
-}
-
-/**
- * Preliv na dnu pocetne (Ivan, 28.9.2026): kartica koja klizi ispod tackica i
- * trake tabova se vise ne vidi kroz njih — dugacak slajd ("Tema perioda") je
- * tamo mesao tekst sa tackicama. Od vrha bledi 40pt, pa je puna siva boja
- * pozadine (`neutral.grouped`) od 12pt iznad tackica do dna ekrana, i iza
- * trake tabova (na iOS-u 26 staklo onda preuzima sivu, ne tekst).
- * Ide IZNAD skrola a ISPOD tackica; ne prima dodir.
- */
-function DnoPreliv({ visina }: { visina: number }) {
+function Odeljak({ nadnaslov, naslov, children }: { nadnaslov: string; naslov: string; children: React.ReactNode }) {
   return (
-    <LinearGradient
-      pointerEvents="none"
-      colors={[`${neutral.grouped}00`, neutral.grouped, neutral.grouped]}
-      locations={[0, DNO_BLEDI / visina, 1]}
-      style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: visina }}
-    />
-  );
-}
-
-/**
- * Vodoravni karusel kartica. Slajd je sirok kao sadrzaj ekrana (bez margine), a
- * sam karusel izlazi do ivica ekrana da kartica pri pomeranju ne bude odsecena
- * na margini. Visina je visina NAJVISE kartice; kartice ostaju svoje visine
- * (poravnate gore), jer rastegnuta kartica sa praznim dnom izgleda kao greska.
- * Indikator NIJE ovde nego u `SlideDots`, van skrola.
- */
-function Carousel({ slides, page, onPage }: { slides: Slide[]; page: number; onPage: (p: number) => void }) {
-  const [width, setWidth] = React.useState(0);
-  const slideWidth = width - space.screen * 2;
-  const step = slideWidth + SLIDE_GAP;
-
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (step <= 0) return;
-    const p = Math.round(e.nativeEvent.contentOffset.x / step);
-    if (p !== page) onPage(p);
-  };
-
-  if (slides.length === 0) return null;
-  return (
-    <View style={{ marginHorizontal: -space.screen }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      {width > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={step}
-          decelerationRate="fast"
-          disableIntervalMomentum
-          onScroll={onScroll}
-          scrollEventThrottle={16}
-          contentContainerStyle={{ paddingHorizontal: space.screen, gap: SLIDE_GAP, alignItems: 'flex-start' }}>
-          {slides.map((s) => (
-            <View key={s.key} style={{ width: slideWidth }}>
-              {/* Naslov slajda ISTIM pismom kao datum na prvom slajdu — `oznaka` 12pt,
-                  verzali (Ivan, 28.9.2026; ranije `display`). U istoj visini kao datum. Naslov
-                  ima svaki slajd osim prvog. */}
-              {/* Kratko objasnjenje IZNAD velikog naslova, istim slovima i razmakom kao
-                  datum iznad naslova "Tvog dana" (Ivan, 29.9.2026). */}
-              {!!s.nadnaslov && <Text variant="oznaka" className={OZNAKA_12}>{s.nadnaslov}</Text>}
-              {!!s.label && (s.veliki
-                ? <Text variant="display" className={s.nadnaslov ? 'mt-3 mb-5' : '-mt-2 mb-5'} accessibilityRole="header">{s.label}</Text>
-                : <Text variant="oznaka" className={cn(OZNAKA_12, 'mb-3')} accessibilityRole="header">{s.label}</Text>)}
-              {s.node}
-            </View>
-          ))}
-        </ScrollView>
-      )}
+    <View>
+      {/* Prvo veliki naslov, pa sitno objasnjenje ispod (Ivan, 29.9.2026). */}
+      <Text variant="display" accessibilityRole="header">{naslov}</Text>
+      <Text variant="oznaka" className={cn(OZNAKA_12, 'mb-7 mt-2')}>{nadnaslov}</Text>
+      {children}
     </View>
   );
 }
 
-/**
- * Indikator slajdova — uvek na istom mestu, `DOTS_ABOVE_TAB_BAR` iznad trake
- * tabova, na svakom telefonu (Ivan, 28.9.2026). Ne zavisi od visine kartica.
- * Van skrola je, pa ne klizi; ne prima dodir.
- *
- * `bottom` se racuna od DNA PROSTORA EKRANA, ne od dna telefona. Izmereno sa
- * snimka iPhone-a (iOS 26, 28.9.2026): prostor ekrana se zavrsava 49pt iznad
- * dna telefona, a vrh plutajuce trake je jos tacno za donji safe-area umetak
- * (34pt) iznad toga. Zato na iOS-u: umetak + razmak. Na telefonu bez umetka
- * (Home dugme) umetak je 0 i traka pocinje tacno na dnu prostora.
- *
- * ANDROID je obrnuto: prostor ekrana ide do dna telefona, IZA Material trake
- * (edge-to-edge). Sa samo razmakom tackice su stajale 32dp od dna telefona,
- * sakrivene iza trake (Pixel 9 emulator, 28.9.2026). Tamo se dodaje cela
- * traka + umetak — `useTabBarSpace`, isti broj kojim `Screen` pravi mesto na dnu.
- */
-function SlideDots({ count, active, bottom }: { count: number; active: number; bottom: number }) {
-  if (count < 2) return null;
-  return (
-    <View
-      pointerEvents="none"
-      className="absolute left-0 right-0 flex-row justify-center gap-1.5"
-      style={{ bottom }}
-      accessible
-      accessibilityLabel={`Kartica ${active + 1} od ${count}`}>
-      {Array.from({ length: count }, (_, i) => (
-        // Neaktivne `bg-subtle` (#9C9C9D): `fill-strong` se na sivoj pozadini nije video (Ivan, 28.9.2026).
-        <View key={i} className={cn('h-1.5 rounded-pill', i === active ? 'w-4 bg-foreground' : 'w-1.5 bg-subtle')} />
-      ))}
-    </View>
-  );
+/** Tab bez sadrzaja: jedna tiha recenica umesto prazne strane. */
+function Prazno({ children }: { children: string }) {
+  return <Text variant="muted" className="mt-2">{children}</Text>;
 }
-
 
 type Texts = Map<string, TransitText>;
 

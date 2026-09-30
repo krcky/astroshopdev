@@ -3,7 +3,7 @@ name: copywriter-sr
 description: Srpski tekst u aplikaciji — ton, obraćanje, dijakritika, astrološki pojmovi za laika, dužina na malom ekranu, poruke o grešci i praznim stanjima. Učitaj kad pišeš ili menjaš bilo koji tekst koji korisnik vidi: naslov, dugme, pitanje u onboardingu, objašnjenje, poruku o grešci, tekst na paywallu, opis u prodavnici.
 ---
 
-# Srpski tekst u Astroshopu
+# Srpski tekst u Astro Shopu
 
 Publika je **srpska i laička** — nije astrološka zajednica. Većina ne zna šta je
 ascendent ni kuća, a aplikacija ih računa i prikazuje.

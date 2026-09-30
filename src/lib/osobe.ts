@@ -27,6 +27,12 @@ export const ODNOSI: readonly { key: OdnosKljuc; naziv: string }[] = [
   { key: 'drugo', naziv: 'Neko drugi' },
 ];
 
+/** Polje osobe koje se menja na listu odozdo (`/rodjenje-polje?polje=`, tabele u `/osoba-uredi` i na listu "Nalog"). */
+export type PoljeOsobe = 'ime' | 'odnos' | 'datum' | 'vreme' | 'mesto';
+
+/** Napomena ispod koraka unosa druge osobe (umesto "tvoju kartu" iz onboardinga). */
+export const NAPOMENA_PODACI = 'Podatke o rođenju vidiš samo ti. Ne delimo ih i ne prodajemo.';
+
 /** Naziv odnosa za prikaz; "Neko drugi" i neodabran nemaju sta da kazu — null. */
 export function nazivOdnosa(k: OdnosKljuc | null | undefined): string | null {
   if (!k || k === 'drugo') return null;
@@ -72,5 +78,7 @@ export function porukaOsobe(poruka: string | undefined | null): string {
   if (/granica_osoba/.test(m)) return 'Za još osoba potreban je Premium.';
   if (/nema_naloga|JWT/i.test(m)) return 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.';
   if (/fetch|network|timed? ?out/i.test(m)) return 'Nema veze sa serverom. Ništa nije sačuvano — probaj kad se internet vrati.';
-  return 'Nije sačuvano. Probaj ponovo za minut.';
+  // U razvoju i tacna poruka servera — bez nje se kvar ne vidi.
+  const razvoj = typeof __DEV__ !== 'undefined' && __DEV__ ? ` (${m})` : '';
+  return `Nije sačuvano. Probaj ponovo za minut.${razvoj}`;
 }

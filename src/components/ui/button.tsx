@@ -226,11 +226,6 @@ type ButtonProps = React.ComponentProps<typeof Pressable> & VariantProps<typeof 
    */
   istaknuto?: boolean;
   /**
-   * Ugaseno dugme SIVO umesto belog — za bele povrsine (list odozdo), gde belo
-   * dugme sa senkom nestane i ostane samo sivi natpis (Ivan, 29.9.2026).
-   */
-  ugasenoSivo?: boolean;
-  /**
    * Nesto se ceka (slanje, cuvanje, provera koda). Dugme ZADRZI svoj izgled, a
    * umesto natpisa se vrti sistemski spiner u boji natpisa (Ivan, 29.9.2026:
    * "Ucitavam" koji samo stoji ne kaze da se nesto desava). Do tada je ekran
@@ -252,19 +247,20 @@ export function Button({
   style,
   children,
   istaknuto = true,
-  ugasenoSivo = false,
   ucitava = false,
   accessibilityState,
   ...props
 }: ButtonProps) {
   /*
-   * Neaktivno dugme u referentnoj aplikaciji NIJE prigusena verzija crnog —
-   * ono postane belo sa sivim natpisom. Razlika je vazna: prigusena crna i
-   * dalje vuce oko kao glavna akcija, a belo jasno kaze "jos ne moze".
+   * UGASENO DUGME JE SIVA KAPSULA (`bg-fill-strong`) sa sivim natpisom — SVUDA
+   * (Ivan, 29.9.2026: "da ima neku boju a ne da bude samo tekst"; stil sa
+   * "Postavi pitanje"). Nije prigusena verzija crnog: ta i dalje vuce oko kao
+   * glavna akcija. Nije ni belo sa senkom (ranije): na belom listu se od njega
+   * video samo natpis, pa je izgledalo kao tekst, ne kao dugme.
    */
   // Dok se ceka, dugme NIJE ugaseno na izgled — vidi `ucitava`.
   const ugaseno = Boolean(disabled) && !ucitava;
-  const stvarni = ugaseno ? (ugasenoSivo ? 'secondary' : 'soft') : (variant ?? 'default');
+  const stvarni = ugaseno ? 'secondary' : (variant ?? 'default');
   const meka = stvarni === 'soft';
   const crno = stvarni === 'default' || stvarni === 'destructive';
   const sjajno = istaknuto && stvarni === 'default';
@@ -289,7 +285,7 @@ export function Button({
           buttonVariants({ variant: stvarni, size }),
           // Bez seckanja, inace iOS ne crta senku; sjajeve secka njihov sloj.
           sjajno && 'overflow-visible',
-          ugaseno && ugasenoSivo && 'bg-fill-strong',
+          ugaseno && 'bg-fill-strong',
           className,
         )}
         {...props}>

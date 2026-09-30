@@ -6,7 +6,7 @@ import { Screen } from '@/components/screen';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { PodvuceniTabovi } from '@/components/ui/podvuceni-tabovi';
+import { KapsuleRed } from '@/components/ui/kapsule';
 import { NatalnaKartaPrikaz } from '@/components/natalna-karta-prikaz';
 import { TranzitiLista } from '@/components/tranziti-lista';
 import { AstrologSlika } from '@/components/astrolog-slika';
@@ -19,17 +19,20 @@ import { usePremium } from '@/store/auth';
 import { useDanas } from '@/store/danas';
 import { cn } from '@/lib/utils';
 
-type Strana = 'karta' | 'danas';
+type Strana = 'karta' | 'tranziti' | 'pitaj';
 
-const STRANE = [
-  { key: 'karta', natpis: 'Karta' },
-  { key: 'danas', natpis: 'Danas' },
-] as const;
+/** Tabovi strane osobe — staklene kapsule kao na pocetnoj (Ivan, 29.9.2026). */
+const STRANE: { key: Strana; label: string }[] = [
+  { key: 'karta', label: 'Natalna karta' },
+  { key: 'tranziti', label: 'Tranziti' },
+  { key: 'pitaj', label: 'Pitaj' },
+];
 
 /**
- * Strana druge osobe (Ivan, 29.9.2026): njena natalna karta i danasnji tranziti
- * na nju — ISTI prikazi kao tab "Ti" i tab "Tranziti", sa istim granicama za
- * besplatne (pravilo 18c). Dole je pitanje astrologu o njoj (`/pitanje-novo?osoba=`).
+ * Strana druge osobe (Ivan, 29.9.2026): tabovi Natalna karta / Tranziti / Pitaj
+ * (staklene kapsule kao na pocetnoj). Karta i tranziti su ISTI prikazi kao tab
+ * "Ti" i tab "Tranziti", sa istim granicama za besplatne (pravilo 18c); "Pitaj"
+ * vodi na pitanje astrologu o njoj (`/pitanje-novo?osoba=`).
  *
  * Posebna strana, a ne prekidac "ja / ona" na tabovima: "Danas" i "Tvoj dan" su
  * uvek korisnikovi, pa ne moze da se desi da neko cita tudji dan kao svoj.
@@ -72,10 +75,14 @@ export default function OsobaStrana() {
         />
       ) : (
         <>
-          <PodvuceniTabovi className="mx-5 mb-6" stavke={STRANE} izabrana={strana} onIzbor={setStrana} />
+          <View className="mb-6 px-5">
+            <KapsuleRed tabovi stavke={STRANE} izabrana={strana} onIzbor={setStrana} />
+          </View>
 
           {strana === 'karta' ? (
             <NatalnaKartaPrikaz resolved={resolved} osobaId={osoba.id} />
+          ) : strana === 'pitaj' ? (
+            <PitajOOsobi id={osoba.id} />
           ) : resolved.zoneUnreliable ? (
             <View className={cn(CARD_SURFACE, 'mx-5 p-5')}>
               <Text variant="h3">Tranziti ne mogu da se izračunaju</Text>
@@ -91,8 +98,6 @@ export default function OsobaStrana() {
                 besplatno={premium ? undefined : BESPLATNO.tranzitiDana} />
             </View>
           ) : null}
-
-          <PitajOOsobi id={osoba.id} />
         </>
       )}
     </Screen>
@@ -119,7 +124,7 @@ function IzmeniDugme({ id }: { id: string }) {
  */
 function PitajOOsobi({ id }: { id: string }) {
   return (
-    <View className={cn(CARD_SURFACE, 'mx-5 mt-8 p-5')}>
+    <View className={cn(CARD_SURFACE, 'mx-5 p-5')}>
       <View className="flex-row items-center gap-3">
         <AstrologSlika velicina={44} />
         <View className="flex-1">
@@ -129,7 +134,8 @@ function PitajOOsobi({ id }: { id: string }) {
           </Text>
         </View>
       </View>
-      <Button variant="secondary" className="mt-4"
+      {/* Crno glavno dugme (Ivan, 29.9.2026) — na tabu "Pitaj" je ovo jedina radnja. */}
+      <Button className="mt-4"
         // Prvi korak je uvod (astrolog, uslovi, cena), kao "Postavi pitanje" na tabu Pitaj.
         onPress={() => router.push({ pathname: '/pitanje-novo', params: { osoba: id, korak: 'uvod' } })}>
         <Text>Postavi pitanje</Text>

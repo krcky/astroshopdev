@@ -9,7 +9,7 @@ import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
 
 /*
- * Logo u traci na vrhu ekrana: animirani krug + natpis ASTROSHOP.
+ * Logo u traci na vrhu ekrana: animirani krug + natpis "Astro Shop".
  *
  * Krug je VEKTORSKI Lottie sklopljen iz brend SVG-a (`logo/krug-vektor.svg`)
  * skriptom `scripts/logo/build-krug.py` — tamo su i razlozi i zamke. Originalni

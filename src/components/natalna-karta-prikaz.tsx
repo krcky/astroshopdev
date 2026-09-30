@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { datumRodjenja } from '@/lib/horoscope';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { RowHead } from '@/components/ui/row';
+import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import {
@@ -176,8 +176,13 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           </View>
 
           {/* Aspekti: naslov tumacenja je glavni red, ime aspekta i orbis sitno ispod (kao sajt). */}
+          {/* Naslov U kartici, kao na Nebu (Ivan, 29.9.2026): prvi red, oznaka 12pt. */}
           <View className={cn(KARTICA, 'mx-5 mt-4 overflow-hidden')}>
-            <RowHead>Aspekti · {aspects.length}</RowHead>
+            <View className="border-b border-border px-4 py-3">
+              <Text variant="oznaka" className={OZNAKA_12} accessibilityRole="header">
+                Aspekti{'\u00A0\u00A0·\u00A0\u00A0'}{aspects.length}
+              </Text>
+            </View>
             {aspects.map((a, i) => (
               <AspektRed
                 key={a.key}

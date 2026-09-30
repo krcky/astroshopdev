@@ -12,10 +12,16 @@ import { cn } from '@/lib/utils';
  * tekst ispod (Ivan, 27. i 28.9.2026). Oblik pravi izvoz korpusa, a deli ga
  * `lib/tumacenje.ts`.
  */
-export function TumacenjeTekst({ tekst }: { tekst: string }) {
+export function TumacenjeTekst({ tekst, listePrvo = false }: {
+  tekst: string;
+  /** Stavke (•) pre pasusa — saveti lunarnog kalendara (Ivan, 29.9.2026). */
+  listePrvo?: boolean;
+}) {
+  const b0 = blokovi(tekst);
+  const redom = listePrvo ? [...b0.filter((b) => b.vrsta !== 'pasus'), ...b0.filter((b) => b.vrsta === 'pasus')] : b0;
   return (
     <View className="gap-3">
-      {blokovi(tekst).map((b, i) =>
+      {redom.map((b, i) =>
         b.vrsta === 'pasus' ? (
           <Text key={i} variant="reading">{b.tekst}</Text>
         ) : (

@@ -58,7 +58,10 @@ function PitajCoveka() {
   useFocusEffect(React.useCallback(() => { osveziPitanja(); osveziKredite(); }, [osveziPitanja, osveziKredite]));
 
   // Prvo ucitavanje: ni uvod ni lista, da strana ne bljesne uvodom pa predje u listu.
-  if (pitanja.isPending && pitanja.fetchStatus === 'fetching') return null;
+  // SAMO prvo: posle greske (`errorUpdateCount`) ponovni upit vraca status u "pending",
+  // pa je strana bila PRAZNA ~2 s pri svakom dolasku na tab dok traju ponavljanja
+  // (snimak, 29.9.2026) — tada ostaje uvod dok odgovor ne stigne.
+  if (pitanja.isPending && pitanja.fetchStatus === 'fetching' && pitanja.errorUpdateCount === 0) return null;
 
   const moja = pitanja.data ?? [];
   const kredit = brojKredita > 0 && (

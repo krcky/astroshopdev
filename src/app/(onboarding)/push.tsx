@@ -54,7 +54,8 @@ export default function Push() {
     <OnboardingStep
       skip={{ label: 'Preskoči', onPress: done, disabled: busy }}
       icon={BellRing}
-      title="Da ti javimo?"
+      // Naslov (Ivan, 30.9.2026; ranije "Da ti javimo?").
+      title="Da ne propustiš svoj dan"
       subtitle={Platform.OS === 'web'
         ? 'Notifikacije rade na telefonu; na vebu ovaj korak preskačemo.'
         : 'Jednom ujutru, sa horoskopom za taj dan, i kad ti astrolog odgovori. Ništa drugo ti ne šaljemo.'}

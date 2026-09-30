@@ -153,9 +153,12 @@ export default function TransitDetail() {
               ) : (
                 <PremiumKartica
                   izLista
-                  className="mt-8"
-                  naslov="Detaljno tumačenje"
-                  opis="Dugoročni efekti, sfere života na koje se odnosi, i konkretni saveti za ovaj period."
+                  ilustracija
+                  className="mt-12"
+                  // Tekst: verzija 2 od tri (Ivan, 30.9.2026) — iskreno kaze da je gore kratka verzija.
+                  naslov="Pročitaj do kraja"
+                  opis="Ovo je kratka verzija. U celoj su oblasti života na koje tranzit deluje, dugoročni efekti i konkretni saveti."
+                  dugme="Otključaj ceo tekst"
                 />
               )}
             </>

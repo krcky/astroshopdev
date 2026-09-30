@@ -39,8 +39,12 @@ export function SheetGrabber() {
  * nadole. List ide odmah do vrha (`TUMACENJE_LIST`), a dugacak tekst se
  * skroluje unutra.
  */
-export function SheetScroll({ children, keyboardShouldPersistTaps, siva = false }: {
+export function SheetScroll({ children, keyboardShouldPersistTaps, siva = false, skrolRef, onScrollY }: {
   children: React.ReactNode;
+  /** Skrol lista — za povratak na mesto posle zamene sadrzaja (lunarni kalendar). */
+  skrolRef?: React.Ref<ScrollView>;
+  /** Trenutni pomeraj skrola (throttle 16 ms). */
+  onScrollY?: (y: number) => void;
   /**
    * Siva pozadina (`bg-grouped`) umesto bele — za list sa BELIM KARTICAMA (lunarni
    * kalendar, Ivan 29.9.2026): bela kartica na belom listu se ne vidi (pravilo 17).
@@ -57,6 +61,9 @@ export function SheetScroll({ children, keyboardShouldPersistTaps, siva = false 
     // (`stickyHeaderIndices`) — zalepljeno zaglavlje RN crta PREKO sadrzaja koji
     // prolazi ispod, a svojih 40pt ujedno sluzi kao gornji razmak.
     <ScrollView
+      ref={skrolRef}
+      onScroll={onScrollY ? (e) => onScrollY(e.nativeEvent.contentOffset.y) : undefined}
+      scrollEventThrottle={onScrollY ? 16 : undefined}
       className={siva ? 'flex-1 bg-grouped' : 'flex-1 bg-background'}
       stickyHeaderIndices={[0]}
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}

@@ -1,48 +1,36 @@
 import * as React from 'react';
-import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Check } from 'lucide-react-native';
 
 import { Screen } from '@/components/screen';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { KapsuleRed } from '@/components/ui/kapsule';
 import { BezInterneta } from '@/components/bez-interneta';
-import { RodjenjeForma, Sekcija, pocetniUnos, profilIzUnosa } from '@/components/rodjenje-forma';
-import { otvoriPremium } from '@/components/zakljucano';
-import { dodajOsobu, izmeniOsobu, obrisiOsobu, useOsoba } from '@/lib/osobe-api';
-import { ODNOSI, porukaOsobe, type OdnosKljuc } from '@/lib/osobe';
-import { useNaMrezi } from '@/lib/mreza';
+import { Group, ListRow } from '@/components/ui/list';
+import { VrednostReda } from '@/components/ui/vrednost-reda';
+import { obrisiOsobu, useOsoba } from '@/lib/osobe-api';
+import { ODNOSI, porukaOsobe, type PoljeOsobe } from '@/lib/osobe';
+import { datumRodjenja } from '@/lib/horoscope';
 import { ASTROLOG } from '@/lib/pitanja';
 import { useAuthStore } from '@/store/auth';
-import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 
+const dvo = (n: number) => String(n).padStart(2, '0');
+
 /**
- * Unos ili izmena druge osobe (Ivan, 29.9.2026) — sve na jednom ekranu, kao
- * `/edit` (pravilo 10), plus "Ko ti je". Bez `id` je nova osoba.
+ * Izmena druge osobe (Ivan, 29.9.2026): TABELA sa svim podacima; dodir na red
+ * otvara list odozdo samo sa tim poljem (`/rodjenje-polje`), koji cuva odmah.
+ * Nova osoba se unosi korak po korak (`app/nova-osoba/`), ne ovde.
  *
- * Upis ide PRVO na server (`lib/osobe-api.ts`): baza proverava granicu (1
- * besplatno, 10 uz Premium) i daje id. Bez mreze se ne cuva nista, i to se kaze.
- *
- * PRISTANAK: pri dodavanju korisnik potvrdi da osoba zna da unosi njene podatke,
- * a za dete da je roditelj ili staratelj. Konacan tekst ide pravniku uz politiku
- * privatnosti (unosimo podatke trece osobe, a vidi ih i astrolog kad se pita o njoj).
+ * Dole je brisanje. Pitanja o osobi ostaju — snimak karte je u pitanju.
  */
 export default function OsobaUredi() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const osoba = useOsoba(id);
   const uid = useAuthStore((s) => s.user?.id);
-  const naMrezi = useNaMrezi();
-
-  const [unos, setUnos] = React.useState(() => pocetniUnos(osoba));
-  const [odnos, setOdnos] = React.useState<OdnosKljuc | null>(osoba?.odnos ?? null);
-  // Kod izmene je pristanak vec dat pri dodavanju.
-  const [pristanak, setPristanak] = React.useState(!!id);
-  const [radi, setRadi] = React.useState<'cuvam' | 'brisem' | null>(null);
+  const [brisem, setBrisem] = React.useState(false);
   const [poruka, setPoruka] = React.useState<string | null>(null);
 
-  if (id && !osoba) {
+  if (!osoba) {
     return (
       <Screen label="Izmena" tabBarSpace={false} pushed>
         <Text variant="muted" className="mt-6">Ova osoba više nije na tvojoj listi.</Text>
@@ -50,33 +38,11 @@ export default function OsobaUredi() {
     );
   }
 
-  const podaci = profilIzUnosa(unos);
-  const spremno = !!podaci && pristanak && !!uid && naMrezi && radi === null;
-
-  const sacuvaj = async () => {
-    if (!spremno || !podaci || !uid) return;
-    setRadi('cuvam');
-    setPoruka(null);
-    try {
-      if (id) {
-        await izmeniOsobu(uid, id, { ...podaci, odnos });
-        router.back();
-      } else {
-        const nova = await dodajOsobu(uid, { ...podaci, odnos });
-        // Na stranu nove osobe, a forma izlazi iz istorije (nazad vodi na "Ti").
-        router.replace({ pathname: '/osoba', params: { id: nova.id } });
-      }
-    } catch (e) {
-      const m = (e as Error)?.message;
-      setPoruka(porukaOsobe(m));
-      setRadi(null);
-      // Granica je na serveru (npr. Premium istekao dok je forma bila otvorena).
-      if (/granica_osoba/.test(m ?? '')) otvoriPremium();
-    }
-  };
+  const otvori = (polje: PoljeOsobe) => router.push({ pathname: '/rodjenje-polje', params: { osoba: osoba.id, polje } });
+  const t = osoba.time;
 
   const obrisi = () => {
-    if (!id || !uid || !osoba) return;
+    if (!uid) return;
     Alert.alert(
       'Obrisati osobu?',
       `${osoba.name} nestaje sa tvoje liste, na svim uređajima. Već postavljena pitanja o ovoj osobi ostaju.`,
@@ -86,15 +52,15 @@ export default function OsobaUredi() {
           text: 'Obriši',
           style: 'destructive',
           onPress: async () => {
-            setRadi('brisem');
+            setBrisem(true);
             setPoruka(null);
             try {
-              await obrisiOsobu(uid, id);
+              await obrisiOsobu(uid, osoba.id);
               // Strana osobe iza ove vise nema sta da pokaze — nazad na "Ti".
               router.dismissTo('/chart');
             } catch (e) {
               setPoruka(porukaOsobe((e as Error)?.message));
-              setRadi(null);
+              setBrisem(false);
             }
           },
         },
@@ -103,66 +69,41 @@ export default function OsobaUredi() {
   };
 
   return (
-    <Screen
-      label={id ? 'Izmena' : 'Nova osoba'}
-      tabBarSpace={false}
-      pushed
-      keyboardShouldPersistTaps="handled">
-      <BezInterneta className="mt-4" />
+    <Screen label={osoba.name} tabBarSpace={false} pushed padded={false}>
+      <BezInterneta className="mx-screen mt-4" />
 
-      <RodjenjeForma
-        unos={unos}
-        onChange={setUnos}
-        imePlaceholder="Ime ili nadimak"
-        posleImena={
-          <Sekcija naslov="Ko ti je">
-            <KapsuleRed
-              stavke={ODNOSI.map((o) => ({ key: o.key, label: o.naziv, icon: null }))}
-              // Nista izabrano dok korisnik ne izabere — odnos nije obavezan.
-              izabrana={(odnos ?? '') as OdnosKljuc}
-              onIzbor={(k) => setOdnos(k === odnos ? null : k)}
-            />
-          </Sekcija>
-        }
-      />
+      <Group className="mt-6">
+        <ListRow title="Ime" trailing={<VrednostReda>{osoba.name}</VrednostReda>} onPress={() => otvori('ime')} />
+        <ListRow
+          title="Ko ti je"
+          trailing={<VrednostReda>{ODNOSI.find((o) => o.key === osoba.odnos)?.naziv ?? 'Nije izabrano'}</VrednostReda>}
+          onPress={() => otvori('odnos')}
+        />
+        <ListRow title="Datum rođenja" trailing={<VrednostReda>{datumRodjenja(osoba.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
+        <ListRow
+          title="Vreme rođenja"
+          trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : 'Ne zna se'}</VrednostReda>}
+          onPress={() => otvori('vreme')}
+        />
+        <ListRow title="Mesto rođenja" trailing={<VrednostReda>{osoba.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />
+      </Group>
 
-      {!id && (
-        <Pressable
-          onPress={() => setPristanak(!pristanak)}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: pristanak }}
-          className="mt-7 flex-row gap-3 active:opacity-60">
-          <View
-            className={cn('mt-0.5 h-6 w-6 items-center justify-center rounded-md border-2 border-foreground', pristanak && 'bg-foreground')}>
-            {pristanak && <Check size={16} color={neutral.white} strokeWidth={3} />}
-          </View>
-          <Text variant="default" className="flex-1">
-            Osoba zna da unosim njene podatke o rođenju. Ako je dete, ja sam roditelj ili staratelj.
-          </Text>
-        </Pressable>
-      )}
-      <Text variant="muted" className="mt-3">
+      <Text variant="muted" className="mx-screen mt-3">
+        {t ? '' : 'Bez vremena rođenja karta nema podznak ni kuće. '}
         Ove podatke vidiš samo ti. Ako postaviš pitanje o ovoj osobi, vidi ih i {ASTROLOG.kratko}.
       </Text>
 
-      {!!poruka && <Text variant="note" className="mt-6 text-foreground">{poruka}</Text>}
+      {!!poruka && <Text variant="note" className="mx-screen mt-6 text-foreground">{poruka}</Text>}
 
-      <Button className="mt-6" size="lg" disabled={!spremno} ucitava={radi === 'cuvam'} onPress={sacuvaj}>
-        <Text>{id ? 'Sačuvaj' : 'Dodaj osobu'}</Text>
-      </Button>
-
-      {id && (
-        <Pressable
-          onPress={obrisi}
-          disabled={radi !== null}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: radi !== null, busy: radi === 'brisem' }}
-          className="mt-4 items-center py-3 active:opacity-60">
-          {radi === 'brisem'
-            ? <ActivityIndicator color={neutral.inkSubtle} />
-            : <Text variant="muted" className="text-destructive">Obriši osobu</Text>}
-        </Pressable>
-      )}
+      <Group className="mt-8">
+        <ListRow
+          title="Obriši osobu"
+          destructive
+          chevron={false}
+          onPress={brisem ? undefined : obrisi}
+          trailing={brisem ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
+        />
+      </Group>
     </Screen>
   );
 }

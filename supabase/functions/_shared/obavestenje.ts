@@ -60,7 +60,7 @@ export function mejlZaAstrologa(p: NovoPitanje, panelUrl: string): Mejl {
     '',
     'Tekst pitanja i karta su u panelu, iza prijave.',
     '',
-    '— Astroshop',
+    '— Astro Shop',
   ].join('\n');
 
   const telo = `<!doctype html><html><body style="margin:0;padding:24px;background:#F6F7F8;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#151515">

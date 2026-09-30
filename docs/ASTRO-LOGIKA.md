@@ -1,4 +1,4 @@
-# Astroshop: astrološka logika aplikacije
+# Astro Shop: astrološka logika aplikacije
 
 Stanje: 27. septembar 2026.
 

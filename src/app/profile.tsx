@@ -7,13 +7,15 @@ import { Camera, ChevronRight, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
+import { TvojiLjudi } from '@/components/tvoji-ljudi';
+import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { SlikaProfila } from '@/components/slika-profila';
 import { PREMIUM, otvoriPremium } from '@/components/zakljucano';
 import { signOut, useAuthStore, useEntitlement } from '@/store/auth';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { imaSvojuSliku, ukloniSliku, usePromeniSliku, type IshodSlike } from '@/lib/slika-profila';
-import { datumRodjenja, formatDatum } from '@/lib/horoscope';
+import { formatDatum } from '@/lib/horoscope';
 import { chartRulers } from '@/lib/rulers';
 import { vratiKupovine } from '@/lib/kupovina';
 import { PRIVATNOST, USLOVI } from '@/lib/pravila';
@@ -21,11 +23,10 @@ import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
-const pad = (n: number) => String(n).padStart(2, '0');
-
 /** Grupe bez svojih bokova — bokove daje `SheetScroll`. */
 const GRUPA = 'mx-0';
-const NASLOV = 'ml-0';
+/** Naslov sekcije: kao datum na pocetnoj ("TVOJ DAN · …", `oznaka` 12pt — Ivan, 29.9.2026). */
+const NASLOV = cn('ml-0', OZNAKA_12);
 
 /** Pretplate u prodavnici — tu se otkazuje i menja paket (Apple ne da da to radi aplikacija). */
 const PRETPLATE = Platform.OS === 'ios'
@@ -39,8 +40,8 @@ const ZNACKA = 30;
  * PROFIL — list odozdo do vrha (Ivan, 29.9.2026; do tada unutrasnja strana sa
  * strelicom nazad). Otvara ga dugme gore desno na svim tabovima.
  *
- * Redosled: ko si (slika, ime) -> Premium -> podaci o rodjenju -> nalog -> pravila.
- * Brisanje naloga NIJE ovde nego jedan korak dublje, na listu "Nalog"
+ * Redosled: ko si (slika, ime) -> Tvoji ljudi -> Premium -> nalog
+ * (email i podaci o rodjenju su na listu "Nalog", Ivan 29.9.2026). Brisanje naloga NIJE ovde nego jedan korak dublje, na listu "Nalog"
  * (Ivan: "ne treba da bude dostupno odmah") — i dalje u aplikaciji, kako Apple
  * trazi (5.1.1(v)), samo ne na dohvat palca.
  */
@@ -56,7 +57,7 @@ export default function ProfileSheet() {
   if (loading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved) return <Redirect href="/" />;
 
-  const { profile, city, chart, timeUnknown } = resolved;
+  const { profile, chart, timeUnknown } = resolved;
   // Bez slike: vladar horoskopa (tradicionalni vladar podznaka, `lib/rulers.ts`).
   // Bez vremena rodjenja podznaka nema, pa ni vladara — tada Sunce (pravilo 5).
   const vladar = chartRulers(chart, timeUnknown)[0] ?? 'sun';
@@ -105,7 +106,6 @@ export default function ProfileSheet() {
     router.replace('/');
   };
 
-  const vreme = profile.time ? ` u ${pad(profile.time.hour)}:${pad(profile.time.minute)}` : '';
   const premium = entitlement?.active ?? false;
   const istice = entitlement?.expiresAt ? formatDatum(new Date(entitlement.expiresAt)) : null;
 
@@ -142,11 +142,14 @@ export default function ProfileSheet() {
         <Text variant="naslovLista" className="mt-4 text-center">{profile.name}</Text>
       </View>
 
+      {/* Druge osobe — PRVA stvar u meniju (Ivan, 29.9.2026): spisak i dodavanje. */}
+      <TvojiLjudi className="mt-6" izLista />
+
       {/* Pretplata: stanje, upravljanje (samo kupljena — poklon se ne otkazuje u
           prodavnici) i vracanje kupovina za besplatne. */}
       {premium ? (
         <>
-          <GroupHeader className={NASLOV}>Pretplata</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>Pretplata</GroupHeader>
           <Group className={GRUPA}>
             <ListRow
               title="Premium"
@@ -166,7 +169,7 @@ export default function ProfileSheet() {
         </>
       ) : (
         <>
-          <GroupHeader className={NASLOV}>Pretplata</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>Pretplata</GroupHeader>
           {/* Jedan NAGLASEN red umesto kartice (Ivan, 29.9.2026: "da bude manji"):
               pun indigo (boja Premium-a svuda, pravilo 2) i beo tekst. */}
           <Group className={GRUPA}>
@@ -188,28 +191,13 @@ export default function ProfileSheet() {
         </>
       )}
 
-      {/* Podaci o rodjenju */}
-      <GroupHeader className={NASLOV}>Podaci o rođenju</GroupHeader>
-      <Group className={GRUPA}>
-        <ListRow
-          title={`${datumRodjenja(profile.birth)}${vreme}`}
-          subtitle={`${city.name}, ${city.country}`}
-          onPress={() => leaveSheetTo('/edit')}
-        />
-      </Group>
-      {timeUnknown && (
-        <Text variant="caption" className="mt-2 px-gutter">
-          Vreme rođenja nije uneto, pa podznak i kuće nisu pouzdani. Dodirni da dopuniš.
-        </Text>
-      )}
-
       {/* Nalog: email i odjava. Brisanje je na listu "Nalog". */}
-      <GroupHeader className={NASLOV}>Nalog</GroupHeader>
+      <GroupHeader variant="oznaka" className={NASLOV}>Nalog</GroupHeader>
       <Group className={GRUPA}>
-        <ListRow title="Nalog" subtitle={user?.email ?? undefined} onPress={() => router.push('/nalog')} />
+        <ListRow title="Nalog" subtitle="Email i podaci o rođenju" onPress={() => router.push('/nalog')} />
         <ListRow
           title="Odjavi se"
-          destructive
+          // Crno, ne crveno (Ivan, 29.9.2026): odjava nista ne brise.
           chevron={false}
           onPress={odjava ? undefined : doSignOut}
           trailing={odjava ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
@@ -217,7 +205,7 @@ export default function ProfileSheet() {
       </Group>
 
       {/* Pravila na sajtu — isti linkovi kao na paywall-u. */}
-      <GroupHeader className={NASLOV}>Pravila</GroupHeader>
+      <GroupHeader variant="oznaka" className={NASLOV}>Pravila</GroupHeader>
       <Group className={GRUPA}>
         <ListRow title="Pravila privatnosti" onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)} />
         <ListRow title="Uslovi korišćenja" onPress={() => WebBrowser.openBrowserAsync(USLOVI)} />

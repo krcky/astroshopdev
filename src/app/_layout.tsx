@@ -30,7 +30,7 @@ if (Platform.OS === 'android' && !isRunningInExpoGo()) {
   SplashScreen.setOptions({ duration: UVOD_MS.androidSplash });
 }
 
-// Astroshop je light-first. Tamna tema ostaje definisana u global.css
+// Astro Shop je light-first. Tamna tema ostaje definisana u global.css
 // (.dark:root) ako je ikad budemo ponudili kao opciju.
 //
 // Guard: pri static web renderu Expo izvrsava ovaj modul u Node-u, gde nema
@@ -163,11 +163,22 @@ export default function RootLayout() {
                   {/* Pitaj astrologa (29.9.2026): odgovor je list kao tumacenje; pisanje je
                       pageSheet preko celog ekrana — formSheet ne daje visinu, a polje mora
                       da zauzme prostor i dugme da stoji iznad tastature (`pitanje-novo.tsx`). */}
+                  {/* Izmena jednog podatka o rodjenju (svog ili druge osobe) sa tabele (Ivan, 29.9.2026):
+                      ime i mesto do vrha (tastatura, predlozi grada), ostalo visoko koliko sadrzaj. */}
+                  <Stack.Screen
+                    name="rodjenje-polje"
+                    options={({ route }) => {
+                      const polje = (route.params as { polje?: string } | undefined)?.polje;
+                      return polje === 'ime' || polje === 'mesto' ? TUMACENJE_LIST : LIST_PO_SADRZAJU;
+                    }}
+                  />
                   <Stack.Screen name="pitanje" options={TUMACENJE_LIST} />
                   {/* Profil (Ivan, 29.9.2026): list odozdo do vrha, SIVI — na njemu su bele
                       grupe. "Nalog" (brisanje naloga) je list preko njega, visok koliko sadrzaj. */}
                   <Stack.Screen name="profile" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
-                  <Stack.Screen name="nalog" options={LIST_PO_SADRZAJU} />
+                  <Stack.Screen name="nalog" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  {/* Promena emaila sa lista "Nalog": nova adresa, pa kod sa mejla (29.9.2026). */}
+                  <Stack.Screen name="email" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
                   <Stack.Screen
                     name="pitanje-novo"
                     options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.white } }}

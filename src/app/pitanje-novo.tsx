@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Platform, ScrollView, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { AstrologSlika } from '@/components/astrolog-slika';
 import { BezInterneta } from '@/components/bez-interneta';
 import { PitajUvod } from '@/components/pitaj-uvod';
 import { KapsuleRed } from '@/components/ui/kapsule';
+import { Kvacica } from '@/components/ui/kvacica';
 import {
   ASTROLOG, OKVIRNI_ROK, PITANJE_MAX, pitanjeSpremno, porukaGreske, snimakKarte, snimakODrugoj,
 } from '@/lib/pitanja';
@@ -22,7 +23,6 @@ import { useAuthStore, useEntitlement } from '@/store/auth';
 import { useResolvedProfile } from '@/store/profile';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
-import { Check } from 'lucide-react-native';
 
 /** Izbor "Ja" u redu "O kome je pitanje". */
 const JA = 'ja';
@@ -221,16 +221,9 @@ export default function PitanjeNovo() {
             onIzbor={(k) => { setOsobaId(k === JA ? null : k); if (k === JA) setOOdnosu(false); }}
           />
           {osoba && (
-            <Pressable
-              onPress={() => setOOdnosu(!oOdnosu)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: oOdnosu }}
-              className="mt-3 flex-row items-center gap-3 py-1 active:opacity-60">
-              <View className={cn('h-6 w-6 items-center justify-center rounded-md border-2 border-foreground', oOdnosu && 'bg-foreground')}>
-                {oOdnosu && <Check size={16} color={neutral.white} strokeWidth={3} />}
-              </View>
-              <Text variant="default" className="flex-1">Pitanje je o nama dvoma — pošalji i moju kartu</Text>
-            </Pressable>
+            <Kvacica ukljuceno={oOdnosu} onPromena={setOOdnosu} className="mt-3">
+              Pitanje je o nama dvoma — pošalji i moju kartu
+            </Kvacica>
           )}
         </View>
       )}
@@ -271,7 +264,7 @@ export default function PitanjeNovo() {
             <Text variant="note">{napomena}</Text>
           )}
           {/* Ugaseno SIVO: belo dugme na belom listu je izgledalo kao sam natpis (Ivan). */}
-          <Button istaknuto ugasenoSivo onPress={posalji} disabled={!spremno} ucitava={saljem}>
+          <Button istaknuto onPress={posalji} disabled={!spremno} ucitava={saljem}>
             <Text>{kreditom ? 'Pošalji pitanje' : 'Nastavi na plaćanje'}</Text>
           </Button>
         </View>

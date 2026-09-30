@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Pressable, ScrollView, View, type ViewStyle } from 'react-native';
-import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
+import { GlassContainer, GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
 import { Text } from '@/components/ui/text';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
-import { size } from '@/theme/tokens';
+import { brand, neutral, size } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 /**
@@ -13,8 +13,8 @@ import { tezina } from '@/theme/tipografija';
  * Efekat / Pazi / Savet na "Tvom danu" (Ivan, 28.9.2026). Vodoravni skrol, da
  * duzi nazivi i Dynamic Type ne lome red. Kartica oko reda ima `p-4`.
  */
-export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false }: {
-  stavke: { key: K; label: string; icon: React.ReactNode }[];
+export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false, tabovi = false, naStrani = false, pravoStaklo = naStrani }: {
+  stavke: { key: K; label: string; icon?: React.ReactNode }[];
   izabrana: K;
   onIzbor: (k: K) => void;
   /**
@@ -23,32 +23,79 @@ export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVid
    * sa natpisom pored ikonice u taj red ne staju.
    */
   sveVidljive?: boolean;
+  /**
+   * Tabovi strane (pocetna, Ivan 29.9.2026): kapsule u jednom redu, bez skrola, svaka
+   * siroka koliko natpis + razmak. Za 3—4 kratka natpisa.
+   */
+  tabovi?: boolean;
+  /**
+   * Vodoravni red NA STRANI, ne u kartici (tab "Mesec" na pocetnoj, Ivan 29.9.2026):
+   * pravo staklo kao tabovi (bez sive nijanse, jedna grupa, izabrana svetlo lila), a skrol
+   * ide do ivica ekrana umesto do ivica kartice.
+   */
+  naStrani?: boolean;
+  /** Pravo staklo i U KARTICI, izabrana svetlo lila (tab "Mesec" na pocetnoj, Ivan 29.9.2026). */
+  pravoStaklo?: boolean;
 }) {
-  if (sveVidljive) {
-    return (
-      <View accessibilityRole="tablist" className="flex-row gap-1.5">
-        {stavke.map((s) => (
-          <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} uspravna />
-        ))}
-      </View>
+  if (tabovi) {
+    // PRAVO STAKLO (Ivan, 29.9.2026: "izgleda kao lazni glass"): neizabrane BEZ sive
+    // nijanse — tabovi stoje na prelivu pocetne, pa staklo ima sta da prelomi, kao
+    // sistemska dugmad u traci. `GlassContainer` ih vodi kao jednu grupu stakla
+    // (zajednicko prelamanje i spajanje pri dodiru), kao susedne stavke trake.
+    const red = stavke.map((s) => (
+      <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} cisto indigo />
+    ));
+    return isLiquidGlassAvailable() ? (
+      <GlassContainer spacing={8} accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 8 }}>{red}</GlassContainer>
+    ) : (
+      <View accessibilityRole="tablist" className="flex-row gap-2">{red}</View>
     );
   }
+  if (sveVidljive) {
+    // Pravo staklo, kao tabovi pocetne (Ivan, 29.9.2026: "a ne ovi lazni"): bez sive
+    // nijanse, jedna grupa stakla. Izabrana svetlo lila — INDIGO je samo na glavnim
+    // tabovima pocetne (Ivan, 29.9.2026: "svuda osim na glavnim tabovima gore").
+    const red = stavke.map((s) => (
+      <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} uspravna cisto />
+    ));
+    return isLiquidGlassAvailable() ? (
+      <GlassContainer spacing={6} accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 6 }}>{red}</GlassContainer>
+    ) : (
+      <View accessibilityRole="tablist" className="flex-row gap-1.5">{red}</View>
+    );
+  }
+  const red = stavke.map((s) => (
+    <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)}
+      cisto={pravoStaklo} />
+  ));
   return (
+    // PRAVO STAKLO SE NE SECE (Ivan, 30.9.2026): staklo ima siroku meku senku, a pri dodiru
+    // (`isInteractive`) se uveca. Skrol ga je secao na svojim granicama — videlo se kao siv
+    // pravougaonik oko reda i odsecen vrh i dno pri dodiru; ni 20pt vazduha nije bilo dosta
+    // (izmereno). Zato skrol sa pravim staklom NE SECE (`overflow: visible`), a vodoravno
+    // SECE KARTICA oko reda (`overflow-hidden` kod pozivaoca, npr. `mesec-danas-card.tsx`) —
+    // njena ivica je ionako prava ivica.
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       accessibilityRole="tablist"
-      className="-mx-4"
-      contentContainerClassName="gap-2 px-4">
-      {stavke.map((s) => (
-        <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} />
-      ))}
+      style={pravoStaklo ? { overflow: 'visible' } : undefined}
+      className={naStrani ? '-mx-5' : '-mx-4'}
+      contentContainerClassName={naStrani ? 'px-5' : pravoStaklo ? 'px-4' : 'gap-2 px-4'}>
+      {pravoStaklo && isLiquidGlassAvailable() ? (
+        <GlassContainer spacing={8} style={{ flexDirection: 'row', gap: 8 }}>{red}</GlassContainer>
+      ) : pravoStaklo ? (
+        <View className="flex-row gap-2">{red}</View>
+      ) : red}
     </ScrollView>
   );
 }
 
-/** Izabrana kapsula: svetla lila izabrane ikonice oblasti (`OBLAST_BOJA`), providna. */
-export const LILA_SVETLA = hexAlpha(OBLAST_BOJA, 0.3);
+/**
+ * Izabrana kapsula: lila izabrane ikonice oblasti (`OBLAST_BOJA`), providna. 0,3 -> 0,45
+ * (Ivan, 29.9.2026: "malo jaca") — svuda isto: tabovi, oblasti, izabran dan u kalendaru.
+ */
+export const LILA_SVETLA = hexAlpha(OBLAST_BOJA, 0.45);
 
 /**
  * Neizabrana kapsula: staklo sa SIVOM nijansom (Ivan, 29.9.2026: "loše izgleda").
@@ -81,18 +128,25 @@ function hexAlpha(hex: string, a: number) {
  * sloj iza sadrzaja, i senka/obod oko njega — kapsula ostane siva ili bela.
  * Bez stakla (iOS 18, Android, veb): siva ispuna, izabrana ista lila.
  */
-function Kapsula({ label, icon, selected, onPress, uspravna = false }: {
-  label: string; icon: React.ReactNode; selected: boolean; onPress: () => void; uspravna?: boolean;
+function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = false, indigo = false }: {
+  label: string; icon?: React.ReactNode; selected: boolean; onPress: () => void; uspravna?: boolean;
+  /** Neizabrana bez sive nijanse — cisto staklo (tabovi na prelivu). */
+  cisto?: boolean;
+  /** Izabrana u INDIGU iz loga (`brand.indigo`), beli natpis — tabovi pocetne (Ivan, 29.9.2026). */
+  indigo?: boolean;
 }) {
+  const izabranaBoja = indigo ? brand.indigo : LILA_SVETLA;
+  const beo = indigo && selected;
   const sadrzaj = (
     <>
       {icon}
       {uspravna ? (
         // Najduzi natpis ("Karijera", "Zdravlje") mora da stane u petinu reda.
         <Text variant="caption" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}
+          style={beo ? { color: neutral.white } : undefined}
           className={cn('text-foreground', selected && tezina('chipIzabran'))}>{label}</Text>
       ) : (
-        <Text variant="chip" className={cn(selected && tezina('chipIzabran'))}>{label}</Text>
+        <Text variant="chip" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={beo ? { color: neutral.white } : undefined} className={cn(selected && tezina('chipIzabran'))}>{label}</Text>
       )}
     </>
   );
@@ -102,7 +156,7 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false }: {
         onPress={onPress}
         accessibilityRole="tab"
         accessibilityState={{ selected }}
-        style={[uspravna ? USPRAVNA : null, selected ? { backgroundColor: LILA_SVETLA } : null]}
+        style={[uspravna ? USPRAVNA : null, selected ? { backgroundColor: izabranaBoja } : null]}
         className={cn(
           uspravna ? 'flex-1 active:opacity-70' : 'h-chip flex-row items-center gap-2 rounded-pill px-4 active:opacity-70',
           !selected && 'bg-fill',
@@ -120,7 +174,7 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false }: {
         glassEffectStyle="regular"
         colorScheme="light"
         isInteractive
-        tintColor={selected ? LILA_SVETLA : SIVO_STAKLO}
+        tintColor={selected ? izabranaBoja : cisto ? undefined : SIVO_STAKLO}
         style={uspravna ? USPRAVNA : KAPSULA}>
         {sadrzaj}
       </GlassView>

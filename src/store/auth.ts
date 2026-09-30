@@ -7,6 +7,7 @@
  */
 import * as React from 'react';
 import { create } from 'zustand';
+import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAuthRetryableFetchError, type Session, type User } from '@supabase/supabase-js';
 
@@ -63,9 +64,15 @@ export function useAuthListener() {
     }
 
     const apply = (session: Session | null) => {
+      const bio = useAuthStore.getState().user;
       useAuthStore.getState().setSession(session);
       if (!session) {
         useAuthStore.getState().setEntitlement(null);
+        // SESIJU JE UGASIO SERVER (Ivan, 30.9.2026): odjava sa drugog uredjaja, opozvan
+        // token. Do tada je aplikacija ostajala na tabovima sa kartom iz kesa i BEZ
+        // tekstova (RLS tiho vrati prazno), bez ijedne reci. Namerna odjava ovde ne
+        // prolazi — ona sama cisti i zna kuda dalje ("drugi email" ostaje u onboardingu).
+        if (bio && namernaOdjava === 0) sesijaUgasenaSaServera();
         return;
       }
       ucitajPravo(session.user.id);
@@ -140,23 +147,52 @@ export async function deleteAccount() {
   // `scope: 'local'` namerno: nalog na serveru vise ne postoji, pa bi obicna
   // odjava pokusala da povuce sesiju koje nema i vratila 401. Ovde samo
   // cistimo ono sto je ostalo na telefonu.
-  await supabase.auth.signOut({ scope: 'local' });
-  useProfileStore.getState().clear();
-  await ocistiLokalno();
+  namernaOdjava++;
+  try {
+    await supabase.auth.signOut({ scope: 'local' });
+    useProfileStore.getState().clear();
+    await ocistiLokalno();
+  } finally {
+    namernaOdjava--;
+  }
   return { error: null };
 }
 
 /**
- * `local` odjavljuje samo ovaj telefon; podrazumevana `global` opoziva sesije
- * naloga i na svim drugim uredjajima.
+ * Odjava. PODRAZUMEVANO SAMO OVAJ TELEFON (`local`, Ivan 30.9.2026) — do tada je
+ * "Odjavi se" bio `global` i gasio sesije na SVIM uredjajima: odjava na simulatoru je
+ * izbacila telefon, koji je ostao bez tekstova. `global` je posebna opcija na listu
+ * "Nalog" ("Odjavi se sa svih uređaja").
  */
-export async function signOut(scope: 'global' | 'local' = 'global') {
-  const result = await supabase.auth.signOut({ scope });
-  // Lokalni profil je samo kes servera. Ako ostane posle odjave, sledeci
-  // korisnik na istom telefonu bi video tudju kartu dok se ne povuce njegova.
+export async function signOut(scope: 'global' | 'local' = 'local') {
+  namernaOdjava++;
+  try {
+    const result = await supabase.auth.signOut({ scope });
+    // Lokalni profil je samo kes servera. Ako ostane posle odjave, sledeci
+    // korisnik na istom telefonu bi video tudju kartu dok se ne povuce njegova.
+    useProfileStore.getState().clear();
+    await ocistiLokalno();
+    return result;
+  } finally {
+    namernaOdjava--;
+  }
+}
+
+/** Koliko namernih odjava je u toku — tada `apply(null)` ne preusmerava (vidi gore). */
+let namernaOdjava = 0;
+
+/**
+ * Server je ugasio sesiju: ocisti sve sto pripada nalogu i idi na KAPIJU (pravilo 11) —
+ * ona sama salje na prijavu. Pri pokretanju navigacija mozda jos nije spremna; tada
+ * kapija ionako tek odlucuje, pa je neuspeh preusmeravanja bezopasan.
+ */
+function sesijaUgasenaSaServera() {
   useProfileStore.getState().clear();
-  await ocistiLokalno();
-  return result;
+  void ocistiLokalno();
+  try {
+    if (router.canDismiss()) router.dismissAll();
+    router.replace('/');
+  } catch { /* navigacija jos nije montirana */ }
 }
 
 /** Sacuvani tekstovi, poslednje pravo pristupa, pitanje u pisanju, druge osobe i dnevnici prikaza pripadaju nalogu — ne ostaju posle odjave. */

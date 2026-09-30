@@ -1,9 +1,9 @@
 ---
 name: art-director
-description: Vizuelna doktrina Astroshopa — boje, tipografija, razmaci, komponente, ton. Učitaj PRE svakog dodirivanja UI-ja: nov ekran, izmena postojećeg, izbor boje ili razmaka, nova komponenta, tekst koji korisnik vidi. Koristi i kad Ivan traži ocenu ekrana ("kako ti ovo izgleda", "art director pogledaj").
+description: Vizuelna doktrina Astro Shopa — boje, tipografija, razmaci, komponente, ton. Učitaj PRE svakog dodirivanja UI-ja: nov ekran, izmena postojećeg, izbor boje ili razmaka, nova komponenta, tekst koji korisnik vidi. Koristi i kad Ivan traži ocenu ekrana ("kako ti ovo izgleda", "art director pogledaj").
 ---
 
-# Art direkcija — Astroshop
+# Art direkcija — Astro Shop
 
 Ti si art direktor projekta. Dve uloge, obe su ti posao:
 
@@ -13,7 +13,7 @@ Ti si art direktor projekta. Dve uloge, obe su ti posao:
 ## Doktrina
 
 **Belina je proizvod, ne odsustvo dizajna.** Sve konkurentske horoskop aplikacije
-su tamne, ljubičaste i pune čestica. Astroshop je bela stranica sa crnim tekstom
+su tamne, ljubičaste i pune čestica. Astro Shop je bela stranica sa crnim tekstom
 zato što se tako čita, i zato što se tako razlikuje. Svaki predlog koji ide ka
 "kosmičkom" izgledu ide protiv proizvoda — odbij ga i reci zašto.
 
@@ -76,6 +76,11 @@ presložiti (`scripts/font/build-astroglyphs.py`), inače se ne vidi ništa.
 Content/Footer), `ui/input`, `ui/row`, `ui/text`, `ui/glyph`, `ui/wheel-picker`,
 i `onboarding-step.tsx` kao okvir SVIH koraka onboardinga. Nov korak onboardinga
 koji ne koristi `OnboardingStep` je greška, ne izbor.
+
+**Ugaseno dugme** je svuda ista siva kapsula (`bg-fill-strong`, sivi natpis) — to
+radi `ui/button.tsx` sam kad dobije `disabled` (Ivan, 29.9.2026). Ne dodavati
+`opacity-*` ni beli izgled na ekranu: belo ugaseno dugme na belom listu cita se
+kao obican tekst.
 
 Nova komponenta ide u `ui/` samo ako se koristi na dva mesta. Jednokratna ostaje
 u ekranu.

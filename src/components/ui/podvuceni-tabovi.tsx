@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * Dve (ili vise) strane jednog ekrana, podvucena izabrana — "Pitaj čoveka / Pitaj
- * AI" na tabu Pitaj, "Karta / Danas" na strani osobe (29.9.2026). Linija stoji
+ * AI" na tabu Pitaj (29.9.2026). Linija stoji
  * direktno na sivom, pa `border-fill-strong` (pravilo 17).
  */
 export function PodvuceniTabovi<K extends string>({ stavke, izabrana, onIzbor, className }: {

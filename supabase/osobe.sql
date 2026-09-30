@@ -84,9 +84,10 @@ set search_path = ''
 as $$
 declare
   n int;
-  granica int := case when public.ima_premium() then 10 else 1 end;
+  granica int;
 begin
   if auth.uid() is distinct from new.user_id then return new; end if;
+  granica := case when public.ima_premium() then 10 else 1 end;
   -- Dva istovremena upisa istog naloga ne smeju oba da prodju granicu:
   -- drugi ceka da se prvi zavrsi, pa broji i njegov red.
   perform pg_advisory_xact_lock(hashtext('osobe:' || new.user_id::text));
