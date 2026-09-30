@@ -282,8 +282,10 @@ rođen?").
 </View>
 ```
 
-Linija izmedju redova je **uvucena** do pocetka teksta, ne preko cele sirine —
-`Group` je crta sam, ne treba je pisati rucno.
+Linija izmedju redova ide **od ivice do ivice** kartice — i kad red ima ikonicu
+(Ivan, 29.9.2026; do tada uvucena do pocetka teksta, po referentnoj aplikaciji).
+`Group` je crta sam, ne treba je pisati rucno. Vazi za SVAKU listu redova u
+kartici: bez `ml-*`/`mx-*` na liniji i bez `border-b` na unutrasnjem delu reda.
 
 ---
 

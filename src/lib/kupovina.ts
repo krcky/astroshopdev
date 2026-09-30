@@ -105,7 +105,23 @@ export function ustedaGodisnje(godisnje: number, mesecno: number): number | null
 
 /** "4,17 €" — godisnja cena podeljena na 12, u valuti paketa, srpskim zapisom. */
 export function cenaPoMesecu(godisnje: number, valuta: string): string {
-  const iznos = Math.floor((godisnje / 12) * 100) / 100;
+  // Na dole, da "mesecno" nikad ne izgleda jeftinije nego sto jeste zaokruzivanjem navise.
+  return formatCena(Math.floor((godisnje / 12) * 100) / 100, valuta);
+}
+
+/**
+ * PUNA CENA GODINE bez popusta (Ivan, 30.9.2026) — 12 mesecnih rata, precrtana na
+ * godisnjem paketu. Racuna se iz cene MESECNOG paketa iz prodavnice, kao i
+ * "Uštedi N%": Apple dozvoljava precrtanu cenu samo kad je stvarna, a ova jeste —
+ * toliko bi korisnik platio godinu mesecnim paketom. `null` kad godisnje nije jeftinije.
+ */
+export function cenaBezPopusta(godisnje: number, mesecno: number, valuta: string): string | null {
+  if (ustedaGodisnje(godisnje, mesecno) === null) return null;
+  return formatCena(Math.round(mesecno * 12 * 100) / 100, valuta);
+}
+
+/** Iznos u valuti paketa, srpskim zapisom: "71,88 €". */
+function formatCena(iznos: number, valuta: string): string {
   try {
     return new Intl.NumberFormat('sr-Latn-RS', { style: 'currency', currency: valuta }).format(iznos);
   } catch {

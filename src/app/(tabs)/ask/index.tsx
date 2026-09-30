@@ -72,9 +72,9 @@ function PitajCoveka() {
   // Bez ijednog pitanja: uvod je na strani, "Pitaj" otvara odmah polje za pitanje.
   if (moja.length === 0) {
     return (
-      <View className="mt-6">
+      <View className="mt-12">
         <PitajUvod />
-        <View className="mt-5">
+        <View className="mt-4">
           {kredit}
           {/* Isto dugme kao "Saznaj više" na pocetnoj (Ivan, 29.9.2026), preko cele sirine. */}
           <Button istaknuto onPress={() => router.push('/pitanje-novo')}>

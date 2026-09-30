@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Platform, Pressable, useWindowDimensions, View } from 'react-native';
+import { Platform, useWindowDimensions, View } from 'react-native';
 import { Redirect, router, useFocusEffect } from 'expo-router';
-import { CalendarDays, ChevronLeft, ChevronRight, MapPin } from 'lucide-react-native';
+import { CalendarDays, MapPin } from 'lucide-react-native';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 import { NatalWheel } from '@/components/natal-wheel';
@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
-import { GlassBubble } from '@/components/ui/glass-button';
+import { StakloDugme } from '@/components/staklo-dugme';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
 import { buildSky, danZaKalendar, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
@@ -136,12 +136,14 @@ export default function Sky() {
           prelazi u sledeci red, centrirano. */}
       <View className="mx-5 mt-5 flex-row flex-wrap justify-center gap-2">
         <StakloDugme
+          sfIkona="calendar"
           ikona={<CalendarDays size={IKONA} color={neutral.ink} strokeWidth={2} />}
           tekst={datum}
           onPress={otvoriKalendar}
           accessibilityLabel={`Datum: ${datum} Dodirni da izabereš dan.`}
         />
         <StakloDugme
+          sfIkona="mappin.and.ellipse"
           ikona={<MapPin size={IKONA} color={neutral.ink} strokeWidth={2} />}
           tekst={grad.name}
           onPress={() => router.push('/sky-place')}
@@ -154,25 +156,17 @@ export default function Sky() {
           pogadjao isti sat; sat je prostih 60 minuta stvarnog vremena — vidi
           komentar u `lib/sky.ts`. Mesec i godinu pokriva kalendar. */}
       <View className="mx-5 mt-3 flex-row gap-2">
-        <Korak smer="nazad" jedinica="dan" onPress={() => pomeriDan(-1)} />
-        <Korak smer="nazad" jedinica="sat" onPress={() => pomeriSat(-1)} />
+        <StakloDugme siroko strelica="levo" tekst="dan" onPress={() => pomeriDan(-1)} accessibilityLabel="Dan nazad" />
+        <StakloDugme siroko strelica="levo" tekst="sat" onPress={() => pomeriSat(-1)} accessibilityLabel="Sat nazad" />
         {/* Ivice nema, pa neaktivno "Trenutno" (vec gledas sadasnjost) razlikuje samo siv natpis. */}
-        <GlassBubble interaktivno={!!izabran}>
-          <Pressable
-            onPress={() => setIzabran(null)}
-            disabled={!izabran}
-            accessibilityRole="button"
-            accessibilityLabel="Vrati se na sadašnji trenutak"
-            accessibilityState={{ disabled: !izabran }}
-            hitSlop={{ top: 2, bottom: 2 }}
-            className="h-full justify-center px-3 active:opacity-60">
-            <Text variant="chip" className={cn(!izabran && 'text-muted-foreground')}>
-              Trenutno
-            </Text>
-          </Pressable>
-        </GlassBubble>
-        <Korak smer="napred" jedinica="sat" onPress={() => pomeriSat(1)} />
-        <Korak smer="napred" jedinica="dan" onPress={() => pomeriDan(1)} />
+        <StakloDugme
+          tekst="Trenutno"
+          onPress={() => setIzabran(null)}
+          disabled={!izabran}
+          accessibilityLabel="Vrati se na sadašnji trenutak"
+        />
+        <StakloDugme siroko strelica="desno" tekst="sat" onPress={() => pomeriSat(1)} accessibilityLabel="Sat napred" />
+        <StakloDugme siroko strelica="desno" tekst="dan" onPress={() => pomeriDan(1)} accessibilityLabel="Dan napred" />
       </View>
 
       {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
@@ -235,51 +229,5 @@ export default function Sky() {
   );
 }
 
-/** Ikonice u staklenim dugmadima (kalendar, mesto) i strelice — uz natpis od 15pt. */
+/** Ikonice u rezervnim staklenim dugmadima (kalendar, mesto) — uz natpis od 15pt. */
 const IKONA = 18;
-
-/**
- * Stakleno dugme sa ikonicom i natpisom (datum, mesto) — isti mehur kao
- * dugmad u zaglavlju (`GlassBubble`); bez stakla (iOS pre 26, Android, veb)
- * bela pilula sa mekom senkom.
- */
-function StakloDugme({ ikona, tekst, onPress, accessibilityLabel }: {
-  ikona: React.ReactNode; tekst: string; onPress: () => void; accessibilityLabel: string;
-}) {
-  return (
-    <GlassBubble>
-      <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-        hitSlop={{ top: 2, bottom: 2 }}
-        className="h-full flex-row items-center gap-2 px-4 active:opacity-60">
-        {ikona}
-        <Text variant="chip" numberOfLines={1}>{tekst}</Text>
-      </Pressable>
-    </GlassBubble>
-  );
-}
-
-/**
- * Jedan korak vremena ("‹ dan", "sat ›") u staklu, kao nekad cetiri dugmeta,
- * samo sa vecim natpisom i pravom strelicom (Ivan, 28.9.2026).
- */
-function Korak({ smer, jedinica, onPress }: {
-  smer: 'nazad' | 'napred'; jedinica: string; onPress: () => void;
-}) {
-  const Strelica = smer === 'nazad' ? ChevronLeft : ChevronRight;
-  return (
-    <GlassBubble style={{ flex: 1 }}>
-      <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={`${jedinica.charAt(0).toUpperCase()}${jedinica.slice(1)} ${smer}`}
-        hitSlop={{ top: 2, bottom: 2 }}
-        className={cn('h-full w-full items-center justify-center active:opacity-60', smer === 'nazad' ? 'flex-row' : 'flex-row-reverse')}>
-        <Strelica size={IKONA} color={neutral.ink} strokeWidth={2.2} />
-        <Text variant="chip">{jedinica}</Text>
-      </Pressable>
-    </GlassBubble>
-  );
-}

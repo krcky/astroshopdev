@@ -58,7 +58,11 @@ export async function completeSignup(userId: string, email: string): Promise<Sig
   };
 
   useProfileStore.getState().setProfile(profile);
-  await pushProfile(userId, profile);
+  // Neuspeo upis BACA (30.9.2026): do tada se tiho isao dalje — karta je ostajala
+  // samo na telefonu, a draft se brisao. `code.tsx` korak ponavlja; draft ostaje
+  // dok upis ne prodje, pa ponovni pokusaj ima sta da posalje.
+  const greska = await pushProfile(userId, profile);
+  if (greska) throw greska;
   useDraft.getState().reset();
   return 'created';
 }

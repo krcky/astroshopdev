@@ -13,13 +13,16 @@ import { supabase } from '@/lib/supabase';
 import { pullProfile } from '@/lib/sync';
 import { datumRodjenja } from '@/lib/horoscope';
 import { cn } from '@/lib/utils';
-import { adoptRemote, completeSignup, routeAfterSignup } from '@/lib/signup';
+import { adoptRemote, completeSignup, routeAfterSignup, type SignupOutcome } from '@/lib/signup';
 import { signOut } from '@/store/auth';
 import type { Profile } from '@/store/profile';
 import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 const LENGTH = 6;
+/** Ponavljanje koraka posle potvrdjenog koda (vidi `verify`): 3 pokusaja, pauza 0,8 pa 1,6 s. */
+const POKUSAJA = 3;
+const PAUZA_MS = 800;
 
 export default function Code() {
   // `nov` = dolazi se iz "Napravi nalog" (reveal -> account), vidi `lib/signup.ts`.
@@ -51,27 +54,46 @@ export default function Code() {
 
       if (error || !data.session) {
         setBusy(false);
-        setError(/expired/i.test(error?.message ?? '')
-          ? 'Kod je istekao. Pošalji novi.'
-          : 'Kod nije tačan. Proveri poštu još jednom.');
+        // Supabase ISTOM greskom javlja i pogresan i istekao kod ("Token has expired or
+        // is invalid", `otp_expired`) — pa ne tvrdimo da je istekao (Ivan, 30.9.2026: "nije,
+        // samo sto je stigao"). Najcesce je upisan kod iz STARIJEG mejla: svaki nov kod
+        // ponistava prethodni.
+        if (__DEV__) console.log('[kod] provera odbijena:', error?.code, error?.message);
+        setError('Kod nije tačan ili više ne važi. Upiši kod iz najnovijeg mejla ili pošalji novi.');
         return;
       }
       id = data.session.user.id;
       setUserId(id);
     }
 
-    try {
+    // PRVI UPIT POSLE KODA ume da padne iako je sve u redu (Ivan, 30.9.2026: "prvi put
+    // nece pa posle hoce", na telefonu i u simulatoru). IZMERENO: `PGRST303 JWT issued
+    // at future` — sat Supabase Auth-a je malo ispred baze, pa token izdat tog trenutka
+    // baza odbije sekund-dva. Zato se korak ponovi sam, do POKUSAJA puta, pre nego
+    // sto korisnik vidi gresku. Navigacija je VAN ovoga: njena greska nije "internet".
+    const idNaloga = id;
+    const posleKoda = async (): Promise<SignupOutcome | 'zauzet'> => {
       if (nov) {
-        const postojeca = await pullProfile(id);
-        if (postojeca) { setZauzet(postojeca); return; }
+        const postojeca = await pullProfile(idNaloga);
+        if (postojeca) { setZauzet(postojeca); return 'zauzet'; }
       }
-      const outcome = await completeSignup(id, String(email));
-      router.replace(routeAfterSignup(outcome));
-    } catch {
-      setError('Kod je potvrđen, ali nalog nije učitan. Proveri internet pa pritisni Potvrdi ponovo.');
-    } finally {
-      setBusy(false);
+      return completeSignup(idNaloga, String(email));
+    };
+    let ishod: SignupOutcome | 'zauzet' | null = null;
+    for (let i = 0; i < POKUSAJA && ishod === null; i++) {
+      try {
+        ishod = await posleKoda();
+      } catch (e) {
+        if (__DEV__) console.log(`[kod] posle potvrde pao pokusaj ${i + 1}/${POKUSAJA}:`, (e as { code?: string })?.code, (e as Error)?.message);
+        if (i < POKUSAJA - 1) await new Promise((r) => setTimeout(r, PAUZA_MS * (i + 1)));
+      }
     }
+    setBusy(false);
+    if (ishod === null) {
+      setError('Kod je potvrđen, ali nalog nije učitan. Proveri internet pa pritisni Potvrdi ponovo.');
+      return;
+    }
+    if (ishod !== 'zauzet') router.replace(routeAfterSignup(ishod));
   };
 
   // Odjava samo sa OVOG telefona: globalna bi vlasnika starog naloga izbacila i

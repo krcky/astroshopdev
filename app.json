@@ -43,6 +43,14 @@
           "recordAudioAndroid": false,
           "enableBackgroundPlayback": false
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Astro Shop pristupa fotografijama samo kad izabereš sliku za svoj profil.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {

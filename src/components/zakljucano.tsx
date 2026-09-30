@@ -73,7 +73,7 @@ export function ZakljucaniRedovi({ redovi, className }: {
     <View className={cn(CARD_SURFACE, 'py-1', className)}>
       {redovi.map((r, i) => (
         <React.Fragment key={r.key}>
-          {i > 0 && <View className="mx-4 h-px bg-border" />}
+          {i > 0 && <View className="h-px bg-border" />}
           <Pressable
             onPress={() => otvoriPremium()}
             accessibilityRole="button"

@@ -6,15 +6,16 @@ import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { cn } from '@/lib/utils';
-import { ASTROLOG, OKVIRNI_ROK } from '@/lib/pitanja';
+import { ASTROLOG, ROK_KRATKO } from '@/lib/pitanja';
 import { useCenaPitanja } from '@/lib/kupovina';
 import { useEntitlement } from '@/store/auth';
 import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 /**
- * Uvod u "Pitaj astrologa": astrolog, naslov, tri recenice koje moraju da stoje
- * pre placanja, i cena. Stoji na strani dok korisnik nema nijedno pitanje, a
+ * Uvod u "Pitaj astrologa": astrolog, naslov, recenica i tabela od tri reda
+ * (odgovor i rok, napomena da nije strucni savet, placanje i cena) — sve sto
+ * mora da stoji pre placanja. Stoji na strani dok korisnik nema nijedno pitanje, a
  * posle toga je prvi korak lista odozdo (`pitanje-novo.tsx`, Ivan 29.9.2026).
  *
  * `naBelom`: list je beo, pa kartica dobija ivicu umesto bele ispune — bela na
@@ -26,49 +27,51 @@ export function PitajUvod({ naBelom = false }: { naBelom?: boolean }) {
 
   return (
     <View>
-      {/* Astrolog, naslov, podnaslov — bez kartice: prazan prostor nosi tezinu. */}
+      {/* Astrolog, naslov, jedna recenica — bez kartice: prazan prostor nosi tezinu.
+          Zbijeno (Ivan, 29.9.2026: "previse teksta"): naslov JE poruka da odgovara
+          covek; rok, placanje i napomena su u tabeli ispod. */}
       <View className="items-center">
-        <AstrologSlika velicina={96} />
-        <Text variant="row" className="mt-3">{ASTROLOG.ime}</Text>
+        <AstrologSlika velicina={88} />
+        <Text variant="row" className="mt-2">{ASTROLOG.ime}</Text>
         <Text variant="caption">Astrolog</Text>
-        <Text variant="h1" className="mt-5 text-center">Lično pitanje, lični odgovor</Text>
+        <Text variant="h1" className="mt-4 text-center">Odgovara pravi astrolog, ne AI</Text>
         <Text variant="body" className="mt-2 px-2 text-center">
-          Napiši šta te zanima. {ASTROLOG.kratko} pogleda tvoju natalnu kartu i odgovori ti glasovnom porukom.
+          Napiši šta te zanima, a {ASTROLOG.kratko} pogleda tvoju natalnu kartu i odgovori ti lično.
         </Text>
       </View>
 
-      {/* Tri recenice koje moraju da stoje pre placanja, pa cena. */}
-      <View className={cn(naBelom ? 'rounded-lg border border-border' : CARD_SURFACE, 'mt-5 px-5 py-1')}>
-        <Cinjenica ikona={<Wallet size={18} color={neutral.ink} strokeWidth={1.8} />}>
-          Pitanje se plaća jednokratno, nezavisno od pretplate.
-        </Cinjenica>
+      {/* Tri reda (Ivan, 29.9.2026): glasovni odgovor i rok (u recenici, ne desno),
+          napomena o savetu, pa placanje i cena na kraju. Linije od ivice do ivice — padding je u redovima, ne u kartici. */}
+      <View className={cn(naBelom ? 'rounded-lg border border-border' : CARD_SURFACE, 'mt-5')}>
+        <Red ikona={<Mic size={18} color={neutral.ink} strokeWidth={1.8} />}>
+          Odgovor ti stiže glasovnom porukom u roku od {ROK_KRATKO}.
+        </Red>
         <View className="h-px bg-border" />
-        <Cinjenica ikona={<Mic size={18} color={neutral.ink} strokeWidth={1.8} />}>
-          Odgovor stiže kao glasovna poruka, {OKVIRNI_ROK}.
-        </Cinjenica>
-        <View className="h-px bg-border" />
-        <Cinjenica ikona={<Info size={18} color={neutral.ink} strokeWidth={1.8} />}>
+        <Red ikona={<Info size={18} color={neutral.ink} strokeWidth={1.8} />}>
           Astrološko tumačenje nije medicinski, pravni ni finansijski savet.
-        </Cinjenica>
-        {cena && (
-          <>
-            <View className="h-px bg-border" />
-            <View className="flex-row items-center justify-between py-3">
-              <Text variant="row" className={tezina('cena')}>Cena pitanja</Text>
-              <Text variant="row" className={tezina('cena')}>{cena}</Text>
-            </View>
-          </>
-        )}
+        </Red>
+        <View className="h-px bg-border" />
+        <Red ikona={<Wallet size={18} color={neutral.ink} strokeWidth={1.8} />} desno={cena}>
+          Jednokratno plaćanje po pitanju
+        </Red>
       </View>
     </View>
   );
 }
 
-function Cinjenica({ ikona, children }: { ikona: React.ReactNode; children: React.ReactNode }) {
+/** Red tabele: ikonica, tekst, i cena desno kad postoji. */
+function Red({ ikona, desno, children }: {
+  ikona: React.ReactNode;
+  desno?: string | null;
+  children: React.ReactNode;
+}) {
   return (
-    <View className="flex-row items-center gap-3 py-3">
+    <View className="flex-row items-center gap-3 px-4 py-3">
       {ikona}
       <Text variant="body" className="flex-1 text-foreground">{children}</Text>
+      {!!desno && (
+        <Text variant="row" className={tezina('cena')}>{desno}</Text>
+      )}
     </View>
   );
 }

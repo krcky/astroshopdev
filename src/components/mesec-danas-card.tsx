@@ -121,8 +121,10 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
         </View>
       </View>
 
-      {/* Kartica sa oblastima: kapsule u staklu, izabrana svetlo lila. */}
-      <Kartica className="mt-5">
+      {/* Oblasti: pravo staklo (bez sive nijanse), izabrana svetlo lila, U kartici sa
+          savetom (Ivan, 29.9.2026). */}
+      {/* Odmaknuto od crnog dugmeta (Ivan, 29.9.2026). */}
+      <Kartica className="mt-8">
         <KapsuleRed
           stavke={LUNAR_AREAS.map((a) => ({
             key: a.key,
@@ -170,7 +172,9 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
 
 /** Kartica ispod vrha: uvek bela (Ivan, 28.9.2026: staklo samo na kapsulama). */
 function Kartica({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <View className={cn(CARD_SURFACE, 'p-4', className)}>{children}</View>;
+  // `overflow-hidden`: red staklenih oblasti se ne sece sam (`ui/kapsule.tsx`) — kartica ga
+  // sece na svojoj ivici, i vodoravno pri skrolu.
+  return <View className={cn(CARD_SURFACE, 'overflow-hidden p-4', className)}>{children}</View>;
 }
 
 /** Savet oblasti — samo tekst, bez tacke (Ivan, 28.9.2026); naslov stavke podebljan. */

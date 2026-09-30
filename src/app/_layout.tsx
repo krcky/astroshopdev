@@ -1,7 +1,7 @@
 import '@/global.css';
 
 import * as React from 'react';
-import { Platform } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -56,6 +56,19 @@ const TUMACENJE_LIST = {
   sheetGrabberVisible: true,
   sheetCornerRadius: 24,
   contentStyle: { backgroundColor: neutral.white },
+};
+
+/**
+ * Paywall kao list (iOS). `fitToContents` NE RADI — sadrzaj je skrol, a list ga ne meri
+ * (bio je prazan). Zato fiksna visina: koliko paywall-u treba (~790pt: naslov, cetiri
+ * stavke, paketi, dugme, pravila), a najvise 92% ekrana — manji telefon skroluje.
+ */
+const PAYWALL_LIST = {
+  presentation: 'formSheet' as const,
+  sheetAllowedDetents: [Math.min(0.92, 790 / Dimensions.get('window').height)],
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 24,
+  contentStyle: { backgroundColor: neutral.grouped },
 };
 
 /** Nativni list visok koliko sadrzaj ("Zašto baš ovaj tekst", kalendar na Nebu). */
@@ -127,12 +140,14 @@ export default function RootLayout() {
                   {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice
                       nazad (Ivan, 29.9.2026). SIVA pozadina: na njemu su bele kartice. */}
                   <Stack.Screen name="moon" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
-                  {/* Paywall — sa svakog "Otključaj" (`components/zakljucano.tsx`). List preko
-                      celog ekrana (Ivan, 29.9.2026: "na 100%"); `modal`, jer `formSheet`
-                      sadrzaju ne daje visinu, a paketi i dugme stoje na dnu. */}
+                  {/* Paywall — sa svakog "Otključaj" (`components/zakljucano.tsx`). Na iOS-u
+                      list VISINE SADRZAJA (Ivan, 30.9.2026: "ne mora da bude 100%"; do tada
+                      `modal` preko celog ekrana) — `PAYWALL_LIST`. Android: `modal`. */}
                   <Stack.Screen
                     name="premium"
-                    options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.grouped } }}
+                    options={Platform.OS === 'ios'
+                      ? PAYWALL_LIST
+                      : { presentation: 'modal', contentStyle: { backgroundColor: neutral.grouped } }}
                   />
                   {/* Nebo (Ivan, 28.9.2026): kalendar sa dugmeta sa datumom, visok koliko
                       sadrzaj; izbor mesta sa dugmeta sa gradom, do vrha — lista gradova
@@ -143,6 +158,10 @@ export default function RootLayout() {
                       pageSheet preko celog ekrana — formSheet ne daje visinu, a polje mora
                       da zauzme prostor i dugme da stoji iznad tastature (`pitanje-novo.tsx`). */}
                   <Stack.Screen name="pitanje" options={TUMACENJE_LIST} />
+                  {/* Profil (Ivan, 29.9.2026): list odozdo do vrha, SIVI — na njemu su bele
+                      grupe. "Nalog" (brisanje naloga) je list preko njega, visok koliko sadrzaj. */}
+                  <Stack.Screen name="profile" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  <Stack.Screen name="nalog" options={LIST_PO_SADRZAJU} />
                   <Stack.Screen
                     name="pitanje-novo"
                     options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.white } }}

@@ -13,8 +13,9 @@ import { accent, neutral } from '@/theme/tokens';
  *   1. Pozadina ekrana je SIVA (#F6F7F8), kartice su bele. Obrnuto ne radi.
  *   2. Naslov grupe je siv, 16pt, obicnim slovima — bez verzala i bez razmaka
  *      medju slovima. Nije naljepnica, nego recenica.
- *   3. Linija izmedju redova je uvucena do pocetka teksta, ne preko cele
- *      sirine. Tako oko cita ikonu i tekst kao jednu kolonu.
+ *   3. Linija izmedju redova ide OD IVICE DO IVICE kartice, i kad red ima
+ *      ikonicu (Ivan, 29.9.2026 — pravilo za celu aplikaciju). Do tada je bila
+ *      uvucena do pocetka teksta, po referentnoj aplikaciji.
  */
 
 /** Pozadina ekrana na kom stoje grupe. Stavi je na koren ekrana. */
@@ -25,25 +26,18 @@ export function GroupHeader({ className, ...props }: React.ComponentProps<typeof
   return <Text variant="label" className={cn('mb-2 ml-screen mt-6', className)} {...props} />;
 }
 
-/**
- * Bela kartica koja drzi redove. Linije izmedju redova crta sama.
- *
- * `inset` — linija uvucena do pocetka teksta (podrazumevano, redovi sa ikonom).
- * Redovi BEZ ikone salju `inset={false}` pa linija ide od ivice do ivice;
- * uvucena linija bez ikone iznad sebe izgleda kao greska u poravnanju.
- */
+/** Bela kartica koja drzi redove. Linije izmedju redova crta sama, preko cele sirine. */
 export function Group({
   className,
   children,
-  inset = true,
   ...props
-}: React.ComponentProps<typeof View> & { inset?: boolean }) {
+}: React.ComponentProps<typeof View>) {
   const redovi = React.Children.toArray(children).filter(Boolean);
   return (
     <View className={cn('mx-screen overflow-hidden rounded-lg bg-card', className)} {...props}>
       {redovi.map((red, i) => (
         <React.Fragment key={i}>
-          {i > 0 && <View className={cn('h-px bg-border', inset && 'ml-[60px]')} />}
+          {i > 0 && <View className="h-px bg-border" />}
           {red}
         </React.Fragment>
       ))}

@@ -26,6 +26,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurTargetView, BlurView } from 'expo-blur';
+import { PostepenoZamucenje } from '@/components/postepeno-zamucenje';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronLeft } from 'lucide-react-native';
 
@@ -99,6 +100,15 @@ import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
  */
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+/**
+ * POSTEPENO ZAMUCENJE (Ivan, 30.9.2026): u sopstvenom buildu traka nema ostru donju
+ * ivicu — nativni modul (`components/postepeno-zamucenje.tsx`) bledi nadole. Expo Go
+ * ga nema, pa tamo ostaje `AnimatedBlurView` gore. Traka je tada za `PRELAZ_ISPOD`
+ * duza, a bledi od `PRELAZ_IZNAD` pre svoje dosadasnje ivice.
+ */
+const AnimatedPostepeno = PostepenoZamucenje ? Animated.createAnimatedComponent(PostepenoZamucenje) : null;
+const PRELAZ_ISPOD = 24;
+const PRELAZ_IZNAD = 12;
 
 /**
  * Koliko ekran koji ODLAZI jos drzi svoju boju i pozadinu.
@@ -310,7 +320,15 @@ export function Screen({
         </Animated.ScrollView>
       </BlurTargetView>
 
-      {/* 2. zamucenje */}
+      {/* 2. zamucenje — postepeno gde postoji nativni modul, inace sa ostrom ivicom */}
+      {AnimatedPostepeno ? (
+        <AnimatedPostepeno
+          pointerEvents="none"
+          animatedProps={zamucenje}
+          pocetakPrelaza={(traka - PRELAZ_IZNAD) / (traka + PRELAZ_ISPOD)}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, height: traka + PRELAZ_ISPOD }}
+        />
+      ) : (
       <AnimatedBlurView
         pointerEvents="none"
         tint="systemUltraThinMaterialLight"
@@ -321,6 +339,7 @@ export function Screen({
         blurTarget={cilj}
         style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }, vidljivost]}
       />
+      )}
 
       {/* 3. preliv */}
       <ScreenBackdrop tint={tint} pushed={pushed} />

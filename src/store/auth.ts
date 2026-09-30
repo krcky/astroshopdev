@@ -17,7 +17,6 @@ import { useProfileStore } from '@/store/profile';
 import { useOsobeStore } from '@/store/osobe';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useHeroLog } from '@/store/hero-log';
-import { DEV_TOOLS_ENABLED, useDevStore } from '@/store/dev';
 
 export type Entitlement = { active: boolean; productId: string | null; expiresAt: string | null };
 
@@ -40,25 +39,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   setEntitlement: (entitlement) => set({ entitlement }),
 }));
 
-/** Test override iz /profile ima isti oblik kao pravi red u bazi. */
-const DEV_ENTITLEMENT: Record<'on' | 'off', Entitlement> = {
-  on: { active: true, productId: 'dev.override', expiresAt: null },
-  off: { active: false, productId: null, expiresAt: null },
-};
-
 /**
  * Pravo pristupa kako ga vidi UI — jedina tacka citanja u aplikaciji.
- *
- * Ekrani NE citaju `useAuthStore(s => s.entitlement)` direktno, jer bi tada
- * test prekidac morao da se ugradjuje na svako mesto posebno. U release bildu
- * je `DEV_TOOLS_ENABLED` false i ovo vraca netaknutu vrednost sa servera.
+ * (Test prekidac Placen/Besplatan u profilu uklonjen 29.9.2026, Ivan: "ne treba
+ * mi"; stanje se menja poklonom — `admin.daj_premium`, `supabase/pokloni.sql`.)
  */
 export function useEntitlement(): Entitlement | null {
-  const server = useAuthStore((s) => s.entitlement);
-  const override = useDevStore((s) => s.entitlementOverride);
-
-  if (!DEV_TOOLS_ENABLED || override === null) return server;
-  return override ? DEV_ENTITLEMENT.on : DEV_ENTITLEMENT.off;
+  return useAuthStore((s) => s.entitlement);
 }
 
 /** Da li ovaj korisnik ima Premium (kupovina ili poklon) — prikaz; granice su u `lib/pristup.ts`. */

@@ -14,7 +14,7 @@ import { neutral } from '@/theme/tokens';
  *
  * Ascendent i MC nemaju sliku — za njih ostaje SVG ikonica (`planeta-ikona.tsx`).
  */
-const SLIKA: Partial<Record<string, ImageSourcePropType>> = {
+export const SLIKA: Partial<Record<string, ImageSourcePropType>> = {
   sun: require('../../assets/images/planete/sun.png'),
   moon: require('../../assets/images/planete/moon.png'),
   mercury: require('../../assets/images/planete/mercury.png'),

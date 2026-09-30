@@ -28,6 +28,8 @@ export const ASTROLOG = {
 
 /** Okviran rok — samo tekst (vidi gore). */
 export const OKVIRNI_ROK = 'obično za 2–3 radna dana';
+/** Isti rok, bez "obično za" — u recenici tabele uvoda (`pitaj-uvod.tsx`). */
+export const ROK_KRATKO = '2–3 radna dana';
 
 export type PitanjeStatus = 'draft' | 'paid' | 'answered' | 'refunded';
 

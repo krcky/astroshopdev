@@ -6,16 +6,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { ScreenBackdrop } from '@/components/screen';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Planeta } from '@/components/planete-par';
-import { MoonDisc } from '@/components/moon-disc';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { PREMIUM as PREMIUM_GRANICE } from '@/lib/pristup';
 import {
-  cenaPoMesecu, kupiPremium, usePaketiPremium, ustedaGodisnje, vratiKupovine, type PaketPremium,
+  cenaBezPopusta, cenaPoMesecu, kupiPremium, usePaketiPremium, ustedaGodisnje, vratiKupovine, type PaketPremium,
 } from '@/lib/kupovina';
+import { PRIVATNOST, USLOVI } from '@/lib/pravila';
 import { dana } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
@@ -26,9 +27,6 @@ import { neutral } from '@/theme/tokens';
 const RUCICA_PROSTOR = 44;
 /** Sirina mesta za ilustraciju levo od teksta. */
 const ILUSTRACIJA = 76;
-/** Pravila na sajtu (`web/`, pravila.astroshop.rs) — Apple trazi linkove na paywall-u. */
-const USLOVI = 'https://pravila.astroshop.rs/uslovi';
-const PRIVATNOST = 'https://pravila.astroshop.rs/privatnost';
 
 /**
  * Paywall (Ivan, 29.9.2026, po uzoru na CHANI): sta Premium daje, dva paketa,
@@ -47,15 +45,25 @@ const PRIVATNOST = 'https://pravila.astroshop.rs/privatnost';
  * (otvoren linkom, posle osvezavanja) nazad ne postoji i `back()` ne radi nista —
  * tada na kapiju (pravilo 11), koja sama zna gde korisnik ide.
  */
-function zatvori() {
+function zatvoriList() {
   if (router.canGoBack()) router.back();
   else router.replace('/');
 }
 
 export default function Premium() {
+  return <PaywallEkran />;
+}
+
+/**
+ * Paywall. `uOnboardingu` (Ivan, 29.9.2026): poslednji korak onboardinga, posle
+ * obavestenja (`(onboarding)/ponuda.tsx`) — CEO EKRAN, ne list: bez rucice, a X
+ * i kupovina vode na kapiju (pravilo 11), ne nazad na obavestenja.
+ */
+export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean }) {
   const insets = useSafeAreaInsets();
   // Otvoren preko drugog ekrana = iOS list; utvrdjuje se jednom, pri otvaranju.
-  const [kaoList] = React.useState(() => Platform.OS === 'ios' && router.canGoBack());
+  const [kaoList] = React.useState(() => !uOnboardingu && Platform.OS === 'ios' && router.canGoBack());
+  const zatvori = uOnboardingu ? () => router.replace('/') : zatvoriList;
   const paketi = usePaketiPremium();
   const [izabran, setIzabran] = React.useState<PaketPremium['id']>('godisnje');
   const [poruka, setPoruka] = React.useState<string | null>(null);
@@ -87,17 +95,12 @@ export default function Premium() {
     else zatvori();
   };
 
-  return (
-    // LIST PREKO CELOG EKRANA (Ivan, 29.9.2026: "povecaj na 100%", vise vazduha).
-    // `modal` (ne `formSheet`, koji sadrzaju ne daje visinu): gore naslov i stavke,
-    // dole paketi, dugme i pravila; visak visine ide IZMEDJU, da paketi ostanu uz
-    // dugme. Na malom telefonu se sve skroluje.
-    <View className="flex-1 bg-grouped" style={{ paddingTop: kaoList ? 0 : insets.top }}>
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 4 }}
-        showsVerticalScrollIndicator={false}>
-      <View className="px-5" style={{ paddingTop: RUCICA_PROSTOR }}>
+  const telo = (
+    <>
+      {/* U onboardingu (ceo ekran, Ivan 30.9.2026): naslov GORE, odmah ispod X-a; visak
+          visine ide IZMEDJU delova (vidi dole), ne iznad naslova. */}
+      <View style={uOnboardingu ? { height: RUCICA_PROSTOR + 12 } : kaoList ? { height: RUCICA_PROSTOR } : { flexGrow: 1, minHeight: RUCICA_PROSTOR }} />
+      <View className="px-5">
 
         <Text variant="naslovLista" className="text-center" accessibilityRole="header">
           Otvori sva tumačenja
@@ -107,7 +110,7 @@ export default function Premium() {
           Svi tvoji tranziti, teme perioda i pogled na sutra i prekosutra.
         </Text>
 
-        <View className="mt-7 gap-5">
+        <View className={uOnboardingu ? 'mt-10 gap-7' : 'mt-7 gap-5'}>
           <Stavka
             slika={
               <Image
@@ -130,7 +133,8 @@ export default function Premium() {
               />
             }
             naslov="Tranziti"
-            tekst="Svi tranziti dana, svaki dan, sa celim tumačenjem."
+            // "Sledeća dva dana" vise nije stavka (Ivan, 29.9.2026) — samo deo ovog teksta.
+            tekst="Svi tranziti dana sa celim tumačenjem — i za sutra i prekosutra."
           />
           {/* Spori tranziti (Jupiter—Pluton), slajd "Tema perioda"; besplatni vidi prvi. */}
           <Stavka
@@ -145,18 +149,16 @@ export default function Premium() {
             naslov="Teme perioda"
             tekst="Spori tranziti koji traju mesecima."
           />
-          <Stavka
-            slika={<MoonDisc angle={60} size={48} />}
-            naslov="Sledeća dva dana"
-            tekst="Pogledaj tumačenja za dva dana unapred."
-          />
           {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
           <Stavka
             slika={
               <View className="flex-row items-center">
-                <ZnakIkona znak="libra" element="vazduh" size={40} />
+                {/* Dva znaka ISTE velicine (Ivan, 29.9.2026), drugi preko prvog sa belim obodom. */}
+                <View className="rounded-full bg-background p-0.5">
+                  <ZnakIkona znak="libra" element="vazduh" size={36} />
+                </View>
                 <View className="-ml-3 rounded-full bg-background p-0.5">
-                  <ZnakIkona znak="cancer" element="voda" size={32} />
+                  <ZnakIkona znak="cancer" element="voda" size={36} />
                 </View>
               </View>
             }
@@ -167,8 +169,9 @@ export default function Premium() {
 
       </View>
 
-      {/* Sav visak visine ovde — izmedju stavki i paketa. */}
-      <View className="min-h-4 flex-1" />
+      {/* Izmedju stavki i paketa NAJVISE 32pt (Ivan, 29.9.2026: "preveliki razmak"); visak
+          visine ide iznad naslova, pa ceo sadrzaj stoji zajedno, uz pakete i dugme na dnu. */}
+      <View style={uOnboardingu ? { flexGrow: 1, minHeight: 32 } : kaoList ? { height: 32 } : { flexGrow: 1, minHeight: 20, maxHeight: 32 }} />
 
       <View className="px-5">
         {/* Paketi — samo kad je cena stigla iz prodavnice. */}
@@ -179,6 +182,7 @@ export default function Premium() {
               naslov="Godišnje"
               period="godišnje"
               ispod={`${cenaPoMesecu(godisnji.iznos, godisnji.valuta)} mesečno`}
+              precrtano={cenaBezPopusta(godisnji.iznos, mesecni.iznos, godisnji.valuta)}
               oznaka={usteda ? `Uštedi ${usteda}%` : undefined}
               izabran={izabran === 'godisnje'}
               onPress={() => setIzabran('godisnje')}
@@ -199,9 +203,9 @@ export default function Premium() {
       </View>
 
       {/* Dno: jedno dugme i pravila, odmah ispod paketa (Ivan: manja rupa). */}
-      <View className="px-5 pt-5">
+      <View className={uOnboardingu ? 'px-5 pt-6' : 'px-5 pt-5'}>
         {!!poruka && <Text variant="muted" className="mb-3 text-center" accessibilityLiveRegion="polite">{poruka}</Text>}
-        <Button disabled={!paket} ucitava={radi} className={cn(!paket && 'opacity-40')} onPress={kupi}>
+        <Button disabled={!paket} ucitava={radi} onPress={kupi}>
           <Text>{paket?.probaDana ? `Probaj ${dana(paket.probaDana)} besplatno` : 'Pretplati se'}</Text>
         </Button>
         {!!paket && (
@@ -220,20 +224,11 @@ export default function Premium() {
           <Veza onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)}>Privatnost</Veza>
         </View>
       </View>
-      </ScrollView>
-
-      {/* Rucica: `modal` je nema sam (Ivan, 29.9.2026) — zatvara se i povlacenjem nadole. */}
-      <View
-        pointerEvents="none"
-        className="absolute inset-x-0 items-center"
-        style={{ top: (kaoList ? 0 : insets.top) + 6 }}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants">
-        <View className="h-[5px] w-9 rounded-pill bg-subtle opacity-50" />
-      </View>
-
-      {/* X gore desno, MALI (Ivan, 29.9.2026: native stavka trake je bila prevelika) —
-          siv krug kao zatvaranje sistemskih listova, ne staklo. Dodir 44pt kroz `hitSlop`. */}
+    </>
+  );
+  // X gore desno, MALI (Ivan, 29.9.2026: native stavka trake je bila prevelika) —
+  // siv krug kao zatvaranje sistemskih listova, ne staklo. Dodir 44pt kroz `hitSlop`.
+  const dugmeX = (
       <Pressable
         onPress={zatvori}
         accessibilityRole="button"
@@ -243,6 +238,53 @@ export default function Premium() {
         style={{ top: (kaoList ? 0 : insets.top) + 14 }}>
         <X size={16} color={neutral.inkSubtle} strokeWidth={2.6} />
       </Pressable>
+  );
+
+  // KAO LIST (iOS, otvoren iz aplikacije — Ivan, 30.9.2026: "ne mora da bude 100%"):
+  // `formSheet` sa visinom koja odgovara sadrzaju (`PAYWALL_LIST` u `_layout.tsx`). List
+  // sadrzaju NE DAJE visinu, pa je KOREN SKROL (kao `SheetScroll`) — sa `flex-1` omotacem
+  // ili skrolom bez visine list je bio prazan (izmereno). X je u sadrzaju, rucicu crta sistem.
+  if (kaoList) {
+    return (
+      <ScrollView
+        className="flex-1 bg-grouped"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 4 }}
+        showsVerticalScrollIndicator={false}>
+        {telo}
+        {dugmeX}
+      </ScrollView>
+    );
+  }
+
+  return (
+    // LIST PREKO CELOG EKRANA (Ivan, 29.9.2026: "povecaj na 100%", vise vazduha).
+    // `modal` (ne `formSheet`, koji sadrzaju ne daje visinu): gore naslov i stavke,
+    // dole paketi, dugme i pravila; visak visine ide IZMEDJU, da paketi ostanu uz
+    // dugme. Na malom telefonu se sve skroluje. (Android i onboarding.)
+    <View className="flex-1 bg-grouped" style={{ paddingTop: insets.top }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 4 }}
+        showsVerticalScrollIndicator={false}>
+        {telo}
+      </ScrollView>
+
+      {/* Rucica: `modal` je nema sam (Ivan, 29.9.2026) — zatvara se i povlacenjem nadole.
+          U onboardingu je ceo ekran, pa rucice nema; kao list je crta sistem. */}
+      {!uOnboardingu && !kaoList && <View
+        pointerEvents="none"
+        className="absolute inset-x-0 items-center"
+        style={{ top: (kaoList ? 0 : insets.top) + 6 }}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants">
+        <View className="h-[5px] w-9 rounded-pill bg-subtle opacity-50" />
+      </View>}
+
+      {/* Ljubicasti preliv na vrhu kao na svim koracima onboardinga (Ivan, 30.9.2026) —
+          IZNAD sadrzaja i bez dodira (pravilo 17); X ide posle njega, da ostane iznad. */}
+      {uOnboardingu && <ScreenBackdrop />}
+
+      {dugmeX}
     </View>
   );
 }
@@ -265,11 +307,13 @@ function Stavka({ slika, naslov, tekst }: { slika: React.ReactNode; naslov: stri
  * Paket: bela kartica; izabran dobija indigo obod i svetlu indigo povrsinu
  * (`PREMIUM`) — boja Premium-a je ovde na mestu, to je jedino sto se placa.
  */
-function PaketKartica({ paket, naslov, period, ispod, oznaka, izabran, onPress }: {
+function PaketKartica({ paket, naslov, period, ispod, precrtano, oznaka, izabran, onPress }: {
   paket: PaketPremium;
   naslov: string;
   period: string;
   ispod?: string;
+  /** Puna cena bez popusta, precrtana iznad prave (`cenaBezPopusta`). */
+  precrtano?: string | null;
   oznaka?: string;
   izabran: boolean;
   onPress: () => void;
@@ -279,7 +323,7 @@ function PaketKartica({ paket, naslov, period, ispod, oznaka, izabran, onPress }
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected: izabran }}
-      accessibilityLabel={[naslov, paket.probaDana ? `${dana(paket.probaDana)} besplatno` : null, `${paket.cena} ${period}`, ispod, oznaka].filter(Boolean).join(', ')}
+      accessibilityLabel={[naslov, paket.probaDana ? `${dana(paket.probaDana)} besplatno` : null, `${paket.cena} ${period}`, precrtano ? `umesto ${precrtano}` : null, ispod, oznaka].filter(Boolean).join(', ')}
       className={cn(CARD_SURFACE, 'flex-1 border-2 p-4 active:opacity-80', !izabran && 'border-transparent')}
       style={izabran ? { borderColor: PREMIUM, backgroundColor: PREMIUM_IZABRAN } : undefined}>
       {!!oznaka && (
@@ -295,8 +339,15 @@ function PaketKartica({ paket, naslov, period, ispod, oznaka, izabran, onPress }
       </View>
       <View className="mt-3">
         {!!paket.probaDana && <Text variant="default">{dana(paket.probaDana)} besplatno</Text>}
-        {/* Cena podebljana (Ivan, 29.9.2026). */}
-        <Text variant="default"><Text variant="default" className={tezina('naslovUTekstu')}>{paket.cena}</Text> {period}</Text>
+        {/* Cena podebljana (Ivan, 29.9.2026). Uz precrtanu punu cenu (Ivan, 30.9.2026): prvo
+            prava, pa precrtana, u istom redu — BEZ reci "godišnje", da red uvek stane (naslov
+            kartice to vec kaze, a recenica o obnavljanju ispod dugmeta nosi i period). */}
+        <Text variant="default">
+          <Text variant="default" className={tezina('naslovUTekstu')}>{paket.cena}</Text>
+          {precrtano
+            ? <>{' '}<Text variant="default" className="text-muted-foreground line-through">{precrtano}</Text></>
+            : ` ${period}`}
+        </Text>
         {!!ispod && <Text variant="caption" className="mt-1">{ispod}</Text>}
       </View>
     </Pressable>

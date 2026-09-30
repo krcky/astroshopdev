@@ -9,6 +9,7 @@ import { OnboardingStep } from '@/components/onboarding-step';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { Text } from '@/components/ui/text';
 import { ASTROLOG } from '@/lib/pitanja';
+import { usePremium } from '@/store/auth';
 import { shadow } from '@/theme/tokens';
 
 const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
@@ -25,7 +26,10 @@ const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
 export default function Push() {
   const [busy, setBusy] = React.useState(false);
 
-  const done = () => router.replace('/');
+  // Posle obavestenja: Premium kao poslednji korak (`ponuda.tsx`, Ivan 29.9.2026) —
+  // osim za onoga ko ga vec ima (poklon, ranija kupovina); on ide pravo na kapiju.
+  const premium = usePremium();
+  const done = () => router.replace(premium ? '/' : '/ponuda');
 
   const ask = async () => {
     if (busy) return;

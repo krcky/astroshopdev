@@ -80,6 +80,10 @@ koji ne koristi `OnboardingStep` je greška, ne izbor.
 Nova komponenta ide u `ui/` samo ako se koristi na dva mesta. Jednokratna ostaje
 u ekranu.
 
+**Linije izmedju redova idu od ivice do ivice kartice** (Ivan, 29.9.2026) — i
+kad red ima ikonicu. Nikad uvucena linija (`ml-[60px]`, `mx-4 h-px`). `Group` iz
+`ui/list.tsx` to radi sam; rucno pravljena lista stavlja `border-b` na CEO red.
+
 **Razmak i oblik.** Tailwind skala, bez proizvoljnih brojeva. Vodoravni margin
 ekrana je `px-5` (`px-8` za usko centriran tekst). Unutrašnjost kartice `p-5`.
 Radijus preko `rounded-lg` / `rounded-xl` — vezani su za `--radius`, ne za piksele.

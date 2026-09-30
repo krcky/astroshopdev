@@ -24,7 +24,8 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
     sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
-    (onboarding)/    welcome, date, time, place, reveal, account, code, name, push
+    (onboarding)/    welcome, date, time, place, reveal, account, code, name, push, ponuda
+                     ponuda = PAYWALL posle obavestenja, ceo ekran (`PaywallEkran uOnboardingu`); ko ima Premium ga preskace
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
@@ -36,7 +37,8 @@ src/
     nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
     moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
                      i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
-    profile.tsx      profil — NIJE tab, otvara se dugmetom gore desno (nazad gore levo)
+    profile.tsx      profil — NIJE tab, LIST odozdo (29.9.2026) sa dugmeta gore desno: slika, Premium, rodjenje, nalog
+    nalog.tsx        list sa profila: email, nacin prijave, BRISANJE NALOGA (namerno korak dalje od profila)
     osoba.tsx        strana DRUGE OSOBE (?id=): "Karta | Danas" + pitanje o njoj (pravilo 22)
     osoba-uredi.tsx  unos/izmena druge osobe (bez id = nova), sve na jednom ekranu + pristanak
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
@@ -133,6 +135,10 @@ tackica novog odgovora), pa Premium ne prepoznaje boja sama nego katanac u njoj.
 `--gold` za Premium vise nije u upotrebi. Tamna
 tema je i dalje definisana pod `.dark:root` ako je ikad budemo ponudili kao
 opciju; `_layout.tsx` je zakljucan na `colorScheme.set('light')`.
+
+LINIJE IZMEDJU REDOVA idu OD IVICE DO IVICE kartice, i kad red ima ikonicu (Ivan,
+29.9.2026) — nikad uvucene. `Group` (`ui/list.tsx`) ih crta sam; rucna lista stavlja
+`border-b` na ceo red. Vidi `DESIGN.md`, poglavlje 4.
 
 DATUM je svuda istog oblika, "Uto, 29. sep 2026" (Ivan, 29.9.2026): skracen dan i mesec,
 godina bez tacke; mesta se razlikuju samo po tome da li nose dan i godinu. Sklapa ga
@@ -301,12 +307,19 @@ ekrana (provereno — traka ostane na nuli i kad je stanje upaljeno). `expo-blur
 zato izvozi `getAnimatableRef()` za Reanimated; provereno, `intensity` 20 daje
 `blur(4px)`.
 
+POSTEPENO ZAMUCENJE U SOPSTVENOM BUILDU (Ivan, 30.9.2026, provereno na telefonu): traka
+nema ostru donju ivicu — lokalni nativni modul `modules/postepeno-zamucenje` (Swift,
+`UIVisualEffectView.mask` = preliv, JAVNI API; isti materijal i jacina kao `expo-blur`).
+Expo Go ga nema, pa tamo ostaje `expo-blur` sa ivicom (`components/postepeno-zamucenje.tsx`
+vraca `null`). Maska na roditelju (MaskedView) NE radi — iOS tada ne crta efekat. Modul se
+linkuje sam (`pod install`, i posle `prebuild --clean`).
+
 ANDROID TIHO OSTANE BEZ ZAMUCENJA. `ExpoBlurView.kt` radi
 `if (blurTarget != null) method else BlurMethod.NONE` — nema greske, samo
 providna traka. Zato je sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide
 traci. Na iOS-u je `BlurTargetView` obican `View` i ne kosta nista.
 
-UNUTRASNJE STRANE (`pushed`: profil, Mesec, izmena) imaju svoje
+UNUTRASNJE STRANE (`pushed`: izmena; profil i Mesec su od 29.9.2026 listovi) imaju svoje
 zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
 BEZ loga i BEZ preliva (izuzetak: Mesec ima ljubicasti, `tint="purple"`). Strelicu
 crta `Screen` sam — ekran je ne salje.
@@ -318,6 +331,9 @@ profil na pocetnoj: providna native traka (`headerShown` samo za `!STARI_IOS`,
 Traka svih tabova je `components/tab-stack.tsx` (`TabStack`, u `_layout.tsx` svakog
 taba); profil gore desno je `ProfileButton` (sam bira native stavku ili rezervu).
 Onboarding: `(onboarding)/_layout.tsx` + `onboarding-step.tsx`.
+STAKLENO DUGME U SADRZAJU (van trake, npr. datum/mesto/koraci na Nebu, 29.9.2026) je
+`StakloDugme` (`components/staklo-dugme.ios.tsx`): SwiftUI `Button` + `buttonStyle('glass')`
+preko `@expo/ui`, sadrzaj CIST SwiftUI (SF Symbol + tekst, bez `RNHostView`).
 `GlassView` (`ui/glass-button.tsx`) "lici na Apple glass, nije to" — ostaje samo kao
 rezerva za Android / iOS < 26 i tamo gde trake nema (kapsule u karticama). Providan
 roditelj (`active:opacity`) kvari staklo — nikad oko `GlassView`. `@expo/ui`
@@ -620,7 +636,7 @@ npm run panel:build       panel za objavu -> panel/dist
       (`panel.astroshop.rs`); politika privatnosti i uslovi (astrolog vidi podatke o
       rodjenju, cuva se snimak).
 - [x] Brisanje naloga u aplikaciji — Edge Function `delete-account` deplojovana,
-      dugme u `profile.tsx`. Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
+      dugme na listu `nalog.tsx` (sa profila, 29.9.2026). Zatvara Apple zahtev 5.1.1(v). Funkcija koga brise
       cita ISKLJUCIVO iz tokena; anon kljuc je validan JWT i prolazi platformsku
       proveru, pa je `getUser()` u kodu jedina prava kapija — ne uklanjati je.
 - [ ] Objaviti `web/` na Cloudflare Pages (`pravila.astroshop.rs`) — popuniti
