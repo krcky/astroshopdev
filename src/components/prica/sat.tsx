@@ -26,6 +26,21 @@ export type Ublazavanje = (x: number) => number;
 
 const SatKontekst = React.createContext<Sat | null>(null);
 
+/**
+ * VREME VIDEA (ms od prvog kadra), za pokret koji ide KROZ sve slike — krug loga
+ * (`logo-price.tsx`). Sat slike ovde ne valja: krece od 0 na svakoj slici. Postavlja ga
+ * radionica videa; u prici i na slici za deljenje ga nema.
+ */
+const VremeKontekst = React.createContext<Sat | null>(null);
+
+export function VremeVidea({ vreme, children }: { vreme: Sat | null; children: React.ReactNode }) {
+  return <VremeKontekst.Provider value={vreme}>{children}</VremeKontekst.Provider>;
+}
+
+export function useVremeVidea(): Sat | null {
+  return React.useContext(VremeKontekst);
+}
+
 export function SatSlike({ sat, children }: { sat: Sat | null; children: React.ReactNode }) {
   return <SatKontekst.Provider value={sat}>{children}</SatKontekst.Provider>;
 }

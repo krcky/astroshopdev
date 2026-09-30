@@ -48,10 +48,13 @@ export function slikeDana(s: Sadrzaj): SlikaKljuc[] {
 }
 
 /**
- * Trajanje slike: 2 s + 0,4 s po reci, najmanje 5 i najvise 12 s. NN/g racuna
- * ~3 reci u sekundi; ovde je sporije (2,5), jer je tekst astrologov i cita se, ne preleće.
+ * Trajanje slike: 1 s + 0,25 s po reci, najmanje 4 i najvise 8 s (Ivan, 30.9.2026: "predugo";
+ * do tada 2 s + 0,4 s po reci, 5—12 s, pa je tipican dan trajao ~50 s, a sada ~35 s).
+ * 4 reci u sekundi je obicno citanje; ko cita sporije, drzi prstom (pauza).
  */
-export const TRAJANJE = { osnova: 2000, poReci: 400, min: 5000, max: 12000 } as const;
+export const TRAJANJE = { osnova: 1000, poReci: 250, min: 4000, max: 8000 } as const;
+/** Slike sa crtezom umesto teksta: stalno trajanje (do 30.9.2026: 6 / 7,5 / 7 s). */
+export const TRAJANJE_STALNO = { naslovna: 4500, ocene: 5000, savet: 5000 } as const;
 
 export function trajanjeSlike(tekst: string): number {
   const reci = tekst.trim() ? tekst.trim().split(/\s+/).length : 0;

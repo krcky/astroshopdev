@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Minus, Plus } from 'lucide-react-native';
 
@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 import { OblastIkona } from '@/components/oblast-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { MoonDisc } from '@/components/moon-disc';
+import { LogoPrice } from '@/components/prica/logo-price';
 import { PricaPozadina } from '@/components/prica/pozadina';
 import { INDIGO, INK, LILA, MINUS, PLUS, SIVA, TON_MASTILO } from '@/components/prica/boje';
 import {
@@ -41,12 +42,13 @@ import { neutral } from '@/theme/tokens';
  */
 export const KARTICA = { w: 360, h: 640 } as const;
 
-const LOGO_POZITIV = require('../../../assets/images/logo-story-pozitiv.png');
-const LOGO_NEGATIV = require('../../../assets/images/logo-story-negativ.png');
-/** Isti logo, 1260 px (`files/logo-story-negative.svg`) — na zavrsnom kadru je veliki, 420 px bi bio mutan. */
-const LOGO_VELIKI = require('../../../assets/images/logo-story-negativ-veliki.png');
 const LOGO_W = 132;
-const LOGO_H = (LOGO_W * 112) / 420;
+/**
+ * Logo dole (Ivan, 30.9.2026: "spusti jos dole"; do tada vrh na 512). Dno mu je na ~575 od 640,
+ * tj. ~195 px od dna u 1080 × 1920 — tik iznad polja za odgovor koje Instagram crta preko price.
+ * U videu mu se krug vrti (`logo-price.tsx`).
+ */
+const LOGO_VRH = 540;
 
 const BELA = neutral.white;
 const BELA_80 = 'rgba(255,255,255,0.8)';
@@ -77,11 +79,7 @@ function Okvir({ pozadina, nijansa, datum, boja, negativ = false, ekstra, childr
       <View style={{ position: 'absolute', left: 22, right: 22, top: 116, bottom: 138, justifyContent: 'center', alignItems: poravnanje === 'center' ? 'stretch' : 'flex-start' }}>
         {children}
       </View>
-      <Image
-        source={negativ ? LOGO_NEGATIV : LOGO_POZITIV}
-        style={{ position: 'absolute', top: 512, left: (KARTICA.w - LOGO_W) / 2, width: LOGO_W, height: LOGO_H }}
-        resizeMode="contain"
-      />
+      <LogoPrice sirina={LOGO_W} negativ={negativ} style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
     </View>
   );
 }
@@ -230,7 +228,7 @@ function KIdeKoci({ p }: { p: PricaDana }) {
           {`${p.datumTekst} · astroshop.rs`}
         </Text>
         <View style={{ position: 'absolute', left: 22, right: 22, top: KARTICA.h / 2 + 22 }}>{blok('minus', 'Koči me', koci, 1400)}</View>
-        <Image source={LOGO_NEGATIV} style={{ position: 'absolute', top: 512, left: (KARTICA.w - LOGO_W) / 2, width: LOGO_W, height: LOGO_H }} resizeMode="contain" />
+        <LogoPrice sirina={LOGO_W} negativ style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
       </View>
     );
   }
@@ -325,7 +323,7 @@ function KSavet({ p }: { p: PricaDana }) {
           <Text className="text-center text-[13px] leading-[18px]" style={{ color: MUTNO }}>{natpis}</Text>
         </Pojava>
       </View>
-      <Image source={LOGO_POZITIV} style={{ position: 'absolute', top: 512, left: (KARTICA.w - LOGO_W) / 2, width: LOGO_W, height: LOGO_H }} resizeMode="contain" />
+      <LogoPrice sirina={LOGO_W} style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
     </View>
   );
 }
@@ -351,7 +349,7 @@ export function KarticaKraj() {
       <PricaPozadina nijansa="noc" sirina={KARTICA.w} visina={KARTICA.h} />
       <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
         <Pojava kasni={250} trajanje={800}>
-          <Image source={LOGO_VELIKI} style={{ width: w, height: (w * 341) / 1260 }} resizeMode="contain" />
+          <LogoPrice sirina={w} negativ />
         </Pojava>
         <Pojava kasni={700} style={{ marginTop: 22 }}>
           <Text className={OZN} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 2.4, color: BELA_80 }}>astroshop.rs</Text>

@@ -9,9 +9,11 @@ import { buildNatalChart } from '../src/lib/natal';
 import { oblastiDana } from '../src/lib/oblasti';
 import {
   boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, kadarVidea, legendaTonova, luk, najbolja, poluprecnikKruga, rasporedVidea, reciZaPrelom, redovaTeksta, REDOSLED, slikeDana, VIDEO,
-  tackaNaKrugu, tackaNaTocku, TRAJANJE, trajanjeSlike, ugloviCrteza, velicinaSaveta, VELICINE_SAVETA, VELICINE_SAVETA_KARTICA, visinaNatpisa, ZNAK_EM, zraciDuzina,
+  tackaNaKrugu, tackaNaTocku, TRAJANJE, TRAJANJE_STALNO, trajanjeSlike, ugloviCrteza, velicinaSaveta, VELICINE_SAVETA, VELICINE_SAVETA_KARTICA, visinaNatpisa, ZNAK_EM, zraciDuzina,
 } from '../src/lib/prica';
 import { BEOGRAD } from '../src/lib/test-karta';
+import { LOGO_OKRET_S, polozajZnaka, ugaoLoga } from '../src/lib/logo-price';
+import { LOGO_KRUG, LOGO_ZNAKOVI } from '../src/lib/logo-price-oblici';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -20,13 +22,16 @@ const ok = (c: boolean, label: string, detail = '') => {
 };
 const blizu = (a: number, b: number, e = 1e-6) => Math.abs(a - b) < e;
 
-console.log('\n1. Trajanje slike: 2 s + 0,4 s po reci, 5—12 s');
-ok(trajanjeSlike('') === TRAJANJE.min, 'bez teksta: najmanje 5 s', String(trajanjeSlike('')));
-ok(trajanjeSlike('Budite strpljivi i dosledni.') === 5000, 'kratka recenica: 5 s');
+console.log('\n1. Trajanje slike: 1 s + 0,25 s po reci, 4—8 s');
+ok(trajanjeSlike('') === TRAJANJE.min, 'bez teksta: najmanje 4 s', String(trajanjeSlike('')));
+ok(trajanjeSlike('Budite strpljivi i dosledni.') === 4000, 'kratka recenica: 4 s');
 const td = 'Stabilan i odgovoran napredak Donosite važne odluke i planove s jasnoćom. Osećate veću odgovornost i spremnost da prihvatite savete koji vam pomažu da rastete.';
-ok(trajanjeSlike(td) === 2000 + 24 * 400, '"Tvoj dan" (24 reci): 11,6 s', String(trajanjeSlike(td)));
-ok(trajanjeSlike(Array(60).fill('rec').join(' ')) === TRAJANJE.max, 'dug tekst: najvise 12 s');
-ok(trajanjeSlike('  jedna   dve  ') === 5000, 'visak razmaka ne broji reci');
+ok(trajanjeSlike(td) === 1000 + 24 * 250, '"Tvoj dan" (24 reci): 7 s', String(trajanjeSlike(td)));
+ok(trajanjeSlike(Array(60).fill('rec').join(' ')) === TRAJANJE.max, 'dug tekst: najvise 8 s');
+ok(trajanjeSlike('  jedna   dve  ') === 4000, 'visak razmaka ne broji reci');
+const tipican = TRAJANJE_STALNO.naslovna + trajanjeSlike(td) + TRAJANJE_STALNO.ocene + trajanjeSlike(Array(24).fill('rec').join(' '))
+  + trajanjeSlike(Array(19).fill('rec').join(' ')) + TRAJANJE_STALNO.savet;
+ok(tipican <= 36000, 'tipican dan (6 slika) traje do 36 s', `${tipican / 1000} s`);
 
 console.log('\n1b. Prelom naslova: jednoslovna rec ide uz sledecu');
 const N = '\u00A0';
@@ -162,6 +167,18 @@ console.log('\n11. Video price: raspored kadrova');
   const R0 = poluprecnikKruga(360, 640, 306, 352);
   ok([[0, 0], [360, 0], [0, 640], [360, 640]].every(([x, y]) => Math.hypot(x - 306, y - 352) < R0), 'krug iz (0,85; 0,55) pokrije sva cetiri ugla kartice', R0.toFixed(1));
 }
+
+console.log('\n12. Logo u videu: krug se vrti (lice miruje, znakovi kruze uspravni)');
+ok(LOGO_ZNAKOVI.length === 12 && LOGO_ZNAKOVI.reduce((n, z) => n + z.delovi.length, 0) === 15, '12 znakova od 15 delova (Rak, Vaga, Vodolija po dva)');
+ok(Math.abs(LOGO_KRUG.rLice - 16) < 0.1, 'ivica lica: r = 13,5 / 40 poluprecnika (kao u logu)', String(LOGO_KRUG.rLice));
+ok(ugaoLoga(0) === 0 && Math.abs(ugaoLoga(1500) - 90) < 1e-9 && Math.abs(ugaoLoga(LOGO_OKRET_S * 1000)) < 1e-9, 'jedan krug na 6 s; posle kruga isto kao na pocetku');
+const z0 = LOGO_ZNAKOVI[0];
+const p0 = polozajZnaka(z0, 0);
+ok(blizu(p0.x, z0.cx) && blizu(p0.y, z0.cy), 'ugao 0: znak na svom mestu (slika za deljenje = kao u fajlu)');
+const udaljenost = (p: { x: number; y: number }) => Math.hypot(p.x - LOGO_KRUG.cx, p.y - LOGO_KRUG.cy);
+ok(LOGO_ZNAKOVI.every((z) => blizu(udaljenost(polozajZnaka(z, 137)), udaljenost({ x: z.cx, y: z.cy }), 1e-9)), 'znakovi ostaju na istom krugu dok kruze');
+const desno = polozajZnaka({ cx: LOGO_KRUG.cx + 10, cy: LOGO_KRUG.cy }, 90);
+ok(blizu(desno.x, LOGO_KRUG.cx) && blizu(desno.y, LOGO_KRUG.cy + 10), 'smer kazaljke na ekranu: desno -> dole posle 90°');
 
 console.log(fail ? `\n${fail} FAIL` : '\nSve provere prosle.');
 process.exit(fail ? 1 : 0);

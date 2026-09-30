@@ -8,7 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { KARTICA, KarticaKraj, KarticaZaDeljenje } from '@/components/prica/kartica';
 import { ZAVESA } from '@/components/prica/crtezi';
 import { PlatnoVidea, type PlatnoVideaRef } from '@/components/prica/platno-videa';
-import { SatSlike } from '@/components/prica/sat';
+import { SatSlike, VremeVidea } from '@/components/prica/sat';
 import { kadarVidea, poluprecnikKruga, rasporedVidea, VIDEO } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { poslednjiDodir } from '@/store/budnost';
@@ -90,6 +90,8 @@ function Radionica({ p }: { p: PricaDana }) {
   const satovi = React.useMemo(() => [s0, s1, s2, s3, s4, s5, s6], [s0, s1, s2, s3, s4, s5, s6]);
   const krug = useSharedValue(KR);
   const pun = useSharedValue(KR);
+  // Vreme od prvog kadra — za krug loga, koji se vrti kroz ceo video (`logo-price.tsx`).
+  const vreme = useSharedValue(0);
 
   React.useEffect(() => {
     let otkazano = false;
@@ -108,6 +110,7 @@ function Radionica({ p }: { p: PricaDana }) {
       let tekuci = { gore: 0, dole: null as number | null };
       setSlojevi(tekuci);
       satovi[0].set(0);
+      vreme.set(0);
       krug.set(KR);
       await cekaj(NOVA_SLIKA_MS * 2);
       await ja.pocni(fajl.uri, VIDEO.sirina, VIDEO.visina, VIDEO.fps, VIDEO.bitrate);
@@ -116,6 +119,7 @@ function Radionica({ p }: { p: PricaDana }) {
         if (otkazano) return null;
         if (prekinuto) throw PREKID;
         const k = kadarVidea(raspored, f);
+        vreme.set((f * 1000) / VIDEO.fps);
         const novi = { gore: k.gore.i, dole: k.dole?.i ?? null };
         satovi[k.gore.i].set(k.gore.sat);
         if (k.dole) satovi[k.dole.i].set(k.dole.sat);
@@ -166,7 +170,7 @@ function Radionica({ p }: { p: PricaDana }) {
       pratiApp.remove();
       platno.current?.otkazi().catch(() => {});
     };
-  }, [p, raspored, satovi, krug]);
+  }, [p, raspored, satovi, krug, vreme]);
 
   const vidljive = slojevi.dole === null ? [slojevi.gore] : [slojevi.dole, slojevi.gore];
   return (
@@ -177,9 +181,11 @@ function Radionica({ p }: { p: PricaDana }) {
       importantForAccessibility="no-hide-descendants"
       style={{ position: 'absolute', left: -2 * KARTICA.w - 100, top: 0, width: KARTICA.w, height: KARTICA.h }}>
       <Platno ref={platno} collapsable={false} style={{ width: KARTICA.w, height: KARTICA.h }}>
-        {vidljive.map((i) => (
-          <Sloj key={`${pokusaj}-${i}`} p={p} i={i} sat={satovi[i]} r={i === slojevi.gore ? krug : pun} />
-        ))}
+        <VremeVidea vreme={vreme}>
+          {vidljive.map((i) => (
+            <Sloj key={`${pokusaj}-${i}`} p={p} i={i} sat={satovi[i]} r={i === slojevi.gore ? krug : pun} />
+          ))}
+        </VremeVidea>
       </Platno>
     </View>
   );

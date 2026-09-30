@@ -9,7 +9,7 @@ import { buildPersonalDaily, datum } from '@/lib/horoscope';
 import { phaseDay, naslovMeseca, type PhaseDay } from '@/lib/moon';
 import { oceneOblasti, trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
 import {
-  brojTonova, legendaTonova, MOMENAT_NATPIS, najbolja, slikeDana, trajanjeSlike,
+  brojTonova, legendaTonova, MOMENAT_NATPIS, najbolja, slikeDana, trajanjeSlike, TRAJANJE_STALNO,
   type BrojTonova, type SlikaKljuc,
 } from '@/lib/prica';
 import type { Tone } from '@/lib/tone';
@@ -182,12 +182,12 @@ export function usePricaDana(): PricaDana | null {
       savet: !!savet,
     });
     const trajanja: Record<SlikaKljuc, number> = {
-      naslovna: 6000,
+      naslovna: TRAJANJE_STALNO.naslovna,
       tvojDan: trajanjeSlike(tvojDan ? `${tvojDan.naslov} ${tvojDan.sazetak}` : ''),
-      ocene: 7500,
+      ocene: TRAJANJE_STALNO.ocene,
       ideKoci: trajanjeSlike(`${ide?.tekst ?? ''} ${koci?.tekst ?? ''}`),
       mesec: trajanjeSlike(`${mesec.naslov} ${mesec.zaTebe?.naslov ?? ''} ${mesec.zaTebe?.tekst ?? ''}`),
-      savet: 7000,
+      savet: TRAJANJE_STALNO.savet,
     };
 
     return {

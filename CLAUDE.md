@@ -622,7 +622,8 @@ redova, 141 = 12) — radije manji nego preko ivice. 596 saveta: na iPhone 16/17
 naslovna i Mesec su uvek tu. Zbirne kartice NEMA. Podaci: `lib/use-prica.ts` — ISTI izbori kao pocetna
 (`pickTvojDan` + dnevnik, `pickBrief`, `useOblastiDana`), da prica ne kaze drugo nego kartice. Racun:
 `lib/prica.ts` (`check:prica`). Opis za astrologa: `docs/ASTRO-LOGIKA.md`, 4.7.
-TOK (`app/prica.tsx`): ide sama (2 s + 0,4 s po reci, 5—12 s) kroz `useFrameCallback` — NE `withTiming`,
+TOK (`app/prica.tsx`): ide sama (1 s + 0,25 s po reci, 4—8 s; naslovna 4,5 s, ocene i savet 5 s — Ivan,
+30.9.2026: "predugo", do tada 2 s + 0,4 s, 5—12 s; tipican dan ~34 umesto ~50 s) kroz `useFrameCallback` — NE `withTiming`,
 koji uz "Smanji pokrete" skoci na kraj. Dodir: levih 30% nazad, ostalo napred (nova slika se otkriva KRUGOM
 iz mesta dodira); drzanje = pauza (traka i zaglavlje se sklone); povlacenje nadole = zatvaranje. Dodir ide
 kroz RN responder, ne Gesture Handler — dugmad u slici (Otključaj, Podeli) moraju da pobede. Tekuca slika je
@@ -632,8 +633,12 @@ nje drugi ekran (paywall, tumacenje).
 DELJENJE (`components/prica/kartica.tsx`): kartica 360x640 se crta ispod price, `react-native-view-shot` je
 snimi, `expo-image-manipulator` svede na 1080x1920 PNG, `expo-sharing` otvori sistemski meni; fajl je
 "Astro Shop <dan>.png". Sadrzaj ISTI kao na slici — nista se ne izbacuje, samo smanjuje; PRVO LICE ("Moj dan",
-"Ide mi", "Koči me", "Za mene"). Gore datum · astroshop.rs, dole mali logo (`assets/images/logo-story-*.png`,
-iz `files/logo-story-*.svg`; negativ na indigu i na Ide/Koči). Bezbedna zona samo za Stories (~250 px gore
+"Ide mi", "Koči me", "Za mene"). Gore datum · astroshop.rs, dole mali logo — VEKTORSKI
+(`components/prica/logo-price.tsx`, oblici iz `files/logo-story-positive.svg` skriptom `scripts/logo/build-logo-price.py`;
+negativ na indigu i na Ide/Koči), vrh na 540 od 640 (Ivan, 30.9.2026: "spusti jos dole"; do tada 512). U VIDEU se
+krug loga VRTI ceo video, i na zavrsnom kadru (Ivan: "da ljudi znaju da je animirano"): kao logo i uvod — lice
+miruje, zraci i lukovi se okrecu, znakovi kruze uspravni, jedan krug na 6 s (`lib/logo-price.ts`). Ugao ide po
+VREMENU VIDEA (`useVremeVidea`, `sat.tsx`), ne po satu slike, inace bi krug na svakoj slici skocio nazad. Bezbedna zona samo za Stories (~250 px gore
 i dole), NE za Reels. Katanaca nema ni u prici ni na slici. Tranziti i tocak
 OSTAJU na slici (Ivan prihvatio da se iz njih moze naslutiti datum rodjenja: "ostavi ovako"). Pravo u
 Instagram Stories trazi Facebook App ID i dev build — faza 2.
@@ -651,8 +656,8 @@ EKRANA dok korisnik radi sta hoce: `video-radionica.tsx` (u korenu, `_layout.tsx
 (`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). Raspored: `rasporedVidea` / `kadarVidea` u
 `lib/prica.ts` — ista trajanja kao prica, najvise 58 s (Instagram prica 60 s), prelaz krugom 750 ms kao kad
 prica sama ide dalje (`check:prica`, deo 11). ZAVRSNI KADAR (Ivan, 30.9.2026): logo i "astroshop.rs" na
-indigu, 2,2 s posle poslednje slike (`KarticaKraj`, logo 1260 px `logo-story-negativ-veliki.png` iz
-`files/logo-story-negative.svg`); samo u videu, vreme mu se oduzme od 58 s unapred. U simulatoru: 4 slike (23,5 s) za ~31 s, 6 slika (35,5 s) za
+indigu, 2,2 s posle poslednje slike (`KarticaKraj`, logo `LogoPrice` u negativu, 280 pt, SVG iz
+`files/logo-story-negative.svg` — PNG loga vise nema, obrisan 30.9.2026); samo u videu, vreme mu se oduzme od 58 s unapred. U simulatoru: 4 slike (23,5 s) za ~31 s, 6 slika (35,5 s) za
 ~45 s, 18 MB; brojac kadrova potvrdio da je SVAKI kadar tacan. Posle dodira staje 1,5 s (skrol ne trza).
 IZLAZAK IZ APLIKACIJE = ISPOCETKA SA NOVIM KARTICAMA: iOS u pozadini gasi koder, a posle povratka su trake i broj
 na naslovnoj skocili na staro stanje i tako ostali (provereno) — ne "nastavljati" posao. Gotovo: lokalno
