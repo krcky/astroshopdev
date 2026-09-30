@@ -18,9 +18,10 @@ import {
 import { formatDate } from '../src/lib/horoscope';
 import { trueNodeLongitude, meanLilithLongitude, nodeSpeed } from '../src/lib/points';
 import {
-  chordAt, degreeTickPaths, labelBlockWidth, spreadAngles,
+  chartAngle, chordAt, degreeTickPaths, labelBlockWidth, levaTacka, naOsi, oseKarte, polar, spreadAngles,
   LABEL, LABEL_SEP, WHEEL_R,
 } from '../src/lib/wheel';
+import { buildNatalChart } from '../src/lib/natal';
 import { signFromLongitude } from '../src/lib/zodiac';
 
 let fail = 0;
@@ -311,9 +312,9 @@ const zazorGlif = (WHEEL_R.planetUp - WHEEL_R.number)
   - (LABEL.glyphSize * 0.82) / 2 - sirina / 2;
 ok(zazorGlif > 1, 'blok ne naleti na svoj glif', `rezerva ${zazorGlif.toFixed(1)}`);
 
-// A ka centru ne sme da propadne kroz unutrasnji prsten.
+// A ka centru ne sme da propadne u polje aspekata (od 30.9.2026 bez linije, ivica su tacke planeta).
 const zazorPrsten = (WHEEL_R.number - sirina / 2) - WHEEL_R.houseRing;
-ok(zazorPrsten > 1, 'blok ostaje iznad unutrasnjeg prstena', `rezerva ${zazorPrsten.toFixed(1)}`);
+ok(zazorPrsten > 1, 'blok ostaje iznad ivice polja aspekata', `rezerva ${zazorPrsten.toFixed(1)}`);
 
 // Sto je razmak veci, to simbol stoji dalje od svog stvarnog stepena. Crtica
 // do prstena to pokriva, ali samo do granice.
@@ -325,6 +326,43 @@ const pomakSaStepenima = Math.max(...svi.map((v, i) => {
 }));
 ok(pomakSaStepenima < 20, 'i sa stepenima nijedan simbol ne odluta vise od 20°',
    `najveci pomak ${pomakSaStepenima.toFixed(1)}°`);
+
+console.log('\n=== 11. Kuce do centra (30.9.2026) ===');
+// Kuspide staju na malom krugu `hub`, brojevi kuca stoje oko njega. Dvocifren
+// broj je vodoravan, pa na 3 i 9 sati celu svoju sirinu trosi po poluprecniku.
+const sirinaBroja = 2 * LABEL.houseSize * LABEL.digit;
+ok(WHEEL_R.houseNum - sirinaBroja / 2 - WHEEL_R.hub > 1, 'broj kuce ne ulazi u mali krug',
+   `rezerva ${(WHEEL_R.houseNum - sirinaBroja / 2 - WHEEL_R.hub).toFixed(1)}`);
+ok(WHEEL_R.houseRing - WHEEL_R.houseNum - sirinaBroja / 2 > 1, 'broj kuce ne stize do tacaka planeta',
+   `rezerva ${(WHEEL_R.houseRing - WHEEL_R.houseNum - sirinaBroja / 2).toFixed(1)}`);
+
+// Susedni brojevi na karti iz ove provere (Placidus nad Beogradom) se ne dodiruju.
+// Na severu (Stokholm) kuca ume da bude i 11° pa se brojevi zbiju — to je poznata cena.
+const kuspide = sky.chart.houses.cusps;
+const brojevi = kuspide.map((c, i) => {
+  const mid = c + (((kuspide[(i + 1) % 12] - c) % 360) + 360) % 360 / 2;
+  return polar(0, 0, WHEEL_R.houseNum, chartAngle(mid, sky.chart.houses.ascendant));
+});
+const najblizi = Math.min(...brojevi.map((b, i) => {
+  const n = brojevi[(i + 1) % 12];
+  return Math.hypot(n.x - b.x, n.y - b.y);
+}));
+ok(najblizi > sirinaBroja, 'susedni brojevi kuca se ne dodiruju', `${najblizi.toFixed(1)} vs sirina ${sirinaBroja.toFixed(1)}`);
+
+// Ose (debele) dolaze iz ASC i MC. Po Placidusu su to tacno 1., 4., 7. i 10. kuspida.
+const ose = oseKarte(sky.chart.houses.ascendant, sky.chart.houses.midheaven);
+const naOsama = kuspide.map((c, i) => (naOsi(c, ose) ? i : -1)).filter((i) => i >= 0);
+ok(naOsama.join(',') === '0,3,6,9', 'Placidus: ose su 1., 4., 7. i 10. kuspida', naOsama.map((i) => i + 1).join(', '));
+// Iznad ~66° Placidus pada na Whole Sign: kuspide su granice znakova, ose NISU medju njima.
+const tromse = buildNatalChart({ date: TRENUTAK, latitude: 69.6492, longitude: 18.9553 }, 'placidus');
+const oseSever = oseKarte(tromse.houses.ascendant, tromse.houses.midheaven);
+ok(tromse.houses.fellBack && tromse.houses.cusps.filter((c) => naOsi(c, oseSever)).length === 0,
+   'Whole Sign: ose se crtaju posebno, ne po kuspidi',
+   `Tromse, ASC ${signFromLongitude(tromse.houses.ascendant).formatted}`);
+
+// Bez vremena rodjenja nema kuca ni ASC: levo je 0° Ovna, ne ascendent za podne.
+ok(chartAngle(0, levaTacka(sky.chart.houses.ascendant, true)) === 180, 'bez vremena rodjenja levo je 0° Ovna');
+ok(levaTacka(sky.chart.houses.ascendant, false) === sky.chart.houses.ascendant, 'sa vremenom levo je ascendent');
 
 console.log(fail ? `\n${fail} PROVERA PALO\n` : '\nSve provere prosle.\n');
 process.exit(fail ? 1 : 0);

@@ -48,7 +48,9 @@ const LINIJA = 36;
 function LinijaAspekta({ boja, debljina, crta }: { boja: string; debljina: number; crta?: string }) {
   return (
     <Svg width={LINIJA} height={10} style={{ marginTop: 6 }}>
-      <Line x1={2} y1={5} x2={LINIJA - 2} y2={5} stroke={boja} strokeWidth={debljina * 1.4} strokeDasharray={crta} strokeLinecap="round" />
+      {/* Debljina kao na tocku: do 30.9.2026 legenda je mnozila sa 1,4 jer su linije
+          bile tanje; kad su podebljane na tocku, legenda je ostala kakva je bila. */}
+      <Line x1={2} y1={5} x2={LINIJA - 2} y2={5} stroke={boja} strokeWidth={debljina} strokeDasharray={crta} strokeLinecap="round" />
     </Svg>
   );
 }

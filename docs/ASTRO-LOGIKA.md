@@ -33,7 +33,7 @@ Tamo gde je navedena funkcija u kodu (npr. `pickHero`), to je samo putokaz za pr
 
 **Nepoznato vreme rođenja.** ✅
 - Uzima se **podne**.
-- Kuće se računaju po **Whole Sign** sistemu, od ascendenta izračunatog za podne. Te kuće su nepouzdane i služe samo za crtež.
+- Kuće se računaju po **Whole Sign** sistemu, od ascendenta izračunatog za podne. Te kuće su nepouzdane i **ne crtaju se** (30.9.2026): točak tada nema kuća, Ascendenta ni MC-a, a levo je 0° Ovna umesto ascendenta za podne.
 - **Ascendent i MC se ne koriste nigde**: ni kao meta tranzita, ni u izboru Hero-a, ni za kuće u „Promenama na nebu".
 - Pozicije planeta ostaju upotrebljive, osim **Meseca**, koji za 12 sati pređe i do 7°. ⏳ Da li u tom slučaju Mesec treba izostaviti iz natalnih meta?
 

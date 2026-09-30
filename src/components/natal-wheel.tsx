@@ -5,13 +5,13 @@ import { GLYPH_FONT } from '@/components/ui/glyph';
 import { ZNAK_VIEWBOX, ZnakOblik } from '@/components/znak-ikona';
 import { fontUloge } from '@/theme/tipografija';
 import {
-  ASPECT_STYLE, CENTAR, DEGREES_MIN_SIZE, OKVIR, TICK, TICK_STYLE, TOCAK_BOJE as COLORS, VIEW, ZNAK_TOCAK,
+  ASPECT_STYLE, CENTAR, DEGREES_MIN_SIZE, OKVIR, TACKA_PLANETE, TICK, TICK_STYLE, TOCAK_BOJE as COLORS, VIEW, ZNAK_TOCAK,
 } from '@/lib/tocak-stil';
 import { SIGNS, norm360, signFromLongitude } from '@/lib/zodiac';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
 import {
-  chartAngle, degreeTickPaths, polar, spreadAngles,
+  chartAngle, degreeTickPaths, levaTacka, naOsi, oseKarte, polar, spreadAngles,
   LABEL as NUM, LABEL_SEP, WHEEL_R as R,
 } from '@/lib/wheel';
 
@@ -33,18 +33,23 @@ export { ASPECT_STYLE };
  * Sada su stepen i minut jedan red, sa minutom kao indeksom gore-desno.
  * Smer je uvek isti bez obzira gde je planeta na krugu.
  *
- * Cena je sirina: "16 48'" je 23 jedinice, a sam glif ~14. Dva suseda na istom
- * poluprecniku traze tetivu duzu od toga — otud razmak od 14°, koji na r=102
- * daje 24.7. I zato se prsten planeta odmice na 125: na dijagonali se ugao
+ * Cena je sirina: "16 48'" je 25,5 jedinica, a sam glif ~16. Dva suseda na istom
+ * poluprecniku traze tetivu duzu od toga — otud razmak od 15°, koji na r=102
+ * daje 26,6. I zato se prsten planeta odmice na 125: na dijagonali se ugao
  * glifa i ugao bloka priblizavaju, pa je na blizim poluprecnicima Venera
  * zakacala svoj broj.
  *
  * Svaki put kad se `minSize` promeni, blok se siri i OVA TRI BROJA se menjaju
- * zajedno. Preveri `npm run check:sky`, sekcija 10.
- *
- * Izmereno na stvarnoj karti, 42 okvira: nijedno preklapanje, blok najblize
- * centru na r=89.3 (unutrasnji prsten je na 88), najveci pomak simbola od
- * pravog ugla 8.8° (check-natal dozvoljava 20°).
+ * zajedno. Preveri `npm run check:sky`, sekcija 10. (30.9.2026 su simbol, stepen
+ * i minut podignuti na 19,5 / 10 / 7,8, a razmak sa 14° na 15°.)
+ */
+
+/*
+ * Kuce idu do CENTRA (Ivan, 30.9.2026, po uzoru na klasicnu kartu): kuspide
+ * prolaze kroz polje aspekata i staju na malom krugu u sredini, brojevi kuca
+ * stoje oko njega, a polje aspekata nema svoju liniju — ivicu pokazuju tacke
+ * planeta, iz kojih krecu linije aspekata. Broj kuce ostaje na SREDINI kuce, ne
+ * odmah posle linije: u uskoj kuci bi se inace sudario sa sledecom linijom.
  */
 
 /**
@@ -92,19 +97,23 @@ type Props = {
    * prvi pogled vidi sta je telo a sta racun.
    */
   points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[];
+  /**
+   * Vreme rodjenja nije poznato: bez kuca, ASC i MC (Ivan, 30.9.2026). Kuce bi
+   * bile Whole Sign od ascendenta za podne — izmisljene (pravilo 5). Levo je
+   * tada 0° Ovna (`levaTacka`).
+   */
+  bezKuca?: boolean;
 };
 
-export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points }: Props) {
+export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false }: Props) {
   const cx = CENTAR;
   const cy = CENTAR;
-  const asc = chart.houses.ascendant;
+  const leva = levaTacka(chart.houses.ascendant, bezKuca);
   const degrees = showDegrees ?? size >= DEGREES_MIN_SIZE;
-  // Brojevi kuca bi upali u drugi red brojeva, pa se sklanjaju unutar prstena.
-  const houseNumR = degrees ? R.houseNumIn : R.houseNum;
   const planetR = degrees ? R.planetUp : R.planet;
 
   /** Ekliptička longituda -> ugao na ekranu. ASC levo, longituda raste suprotno od kazaljke. */
-  const angleOf = (lon: number) => chartAngle(lon, asc);
+  const angleOf = (lon: number) => chartAngle(lon, leva);
   const at = (lon: number, r: number) => polar(cx, cy, r, angleOf(lon));
   /** Za vec izracunat ugao (posle razmicanja). */
   const atAngle = (deg: number, r: number) => polar(cx, cy, r, deg);
@@ -123,18 +132,23 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   // smanji, inace relaksacija gurne ceo klaster u stranu.
   //
   // Sa stepenima razmak mora da poraste: glif staje u 9.5°, ali blok "16 48'"
-  // ispod njega je sirok 23 jedinice, sto na poluprecniku 102 trazi 13.1°.
-  // Uzeto je 14° za rezervu. Cena je da simbol stoji dalje od svog stvarnog
+  // ispod njega je sirok 25,5 jedinica, sto na poluprecniku 102 trazi 14,4°.
+  // Uzeto je 15° za rezervu. Cena je da simbol stoji dalje od svog stvarnog
   // stepena — zato crtica koja vodi do prstena postaje obavezna, a ne ukras.
   const minSep = degrees ? LABEL_SEP : (simboli.length > 11 ? 8.5 : 9.5);
   const symbolAngles = React.useMemo(
     () => spreadAngles(simboli.map((s) => angleOf(s.longitude)), minSep),
-    [simboli, minSep]
+    [simboli, minSep, leva]
   );
 
   const ticks = React.useMemo(
-    () => degreeTickPaths(cx, cy, asc, R.zodiacIn, degrees ? TICK : { ...TICK, d5: 4 }),
-    [asc, degrees]
+    () => degreeTickPaths(cx, cy, leva, R.zodiacIn, degrees ? TICK : { ...TICK, d5: 4 }),
+    [leva, degrees]
+  );
+
+  const ose = React.useMemo(
+    () => oseKarte(chart.houses.ascendant, chart.houses.midheaven),
+    [chart]
   );
 
   const aspects = React.useMemo(
@@ -145,10 +159,10 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   return (
     <Svg width={size} height={size} viewBox={`${-OKVIR} ${-OKVIR} ${VIEW} ${VIEW}`}>
       {/* --- prstenovi --- */}
-      {/* Bela ispuna ispod svega: na sivoj pozadini ekrana tocak inace prosijava. */}
+      {/* Bela ispuna ispod svega: na sivoj pozadini ekrana tocak inace prosijava.
+          Polje aspekata nema svoj krug — ivicu pokazuju tacke planeta. */}
       <Circle cx={cx} cy={cy} r={R.outer} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
       <Circle cx={cx} cy={cy} r={R.zodiacIn} stroke={COLORS.line} strokeWidth={1} fill="none" />
-      <Circle cx={cx} cy={cy} r={R.houseRing} stroke={COLORS.line} strokeWidth={1} fill="none" />
 
       {/* --- crtice za stepene --- */}
       <G>
@@ -186,35 +200,24 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
         })}
       </G>
 
-      {/* --- kuspide kuca + brojevi --- */}
-      <G>
-        {chart.houses.cusps.map((cusp, i) => {
-          const isAngle = i === 0 || i === 3 || i === 6 || i === 9; // ASC, IC, DSC, MC
-          const a = at(cusp, R.houseRing);
-          const b = at(cusp, R.zodiacIn);
-          // Broj kuce ide na sredinu izmedju ove i sledece kuspide.
-          const next = chart.houses.cusps[(i + 1) % 12];
-          const midLon = cusp + norm360(next - cusp) / 2;
-          const n = at(midLon, houseNumR);
-          return (
-            <G key={`h${i}`}>
-              <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                    stroke={isAngle ? COLORS.ink : COLORS.line}
-                    strokeWidth={isAngle ? 1.4 : 0.8} />
-              {/* Uz stepene ovo su druge cifre na ekranu — sitnije i svetlije,
-                  da se broj kuce ne procita kao stepen planete. */}
-              <SvgText x={n.x} y={n.y + 3.5}
-                       fontSize={degrees ? 8.5 : 9.5} fontFamily={fontUloge('tockKuca')}
-                       fill={degrees ? COLORS.houseNum : COLORS.muted}
-                       textAnchor="middle">
-                {i + 1}
-              </SvgText>
-            </G>
-          );
-        })}
-      </G>
+      {/* --- kuspide od malog kruga do zodijaka, ose deblje --- */}
+      {!bezKuca && (
+        <G>
+          {chart.houses.cusps.filter((c) => !naOsi(c, ose)).map((cusp, i) => {
+            const a = at(cusp, R.hub);
+            const b = at(cusp, R.zodiacIn);
+            return <Line key={`h${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.line} strokeWidth={0.8} />;
+          })}
+          {ose.map((lon, i) => {
+            const a = at(lon, R.hub);
+            const b = at(lon, R.zodiacIn);
+            return <Line key={`o${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ink} strokeWidth={1.4} />;
+          })}
+          <Circle cx={cx} cy={cy} r={R.hub} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
+        </G>
+      )}
 
-      {/* --- linije aspekata --- */}
+      {/* --- linije aspekata (preko malog kruga: opozicija prolazi kroz centar) --- */}
       <G>
         {aspects.map((a, i) => {
           const st = ASPECT_STYLE[a.aspect.key];
@@ -233,25 +236,57 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
         })}
       </G>
 
+      {/* --- brojevi kuca, na sredini kuce oko malog kruga --- */}
+      {!bezKuca && (
+        <G>
+          {chart.houses.cusps.map((cusp, i) => {
+            const next = chart.houses.cusps[(i + 1) % 12];
+            const n = at(cusp + norm360(next - cusp) / 2, R.houseNum);
+            const y = n.y + NUM.houseSize * 0.38;
+            // Broj lezi preko linija aspekata i kuca: beo oreol ispod njega ih prekine
+            // da se cifra cita. react-native-svg nema `paint-order`, pa je oreol
+            // poseban beli tekst sa belim obrisom, ispod pravog.
+            return (
+              <G key={`n${i}`}>
+                <SvgText x={n.x} y={y} fontSize={NUM.houseSize} fontFamily={fontUloge('tockKuca')}
+                         fill={COLORS.disk} stroke={COLORS.disk} strokeWidth={3} strokeLinejoin="round"
+                         textAnchor="middle">
+                  {i + 1}
+                </SvgText>
+                <SvgText x={n.x} y={y} fontSize={NUM.houseSize} fontFamily={fontUloge('tockKuca')}
+                         fill={COLORS.muted} textAnchor="middle">
+                  {i + 1}
+                </SvgText>
+              </G>
+            );
+          })}
+        </G>
+      )}
+
       {/* --- planete i izvedene tacke --- */}
       <G>
         {simboli.map((p, i) => {
           const spread = symbolAngles[i];
           const pos = atAngle(spread, planetR);
           const boja = p.izvedena ? COLORS.muted : COLORS.ink;
+          const glif = p.izvedena ? NUM.glyphSizeIzv : NUM.glyphSize;
           // Crtica koja povezuje simbol sa STVARNIM stepenom na prstenu.
           const trueOuter = at(p.longitude, R.zodiacIn);
           const trueInner = at(p.longitude, R.zodiacIn - 7);
           const leadFrom = atAngle(spread, planetR + 6);
+          // Tacka na ivici polja aspekata — tu se sustizu linije aspekata ove planete.
+          // Izvedene tacke nemaju aspekte (pravilo 16), pa ni tacku.
+          const tacka = showAspects && !p.izvedena ? at(p.longitude, R.houseRing) : null;
           return (
             <G key={p.key}>
               <Line x1={trueOuter.x} y1={trueOuter.y} x2={trueInner.x} y2={trueInner.y}
                     stroke={boja} strokeWidth={p.izvedena ? 0.9 : 1.2} />
               <Line x1={trueInner.x} y1={trueInner.y} x2={leadFrom.x} y2={leadFrom.y}
                     stroke={COLORS.line} strokeWidth={0.7} />
+              {tacka && <Circle cx={tacka.x} cy={tacka.y} r={TACKA_PLANETE} fill={boja} />}
               <SvgText
-                x={pos.x} y={pos.y + 6}
-                fontSize={p.izvedena ? 15 : 17} fontFamily={GLYPH_FONT} fill={boja}
+                x={pos.x} y={pos.y + glif * 0.353}
+                fontSize={glif} fontFamily={GLYPH_FONT} fill={boja}
                 textAnchor="middle">
                 {p.glyph}
               </SvgText>
@@ -262,11 +297,13 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
                 // tocka pada tacno u red sa brojevima, jer je tamo "desno"
                 // ujedno i "ka centru". Zato se uz stepene "R" sklanja
                 // RADIJALNO — po luku u stranu i malo ka spolja, gde brojeva
-                // nema ni na jednoj strani kruga.
-                const r = degrees ? atAngle(spread - 5.5, planetR + 2) : { x: pos.x + 11, y: pos.y + 10 };
+                // nema ni na jednoj strani kruga. (6,3° = nekadasnjih 5,5° uz simbol 17,
+                // srazmerno vecem simbolu.)
+                const r = degrees ? atAngle(spread - 6.3, planetR + 2) : { x: pos.x + 12.5, y: pos.y + 11.5 };
                 return (
-                  <SvgText x={r.x} y={degrees ? r.y + 2.4 : r.y}
-                           fontSize={degrees ? 7 : 8} fontFamily={fontUloge('tockKuca')} fill={COLORS.muted} textAnchor="middle">
+                  <SvgText x={r.x} y={degrees ? r.y + 2.7 : r.y}
+                           fontSize={degrees ? NUM.rSize : NUM.rSize + 1} fontFamily={fontUloge('tockKuca')}
+                           fill={COLORS.muted} textAnchor="middle">
                     R
                   </SvgText>
                 );
@@ -313,22 +350,24 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
       </G>
 
       {/* --- oznake uglova: crtica van kruga + natpis, da ne udju u zodijacki prsten --- */}
-      <G>
-        {([['ASC', chart.houses.ascendant], ['MC', chart.houses.midheaven]] as const).map(([label, lon]) => {
-          const a = at(lon, R.outer);
-          const b = at(lon, R.outer + 7);
-          const t = at(lon, R.outer + 16);
-          return (
-            <G key={label}>
-              <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ugao} strokeWidth={1.5} />
-              <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontFamily={fontUloge('tockUgao')}
-                       fill={COLORS.ugao} textAnchor="middle">
-                {label}
-              </SvgText>
-            </G>
-          );
-        })}
-      </G>
+      {!bezKuca && (
+        <G>
+          {([['ASC', chart.houses.ascendant], ['MC', chart.houses.midheaven]] as const).map(([label, lon]) => {
+            const a = at(lon, R.outer);
+            const b = at(lon, R.outer + 7);
+            const t = at(lon, R.outer + 16);
+            return (
+              <G key={label}>
+                <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ugao} strokeWidth={1.5} />
+                <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontFamily={fontUloge('tockUgao')}
+                         fill={COLORS.ugao} textAnchor="middle">
+                  {label}
+                </SvgText>
+              </G>
+            );
+          })}
+        </G>
+      )}
     </Svg>
   );
 }

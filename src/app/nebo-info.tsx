@@ -36,7 +36,7 @@ export default function NeboInfo() {
         <Text variant="reading">
           Spoljni prsten je 12 znakova. Brojevi od 1 do 12 su kuće, simboli su planete. Levo je
           Ascendent: znak koji se upravo diže na istoku. Gore je MC, najviša tačka neba u ovom
-          trenutku. Linije u sredini su aspekti, a sivi simboli su tačke.
+          trenutku. Obojene linije u sredini su aspekti, a sivi simboli su tačke.
         </Text>
         <Text variant="reading" className="mt-3">
           R pored planete znači da je retrogradna: gledano sa Zemlje, prividno ide unazad kroz

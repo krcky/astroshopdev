@@ -101,7 +101,8 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
       ) : (
         // Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Nebu").
         <View className="-mt-3 items-center">
-          <NatalWheel chart={chart} size={wheelSize} />
+          {/* Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5). */}
+          <NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} />
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}
           <TockInfo velicina={wheelSize} onPress={() => router.push('/natalna-karta-info')}

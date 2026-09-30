@@ -73,8 +73,8 @@ export default function NatalnaKartaInfo() {
         <Text variant="reading">
           Spoljni prsten je 12 znakova, a boja kruga oko znaka je njegov element. Brojevi od 1 do 12
           su kuće, simboli su planete. Levo je Ascendent, odnosno podznak: znak koji se dizao na
-          istoku kad si se rodio. Gore je MC, najviša tačka neba u tom trenutku. Linije u sredini
-          su aspekti.
+          istoku kad si se rodio. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u
+          sredini su aspekti.
         </Text>
       </Odeljak>
 
@@ -109,7 +109,8 @@ export default function NatalnaKartaInfo() {
       <Odeljak naslov="Vreme rođenja">
         <Text variant="reading">
           Podznak i kuće zavise od tačnog vremena rođenja. Za sat vremena Zemlja se okrene toliko da
-          se podznak pomeri za pola znaka.
+          se podznak pomeri za pola znaka. Kad vreme rođenja nije uneto, krug nema kuća, Ascendenta
+          ni MC-a, a levo je Ovan, prvi znak zodijaka.
         </Text>
       </Odeljak>
     </SheetScroll>

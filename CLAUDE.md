@@ -61,7 +61,8 @@ src/
   components/
     screen.tsx           okvir ekrana — preliv, zamucena traka, skrol, siva pozadina
     onboarding-step.tsx  zajednicki okvir svih koraka
-    natal-wheel.tsx      SVG tocak natalne karte
+    natal-wheel.tsx      SVG tocak natalne karte — kuce do malog kruga u sredini, polje aspekata BEZ linije,
+                         ivicu pokazuju tacke planeta; ose iz ASC/MC, ne iz broja kuspide (Ivan, 30.9.2026)
     natalna-karta-prikaz.tsx  cela natalna karta (tocak, trojka, planete, aspekti) — tab "Ti" i strana osobe
     tvoji-ljudi.tsx      kartica "Tvoji ljudi" na tabu "Ti" (druge osobe, "Dodaj osobu")
     polje-mesto.tsx      pretraga grada rodjenja — korak nove osobe, list jednog podatka (`rodjenje-polje`)
@@ -204,6 +205,8 @@ Zimsko/letnje vreme se racuna ZA DATUM RODJENJA. Nikad ne koristiti
 **5. Bez tacnog vremena rodjenja nema Placidusa.**
 `resolveProfile` automatski prelazi na Whole Sign i postavlja `timeUnknown`.
 UI mora da prizna da ascendent nije pouzdan umesto da prikaze izmisljen broj.
+TOCAK tada NE crta kuce, ASC ni MC (`NatalWheel bezKuca`, Ivan, 30.9.2026), a levo je
+0° Ovna (`levaTacka` u `wheel.ts`), ne ascendent za podne. Isto u panelu.
 
 **6. Cista matematika ide u `lib/`, nikad u komponentu.**
 `wheel.ts` je izdvojen iz `natal-wheel.tsx` bas zato: cim nesto uveze

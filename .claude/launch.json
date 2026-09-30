@@ -49,6 +49,18 @@
       "port": 5180
     },
     {
+      "name": "astroshop-panel-5181",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "panel/vite.config.mts",
+        "--port",
+        "5181"
+      ],
+      "port": 5181
+    },
+    {
       "name": "astroshop-web-8083",
       "runtimeExecutable": "npx",
       "runtimeArgs": [

@@ -20,6 +20,36 @@ export function chartAngle(longitude: number, ascendant: number): number {
   return 180 + (longitude - ascendant);
 }
 
+/**
+ * Longituda koja stoji LEVO (9 sati) — ono sto se predaje `chartAngle` kao
+ * `ascendant`. Sa vremenom rodjenja to je ascendent. Bez njega ascendent nije
+ * poznat (pravilo 5) i tocak ne crta kuce, ASC ni MC; levo je tada 0° Ovna,
+ * "prirodni" tocak koji ne tvrdi nista o kucama (Ivan, 30.9.2026). Da ostane
+ * ascendent za podne, levo bi stajao izmisljen podznak bez natpisa.
+ */
+export function levaTacka(ascendant: number, bezKuca: boolean): number {
+  return bezKuca ? 0 : ascendant;
+}
+
+/**
+ * Cetiri ose karte — ASC, IC, DSC, MC — kao eklipticke longitude. Crtaju se
+ * debelo, kroz ceo tocak.
+ *
+ * Po Placidusu su to bas 1., 4., 7. i 10. kuspida. Ali kad Placidus nije moguc
+ * (polarna sirina na "Nebu"), kuce su Whole Sign i kuspide su granice znakova:
+ * ose tada NISU medju njima. Zato se uzimaju iz ascendenta i MC-a, a ne iz
+ * rednog broja kuspide — inace bi crni krst stajao ukoso od natpisa ASC i MC.
+ */
+export function oseKarte(ascendant: number, midheaven: number): number[] {
+  const n = (a: number) => ((a % 360) + 360) % 360;
+  return [n(ascendant), n(midheaven + 180), n(ascendant + 180), n(midheaven)];
+}
+
+/** Kuspida koja pada na osu se ne crta tanko — preko nje ide debela osa. */
+export function naOsi(longitude: number, ose: number[]): boolean {
+  return ose.some((o) => Math.abs(((longitude - o + 540) % 360) - 180) < 1e-6);
+}
+
 /** Tacka na krugu. SVG ima y nadole, pa se sinus oduzima. */
 export function polar(cx: number, cy: number, radius: number, angleDeg: number) {
   const a = angleDeg * DEG;
@@ -136,7 +166,14 @@ export function degreeTickPaths(
  * koji niko ne testira; ovde ga drzi `check:sky`, sekcija 10.
  * ------------------------------------------------------------------------- */
 
-/** Poluprecnici, u koordinatama viewBox-a (0—360). */
+/**
+ * Poluprecnici, u koordinatama viewBox-a (0—360).
+ *
+ * Kuce idu do CENTRA (Ivan, 30.9.2026, po uzoru na klasicnu kartu): kuspide
+ * prolaze kroz polje aspekata i staju na malom krugu `hub`, a brojevi kuca
+ * stoje oko njega. Polje aspekata (`houseRing`) nema svoju liniju — ivicu
+ * pokazuju tacke planeta iz kojih krecu aspekti.
+ */
 export const WHEEL_R = {
   outer: 174,      // spoljasnji krug
   zodiacIn: 144,   // unutrasnja ivica zodijackog prstena
@@ -144,18 +181,29 @@ export const WHEEL_R = {
   planet: 116,     // gde stoje simboli planeta
   planetUp: 125,   // ... a gde kad se crtaju i stepeni
   number: 102,     // blok "16 48'" ispod simbola
-  houseRing: 88,   // unutrasnji krug, granica polja aspekata
-  houseNum: 97,    // brojevi kuca
-  houseNumIn: 77,  // ... kad se crtaju stepeni, da ne udju u blok
+  houseRing: 88,   // ivica polja aspekata (bez linije) — tu su tacke planeta
+  houseNum: 32,    // brojevi kuca, oko malog kruga
+  hub: 22,         // mali krug u sredini, tu staju kuspide
 } as const;
 
-/** Velicine ispisa stepena i minuta. */
+/**
+ * Velicine ispisa stepena i minuta.
+ *
+ * Podignute 30.9.2026 (Ivan: "malo povecaj"): simbol 17 -> 19,5, stepen 9 -> 10,
+ * minut 7 -> 7,8. Blok je zato siri, pa je i `LABEL_SEP` porastao sa 14° na 15°.
+ */
 export const LABEL = {
-  glyphSize: 17,
-  degSize: 9,
-  degSizeIzv: 8,
-  minSize: 7,
-  minSizeIzv: 6.5,
+  glyphSize: 19.5,
+  /** Izvedene tacke (cvor, Lilit, Tacka srece) su za stepen manje od planeta. */
+  glyphSizeIzv: 17,
+  degSize: 10,
+  degSizeIzv: 9,
+  minSize: 7.8,
+  minSizeIzv: 7.2,
+  /** "R" uz retrogradnu planetu. */
+  rSize: 7.8,
+  /** Brojevi kuca oko malog kruga. */
+  houseSize: 8.5,
   /** Priblizna sirina jedne cifre, u odnosu na velicinu slova. */
   digit: 0.6,
   /** Isto za minut — obican rez je uzi od podebljanog. */
@@ -163,11 +211,11 @@ export const LABEL = {
   /** Razmak izmedju stepena i minuta. */
   gap: 0.6,
   /** Koliko je minut podignut iznad osnovne linije stepena. */
-  rise: 3.6,
+  rise: 4,
 } as const;
 
 /** Razmak izmedju simbola kad se crtaju stepeni, u stepenima. */
-export const LABEL_SEP = 14;
+export const LABEL_SEP = 15;
 
 /**
  * Sirina bloka "stepen + minut" u jedinicama viewBox-a, u najgorem slucaju —
