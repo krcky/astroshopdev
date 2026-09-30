@@ -413,6 +413,9 @@ Odozdo nagore, prepisano iz reference:
 3. **preliv** — visok 180, PREKO zamucenja
 4. natpis trake
 
+Izuzetak (30.9.2026): astroloski krug na "Ti" i "Nebo" stoji IZNAD preliva — `Screen`
+crta njegov primerak izmedju preliva i natpisa (`IznadPreliva`, sloj 3b u `screen.tsx`).
+
 U referenci je preliv dete trake koja nosi `backdrop-filter`, pa se crta posle
 zamucenja i nastavlja ispod njega jos ~127px. Ako preliv ode iznad zamucenja,
 gornji deo u visini trake izgubi boju i traka izgleda kao siva pruga.

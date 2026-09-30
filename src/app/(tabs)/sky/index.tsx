@@ -7,7 +7,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { NatalWheel } from '@/components/natal-wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { Screen } from '@/components/screen';
+import { IznadPreliva, Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
@@ -115,14 +115,16 @@ export default function Sky() {
 
   return (
     <Screen label="Trenutno na nebu" padded={false} tint="pink" right={<ProfileButton />}>
-      {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"). */}
-      <View className="-mt-3 items-center">
-        <NatalWheel chart={chart} size={wheelSize} points={points} />
+      {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
+          preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
+      <IznadPreliva
+        className="-mt-3 items-center"
+        podignuto={<NatalWheel chart={chart} size={wheelSize} points={points} />}>
         {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
             linija, pa je legenda ispod liste uklonjena. */}
         <TockInfo velicina={wheelSize} onPress={() => router.push('/nebo-info')}
           accessibilityLabel="Šta je trenutno nebo?" />
-      </View>
+      </IznadPreliva>
 
       {/* Sat ISPOD tocka, centrirano — na mestu imena na natalnoj karti.
           Veliki, `display` (Ivan, 28.9.2026: "font za vreme povecati"). */}

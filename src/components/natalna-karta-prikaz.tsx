@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, ChevronUp, Lock } from 'lucide-react-native'
 import { router } from 'expo-router';
 
 import { NatalWheel } from '@/components/natal-wheel';
+import { IznadPreliva } from '@/components/screen';
 import { Text } from '@/components/ui/text';
 
 import { cn } from '@/lib/utils';
@@ -99,15 +100,18 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           </Text>
         </View>
       ) : (
-        // Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Nebu").
-        <View className="-mt-3 items-center">
-          {/* Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5). */}
-          <NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} />
+        // Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Nebu"), i IZNAD
+        // preliva — beo, ne obojen (Ivan, 30.9.2026). Na strani osobe preliva nema, pa je
+        // `IznadPreliva` tamo obican View.
+        <IznadPreliva
+          className="-mt-3 items-center"
+          // Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5).
+          podignuto={<NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} />}>
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}
           <TockInfo velicina={wheelSize} onPress={() => router.push('/natalna-karta-info')}
             accessibilityLabel="Šta je natalna karta?" />
-        </View>
+        </IznadPreliva>
       )}
 
       {/* Ime i podaci o rodjenju ISPOD tocka, centrirano (Ivan, 28.9.2026) */}

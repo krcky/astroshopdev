@@ -6,6 +6,7 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  type LayoutRectangle,
   type ScrollViewProps,
 } from 'react-native';
 import Animated, {
@@ -58,6 +59,7 @@ import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
  *   1. sadrzaj (ScrollView)   ide ispod svega, bez svojih umetaka na vrhu
  *   2. zamucenje              visoko `insets.top + headerBar.height`, ostro se zavrsava
  *   3. preliv                 visok 230 od vrha ekrana, PREKO zamucenja
+ *   3b. iznad preliva         samo ono sto ekran podigne kroz `IznadPreliva` (krug karte)
  *   4. natpis trake           preko svega
  *
  * U referenci je preliv dete trake koja nosi `backdrop-filter`, pa se crta
@@ -109,6 +111,21 @@ const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 const AnimatedPostepeno = PostepenoZamucenje ? Animated.createAnimatedComponent(PostepenoZamucenje) : null;
 const PRELAZ_ISPOD = 24;
 const PRELAZ_IZNAD = 12;
+
+/**
+ * Za koliko pt klizanja podignuti element (`IznadPreliva`) izbledi i ostane samo
+ * njegov primerak u sadrzaju, ispod preliva. Krug karte na vrhu liste ukrsti
+ * donju ivicu trake vec posle ~15 pt, pa do tada podignuti primerak spadne na
+ * trecinu: ivica sloja (`traka`) se skoro ne vidi, a dalje krug ide ispod trake
+ * i preliva kao sav ostali sadrzaj.
+ */
+const IZNAD_PRELIVA_BLEDI = 24;
+
+/** Element koji `Screen` crta iznad preliva — gde je u sadrzaju i koliko je velik. */
+type Podignuto = { element: React.ReactNode; x: number; y: number; w: number; h: number };
+
+/** `Screen` preko ovoga prima podignuti element; `null` kad ekran nema preliv. */
+const IznadPrelivaContext = React.createContext<((p: Podignuto | null) => void) | null>(null);
 
 /**
  * Koliko ekran koji ODLAZI jos drzi svoju boju i pozadinu.
@@ -289,6 +306,14 @@ export function Screen({
       : 1,
   }));
 
+  // Sloj 3b: podignuti element prati skrol (isti pomeraj kao sadrzaj, u niti za
+  // pokret) i bledi cim krene klizanje — vidi `IznadPreliva`.
+  const [podignuto, setPodignuto] = React.useState<Podignuto | null>(null);
+  const podignutoStil = useAnimatedStyle(() => ({
+    opacity: interpolate(pomeraj.value, [0, IZNAD_PRELIVA_BLEDI], [1, 0], Extrapolation.CLAMP),
+    transform: [{ translateY: -pomeraj.value }],
+  }));
+
   return (
     // Koren nosi SAMO raspored — bez pozadine, da ga React Native izbaci iz
     // native stabla i skrol ostane dovoljno plitko za iOS 26 (vidi `belina`).
@@ -315,7 +340,10 @@ export function Screen({
           scrollEventThrottle={16}>
           {/* Bez interneta: jedna traka na vrhu SVAKOG ekrana, ne na svakom posebno. */}
           <BezInterneta className={padded ? 'mb-4' : 'mx-screen mb-4'} />
-          {children}
+          {/* Bez preliva nema sta da se podigne — `IznadPreliva` je tada obican View. */}
+          <IznadPrelivaContext.Provider value={tint === 'none' ? null : setPodignuto}>
+            {children}
+          </IznadPrelivaContext.Provider>
           {tabBarSpace && <TabBarSpacer />}
         </Animated.ScrollView>
       </BlurTargetView>
@@ -344,6 +372,24 @@ export function Screen({
       {/* 3. preliv */}
       <ScreenBackdrop tint={tint} pushed={pushed} />
 
+      {/* 3b. iznad preliva — primerak podignutog elementa, tacno preko onog u sadrzaju.
+          Pocinje ispod trake: iznad nje sadrzaj ide pod zamucenje, pa i krug. */}
+      {podignuto && (
+        <View
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={{ position: 'absolute', top: traka, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+          <Animated.View
+            style={[
+              { position: 'absolute', left: podignuto.x, top: podignuto.y - traka, width: podignuto.w, height: podignuto.h },
+              podignutoStil,
+            ]}>
+            {podignuto.element}
+          </Animated.View>
+        </View>
+      )}
+
       {/* 4. natpis */}
       <View
         // `box-none` — sama traka ne hvata dodir (ispod nje klizi lista), ali
@@ -364,6 +410,51 @@ export function Screen({
         </View>
         {right}
       </View>
+    </View>
+  );
+}
+
+/**
+ * Deo sadrzaja koji stoji IZNAD preliva, a ne ispod njega (Ivan, 30.9.2026:
+ * astroloski krug na "Ti" i "Nebo" — beo, ne obojen prelivom).
+ *
+ * Preliv MORA da ostane iznad sadrzaja (pravilo 17: kartice ispod njega primaju
+ * nijansu), pa krug ne moze samo da se spusti ispod njega. Umesto toga `Screen`
+ * crta PRIMERAK `podignuto` u sloju 3b, tacno preko onog u sadrzaju i pomeren
+ * za skrol. Primerak u sadrzaju ostaje: kad krug klizne pod traku, on je taj
+ * koji se zamuti i oboji, kao sav ostali sadrzaj. Podignuti primerak zato bledi
+ * cim krene klizanje (`IZNAD_PRELIVA_BLEDI`).
+ *
+ * Mesto se meri preko `onLayout`, pa `IznadPreliva` MORA biti DIREKTNO dete
+ * sadrzaja `Screen`-a — samo tada je `y` omotaca meren od vrha sadrzaja, i samo
+ * tada se `onLayout` javi kad se nesto iznad pomeri (npr. traka "Nema interneta").
+ * `podignuto` mora imati stalnu velicinu (tocak je `size` x `size`).
+ *
+ * `useLayoutEffect`, ne `useEffect`: novi izgled podignutog stigne u ISTOM kadru
+ * kao onaj u sadrzaju — inace bi pri pomeranju vremena na "Nebu" jedan kadar
+ * stari krug stajao preko novog.
+ *
+ * Bez preliva (gurnut ekran, `tint="none"`) ovo je obican `View`.
+ */
+export function IznadPreliva({ podignuto, className, children }: {
+  podignuto: React.ReactNode;
+  className?: string;
+  children?: React.ReactNode;
+}) {
+  const postavi = React.useContext(IznadPrelivaContext);
+  const [omot, setOmot] = React.useState<LayoutRectangle | null>(null);
+  const [unutra, setUnutra] = React.useState<LayoutRectangle | null>(null);
+
+  React.useLayoutEffect(() => {
+    if (!postavi || !omot || !unutra) return;
+    postavi({ element: podignuto, x: omot.x + unutra.x, y: omot.y + unutra.y, w: unutra.width, h: unutra.height });
+  }, [postavi, omot, unutra, podignuto]);
+  React.useLayoutEffect(() => (postavi ? () => postavi(null) : undefined), [postavi]);
+
+  return (
+    <View className={className} onLayout={postavi ? (e) => setOmot(e.nativeEvent.layout) : undefined}>
+      <View onLayout={postavi ? (e) => setUnutra(e.nativeEvent.layout) : undefined}>{podignuto}</View>
+      {children}
     </View>
   );
 }

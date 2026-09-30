@@ -329,6 +329,11 @@ bele i efekta nema. Mora da nosi `pointerEvents="none"` — inace pokrije gornji
 ode iznad, gornjih 53pt izgubi boju i traka izgleda kao siva pruga. Sva tri
 sloja su direktna deca korenskog `View`-a jer Android secka ono sto izadje iz
 roditelja, a iOS ne — razlika bi se videla tek na drugom telefonu.
+IZUZETAK: ASTROLOSKI KRUG ("Ti", "Nebo") stoji IZNAD preliva, beo (Ivan, 30.9.2026).
+Ne spusta se preliv, nego `IznadPreliva` (`screen.tsx`) crta PRIMERAK kruga u sloju
+3b, izmedju preliva i natpisa, ispod trake, pomeren za skrol; primerak u sadrzaju
+ostaje za klizanje pod traku, a podignuti izbledi posle 24 pt klizanja. Mora biti
+direktno dete sadrzaja `Screen`-a (meri se `onLayout`).
 
 ZAMUCENJE IDE PREKO `animatedProps`, NE PREKO RN-ovog `Animated`. Pali se tek
 kad sadrzaj predje `headerBar.blurAt` — na vrhu liste nema sta da se zamuti,
