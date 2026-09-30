@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { SheetScroll } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
-import { TamnaTacka } from '@/components/planeta-ikona';
+import { IkonaTacke } from '@/components/planeta-ikona';
 import { AspektiOdeljak, IKONA, Odeljak, Stavka } from '@/components/info-list';
 import { POINTS, type PointKey } from '@/lib/points';
 
@@ -50,7 +50,7 @@ export default function NeboInfo() {
           se za njih ne crtaju.
         </Text>
         {POINTS.map((t) => (
-          <Stavka key={t.key} ime={t.name} ikona={<TamnaTacka tacka={t} size={IKONA} />}>
+          <Stavka key={t.key} ime={t.name} ikona={<IkonaTacke tacka={t} size={IKONA} />}>
             {OPIS_TACKE[t.key]}
           </Stavka>
         ))}

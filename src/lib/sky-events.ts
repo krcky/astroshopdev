@@ -13,8 +13,10 @@
  * rodjenja podznak nije pouzdan i kuca se NE prikazuje (pravilo 4 i 5).
  *
  * Mesec ne ulazi: menja znak na ~2,5 dana i ima svoju karticu.
- * Tekstova "planeta u kuci" jos nema (120 recenica ceka astrologa) — ovde je
- * samo racun.
+ * Tekstovi (Ivan, 30.9.2026) idu po ZNAKU, ne po kuci: "planeta u znaku" (ulazak ili ponovo
+ * direktna) i "retrogradna u znaku" (postaje retrogradna ili retrogradno ulazi), kljucevi
+ * `sky.<planeta>.sign|retrograde.<znak>`. Trazi se samo sto se za godinu dana desi —
+ * `scripts/korpus/promene-godine.ts`. Jos nisu stigli; ovde je samo racun.
  */
 import { bodyLongitude, BODIES, type PlanetKey } from '@/lib/astro';
 import { localMidnight } from '@/lib/transits';

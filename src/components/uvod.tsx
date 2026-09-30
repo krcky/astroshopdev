@@ -2,10 +2,10 @@ import * as React from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, {
   Easing,
+  ReduceMotion,
   useAnimatedProps,
   useAnimatedStyle,
   useFrameCallback,
-  useReducedMotion,
   useSharedValue,
   withDelay,
   withSequence,
@@ -46,9 +46,15 @@ import { backdrop, neutral } from '@/theme/tokens';
  * pa se njeno prvo crtanje, koje zauzme JS, odvija dok se krug vrti. Ako crtanje
  * potraje, krug se vrti dalje i otvaranje ceka — sto je i zeljeno.
  *
- * "SMANJI POKRETE": nema vrtenja, preliva ni rasta — kad je spremno, uvod se samo
- * pretopi.
+ * "SMANJI POKRETE" (Reduce Motion): ISTA animacija i tada (Ivan, 30.9.2026 — izabrao
+ * je to umesto blaze verzije). Do tada se uvod uz to podesavanje samo pretapao.
+ * Reanimated po podrazumevanom preskace animaciju na kraj kad je podesavanje
+ * ukljuceno (`ReduceMotion.System`), pa svaki pokret ovde nosi `NIKAD` — bez toga
+ * bi krug skocio pravo u otvoren prozor.
  */
+
+/** Pokreti uvoda se ne preskacu uz "Smanji pokrete" — vidi gore. */
+const NIKAD = ReduceMotion.Never;
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -82,7 +88,6 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
   /** Uvod je gotov i moze da se ukloni. */
   onKraj: () => void;
 }) {
-  const bezPokreta = useReducedMotion();
   const [vel, setVel] = React.useState<{ w: number; h: number } | null>(null);
   /** Lottie je ucitan (ili je prosla rezerva) — splash se sklanja, krug krece. */
   const [krenuo, setKrenuo] = React.useState(false);
@@ -97,7 +102,6 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
     zalet: useSharedValue(0),
     otvor: useSharedValue(0),
   };
-  const vidljivost = useSharedValue(1);
 
   // Pozivi napolje idu kroz ref: efekti ispod se ne smeju ponoviti ako roditelj
   // posalje novu funkciju. Kraj se javlja jednom, i kad ga javi i animacija i rezervni sat.
@@ -132,11 +136,10 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
     SplashScreen.hide();
     napolje.current.pocetak = Date.now();
     napolje.current.onPocetak();
-    if (bezPokreta) return;
     zum.set(ZUM_SADRZAJA);
     krug.current?.zavrti();
-    faze.uvod.set(withTiming(1, { duration: UVOD_MS.vrtenje, easing: Easing.out(Easing.cubic) }));
-  }, [krenuo, vel, bezPokreta, zum, faze.uvod]);
+    faze.uvod.set(withTiming(1, { duration: UVOD_MS.vrtenje, easing: Easing.out(Easing.cubic), reduceMotion: NIKAD }));
+  }, [krenuo, vel, zum, faze.uvod]);
 
   React.useEffect(() => {
     if (!spremno) return;
@@ -149,37 +152,31 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
   React.useEffect(() => {
     if (!smiren || !krenuo || !vel || !pokrenut.current || otvara.current) return;
     otvara.current = true;
-    if (bezPokreta) {
-      vidljivost.set(withTiming(0, { duration: UVOD_MS.bezPokreta }, (g) => { if (g) scheduleOnRN(zavrsi); }));
-      setTimeout(zavrsi, UVOD_MS.bezPokreta + 500);
-      return;
-    }
     // Krug se vrti najmanje `vrtenje`, pa zalet; ako je aplikacija kasnila, odmah.
     const odmor = Math.max(0, UVOD_MS.vrtenje - (Date.now() - napolje.current.pocetak));
     faze.R.set(withDelay(odmor, withSequence(
-      withTiming(R0 * ZALET, { duration: UVOD_MS.zalet, easing: Easing.inOut(Easing.quad) }),
-      withTiming(R0 * KRUG_NESTAJE.rast, { duration: UVOD_MS.otvaranje * KRUG_NESTAJE.udeo, easing: Easing.out(Easing.quad) }),
-    )));
-    faze.zalet.set(withDelay(odmor, withTiming(1, { duration: UVOD_MS.zalet, easing: Easing.inOut(Easing.quad) })));
+      NIKAD,
+      withTiming(R0 * ZALET, { duration: UVOD_MS.zalet, easing: Easing.inOut(Easing.quad), reduceMotion: NIKAD }),
+      withTiming(R0 * KRUG_NESTAJE.rast, { duration: UVOD_MS.otvaranje * KRUG_NESTAJE.udeo, easing: Easing.out(Easing.quad), reduceMotion: NIKAD }),
+    ), NIKAD));
+    faze.zalet.set(withDelay(odmor, withTiming(1, { duration: UVOD_MS.zalet, easing: Easing.inOut(Easing.quad), reduceMotion: NIKAD }), NIKAD));
     const posle = odmor + UVOD_MS.zalet;
-    faze.otvor.set(withDelay(posle, withTiming(1, { duration: UVOD_MS.otvaranje, easing: Easing.linear }, (g) => {
+    faze.otvor.set(withDelay(posle, withTiming(1, { duration: UVOD_MS.otvaranje, easing: Easing.linear, reduceMotion: NIKAD }, (g) => {
       if (g) scheduleOnRN(zavrsi);
-    })));
-    zum.set(withDelay(posle, withTiming(1, { duration: UVOD_MS.otvaranje, easing: Easing.out(Easing.cubic) })));
+    }), NIKAD));
+    zum.set(withDelay(posle, withTiming(1, { duration: UVOD_MS.otvaranje, easing: Easing.out(Easing.cubic), reduceMotion: NIKAD }), NIKAD));
     // Rezerva: uvod koji ne javi kraj bi zauvek pokrio aplikaciju.
     setTimeout(zavrsi, posle + UVOD_MS.otvaranje + 500);
-  }, [smiren, krenuo, vel, bezPokreta, zavrsi, zum, vidljivost, faze.R, faze.zalet, faze.otvor, R0]);
+  }, [smiren, krenuo, vel, zavrsi, zum, faze.R, faze.zalet, faze.otvor, R0]);
 
   const naRaspored = React.useCallback((e: LayoutChangeEvent) => {
     const { width: w, height: h } = e.nativeEvent.layout;
     setVel((v) => (v && v.w === w && v.h === h ? v : { w, h }));
   }, []);
 
-  const koren = useAnimatedStyle(() => ({ opacity: vidljivost.get() }));
-
   return (
     <Animated.View
-      style={[StyleSheet.absoluteFill, koren]}
+      style={StyleSheet.absoluteFill}
       onLayout={naRaspored}
       // Aplikacija ispod je vec montirana; VoiceOver je ne cita dok je uvod preko nje.
       accessibilityViewIsModal
@@ -191,7 +188,7 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
       ) : (
         <>
           <Zavesa w={vel.w} h={vel.h} faze={faze} />
-          {!bezPokreta && <PrelivUvoda faze={faze} />}
+          <PrelivUvoda faze={faze} />
           <Krug cx={vel.w / 2} cy={vel.h / 2} faze={faze} krug={krug} onSpreman={lottieSpreman} />
         </>
       )}

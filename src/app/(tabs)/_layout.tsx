@@ -4,6 +4,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { STARI_IOS } from '@/lib/platform';
 import { useBrojNeprocitanih } from '@/lib/pitanja-api';
+import { useTrakaVidea, VideoTraka } from '@/components/prica/video-traka';
 import { brand, neutral } from '@/theme/tokens';
 import { fontUloge } from '@/theme/tipografija';
 
@@ -68,6 +69,8 @@ const IZABRANI = '#B39DDB';
 export default function TabsLayout() {
   // Novi odgovori astrologa (Ivan, 29.9.2026): broj u indigo krugu na tabu "Pitaj".
   const noviOdgovori = useBrojNeprocitanih();
+  // Video price (Ivan, 30.9.2026): traka iznad tabova dok se pravi i kad je gotov (iOS 26).
+  const video = !!useTrakaVidea();
   return (
     <NativeTabs
       // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
@@ -97,6 +100,11 @@ export default function TabsLayout() {
       badgeBackgroundColor={brand.indigo}
       badgeTextColor={neutral.white}
       screenListeners={SLUSAOCI}>
+      {video && (
+        <NativeTabs.BottomAccessory>
+          <VideoTraka />
+        </NativeTabs.BottomAccessory>
+      )}
       <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
         <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>

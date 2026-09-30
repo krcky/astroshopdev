@@ -103,9 +103,10 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
             }))}
           />
           <PremiumKartica
-            className="mt-3"
-            naslov="Svi tranziti dana"
-            opis={`Još ${zakljucani.length} ${mnozina(zakljucani.length, TRANZIT)} danas, sa celim tekstom za svaki.`}
+            className="mt-10"
+            naslov={`Još ${zakljucani.length} ${mnozina(zakljucani.length, TRANZIT)} danas`}
+            opis="Najjači su otvoreni na vrhu liste. I ostali utiču na tvoj dan, i svaki ima svoje celo tumačenje."
+            dugme="Otključaj sve tranzite"
           />
         </>
       )}

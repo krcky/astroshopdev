@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  AccessibilityInfo, ActivityIndicator, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
+  AccessibilityInfo, ActionSheetIOS, ActivityIndicator, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
   type GestureResponderEvent,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
@@ -21,11 +21,16 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { KarticaZaDeljenje } from '@/components/prica/kartica';
 import { SLIKE, tamnaSlika, type OkvirSlike } from '@/components/prica/slajdovi';
+import { SatKojiTece } from '@/components/prica/sat';
+import { IMA_VIDEO } from '@/components/prica/platno-videa';
+import { pitajZaObavestenje } from '@/components/prica/video-radionica';
+import { KrugNapretka, procenat } from '@/components/prica/video-traka';
 import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import type { SlikaKljuc } from '@/lib/prica';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { usePricaLog } from '@/store/prica-log';
+import { useVideoDana, useVideoPrice } from '@/store/video-price';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 
@@ -293,6 +298,37 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
     return () => { otkazano = true; };
   }, [deli, pauzaJs, p.dan]);
 
+  // --- VIDEO (Ivan, 30.9.2026): "Podeli" nudi sliku ili celu pricu kao video. Video se pravi
+  // van ekrana dok korisnik radi sta hoce (`video-radionica.tsx`); prica za to vreme ide dalje.
+  // Bez nativnog modula (Expo Go, Android) i bez naloga "Podeli" odmah deli sliku, kao do sada.
+  const video = useVideoDana(userId, p.dan);
+  const ponudi = React.useCallback((k: SlikaKljuc) => {
+    if (!IMA_VIDEO || !userId || Platform.OS !== 'ios') { podeli(k); return; }
+    pauzaJs.set(1);
+    const gotov = video?.stanje === 'gotov' && video.uri ? video.uri : null;
+    const pravi = video?.stanje === 'pravi';
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        title: 'Podeli svoj dan',
+        message: gotov || pravi ? undefined : 'Video pravimo oko minut. Za to vreme koristi aplikaciju — javićemo ti kad bude gotov.',
+        options: ['Ova slika', gotov ? 'Pogledaj video' : pravi ? `Video se pravi · ${procenat(video!.napredak)}` : 'Cela priča, video', 'Otkaži'],
+        cancelButtonIndex: 2,
+        disabledButtonIndices: pravi ? [1] : undefined,
+      },
+      (izbor) => {
+        if (izbor === 0) { podeli(k); return; }
+        pauzaJs.set(0);
+        if (izbor !== 1) return;
+        // Gotov video: list sa pregledom, deljenjem i cuvanjem u Fotografije — i posle deljenja.
+        if (gotov) router.push('/video-price');
+        else if (!pravi) {
+          useVideoPrice.getState().pokreni(userId, p);
+          void pitajZaObavestenje();
+        }
+      },
+    );
+  }, [userId, video, podeli, pauzaJs, p]);
+
   const k = slike[i];
   const tamno = tamnaSlika(k);
   const boja = tamno ? neutral.white : neutral.ink;
@@ -331,14 +367,16 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
               animiraj={s.animiraj}
               onGotovo={() => setSlojevi((sv) => sv.slice(Math.max(0, sv.findIndex((sl) => sl.id === s.id))))}
               zIndex={j}>
-              <Slika
-                p={p}
-                tece={tece}
-                okvir={okvirZa(s.idx)}
-                uvod={uvod}
-                onPodeli={() => podeli(slike[s.idx])}
-                onProcitaj={procitaj}
-              />
+              {/* Svaka slika ima svoj sat od trenutka kad se pojavi (`sat.tsx`); drzanje ga zaustavi. */}
+              <SatKojiTece tece={tece} pokret={!bezPokreta}>
+                <Slika
+                  p={p}
+                  okvir={okvirZa(s.idx)}
+                  uvod={uvod}
+                  onPodeli={() => ponudi(slike[s.idx])}
+                  onProcitaj={procitaj}
+                />
+              </SatKojiTece>
             </Otkrivanje>
           );
         })}
@@ -372,12 +410,16 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
       {mozeDeljenje && !uvod && k !== 'savet' && (
         <Animated.View style={[{ position: 'absolute', right: 16, bottom: insets.bottom + 16 }, hromStil]}>
           <Pressable
-            onPress={() => podeli(k)}
+            onPress={() => ponudi(k)}
             accessibilityRole="button"
-            accessibilityLabel="Podeli ovu sliku"
+            accessibilityLabel={video?.stanje === 'pravi' ? `Podeli. Video se pravi, ${procenat(video.napredak)}` : 'Podeli'}
             className="flex-row items-center gap-1.5 rounded-pill px-3.5 py-2.5 active:opacity-80"
             style={{ backgroundColor: tamno ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)', borderWidth: 1, borderColor: tamno ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.95)' }}>
-            {deli ? <ActivityIndicator size="small" color={boja} /> : <Share size={17} color={boja} strokeWidth={2} />}
+            {deli
+              ? <ActivityIndicator size="small" color={boja} />
+              : video?.stanje === 'pravi'
+                ? <KrugNapretka napredak={video.napredak} velicina={18} boja={boja} podloga={tamno ? 'rgba(255,255,255,0.28)' : 'rgba(21,21,21,0.16)'} />
+                : <Share size={17} color={boja} strokeWidth={2} />}
             <Text className={cn('text-[14px] leading-[18px]', tezina('dugme'))} style={{ color: boja }}>Podeli</Text>
           </Pressable>
         </Animated.View>

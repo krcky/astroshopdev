@@ -7,7 +7,7 @@ import { Glyph } from '@/components/ui/glyph';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
-import { TamnaTacka } from '@/components/planeta-ikona';
+import { IkonaTacke } from '@/components/planeta-ikona';
 import { AspektIkona, imaAspekt } from '@/components/aspekt-ikona';
 import { dnoKruga } from '@/components/natal-wheel';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
@@ -48,9 +48,9 @@ export const stepenMinut = (pos: SignPosition) => `${pos.deg}°${String(pos.min)
 /** "1,4°" — decimalni zarez. */
 export const orbis = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
 
-/** Crna ikonica tacke (Ivan, 28.9.2026), ista kao u zaglavlju tumacenja; tacka bez ikonice dobija znak iz fonta u crnom krugu. */
+/** Ikonica tacke — ista bela kao u zaglavlju tumacenja (`IkonaTacke`). */
 export function Tacka({ tacka, glyph, size }: { tacka: string; glyph: string; size: number }) {
-  return <TamnaTacka tacka={{ key: tacka, glyph }} size={size} />;
+  return <IkonaTacke tacka={{ key: tacka, glyph }} size={size} />;
 }
 
 /** Kolona znaka: ikonica i ime. `znak = null` = nepoznat (Mesec bez vremena rodjenja). */

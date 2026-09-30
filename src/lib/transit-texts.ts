@@ -13,7 +13,7 @@
 import * as React from 'react';
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore, usePremium } from '@/store/auth';
 import { kesProcitaj, kesUpisi, ucitajKes, useKesUcitan } from '@/lib/kes-na-disku';
 import { usePovratakMreze } from '@/lib/mreza';
 
@@ -94,8 +94,16 @@ export async function fetchTransitTexts(
  * (bez interneta). Upit sa servera ide i dalje, pri svakom pokretanju.
  */
 const kes = new Map<string, TransitText | null>();
+const BEZ_KLJUCEVA: string[] = [];
 
-export function useTransitTexts(keys: string[], version: TransitVersion = 'short') {
+export function useTransitTexts(sviKljucevi: string[], version: TransitVersion = 'short') {
+  // DUGA VERZIJA SAMO KAD PRIKAZ KAZE PREMIUM (Ivan, 30.9.2026): test prekidac "Besplatan"
+  // na nalogu koji stvarno ima Premium je i dalje otvarao ceo tekst — server ga salje po
+  // PRAVOM stanju (pravilo 8), a ekrani su ga prikazivali cim stigne. Sada se duga verzija
+  // ni ne trazi, pa svaki ekran (tumacenje, "Tvoj dan", lista) izgleda kao za besplatne.
+  // Pravom besplatnom nalogu se nista ne menja: server mu dugu verziju ionako ne salje.
+  const premiumPrikaz = usePremium();
+  const keys = version === 'long' && !premiumPrikaz ? BEZ_KLJUCEVA : sviKljucevi;
   const korisnik = useAuthStore((s) => s.user?.id ?? '');
   const pristup = useAuthStore((s) => (s.entitlement?.active ? 'p' : ''));
   const kesKljuc = (k: string) => `${korisnik}|${pristup}|${version}|${k}`;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ActionSheetIOS, ActivityIndicator, Alert, Linking, Platform, Pressable, View } from 'react-native';
+import { ActionSheetIOS, ActivityIndicator, Alert, Linking, Platform, Pressable, Switch, View } from 'react-native';
 import { Redirect, router } from 'expo-router';
 import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
@@ -13,6 +13,7 @@ import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { SlikaProfila } from '@/components/slika-profila';
 import { PREMIUM, otvoriPremium } from '@/components/zakljucano';
 import { signOut, useAuthStore, useEntitlement } from '@/store/auth';
+import { PREKIDAC_PRODUCT_ID, PROBNI_BUILD, useDevStore } from '@/store/dev';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { imaSvojuSliku, ukloniSliku, usePromeniSliku, type IshodSlike } from '@/lib/slika-profila';
 import { formatDatum } from '@/lib/horoscope';
@@ -49,6 +50,9 @@ export default function ProfileSheet() {
   const hydrated = useProfileStore((s) => s.hydrated);
   const { user, loading } = useAuthStore();
   const entitlement = useEntitlement();
+  const naServeru = useAuthStore((s) => s.entitlement?.active ?? false);
+  const premiumRucno = useDevStore((s) => s.premiumRucno);
+  const setPremiumRucno = useDevStore((s) => s.setPremiumRucno);
   const resolved = useResolvedProfile();
   const promeniSliku = usePromeniSliku();
   const [radiSlika, setRadiSlika] = React.useState(false);
@@ -109,7 +113,8 @@ export default function ProfileSheet() {
   const premium = entitlement?.active ?? false;
   const istice = entitlement?.expiresAt ? formatDatum(new Date(entitlement.expiresAt)) : null;
 
-  const izProdavnice = premium && entitlement?.productId !== 'poklon';
+  const saPrekidaca = entitlement?.productId === PREKIDAC_PRODUCT_ID;
+  const izProdavnice = premium && entitlement?.productId !== 'poklon' && !saPrekidaca;
 
   const vrati = async () => {
     const ishod = await vratiKupovine();
@@ -154,9 +159,11 @@ export default function ProfileSheet() {
             <ListRow
               title="Premium"
               subtitle={
-                entitlement?.productId === 'poklon'
-                  ? `Poklon${istice ? `, do ${istice}` : ''}`
-                  : istice ? `Aktivan, obnavlja se ${istice}` : 'Aktivan'
+                saPrekidaca
+                  ? 'Uključen test prekidačem'
+                  : entitlement?.productId === 'poklon'
+                    ? `Poklon${istice ? `, do ${istice}` : ''}`
+                    : istice ? `Aktivan, obnavlja se ${istice}` : 'Aktivan'
               }
             />
             {izProdavnice && (
@@ -187,6 +194,35 @@ export default function ProfileSheet() {
               <ChevronRight size={20} color={neutral.white} strokeWidth={2.2} />
             </Pressable>
             <ListRow title="Vrati kupovine" chevron={false} onPress={vrati} />
+          </Group>
+        </>
+      )}
+
+      {/* TEST PREKIDAC (Ivan, 30.9.2026: "samo za test") — samo u probnom buildu
+          (`PROBNI_BUILD`: razvoj, build iz Xcode-a sa `.env`, EAS development/preview).
+          Menja samo prikaz; duge tekstove salje samo server (pravilo 8). */}
+      {PROBNI_BUILD && (
+        <>
+          <GroupHeader variant="oznaka" className={NASLOV}>Test</GroupHeader>
+          <Group className={GRUPA}>
+            <ListRow
+              title="Plaćeni korisnik"
+              subtitle={
+                premiumRucno === null
+                  ? `Prati server (${naServeru ? 'plaćen' : 'besplatan'})`
+                  : 'Ručno, samo na ovom telefonu'
+              }
+              trailing={
+                <Switch
+                  value={premium}
+                  onValueChange={setPremiumRucno}
+                  accessibilityLabel="Test prekidač: plaćeni korisnik"
+                />
+              }
+            />
+            {premiumRucno !== null && (
+              <ListRow title="Vrati na stanje sa servera" chevron={false} onPress={() => setPremiumRucno(null)} />
+            )}
           </Group>
         </>
       )}

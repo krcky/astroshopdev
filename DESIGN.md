@@ -425,15 +425,16 @@ uvuceni u zajednicki omotac visine trake, Android odsece preliv na visinu trake 
 podrazumevano secka ono sto izadje iz roditelja — a iOS ne secka, pa bi se
 razlika videla tek na drugom telefonu.
 
-### Android: zamucenje tiho izostane
+### Android: puna traka, bez zamucenja (30.9.2026)
 
-`ExpoBlurView.kt` radi `if (blurTarget != null) method else BlurMethod.NONE`.
-Bez `blurTarget` nema ni greske ni izuzetka — samo providna traka bez
-zamucenja. Zato je sadrzaj u `Screen`-u obmotan u `BlurTargetView` i njegov
-`ref` ide traci. Na iOS-u je `BlurTargetView` obican `View`, pa ne kosta nista.
+Na Androidu traka NE muti: to je puna podloga u boji pozadine ekrana (siva ili
+bela, ista `belina` kao skrol), na vrhu liste providna, pa se pojavi istom rampom
+kao zamucenje na iOS-u (`headerBar.blurAt`). Preliv i dalje stoji preko nje.
 
-Metod je `dimezisBlurViewSdk31Plus`, ne `dimezisBlurView`: na starijem Androidu
-je Dimezis skup i trza pri klizanju, a ovaj sam padne na `none` ispod SDK 31.
+Zasto: `expo-blur` na Androidu (Dimezis) u svakom kadru snima ceo sadrzaj ispod
+trake i muti ga — na 120 Hz (Xiaomi 11T) aplikacija je seckala. Uz to sa
+`intensity` 0 obara aplikaciju (`nativePtr is null`). Material aplikacije ionako
+imaju punu traku. Mrlje preliva na Androidu stoje (vidi `ScreenBackdrop`).
 
 ---
 

@@ -483,7 +483,7 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
  * ulazak u znak, postaje retrogradna ili ponovo direktna (`lib/sky-events.ts`). Licni deo je kuca
  * od podznaka; bez vremena rodjenja se izostavlja.
  *
- * Tekstova "planeta u kuci" jos nema (ceka astrologa), pa kartice ne vode
+ * Tekstova "planeta u znaku" jos nema (ceka astrologa, `sky-events.ts`), pa kartice ne vode
  * nigde — samo datumi i kuca. Strelica ipak stoji na svakoj (Ivan, 27.9.2026):
  * odrediste se dodaje kad stignu tekstovi. Znakovi idu u padezu (`SIGN_CASES`): "Mars
  * ulazi u Lava", "Retrogradna Venera u Skorpiji" (Ivan, 27.9.2026).

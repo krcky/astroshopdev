@@ -19,6 +19,8 @@ import { useOsobeStore } from '@/store/osobe';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useHeroLog } from '@/store/hero-log';
 import { usePricaLog } from '@/store/prica-log';
+import { useVideoPrice } from '@/store/video-price';
+import { PREKIDAC_PRODUCT_ID, PROBNI_BUILD, useDevStore } from '@/store/dev';
 
 export type Entitlement = { active: boolean; productId: string | null; expiresAt: string | null };
 
@@ -41,13 +43,26 @@ export const useAuthStore = create<AuthState>((set) => ({
   setEntitlement: (entitlement) => set({ entitlement }),
 }));
 
+/** Test prekidac iz profila ima isti oblik kao pravi red u bazi. */
+const RUCNO: Record<'placen' | 'besplatan', Entitlement> = {
+  placen: { active: true, productId: PREKIDAC_PRODUCT_ID, expiresAt: null },
+  besplatan: { active: false, productId: null, expiresAt: null },
+};
+
 /**
  * Pravo pristupa kako ga vidi UI — jedina tacka citanja u aplikaciji.
- * (Test prekidac Placen/Besplatan u profilu uklonjen 29.9.2026, Ivan: "ne treba
- * mi"; stanje se menja poklonom — `admin.daj_premium`, `supabase/pokloni.sql`.)
+ *
+ * Ekrani NE citaju `useAuthStore(s => s.entitlement)` direktno, jer bi tada test
+ * prekidac Placen/Besplatan (profil, samo `PROBNI_BUILD`, `store/dev.ts`) morao na
+ * svako mesto posebno. U buildu za prodavnicu vraca netaknutu vrednost sa servera.
+ * Pravi Premium se daje poklonom — `admin.daj_premium`, `supabase/pokloni.sql`.
  */
 export function useEntitlement(): Entitlement | null {
-  return useAuthStore((s) => s.entitlement);
+  const server = useAuthStore((s) => s.entitlement);
+  const rucno = useDevStore((s) => s.premiumRucno);
+
+  if (!PROBNI_BUILD || rucno === null) return server;
+  return rucno ? RUCNO.placen : RUCNO.besplatan;
 }
 
 /** Da li ovaj korisnik ima Premium (kupovina ili poklon) — prikaz; granice su u `lib/pristup.ts`. */
@@ -195,12 +210,13 @@ function sesijaUgasenaSaServera() {
   } catch { /* navigacija jos nije montirana */ }
 }
 
-/** Sacuvani tekstovi, poslednje pravo pristupa, pitanje u pisanju, druge osobe i dnevnici prikaza pripadaju nalogu — ne ostaju posle odjave. */
+/** Sacuvani tekstovi, poslednje pravo pristupa, pitanje u pisanju, druge osobe, dnevnici prikaza i video price pripadaju nalogu — ne ostaju posle odjave. */
 async function ocistiLokalno() {
   useOsobeStore.getState().clear();
   useTvojDanLog.getState().clear();
   useHeroLog.getState().clear();
   usePricaLog.getState().clear();
+  useVideoPrice.getState().clear();
   await obrisiKes();
   await obrisiPitanjeLokalno();
   try { await AsyncStorage.removeItem(PRAVO_KLJUC); } catch { /* nista */ }

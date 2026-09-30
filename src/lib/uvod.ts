@@ -42,8 +42,6 @@ export const UVOD_MS = {
    * iscrta pre nego sto se prozor otvori, inace bi se kroz krug video prazan ekran.
    */
   smirenje: 150,
-  /** "Smanji pokrete": nema vrtenja ni rasta, uvod se samo pretopi. */
-  bezPokreta: 300,
   /**
    * Android sklanja sistemski splash PRETAPANJEM (iOS trenutno), a sistemska ikonica
    * na Androidu 12+ nije nuzno iste velicine kao krug. Pretapanje je zato kratko:

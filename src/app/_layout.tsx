@@ -20,6 +20,7 @@ import { FONT_FILES } from '@/theme/font';
 import { Uvod } from '@/components/uvod';
 import { KorenskiUmeci } from '@/components/umeci';
 import { UVOD_MS } from '@/lib/uvod';
+import { ObavestenjeVidea, VideoRadionica } from '@/components/prica/video-radionica';
 
 // Sistemski splash ostaje dok ga ne skloni uvod (`components/uvod.tsx`) — tek kad
 // je uvod iscrtan, jer mu je prvi kadar ista slika. Android ga sklanja pretapanjem;
@@ -112,6 +113,10 @@ export default function RootLayout() {
           {/* Pravi umeci prozora za tabove koji jos nisu bili na ekranu — `components/umeci.tsx`. */}
           <KorenskiUmeci>
             <StatusBar style="dark" />
+            {/* Video price (Ivan, 30.9.2026): crta se van ekrana dok korisnik radi sta hoce;
+                obavestenje "Tvoj video je spreman" se vidi i u aplikaciji. */}
+            {pismo && aplikacija && <VideoRadionica />}
+            <ObavestenjeVidea />
             <Animated.View style={[{ flex: 1 }, zumStil]}>
               {pismo && aplikacija && (
                 <Stack
@@ -137,6 +142,8 @@ export default function RootLayout() {
                   {/* "Šta je trenutno nebo" sa ikonice "i" pored tocka na Nebu (Ivan, 29.9.2026). */}
                   <Stack.Screen name="nebo-info" options={TUMACENJE_LIST} />
                   <Stack.Screen name="tvoj-dan-info" options={LIST_PO_SADRZAJU} />
+                  {/* Video price (Ivan, 30.9.2026): sa trake iznad tabova i iz obavestenja. */}
+                  <Stack.Screen name="video-price" options={LIST_PO_SADRZAJU} />
                   {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice
                       nazad (Ivan, 29.9.2026). SIVA pozadina: na njemu su bele kartice. */}
                   <Stack.Screen name="moon" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />

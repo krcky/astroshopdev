@@ -26,7 +26,7 @@ import Animated, {
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurTargetView, BlurView } from 'expo-blur';
+import { BlurView } from 'expo-blur';
 import { PostepenoZamucenje } from '@/components/postepeno-zamucenje';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronLeft } from 'lucide-react-native';
@@ -37,6 +37,7 @@ import { BezInterneta } from '@/components/bez-interneta';
 import { backdrop, headerBar, neutral, space, type BackdropTint } from '@/theme/tokens';
 import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
 import { STARI_IOS } from '@/lib/platform';
+import { TRAKA_VIDEA_VISINA, useTrakaVidea } from '@/components/prica/video-traka';
 import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
 
 /**
@@ -93,12 +94,13 @@ import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
  * prolaska kroz JS na svaki kadar.
  *
  * ---------------------------------------------------------------------------
- * ANDROID: `blurMethod` bez `blurTarget` TIHO postane `none`.
- *
- * `ExpoBlurView.kt` radi `if (blurTarget != null) method else BlurMethod.NONE`
- * — nema greske, nema izuzetka, samo providna traka bez zamucenja. Zato je
- * sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide traci. Na iOS-u je
- * `BlurTargetView` obican `View` (vidi `BlurTargetView.js`), pa ne kosta nista.
+ * ANDROID NEMA ZAMUCENJA (Ivan, 30.9.2026) — traka je PUNA podloga u boji
+ * pozadine ekrana, koja se pojavi istom rampom kao zamucenje (`trakaAndroid`).
+ * `expo-blur` na Androidu (Dimezis) je u SVAKOM kadru snimao ceo sadrzaj ispod
+ * trake i mutio ga — na 120 Hz aplikacija je seckala (Xiaomi 11T). Uz to je sa
+ * `intensity` 0 obarao aplikaciju ("nativePtr is null": `configureBlurView` nulu
+ * ne preskace). Punu traku imaju i Material aplikacije. Zato ni `BlurTargetView`
+ * vise ne treba — na iOS-u je ionako bio obican `View`.
  */
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
@@ -170,7 +172,9 @@ function TabBarSpacer() {
  */
 export function useTabBarSpace(): number {
   const insets = useSafeAreaInsets();
-  return TAB_BAR_SPACE + insets.bottom;
+  // Traka videa price iznad tabova (iOS 26, `video-traka.tsx`) pokrije jos toliko dna.
+  const video = !!useTrakaVidea();
+  return TAB_BAR_SPACE + insets.bottom + (video ? TRAKA_VIDEA_VISINA : 0);
 }
 
 type ScreenProps = {
@@ -233,7 +237,6 @@ export function Screen({
   ...scrollProps
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const cilj = React.useRef<View>(null);
   // Unutrasnje strane (gurnute preko tabova) su bez preliva (Ivan, 27.9.2026).
   const tint: BackdropTint = tintProp ?? (pushed ? 'none' : 'purple');
 
@@ -296,14 +299,12 @@ export function Screen({
       Extrapolation.CLAMP
     ),
   }));
-  // ANDROID: Dimezis i sa `intensity` 0 crta snimak sadrzaja ispod trake, koji se
-  // za nijansu razlikuje od prave pozadine — na vrhu liste se videla ivica trake
-  // (Pixel 9 emulator, Ivan 28.9.2026). Zato tamo traka i NESTAJE na vrhu:
-  // providnost ide 0 -> 1 istom rampom kao zamucenje. iOS na nuli ne crta nista.
-  const vidljivost = useAnimatedStyle(() => ({
-    opacity: Platform.OS === 'android'
-      ? interpolate(pomeraj.value, [0, headerBar.blurAt], [0, 1], Extrapolation.CLAMP)
-      : 1,
+  // ANDROID (vidi "ANDROID NEMA ZAMUCENJA" gore): puna traka u boji pozadine ekrana
+  // (ista `belina` kao skrol), na vrhu liste providna — pojavi se istom rampom kao
+  // zamucenje. Samo providnost i boja, pa ide brzim putem Reanimated-a.
+  const trakaAndroid = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(belina.get(), [0, 1], [neutral.grouped, neutral.white]),
+    opacity: interpolate(pomeraj.value, [0, headerBar.blurAt], [0, 1], Extrapolation.CLAMP),
   }));
 
   // Sloj 3b: podignuti element prati skrol (isti pomeraj kao sadrzaj, u niti za
@@ -319,7 +320,7 @@ export function Screen({
     // native stabla i skrol ostane dovoljno plitko za iOS 26 (vidi `belina`).
     <View style={{ flex: 1 }}>
       {/* 1. sadrzaj — skrol nosi i pozadinu (siva <-> bela) */}
-      <BlurTargetView ref={cilj} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <Animated.ScrollView
           style={pozadina}
           showsVerticalScrollIndicator={false}
@@ -346,10 +347,16 @@ export function Screen({
           </IznadPrelivaContext.Provider>
           {tabBarSpace && <TabBarSpacer />}
         </Animated.ScrollView>
-      </BlurTargetView>
+      </View>
 
-      {/* 2. zamucenje — postepeno gde postoji nativni modul, inace sa ostrom ivicom */}
-      {AnimatedPostepeno ? (
+      {/* 2. zamucenje — Android: puna traka bez zamucenja; iOS: postepeno gde postoji
+          nativni modul, inace sa ostrom ivicom */}
+      {Platform.OS === 'android' ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }, trakaAndroid]}
+        />
+      ) : AnimatedPostepeno ? (
         <AnimatedPostepeno
           pointerEvents="none"
           animatedProps={zamucenje}
@@ -361,11 +368,7 @@ export function Screen({
         pointerEvents="none"
         tint="systemUltraThinMaterialLight"
         animatedProps={zamucenje}
-        // Na starijem Androidu je Dimezis skup, pa tamo radije nista nego
-        // trzanje pri klizanju — `...Sdk31Plus` sam padne na `none` ispod 31.
-        blurMethod="dimezisBlurViewSdk31Plus"
-        blurTarget={cilj}
-        style={[{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }, vidljivost]}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: traka }}
       />
       )}
 
@@ -542,7 +545,9 @@ export function ScreenBackdrop({ tint = 'purple', pushed = false }: { tint?: Bac
   useFocusEffect(React.useCallback(() => { probudi(); }, []));
   useFocusEffect(
     React.useCallback(() => {
-      if (bezPokreta || usteda || backdrop.blobs[tint].length === 0) return;
+      // ANDROID: mrlje STOJE (Ivan, 30.9.2026) — kao u ustedi baterije. Pokret je u
+      // svakom kadru crtao ceo vrh ekrana i telefon nikad nije mirovao (seckanje na 120 Hz).
+      if (Platform.OS === 'android' || bezPokreta || usteda || backdrop.blobs[tint].length === 0) return;
       kadar.setActive(true);
       if (budan) {
         brzina.set(withTiming(1, { duration: ZALET_MS }));

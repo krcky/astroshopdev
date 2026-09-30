@@ -212,7 +212,13 @@ verzije. Sve radi `python3 scripts/korpus/natal.py` — izvestaj, pa
   verzija" zamenjuje ispravku (nasa ostaje u `nasa_ispravka`), rezervna kopija
   `*.pre-odgovora-*.json`, odgovori u `files/odgovori-astrologa-<datum>.md`.
   Skrivene kolone su JSON: Excel vraca prazan string kao None.
-Novi TEKSTOVI ne idu kroz Excel nego u Word, u obliku koji parseri vec citaju.
+Novi TEKSTOVI KORPUSA (tranziti, natal, lunarni) ne idu kroz Excel nego u Word, u
+obliku koji parseri vec citaju. IZUZETAK (30.9.2026): kratki novi tekstovi bez
+parsera — osobine po znaku, recenice faza, teme kuca + Mlad/Pun Mesec u kuci,
+planete u kucama (108), kraci saveti — su listovi za upis u istom Excel-u
+(`TABELE` u `odgovor.py`, skriven `id` po redu); `ucitaj` ih pise u
+`files/odgovori-astrologa-<datum>.md` i `.json`. Paket 30.9.2026 (zamenio
+neposlat od 28.9.): `~/Desktop/Astroshop App/Za astrologa 30.9.2026/`.
 
 ## Otvoreno
 

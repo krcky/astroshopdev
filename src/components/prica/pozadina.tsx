@@ -1,40 +1,29 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle, useFrameCallback, useReducedMotion, useSharedValue, type SharedValue,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
 
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { NIJANSE, type Nijansa } from '@/components/prica/boje';
-
-/** Da li pokret tece (1) ili stoji (0) — SharedValue ili DerivedValue, dovoljno je `get()`. */
-export type Tece = { get(): number };
+import { useSekunde } from '@/components/prica/sat';
 
 /**
  * Zivi preliv preko cele slike price — isti princip kao na pocetnoj (`screen.tsx`,
  * `Mrlja`), samo veci: tri meke mrlje plove svaka svojim tempom. Pokret je samo
- * `transform` na UI niti i stoji dok je prica pauzirana (`tece` = 0) ili je
- * ukljuceno "Smanji pokrete".
+ * `transform` na UI niti i ide po SATU SLIKE (`sat.tsx`): stoji dok je prica
+ * pauzirana, a bez sata (kartica za sliku, "Smanji pokrete") mrlje su na pocetnom mestu.
  *
  * `sirina`/`visina` su za karticu za deljenje (360 × 640); bez njih se meri roditelj.
  */
-export function PricaPozadina({ nijansa, tece, sirina, visina }: {
+export function PricaPozadina({ nijansa, sirina, visina }: {
   nijansa: Nijansa;
-  /** 1 = tece, 0 = stoji. Bez njega (kartica) mrlje stoje na pocetnom mestu. */
-  tece?: Tece;
   sirina?: number;
   visina?: number;
 }) {
   const [mera, setMera] = React.useState<{ w: number; h: number } | null>(
     sirina && visina ? { w: sirina, h: visina } : null
   );
-  const bezPokreta = useReducedMotion();
-  const sat = useSharedValue(0);
-  useFrameCallback((f) => {
-    if (!tece || tece.get() === 0 || bezPokreta) return;
-    sat.set(sat.get() + (f.timeSincePreviousFrame ?? 0) / 1000);
-  }, !!tece);
+  const sat = useSekunde();
 
   return (
     <View
@@ -59,7 +48,7 @@ const MRLJE = [
 ] as const;
 
 function Mrlja({ redni, boja, alfa, sat, w, h }: {
-  redni: number; boja: string; alfa: number; sat: SharedValue<number>; w: number; h: number;
+  redni: number; boja: string; alfa: number; sat: Readonly<SharedValue<number>>; w: number; h: number;
 }) {
   // Jedinstven id, bez dvotacaka iz `useId` (pravilo 13).
   const id = `prica-mrlja-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;

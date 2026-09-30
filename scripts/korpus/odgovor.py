@@ -15,11 +15,17 @@ Lektura: "cutanje = saglasnost". Kolona Odluka je unapred DA; astrolog upise
 NE ili svoju verziju isecka. Redovi "sumnja" (vrsta 'smisao' kod tranzita i
 lunarnog, `sumnja: true` kod natala) idu na vrh.
 
+Listovi za upis (`TABELE`, od 30.9.2026): kratki NOVI tekstovi bez parsera —
+osobine po znaku, recenice faza Meseca, teme kuca + Mlad/Pun Mesec u kuci,
+planete u znacima ("Promene na nebu"), kraci saveti. Privremene vrednosti se
+citaju iz koda (`traits.ts`, `moon.ts`), dugi saveti iz `transit-texts.csv`.
+
 `ucitaj --upisi`:
   - ispravke.json (tri fajla) — NE se brise i cuva u `odbijene-ispravke.json`
     pored, "Vasa verzija" zamenjuje ispravku; svaki pregledan red dobija
     `astrolog: "DA" | "izmena"`. Pre upisa ide rezervna kopija.
-  - `files/odgovori-astrologa-<datum>.md` — odgovori na pitanja i napomene.
+  - `files/odgovori-astrologa-<datum>.md` — odgovori na pitanja, napomene i
+    popunjeni listovi za upis; isti listovi i kao `.json` (id -> polja).
 Sledeci `napravi` preskace ispravke koje vec imaju `astrolog`: salje se samo novo.
 Posle upisa pusti izvoz: izvoz_csv.py, lunarni.py, natal.py.
 
@@ -44,6 +50,8 @@ KORPUSI = {
     'natal': (KOREN / 'files/natal-ispravke.json', 'Natalna karta'),
 }
 PITANJA = KOREN / 'files/pitanja-astrologu.json'
+ZNAKOVI = dict(aries='Ovan', taurus='Bik', gemini='Blizanci', cancer='Rak', leo='Lav', virgo='Devica', libra='Vaga',
+               scorpio='Škorpija', sagittarius='Strelac', capricorn='Jarac', aquarius='Vodolija', pisces='Ribe')
 
 LIST_LEKTURA, LIST_PITANJA, LIST_UPUTSTVO = 'Lektura', 'Pitanja', 'Uputstvo'
 # Kolone lista Lektura. Poslednje cetiri su skrivene i jedini su izvor istine
@@ -79,8 +87,7 @@ def _lunarni():
     import lunarni
     from parse_docx import docx_fajlovi
     ob = {'ljubav': 'Ljubav', 'zdravlje': 'Zdravlje', 'karijera': 'Karijera', 'kuca': 'Kuća', 'basta': 'Bašta'}
-    zn = dict(aries='Ovan', taurus='Bik', gemini='Blizanci', cancer='Rak', leo='Lav', virgo='Devica', libra='Vaga',
-              scorpio='Škorpija', sagittarius='Strelac', capricorn='Jarac', aquarius='Vodolija', pisces='Ribe')
+    zn = ZNAKOVI
     fajl = {}
     for f in docx_fajlovi(lunarni.IZVOR):
         for r in lunarni.parsiraj(f):
@@ -134,6 +141,104 @@ def spoji_tekstove(t: list[str]) -> str:
     return '; '.join(t)
 
 
+# ------------------------------------------------------------------ listovi za upis
+#
+# Kratki NOVI tekstovi za koje parser ne postoji (osobine, recenice faza, kuce,
+# planete u znacima, kraci saveti) — astrolog ih pise direktno u Excel, red po red.
+# Tekstovi korpusa (tranziti, natal, lunarni) i dalje idu u Word (parseri ga citaju).
+# Privremene vrednosti se citaju IZ KODA, da Excel pokaze tacno ono sto je u aplikaciji.
+
+def _ts_blok(fajl: str, ime: str) -> str:
+    """Telo objekta `export const <ime> ... = { ... };` iz TypeScript fajla."""
+    s = (KOREN / fajl).read_text(encoding='utf-8')
+    m = re.search(rf'export const {ime}\b[^=]*=\s*{{(.*?)\n}};', s, re.S)
+    if not m:
+        sys.exit(f'{fajl}: nema {ime} — promenjen oblik, popravi _ts_blok')
+    return m.group(1)
+
+
+def _osobine():
+    blok = _ts_blok('src/lib/traits.ts', 'SUN_TRAITS')
+    rr = re.findall(r"(\w+):\s*\['([^']*)',\s*'([^']*)',\s*'([^']*)'\]", blok)
+    assert [k for k, *_ in rr] == list(ZNAKOVI), 'SUN_TRAITS: ocekivano 12 znakova redom'
+    return [[ZNAKOVI[k], ' · '.join(t), None, None, None, f'traits.sun.{k}'] for k, *t in rr]
+
+
+def _faze():
+    ime = dict(re.findall(r"(\w+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'PHASE_NAME')))
+    rec = dict(re.findall(r"(\w+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'PHASE_SUMMARY_PRIVREMENO')))
+    red = ['new', 'waxing', 'first', 'full', 'waning', 'last']  # redom kroz ciklus
+    assert set(red) == set(rec) == set(ime), 'faze u moon.ts su se promenile'
+    return [[ime[k], rec[k], None, f'phase.{k}'] for k in red]
+
+
+def _kuce():
+    teme = dict(re.findall(r"(\d+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'HOUSE_THEMES')))
+    assert sorted(map(int, teme)) == list(range(1, 13)), 'HOUSE_THEMES: ocekivano 12 kuca'
+    return [[f'{n}. kuća', teme[str(n)], None, None, None, f'house.{n}'] for n in range(1, 13)]
+
+
+# "Promene na nebu" (Ivan, 30.9.2026): tekst po ZNAKU, ne po kuci (do tada 9 planeta x 12
+# kuca = 108), i samo kombinacije koje se u narednih godinu dana stvarno dese — racuna ih
+# `promene-godine.ts` istim efemerisom kao aplikacija. Planeta u znaku = ulazak ili ponovo
+# direktna; retrogradna u znaku = postaje retrogradna ili retrogradno ulazi u znak.
+VRSTE_DOGADJAJA = {'ulazak': 'ulazak', 'ulazak-retro': 'retrogradni ulazak',
+                   'retrograde': 'početak retrogradnosti', 'direct': 'kraj retrogradnosti'}
+
+
+def _promene_godine() -> dict:
+    import subprocess
+    r = subprocess.run(['npx', 'tsx', 'scripts/korpus/promene-godine.ts'], cwd=KOREN, capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(f'promene-godine.ts pao:\n{r.stderr}')
+    return json.loads(r.stdout)
+
+
+def _planete_u_znacima():
+    return [[x['naslov'], 'retrogradno' if x['retro'] else 'direktno',
+             ' · '.join(f"{e['datum']} {VRSTE_DOGADJAJA[e['vrsta']]}" for e in x['dogadjaji']), None, x['kljuc']]
+            for x in _promene_godine()['stavke']]
+
+
+SAVET_MAX = 100  # znakova; duzi savet se na slici price mnogo smanjuje (CLAUDE.md, pravilo 23)
+
+
+def _dugi_saveti():
+    import csv
+    from parse_docx import PLANETE, ASPEKTI
+    csv.field_size_limit(10 ** 9)
+    izvor = APP / 'Tranziti AstroShop'
+    nacrti = {x['key'] for x in json.loads((izvor / 'nacrti-kratkih.json').read_text(encoding='utf-8'))}
+    srp = {v: k.capitalize() for k, v in PLANETE.items()} | {'ascendant': 'Ascendent', 'midheaven': 'MC'}
+    sra = {v: k for k, v in ASPEKTI.items()}
+    out = []
+    with open(izvor / 'transit-texts.csv', encoding='utf-8') as f:
+        for r in csv.DictReader(f):
+            s = (r['advice'] or '').strip()
+            # Nacrte astrolog ionako pregleda u Word-u — ovde samo njegovi saveti.
+            if r['version'] != 'short' or len(s) <= SAVET_MAX or r['key'] in nacrti:
+                continue
+            _, t, a, _, n = r['key'].split('.')
+            out.append([f'{srp[t]} {sra[a]} natalni {srp[n]}', s, len(s), None, r['key']])
+    return sorted(out, key=lambda r: -r[2])
+
+
+# naziv lista: (kolone, sirine, kolone za upis, izvor redova). Poslednja kolona
+# svakog lista je skriveni `id` — po njemu se odgovor vraca na mesto.
+TABELE = {
+    'Osobine po znaku': (['Znak', 'Sada (naše, privremeno)', 'Vaš 1. red', 'Vaš 2. red', 'Vaš 3. red', 'id'],
+                         [12, 52, 28, 28, 28, 10], ['Vaš 1. red', 'Vaš 2. red', 'Vaš 3. red'], _osobine),
+    'Faze Meseca': (['Faza', 'Sada (naša, privremena)', 'Vaša rečenica', 'id'],
+                    [18, 60, 70, 10], ['Vaša rečenica'], _faze),
+    'Kuće': (['Kuća', 'Tema sada (iz briefa)', 'Vaša tema', 'Mlad Mesec u ovoj kući', 'Pun Mesec u ovoj kući', 'id'],
+             [10, 32, 32, 55, 55, 10], ['Vaša tema', 'Mlad Mesec u ovoj kući', 'Pun Mesec u ovoj kući'], _kuce),
+    'Planete u znacima': (['Tekst', 'Kretanje', 'Kad se pojavljuje na kartici', 'Vaš tekst', 'id'],
+                          [28, 12, 42, 90, 10], ['Vaš tekst'], _planete_u_znacima),
+    'Dugi saveti': (['Tranzit', 'Savet sada', 'Znakova', 'Vaša kraća verzija (do ~100 znakova)', 'id'],
+                    [30, 70, 9, 70, 10], ['Vaša kraća verzija (do ~100 znakova)'], _dugi_saveti),
+}
+
+
 # ------------------------------------------------------------------ napravi
 
 def _bogat(a: str, b: str, boja: str):
@@ -179,22 +284,34 @@ def napravi(cilj: Path):
     for j, w in zip('BCDEF', (38, 38, 9, 24, 22)):
         u.column_dimensions[j].width = w
     sumnjivih = sum(r['sumnja'] for r in rr)
+    tabele = {naziv: izvor() for naziv, (*_, izvor) in TABELE.items()}
+    danas = datetime.date.today()
     tekst = [
-        ('Astroshop — vaš odgovor na izveštaj od 28. 9. 2026.', F(bold=True, size=14)),
+        (f'Astroshop — za astrologa, {danas.day}. {danas.month}. {danas.year}.', F(bold=True, size=14)),
         ('', None),
-        ('Ovaj fajl prati dokument „Izvestaj za astrologa 28.9.2026.docx“. Tamo je sve objašnjeno; ovde samo odgovarate.', F()),
+        ('Sve što vas molimo je u ovom fajlu, svaka stvar na svom listu (jezičci dole). Plavo polje = tu pišete.', F()),
+        ('Ostale kolone i redosled nemojte menjati; fajl se čita automatski. Sortiranje i filter su slobodni. Prazno polje znači „bez izmene“.', F()),
         ('', None),
-        (f'1. List „{LIST_LEKTURA}“ — {len(rr)} ispravki.', F(bold=True)),
+        (f'1. „{LIST_LEKTURA}“ — {len(rr)} ispravki u vašim tekstovima (tranziti, lunarni kalendar, natal).', F(bold=True)),
         ('Kolona „Odluka“ je unapred popunjena sa DA. Ako se slažete, ne radite ništa.', F()),
         ('Ako se NE slažete, upišite NE — tekst ostaje kako ste ga vi napisali.', F()),
         ('Ako hoćete drugačiju ispravku, upišite u „Vaša verzija“ CEO isečak onako kako treba da glasi (kao u koloni „Treba“).', F()),
+        ('„Piše“ je doslovni isečak iz vašeg dokumenta, greška je podebljana crveno; „Treba“ je predlog, izmena podebljana zeleno. Tačkica (·) je razmak koji fali ili je višak.', F()),
         (f'Na vrhu je {sumnjivih} žutih redova: tu je greška sigurna, ali nismo sigurni koju ste reč hteli. Njih molimo da pogledate.', F()),
+        ('Dva pravila smo primenili svuda, pa nisu nabrojana: „vi“, „vaš“, „vama“ usred rečenice malim slovom (vaš pristanak od 27. 9.) i brisanje duplog razmaka.', F()),
         ('', None),
-        (f'2. List „{LIST_PITANJA}“ — {len(pitanja)} pitanja. Odgovor upišite u kolonu „Vaš odgovor“. Novi tekstovi (Pluton…) idu u Word, kao do sada.', F(bold=True)),
+        (f'2. „{LIST_PITANJA}“ — {len(pitanja)} pitanja: molbe (M), sadržaj vaših tekstova (S) i pravila koja smo sami postavili (P). Odgovor u kolonu „Vaš odgovor“.', F(bold=True)),
+        ('Duži tekstovi za tranzite (Pluton…) i pregled 160 sažetih kratkih verzija idu u Word, kao do sada — pitanja M1–M5 kažu koji.', F()),
         ('', None),
-        ('Plavo polje = tu pišete. Ostale kolone i redosled nemojte menjati; fajl se čita automatski. Sortiranje i filter su slobodni.', F()),
+        ('3. Novi kratki tekstovi — pišete direktno u listove:', F(bold=True)),
+        (f'„Osobine po znaku“ — 12 znakova × 3 kratka reda (ekran sa znakom Sunca posle unosa podataka o rođenju).', F()),
+        (f'„Faze Meseca“ — {len(tabele["Faze Meseca"])} rečenica, po jedna za svaku fazu (kartica „Mesec danas“).', F()),
+        ('„Kuće“ — tema svake kuće i kratak tekst za Mlad i Pun Mesec u toj kući (12 kuća).', F()),
+        (f'„Planete u znacima“ — {len(tabele["Planete u znacima"])} kratkih tekstova: planeta u znaku i retrogradna planeta u znaku, samo ono što se desi u narednih godinu dana (ekran „Promene na nebu“).', F()),
+        (f'„Dugi saveti“ — {len(tabele["Dugi saveti"])} saveta dužih od {SAVET_MAX} znakova; napišite kraću verziju, jednu rečenicu.', F()),
+        ('Gde stoji „Sada“, to je naš privremeni tekst koji je trenutno u aplikaciji — samo da vidite o čemu je reč, ne morate ga pratiti.', F()),
         ('', None),
-        ('Primer (kako izgleda popunjen red):', F(bold=True)),
+        ('Primer lekture (kako izgleda popunjen red):', F(bold=True)),
     ]
     for i, (t, font) in enumerate(tekst, 1):
         c = u.cell(i, 2, t)
@@ -267,9 +384,29 @@ def napravi(cilj: Path):
                 c.fill = PLAVA
     wp.freeze_panes = 'A2'
 
+    # ---- Listovi za upis
+    for naziv, (kolone, sirine, za_upis, _) in TABELE.items():
+        wt = wb.create_sheet(naziv)
+        for i, (k, w) in enumerate(zip(['Br.'] + kolone, [6] + sirine), 1):
+            c = wt.cell(1, i, k)
+            c.font, c.fill, c.border, c.alignment = F(bold=True), SIVA, okvir, omot
+            wt.column_dimensions[c.column_letter].width = w
+        for n, red in enumerate(tabele[naziv], 1):
+            for i, (k, v) in enumerate(zip(kolone, red), 2):
+                c = wt.cell(n + 1, i, v)
+                c.font, c.border = F(bold=(i == 2)), okvir
+                c.alignment = Alignment(vertical='top') if k == 'id' else omot
+                if k in za_upis:
+                    c.fill = PLAVA
+            wt.cell(n + 1, 1, n).font = F()
+            wt.cell(n + 1, 1).border, wt.cell(n + 1, 1).alignment = okvir, omot
+        wt.column_dimensions[wt.cell(1, len(kolone) + 1).column_letter].hidden = True
+        wt.freeze_panes = 'C2'
+
     wb.active = wb.index(u)
     wb.save(cilj)
-    print(f'{cilj}\n{len(rr)} redova lekture ({sumnjivih} žutih), {len(pitanja)} pitanja')
+    print(f'{cilj}\n{len(rr)} redova lekture ({sumnjivih} žutih), {len(pitanja)} pitanja; '
+          + ', '.join(f'{naziv} {len(v)}' for naziv, v in tabele.items()))
 
 
 # ------------------------------------------------------------------ ucitaj
@@ -278,11 +415,13 @@ def ucitaj(put: Path, upisi: bool):
     from openpyxl import load_workbook
     wb = load_workbook(put)
     greske, odluke = [], []
-    ws = wb[LIST_LEKTURA]
-    zaglavlje = [c.value for c in ws[1]]
+    # Zaseban fajl samo sa listovima za upis (npr. "Planete u znacima", 30.9.2026)
+    # nema lekturu ni pitanja — tada se ti delovi preskacu.
+    ws = wb[LIST_LEKTURA] if LIST_LEKTURA in wb.sheetnames else None
+    zaglavlje = [c.value for c in ws[1]] if ws else KOL
     if zaglavlje[:len(KOL)] != KOL:
         sys.exit(f'List {LIST_LEKTURA}: kolone su promenjene — ocekivano {KOL}')
-    for red in ws.iter_rows(min_row=2):
+    for red in (ws.iter_rows(min_row=2) if ws else []):
         v = {naziv: red[K[naziv] - 1].value for naziv in KOL}
         if not v['id_korpus']:
             continue
@@ -303,10 +442,27 @@ def ucitaj(put: Path, upisi: bool):
                        'vasa': vasa, 'napomena': str(v['Napomena'] or '').strip(), 'tekst': v['Tekst']})
 
     odgovori = []
-    wp = wb[LIST_PITANJA]
-    for red in wp.iter_rows(min_row=2, values_only=True):
+    wp = wb[LIST_PITANJA] if LIST_PITANJA in wb.sheetnames else None
+    for red in (wp.iter_rows(min_row=2, values_only=True) if wp else []):
         if red[0]:
             odgovori.append({'id': red[0], 'tema': red[2], 'pitanje': red[3], 'odgovor': str(red[4] or '').strip()})
+
+    # Listovi za upis (Excel od 30.9.2026 nadalje; stariji ih nema). Uzimaju se samo
+    # popunjeni redovi; kolone se traze po imenu, id je poslednja (skrivena).
+    upisano = {}
+    for naziv, (kolone, _, za_upis, _) in TABELE.items():
+        if naziv not in wb.sheetnames:
+            continue
+        wt = wb[naziv]
+        zaglavlje = [c.value for c in wt[1]]
+        if zaglavlje != ['Br.'] + kolone:
+            greske.append(f'list {naziv}: kolone su promenjene — ocekivano {["Br."] + kolone}')
+            continue
+        for red in wt.iter_rows(min_row=2, values_only=True):
+            v = dict(zip(zaglavlje, red))
+            polja = {k: str(v[k]).strip() for k in za_upis if v.get(k) is not None and str(v[k]).strip()}
+            if v.get('id') and polja:
+                upisano.setdefault(naziv, []).append({'id': v['id'], 'naziv': v[kolone[0]], **polja})
 
     # Primena na ispravke.json
     izmene = {}
@@ -342,6 +498,8 @@ def ucitaj(put: Path, upisi: bool):
                   + (f"  [{o['napomena']}]" if o['napomena'] else ''))
     odgovoreno = [q for q in odgovori if q['odgovor']]
     print(f'Pitanja: odgovoreno {len(odgovoreno)} od {len(odgovori)}')
+    for naziv, redovi_t in upisano.items():
+        print(f'{naziv}: popunjeno {len(redovi_t)} redova')
     for korpus, s in izmene.items():
         for br, kljuc in s['nije_nadjeno']:
             greske.append(f'red {br}: ispravka za {kljuc} vise ne postoji u {KORPUSI[korpus][0].name} ({korpus})')
@@ -356,6 +514,8 @@ def ucitaj(put: Path, upisi: bool):
 
     vreme = datetime.datetime.now().strftime('%Y%m%d-%H%M')
     for korpus, s in izmene.items():
+        if not any(o['korpus'] == korpus for o in odluke):
+            continue  # nista iz lekture — fajl ostaje netaknut
         put_j = KORPUSI[korpus][0]
         shutil.copy(put_j, put_j.with_name(f'{put_j.stem}.pre-odgovora-{vreme}.json'))
         put_j.write_text(json.dumps(s['lista'], ensure_ascii=False, indent=1), encoding='utf-8')
@@ -367,15 +527,28 @@ def ucitaj(put: Path, upisi: bool):
 
     datum = datetime.date.today().isoformat()
     md = KOREN / f'files/odgovori-astrologa-{datum}.md'
-    L = [f'# Odgovori astrologa ({datum})', '', f'Izvor: `{put.name}`', '', '## Pitanja', '']
+    L = [f'# Odgovori astrologa ({datum})', '', f'Izvor: `{put.name}`', '']
+    if odgovori:
+        L += ['## Pitanja', '']
     for q in odgovori:
         L += [f"### {q['id']} — {q['tema']}", '', f"> {q['pitanje']}", '', q['odgovor'] or '*(bez odgovora)*', '']
     napomene = [o for o in odluke if o['napomena']]
     if napomene:
         L += ['## Napomene uz lekturu', '']
         L += [f"- red {o['br']}, {o['tekst']}: {o['napomena']}" for o in napomene]
+    for naziv, redovi_t in upisano.items():
+        L += [f'## {naziv}', '']
+        for r in redovi_t:
+            polja = {k: v for k, v in r.items() if k not in ('id', 'naziv')}
+            L += [f"- **{r['naziv']}** (`{r['id']}`): " + ' · '.join(f'{k}: {v}' for k, v in polja.items())]
+        L += ['']
     md.write_text('\n'.join(L) + '\n', encoding='utf-8')
     print(f'upisano: {md}')
+    if upisano:
+        # Isto i kao JSON (id -> polja), za unos u kod ili bazu.
+        js = md.with_suffix('.json')
+        js.write_text(json.dumps(upisano, ensure_ascii=False, indent=1), encoding='utf-8')
+        print(f'upisano: {js}')
     print('\nSledece: python3 scripts/korpus/izvoz_csv.py && python3 scripts/korpus/lunarni.py && python3 scripts/korpus/natal.py')
 
 

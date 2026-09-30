@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Pressable, View } from 'react-native';
-import Animated, { Easing, SlideInDown, SlideInUp, useAnimatedStyle, ZoomIn } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Minus, Plus, Share } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
@@ -9,12 +9,13 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { OblastIkona } from '@/components/oblast-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { MoonDisc } from '@/components/moon-disc';
-import { PricaPozadina, type Tece } from '@/components/prica/pozadina';
+import { PricaPozadina } from '@/components/prica/pozadina';
 import { INDIGO, INK, LILA, MINUS, PLUS, SIVA, TON_MASTILO } from '@/components/prica/boje';
 import {
-  Broj, FazeMeseca, KrugOko, Pojava, Reci, TackiceOcene, Tocak, TrakeTona, UgaoAspekta, useOkret, Zraci,
+  BLAGO, Broj, FazeMeseca, ISKOK, KrugOko, Pojava, Reci, TackiceOcene, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
 } from '@/components/prica/crtezi';
-import { boljeNegoJuce, fazaOsmina, type SlikaKljuc } from '@/lib/prica';
+import { useOkret } from '@/components/prica/sat';
+import { boljeNegoJuce, fazaOsmina, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
@@ -24,9 +25,9 @@ import { neutral } from '@/theme/tokens';
 /** Prostor za sadrzaj slike: ispod trake sa napretkom i zaglavlja, iznad dugmeta "Podeli". */
 export type OkvirSlike = { vrh: number; dno: number; sirina: number; visina: number; donjiUmetak: number };
 
+/** Pokreti idu po satu slike (`sat.tsx`), koji daje `app/prica.tsx` — slika ga ne prima kao prop. */
 export type SlikaProps = {
   p: PricaDana;
-  tece: Tece;
   okvir: OkvirSlike;
   /** Prica u onboardingu: bez dugmadi saveta — dole je "Nastavi" (`app/prica.tsx`). */
   uvod?: boolean;
@@ -44,7 +45,6 @@ export const TIP = {
   naslov: cn('text-[40px] leading-[44px] tracking-[-1.2px]', tezina('display')),
   naslovM: cn('text-[36px] leading-[40px] tracking-[-1px]', tezina('display')),
   recenica: cn('text-[30px] leading-[35px] tracking-[-0.7px]', tezina('display')),
-  savet: cn('text-[44px] leading-[48px] tracking-[-1.6px]', tezina('display')),
   tekst: cn('text-[17px] leading-[24px]', tezina('reading')),
   sitno: cn('text-[13px] leading-[18px]', tezina('muted')),
 } as const;
@@ -72,16 +72,16 @@ function useMera() {
  * 1 · Naslovna
  * ------------------------------------------------------------------------- */
 
-export function SlikaNaslovna({ p, tece, okvir }: SlikaProps) {
+export function SlikaNaslovna({ p, okvir }: SlikaProps) {
   const [m, onLayout] = useMera();
   const n = p.naslovna.broj;
   return (
     <View style={{ flex: 1, backgroundColor: INDIGO }}>
-      <PricaPozadina nijansa="noc" tece={tece} />
+      <PricaPozadina nijansa="noc" />
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24 }}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} onLayout={onLayout}>
           {m && (
-            <Tocak tetive={p.naslovna.tetive} levo={p.naslovna.levo} velicina={Math.min(m.w, m.h - 16, 340)} tece={tece} />
+            <Tocak tetive={p.naslovna.tetive} levo={p.naslovna.levo} velicina={Math.min(m.w, m.h - 16, 340)} />
           )}
         </View>
         <View style={{ paddingTop: 12 }}>
@@ -121,12 +121,12 @@ export function SlikaNaslovna({ p, tece, okvir }: SlikaProps) {
  * 2 · Tvoj dan
  * ------------------------------------------------------------------------- */
 
-export function SlikaTvojDan({ p, tece, okvir }: SlikaProps) {
+export function SlikaTvojDan({ p, okvir }: SlikaProps) {
   const [m, onLayout] = useMera();
   const td = p.tvojDan!;
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
-      <PricaPozadina nijansa="indigo" tece={tece} />
+      <PricaPozadina nijansa="indigo" />
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24 }}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} onLayout={onLayout}>
           {m && (
@@ -176,9 +176,9 @@ export function SlikaOcene({ p, okvir }: SlikaProps) {
     <View style={{ flex: 1, backgroundColor: SIVA }}>
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24, justifyContent: 'center' }}>
         {naj && (
-          <Animated.View entering={ZoomIn.delay(200).duration(600).easing(Easing.out(Easing.back(1.6)))} style={{ marginBottom: 12, alignSelf: 'flex-start' }}>
+          <Pojava kasni={200} trajanje={600} ublazavanje={ISKOK} zum bledi={false} pomak={0} style={{ marginBottom: 12, alignSelf: 'flex-start' }}>
             <OblastIkona oblast={naj.key} size={64} />
-          </Animated.View>
+          </Pojava>
         )}
         <Pojava kasni={450}>
           <Text className={TIP.oznaka} style={{ color: MUTNO }}>Najbolje ti ide</Text>
@@ -251,11 +251,11 @@ export function SlikaIdeKoci({ p, okvir }: SlikaProps) {
   if (ide && koci) {
     return (
       <View style={{ flex: 1, backgroundColor: MINUS }}>
-        <Animated.View entering={SlideInUp.duration(900).easing(Easing.bezier(0.7, 0, 0.2, 1))} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '52%', backgroundColor: PLUS }}>
+        <Pojava trajanje={900} ublazavanje={ZAVESA} pomak={-okvir.visina} bledi={false} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '52%', backgroundColor: PLUS }}>
           <View style={{ position: 'absolute', left: 24, right: 24, bottom: 32 }}>
             <IdeKociBlok znak="plus" natpis="Ide ti" tekst={ide.tekst} ime={ide.ime} kasni={500} />
           </View>
-        </Animated.View>
+        </Pojava>
         <View style={{ position: 'absolute', top: '52%', left: 24, right: 24, paddingTop: 32 }}>
           <IdeKociBlok znak="minus" natpis="Koči te" tekst={koci.tekst} ime={koci.ime} kasni={1400} />
         </View>
@@ -277,24 +277,26 @@ export function SlikaIdeKoci({ p, okvir }: SlikaProps) {
  * 5 · Mesec
  * ------------------------------------------------------------------------- */
 
-export function SlikaMesec({ p, tece, okvir }: SlikaProps) {
+export function SlikaMesec({ p, okvir }: SlikaProps) {
   const m = p.mesec;
   const prostor = okvir.visina - okvir.vrh - okvir.dno;
   const mesec = Math.max(120, Math.min(190, prostor * 0.3));
-  const okret = useOkret(tece, 240);
+  const okret = useOkret(240);
   const stil = useAnimatedStyle(() => ({ transform: [{ rotate: `${okret.get()}deg` }] }));
   return (
     <View style={{ flex: 1, backgroundColor: INDIGO }}>
-      <PricaPozadina nijansa="noc" tece={tece} />
+      <PricaPozadina nijansa="noc" />
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24, justifyContent: 'center' }}>
         <View style={{ height: mesec + 40 }}>
-          <Animated.View
-            entering={SlideInDown.duration(1400).easing(Easing.out(Easing.cubic))}
+          <Pojava
+            trajanje={1400}
+            pomak={okvir.visina}
+            bledi={false}
             style={{ position: 'absolute', top: 0, alignSelf: 'center', shadowColor: LILA, shadowOpacity: 0.55, shadowRadius: 34, shadowOffset: { width: 0, height: 0 } }}>
             <Animated.View style={stil}>
               <MoonDisc angle={m.faza.angle} size={mesec} />
             </Animated.View>
-          </Animated.View>
+          </Pojava>
           <Pojava kasni={700} style={{ position: 'absolute', left: 0, bottom: 0, flexDirection: 'row', alignItems: 'baseline' }}>
             <Broj do={m.faza.illuminationPct} kasni={800} style={{ fontSize: 96, lineHeight: 96, color: BELA, letterSpacing: -5 }} />
             <Text className={cn('text-[34px] leading-[36px]', tezina('display'))} style={{ color: BELA }}> %</Text>
@@ -315,9 +317,9 @@ export function SlikaMesec({ p, tece, okvir }: SlikaProps) {
             className={cn('text-[32px] leading-[36px] tracking-[-0.9px]', tezina('display'))}
             style={{ color: BELA }}
             pre={(
-              <Animated.View entering={ZoomIn.delay(1750).duration(500)} style={{ marginRight: 9 }}>
+              <Pojava kasni={1750} trajanje={500} ublazavanje={BLAGO} zum bledi={false} pomak={0} style={{ marginRight: 9 }}>
                 <ZnakIkona znak={m.znak.key} element={m.znak.element} size={30} accessibilityLabel={m.znak.name} />
-              </Animated.View>
+              </Pojava>
             )}
           />
         </View>
@@ -342,26 +344,38 @@ export function SlikaMesec({ p, tece, okvir }: SlikaProps) {
 /** Visina dugmadi na poslednjoj slici (crno dugme + "Pročitaj ceo tekst"). */
 export const DUGMAD_SAVETA = 50 + 6 + 44;
 
-export function SlikaSavet({ p, tece, okvir, uvod, onPodeli, onProcitaj }: SlikaProps) {
+export function SlikaSavet({ p, okvir, uvod, onPodeli, onProcitaj }: SlikaProps) {
   const s = p.savet!;
   const dnoSadrzaja = okvir.donjiUmetak + 16 + DUGMAD_SAVETA + 12;
+  // Velicina slova po duzini saveta (`lib/prica.ts`): prostor izmedju zaglavlja i dugmadi,
+  // bez oznake "Savet dana" (15 + 16) i natpisa ispod (18 + njegovi redovi).
+  const natpis = `Iz tumačenja tranzita ${s.ime}.`;
+  const sirina = okvir.sirina - 48;
+  const vel = velicinaSaveta(s.tekst, sirina, okvir.visina - okvir.vrh - dnoSadrzaja - 15 - 16 - 18 - visinaNatpisa(natpis, sirina));
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
-      <PricaPozadina nijansa="zlato" tece={tece} />
+      <PricaPozadina nijansa="zlato" />
       {/* Savet je vertikalno centriran u krugu zraka (Ivan, 30.9.2026): isti prostor, ista sredina. */}
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: dnoSadrzaja, left: 0, right: 0, alignItems: 'center', justifyContent: 'center' }}>
         <View style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center', top: 0, bottom: 0, left: 0, right: 0 }}>
-          <Zraci velicina={okvir.sirina * 1.64} tece={tece} />
+          <Zraci velicina={okvir.sirina * 1.64} />
         </View>
         <View style={{ paddingHorizontal: 24, alignItems: 'center' }}>
           <Pojava kasni={300}>
             <Text className={cn(TIP.oznaka, 'text-center')} style={{ color: MUTNO }}>Savet dana</Text>
           </Pojava>
           <View style={{ marginTop: 16 }}>
-            <Reci tekst={s.tekst} kasni={450} korak={110} centar className={cn(TIP.savet, 'text-center')} />
+            <Reci
+              tekst={s.tekst}
+              kasni={450}
+              korak={110}
+              centar
+              className={tezina('display')}
+              style={{ fontSize: vel.velicina, lineHeight: vel.prored, letterSpacing: -0.036 * vel.velicina }}
+            />
           </View>
           <Pojava kasni={1200} style={{ marginTop: 18 }}>
-            <Text className={cn(TIP.sitno, 'text-center')} style={{ color: MUTNO }}>{`Iz tumačenja tranzita ${s.ime}.`}</Text>
+            <Text className={cn(TIP.sitno, 'text-center')} style={{ color: MUTNO }}>{natpis}</Text>
           </Pojava>
         </View>
       </View>

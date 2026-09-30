@@ -69,9 +69,10 @@ export default function OsobaStrana() {
       right={<IzmeniDugme id={osoba.id} />}>
       {!otvorena ? (
         <PremiumKartica
-          className="mx-5 mt-6"
-          naslov="Karta i tranziti"
-          opis={`Uz Premium možeš da imaš do ${PREMIUM_GRANICE.osobe} osoba. Bez njega je otvorena samo prva osoba na listi.`}
+          className="mx-5 mt-10"
+          naslov={`${osoba.name} je uz Premium`}
+          opis={`Bez Premium-a je otvorena samo prva osoba na listi. Uz njega imaš karte i tranzite za do ${PREMIUM_GRANICE.osobe} osoba.`}
+          dugme="Otključaj sve osobe"
         />
       ) : (
         <>

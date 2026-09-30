@@ -8,8 +8,8 @@
 import { buildNatalChart } from '../src/lib/natal';
 import { oblastiDana } from '../src/lib/oblasti';
 import {
-  boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, legendaTonova, luk, najbolja, reciZaPrelom, REDOSLED, slikeDana,
-  tackaNaKrugu, tackaNaTocku, TRAJANJE, trajanjeSlike, ugloviCrteza, zraciDuzina,
+  boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, kadarVidea, legendaTonova, luk, najbolja, poluprecnikKruga, rasporedVidea, reciZaPrelom, redovaTeksta, REDOSLED, slikeDana, VIDEO,
+  tackaNaKrugu, tackaNaTocku, TRAJANJE, trajanjeSlike, ugloviCrteza, velicinaSaveta, VELICINE_SAVETA, VELICINE_SAVETA_KARTICA, visinaNatpisa, ZNAK_EM, zraciDuzina,
 } from '../src/lib/prica';
 import { BEOGRAD } from '../src/lib/test-karta';
 
@@ -96,6 +96,72 @@ const dan = oblastiDana({ chart, date: new Date(2026, 8, 30, 12), timeUnknown: f
 const leg = legendaTonova(brojTonova(dan.poVaznosti.map((s) => s.ton)));
 ok(dan.poVaznosti.length === 10, '10 tranzita na listi dana', String(dan.poVaznosti.length));
 ok(leg === '7 skladnih · 2 mešovita · 1 napet', 'legenda kao na prototipu', leg);
+
+console.log('\n10. Savet: velicina slova po duzini (ne sme preci zaglavlje ni dugme)');
+const KRATAK = 'Budite strpljivi i dosledni.';
+const S72 = 'Iskoristite ovu energiju za unapređenje ljubavnih i kreativnih odnosa.';
+const S141 = 'Otvorite se za ljubav – Iskoristite ovaj period za jačanje ljubavnih i prijateljskih odnosa, rešite nesuglasice i uživajte u lepim trenucima.';
+const S196 = 'Umesto da reagujete naglo, koristite strpljenje i taktiku. Kanalizujte višak energije kroz fizičku aktivnost i konstruktivne projekte. Pametno birajte bitke i ne dozvolite da ego vodi vaše odluke.';
+const uRedu44 = Math.floor(354 / (44 * ZNAK_EM));
+ok(redovaTeksta(S72, uRedu44) === 6, 'podeseno: 72 znaka pri 44 = 6 redova (snimak iz simulatora)', String(redovaTeksta(S72, uRedu44)));
+ok(redovaTeksta(S141, uRedu44) === 12, 'podeseno: 141 znak pri 44 = 12 redova (snimak sa telefona)', String(redovaTeksta(S141, uRedu44)));
+// iPhone 16/17 (402 × 874): sirina 354, visina za savet 501; iPhone SE (375 × 667): 327 × 370.
+const VELIKI = { w: 354, h: 874 - 126 - 162 - 85 };
+const MALI = { w: 327, h: 667 - 84 - 128 - 85 };
+// Kartica: blok 332 pt oko sredine zraka, bez oznake (25), razmaka (14) i natpisa u jednom redu (18).
+const KARTICA_H = 332 - 25 - 14 - visinaNatpisa('Iz tumačenja tranzita Sunce kvadrat Sunce.', 316);
+ok(visinaNatpisa('Iz tumačenja tranzita Sunce kvadrat Sunce.', 316) === 18, 'natpis ispod saveta na kartici: jedan red');
+ok(velicinaSaveta(S72, 316, KARTICA_H, VELICINE_SAVETA_KARTICA).velicina === 39, 'kartica: savet od 72 znaka ostaje 39 (kao do sada)');
+ok(velicinaSaveta(KRATAK, VELIKI.w, VELIKI.h).velicina === 44, 'kratak savet ostaje 44');
+ok(velicinaSaveta(S72, VELIKI.w, VELIKI.h).velicina === 44, 'savet od 72 znaka (6 redova) ostaje 44');
+const v141 = velicinaSaveta(S141, VELIKI.w, VELIKI.h);
+ok(v141.velicina < 44 && v141.redova * v141.prored <= VELIKI.h, 'savet sa slike (141) je manji i staje', `${v141.velicina} pt, ${v141.redova} redova`);
+for (const [ime, t] of [['141', S141], ['196 (najduzi)', S196]] as const) {
+  for (const [telefon, m] of [['iPhone 16/17', VELIKI], ['iPhone SE', MALI]] as const) {
+    const v = velicinaSaveta(t, m.w, m.h);
+    ok(v.redova * v.prored <= m.h, `${ime} staje na ${telefon}`, `${v.velicina} pt, ${v.redova} redova, ${v.redova * v.prored}/${m.h} pt`);
+  }
+  const k = velicinaSaveta(t, 316, KARTICA_H, VELICINE_SAVETA_KARTICA);
+  ok(k.redova * k.prored <= KARTICA_H, `${ime} staje na karticu za deljenje`, `${k.velicina} pt, ${k.redova} redova`);
+}
+ok(VELICINE_SAVETA.includes(velicinaSaveta(S196, 100, 50).velicina as never), 'kad nista ne staje: najmanja iz spiska, ne izmisljena', String(velicinaSaveta(S196, 100, 50).velicina));
+
+console.log('\n11. Video price: raspored kadrova');
+{
+  const obicna = [9000, 11600, 7000, 8000, 9000, 6000];
+  const r = rasporedVidea(obicna);
+  ok(r.ukupno === 50600 && r.trajanje.join() === obicna.join(), 'prica do 58 s: ista trajanja kao u prici', `${r.ukupno} ms`);
+  ok(r.kadrova === Math.ceil((50600 * 30) / 1000), 'broj kadrova = trajanje × 30', String(r.kadrova));
+  const duga = rasporedVidea([12000, 12000, 12000, 12000, 12000, 12000]);
+  ok(duga.ukupno <= VIDEO.najduze, 'sest slika po 12 s: skraceno na najvise 58 s (Instagram prica 60 s)', `${duga.ukupno} ms`);
+  ok(duga.trajanje.every((d) => d >= VIDEO.najkrace), 'nijedna slika ispod 3,5 s');
+  const mesana = rasporedVidea([12000, 12000, 12000, 12000, 12000, 3000]);
+  ok(mesana.ukupno <= VIDEO.najduze && mesana.trajanje[5] === VIDEO.najkrace, 'kratka slika ostaje najkraca, duge se skrate', mesana.trajanje.join(' '));
+  const k0 = kadarVidea(r, 0);
+  ok(k0.gore.i === 0 && k0.gore.sat === 0 && k0.dole === null && k0.prelaz === 1, 'prvi kadar: prva slika od pocetka, bez prelaza');
+  const naPrelazu = kadarVidea(r, Math.ceil((r.pocetak[1] * 30) / 1000));
+  ok(naPrelazu.gore.i === 1 && naPrelazu.dole?.i === 0 && naPrelazu.prelaz < 0.1, 'pocetak druge slike: krug krece, prva je ispod', naPrelazu.prelaz.toFixed(3));
+  const posle = kadarVidea(r, Math.ceil(((r.pocetak[1] + VIDEO.prelaz) * 30) / 1000));
+  ok(posle.dole === null && posle.prelaz === 1, 'posle 750 ms: druga slika cela, prve nema');
+  let dobro = true;
+  let poslednja = 0;
+  for (let f = 0; f < r.kadrova; f++) {
+    const k = kadarVidea(r, f);
+    if (k.gore.sat < 0 || k.gore.sat >= r.trajanje[k.gore.i] || k.gore.i < poslednja) dobro = false;
+    poslednja = k.gore.i;
+  }
+  ok(dobro && poslednja === 5, 'svaki kadar: slika po redu, sat unutar njenog trajanja, kraj na poslednjoj');
+  const sKrajem = rasporedVidea(obicna, VIDEO.zavrsni);
+  ok(sKrajem.trajanje.length === 7 && sKrajem.trajanje[6] === VIDEO.zavrsni && sKrajem.ukupno === 50600 + VIDEO.zavrsni,
+    'zavrsni kadar (logo): posle poslednje slike, 2,2 s', `${sKrajem.ukupno} ms`);
+  const dugaSKrajem = rasporedVidea([12000, 12000, 12000, 12000, 12000, 12000], VIDEO.zavrsni);
+  ok(dugaSKrajem.ukupno <= VIDEO.najduze && dugaSKrajem.trajanje[6] === VIDEO.zavrsni,
+    'duga prica + zavrsni: i dalje najvise 58 s, zavrsni se ne skracuje', `${dugaSKrajem.ukupno} ms`);
+  const kraj = kadarVidea(sKrajem, sKrajem.kadrova - 1);
+  ok(kraj.gore.i === 6 && kraj.dole === null, 'poslednji kadar je zavrsni, ceo');
+  const R0 = poluprecnikKruga(360, 640, 306, 352);
+  ok([[0, 0], [360, 0], [0, 640], [360, 640]].every(([x, y]) => Math.hypot(x - 306, y - 352) < R0), 'krug iz (0,85; 0,55) pokrije sva cetiri ugla kartice', R0.toFixed(1));
+}
 
 console.log(fail ? `\n${fail} FAIL` : '\nSve provere prosle.');
 process.exit(fail ? 1 : 0);

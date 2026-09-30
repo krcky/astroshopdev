@@ -16,7 +16,7 @@ import { tvojDanInfo } from '@/lib/tvoj-dan';
 import { trajanjeTranzita } from '@/lib/oblasti';
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
-import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { PLANETA_POTEZ, IkonaTacke } from '@/components/planeta-ikona';
 import { TransitTrajanje } from '@/components/transit-trajanje';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
@@ -172,5 +172,5 @@ const SIMBOL = 26;
 
 /** Crna ikonica planete (ili Asc/MC) za zaglavlje lista — ista i na natalnom tumacenju. */
 function Simbol({ tacka }: { tacka: { key: string; glyph: string } }) {
-  return <TamnaTacka tacka={tacka} size={SIMBOL} />;
+  return <IkonaTacke tacka={tacka} size={SIMBOL} />;
 }

@@ -15,7 +15,7 @@ import { SIGN_CASES } from '@/lib/zodiac';
 import { isFreeNatalKey, natalTopic, tacnostAspekta, udeoUZnaku } from '@/lib/natal-keys';
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
-import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { PLANETA_POTEZ, IkonaTacke } from '@/components/planeta-ikona';
 import { Planeta } from '@/components/planete-par';
 import { TrakaNapretka } from '@/components/transit-trajanje';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
@@ -77,11 +77,14 @@ export default function NatalTumacenje() {
   }
 
   const { chart } = resolved;
-  const zakljucani = kljucevi.filter((k) => !texts.has(k) && !loading && !premium && !isFreeNatalKey(k));
+  // Zakljucano je ono sto PRIKAZ kaze da nije otvoreno (Ivan, 30.9.2026): test prekidac
+  // "Besplatan" na nalogu sa Premium-om je inace pokazivao sve, jer tekst stigne po pravom
+  // stanju. Dok tekst jos stize, red se ne zakljucava (ceka se).
+  const zakljucani = kljucevi.filter((k) => !premium && !isFreeNatalKey(k) && (texts.has(k) || !loading));
 
   // Veliki naslov je podnaslov astrologa iz PRVOG teksta ("Druzeljubivi vizionar"),
   // kao sto je na tranzitu naslov teksta; racunato ime ide u oznaku iznad njega.
-  const prvi = kljucevi.length > 0 ? texts.get(kljucevi[0]) : undefined;
+  const prvi = kljucevi.length > 0 && !zakljucani.includes(kljucevi[0]) ? texts.get(kljucevi[0]) : undefined;
   let zaglavlje: React.ReactNode = null;
   if (topic.kind === 'planet') {
     const p = chart.planets.find((x) => x.key === topic.planet)!;
@@ -156,9 +159,10 @@ export default function NatalTumacenje() {
       {zakljucani.length > 0 && (
         <PremiumKartica
           izLista
-          className="mt-8"
-          naslov="Cela natalna karta"
-          opis={`Sve planete u znakovima i kućama i svi aspekti ${osoba ? 'ove' : 'tvoje'} karte. Sunce, Mesec i podznak su besplatni.`}
+          className="mt-12"
+          naslov={osoba ? 'Cela karta ove osobe' : 'Tvoja cela karta'}
+          opis="Sunce, Mesec i podznak su već otvoreni. Ostale planete u znakovima i kućama i svi aspekti su uz Premium."
+          dugme="Otključaj celu kartu"
         />
       )}
     </SheetScroll>
@@ -210,11 +214,11 @@ function Glava({ tacke, aspekt, slika, oznaka, naslov, traka }: {
         <View className="flex-1 justify-between">
           {!slika && (
             <View className="flex-row items-center gap-2">
-              <TamnaTacka tacka={tacke[0]} size={SIMBOL} />
+              <IkonaTacke tacka={tacke[0]} size={SIMBOL} />
               {aspekt && imaAspekt(aspekt) && (
                 <AspektIkona aspekt={aspekt as AspektKljuc} size={15} potez={PLANETA_POTEZ * SIMBOL} />
               )}
-              {tacke[1] && <TamnaTacka tacka={tacke[1]} size={SIMBOL} />}
+              {tacke[1] && <IkonaTacke tacka={tacke[1]} size={SIMBOL} />}
             </View>
           )}
           <View className={slika ? undefined : 'mt-7'}>
@@ -273,7 +277,7 @@ type StavkaSimbolike = { key: string; ikona: React.ReactNode; ime: string; reci:
 function simbolikaTeme(topic: NatalTopic, chart: NatalChart): StavkaSimbolike[] {
   const out: (StavkaSimbolike | null)[] = [];
   const tacka = (key: string, glyph: string, ime: string) =>
-    SIMBOLIKA_PLANETA[key] ? { key, ikona: <TamnaTacka tacka={{ key, glyph }} size={SIMBOL} />, ime, reci: SIMBOLIKA_PLANETA[key] } : null;
+    SIMBOLIKA_PLANETA[key] ? { key, ikona: <IkonaTacke tacka={{ key, glyph }} size={SIMBOL} />, ime, reci: SIMBOLIKA_PLANETA[key] } : null;
   const znak = (pos: SignPosition) =>
     SIMBOLIKA_ZNAKA[pos.sign.key]
       ? { key: pos.sign.key, ikona: <ZnakIkona znak={pos.sign.key} element={pos.sign.element} size={SIMBOL} />, ime: pos.sign.name, reci: SIMBOLIKA_ZNAKA[pos.sign.key] }

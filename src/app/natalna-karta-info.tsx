@@ -4,7 +4,7 @@ import { Image, useWindowDimensions, View } from 'react-native';
 import { SheetScroll } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
-import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { PLANETA_POTEZ, IkonaTacke } from '@/components/planeta-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import { ElementIkona } from '@/components/element-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
@@ -55,7 +55,7 @@ export default function NatalnaKartaInfo() {
       />
 
       <Odeljak naslov="Kako se čita">
-        <Stavka ime="Planete — šta" ikona={<TamnaTacka tacka={primer.planeta} size={IKONA} />}>
+        <Stavka ime="Planete — šta" ikona={<IkonaTacke tacka={primer.planeta} size={IKONA} />}>
           Svaka planeta je jedna vrsta energije koja te pokreće.
         </Stavka>
         <Stavka ime="Znakovi — kako" ikona={<ZnakIkona znak={primer.znak.key} element={primer.znak.element} size={IKONA} />}>

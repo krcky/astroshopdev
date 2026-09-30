@@ -41,16 +41,18 @@ export function otvoriPremium(izLista = false) {
 }
 
 /** Kartica sa katancem i dugmetom "Otključaj" — ispod zakljucane liste ili teksta. */
-export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = false, ilustracija = false, className }: {
+export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = false, ilustracija = true, className }: {
   naslov: string;
   opis: string;
   /** Natpis na dugmetu; podrazumevano "Otključaj". */
   dugme?: string;
   izLista?: boolean;
   /**
-   * Ilustracija kruga u pozadini, zalepljena uz gornju ivicu, i meka senka (Ivan,
-   * 30.9.2026; "Detaljno tumačenje" na tranzitu). Slika je `files/footer-illustration@2x.png`
-   * rotirana za 90° (`assets/images/kartica-premium-krug.png`).
+   * Ilustracija kruga u pozadini, zalepljena uz gornju ivicu, indigo krug sa katancem koji
+   * viri iznad, i meka senka (Ivan, 30.9.2026) — PODRAZUMEVANO, isti izgled na svim mestima.
+   * Krug viri 24pt iznad kartice, pa pozivalac daje veci razmak iznad (`mt-10` i vise).
+   * Slika je `files/footer-illustration@2x.png` rotirana za 90° (`assets/images/kartica-premium-krug.png`).
+   * `false` = stara ravna kartica.
    */
   ilustracija?: boolean;
   className?: string;

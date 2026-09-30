@@ -224,6 +224,13 @@ Za tri planete se prikazuje **prvi sledeći događaj**: ulazak u znak, početak 
 
 Bez vremena rođenja kuća se ne prikazuje. ✅
 
+**Tekst uz promenu** (30.9.2026) ide po **znaku**, ne po kući, i isti je za sve korisnike:
+
+- planeta **uđe u znak** ili u njemu **ponovo postane direktna** → „planeta u znaku" (npr. Mars u Lavu);
+- planeta **postane retrogradna** ili **retrogradno uđe u znak** → „retrogradna planeta u znaku".
+
+Traže se samo kombinacije koje se u narednih godinu dana stvarno dese: od 30. 9. 2026. to je 60 tekstova (46 + 14). Za sledeću godinu spisak se računa ponovo. ⏳ Tekstovi čekaju astrologa.
+
 ### 4.5 Tema perioda
 
 Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa datumom do kada traju. ✅ Besplatni vidi prvi, ostale samo po imenu (poglavlje 5c).

@@ -22,7 +22,7 @@ import type { SkyEvent } from '@/lib/sky-events';
  *   redu "Traje do …";
  * - umesto ilustracije aspekta: slika planete, dole desno znak u koji ulazi
  *   (odnosno u kom menja smer), u belom prstenu — kao velika trojka na "Ti".
- * Tekstova "planeta u kuci" jos nema, pa kartica ne vodi nigde; strelica ipak
+ * Tekstova "planeta u znaku" jos nema, pa kartica ne vodi nigde; strelica ipak
  * stoji (Ivan, 27.9.2026) — odrediste se dodaje kad stignu tekstovi.
  */
 const SLIKA: Record<string, ImageSourcePropType> = {

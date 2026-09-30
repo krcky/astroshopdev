@@ -10,7 +10,7 @@
     "ios": {
       "bundleIdentifier": "com.krcky.astroshop",
       "infoPlist": {
-        "NSPhotoLibraryAddUsageDescription": "Astro Shop dodaje sliku u Fotografije samo kad pri deljenju izabereš „Sačuvaj sliku“."
+        "NSPhotoLibraryAddUsageDescription": "Astro Shop dodaje u Fotografije samo sliku ili video koji izabereš da sačuvaš."
       }
     },
     "android": {
@@ -55,7 +55,8 @@
           "microphonePermission": false
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true,

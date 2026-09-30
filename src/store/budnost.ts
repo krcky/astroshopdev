@@ -22,9 +22,17 @@ export const MIROVANJE_MS = 20_000;
 export const useBudnost = create<{ budan: boolean }>(() => ({ budan: true }));
 
 let tajmer: ReturnType<typeof setTimeout> | null = null;
+let dodir = 0;
+
+/**
+ * Kada je korisnik poslednji put nesto dirao (ms). Radionica videa price tada kratko
+ * stane (`video-radionica.tsx`), da snimanje kadrova ne trza skrol.
+ */
+export const poslednjiDodir = () => dodir;
 
 /** Korisnik je nesto uradio — produzi budnost. Jeftino, zove se na svaki dodir. */
 export function probudi() {
+  dodir = Date.now();
   if (tajmer) clearTimeout(tajmer);
   tajmer = setTimeout(() => useBudnost.setState({ budan: false }), MIROVANJE_MS);
   if (!useBudnost.getState().budan) useBudnost.setState({ budan: true });

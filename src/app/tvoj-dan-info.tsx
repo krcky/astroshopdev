@@ -10,7 +10,7 @@ import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ik
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { Planeta } from '@/components/planete-par';
 import { PlanetaSaZnakom, imaSlikuSaZnakom } from '@/components/planeta-sa-znakom';
-import { PLANETA_POTEZ, TamnaTacka } from '@/components/planeta-ikona';
+import { PLANETA_POTEZ, IkonaTacke } from '@/components/planeta-ikona';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { tvojDanInfo } from '@/lib/tvoj-dan';
 import { trajanjeTranzita } from '@/lib/oblasti';
@@ -136,7 +136,7 @@ export default function TvojDanInfo() {
 function Tacka({ tacka, vladar }: { tacka: { key: string; glyph: string }; vladar: boolean }) {
   return (
     <View>
-      <TamnaTacka tacka={tacka} size={SIMBOL} />
+      <IkonaTacke tacka={tacka} size={SIMBOL} />
       {vladar && (
         <View
           className="absolute items-center justify-center rounded-full border border-border bg-background"

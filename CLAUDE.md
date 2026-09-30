@@ -35,6 +35,7 @@ src/
                      ponuda = PAYWALL, POSLEDNJI korak, ceo ekran (`PaywallEkran uOnboardingu`) -> kapija; ko ima Premium ga preskace
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
+    dev-video.tsx    SAMO PROBNI BUILD: video price — merenje kadrova i ceo video sa probnim profilom (pravilo 23)
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
     premium.tsx      PAYWALL (po uzoru na CHANI) — modal preko celog ekrana, sa svakog "Otključaj"; paketi iz `kupovina.ts`
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
@@ -54,6 +55,7 @@ src/
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
+    video-price.tsx  "Tvoj video" — LIST odozdo (traka iznad tabova, obavestenje, "Podeli" u prici): pregled, "Podeli", "Sačuvaj u Fotografije"
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
   theme/
@@ -74,7 +76,8 @@ src/
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
-    prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon)
+    prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon);
+                         sat.tsx = SAT SLIKE (svi pokreti), video-radionica / video-traka / platno-videa = VIDEO
     ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
@@ -85,6 +88,7 @@ src/
     osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
     nova-osoba.ts    nova osoba dok se unosi po koracima — BEZ persist (kao draft.ts)
     prica-log.ts     koji dan je prica pogledana — PRIPADA NALOGU, brise se pri odjavi
+    video-price.ts   video price: pravi se / gotov (fajl za danas) — PRIPADA NALOGU, brise se pri odjavi
   lib/
     zodiac.ts        12 znakova, longituda -> znak
     astro.ts         ephemeris + aspekti        <- engine
@@ -115,6 +119,7 @@ supabase/
   pitanja.sql        pitanja, krediti, astrolozi, skladiste `odgovori`
   pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
 panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
+modules/             lokalni nativni moduli (samo sopstveni build): postepeno-zamucenje, video-price (MP4 kadar po kadar)
 scripts/
   check-*.ts         provere tacnosti
   font/              sklapanje AstroGlyphs.ttf iz Noto izvora
@@ -176,8 +181,9 @@ Unicode astroloski znaci (♈ ♃ ☽) imaju podrazumevanu EMOJI prezentaciju i
 sistem ih renderuje kao obojene kvadratice. `components/ui/glyph.tsx` forsira
 tekstualni font. Nikad ne stavljati simbol direktno u `<Text>`.
 Izuzetak (28.9.2026): na tabu "Tranziti" planete i tacke su Ivanove SVG ikonice
-(`components/planeta-ikona.tsx`, beo krug sa sivim obrisom, znak u indigu) — ima ih za 10 tela,
-Ascendent, MC, Severni cvor i Kiron; aspekti su `components/aspekt-ikona.tsx` (precrtani kao linije ISTE debljine kao znaci planeta, `PLANETA_POTEZ`; indigo
+(`components/planeta-ikona.tsx`, beo krug sa INDIGO obrisom, znak u indigu — Ivanove bele ikonice iz
+`files/*-white.svg`, 30.9.2026; putanje prepisane skriptom, mreza 40) — ima ih za 10 tela,
+Ascendent, MC, Severni cvor i Kiron, a Lilit i Tacka srece su NACRTANI po meri ostalih (bez fajla, 30.9.2026 — znak iz fonta je bio premali i van sredine); ISTA BELA je i u zaglavljima tumacenja, listama natalne karte i Neba i "i" listovima (`IkonaTacke`; crna varijanta ukinuta 30.9.2026, Ivan); aspekti su `components/aspekt-ikona.tsx` (precrtani kao linije ISTE debljine kao znaci planeta, `PLANETA_POTEZ`; indigo
 iz fajlova, `brand.indigo`). KARTICA TRANZITA (28.9.2026) ipak koristi SLIKE planeta
 (`assets/images/planete/`) na ILUSTRACIJI ASPEKTA (`components/aspekt-ilustracija.tsx`,
 `assets/images/aspekti/`): tocak, natalna planeta unutra, tranzitna van kruga — slike se
@@ -351,10 +357,15 @@ Expo Go ga nema, pa tamo ostaje `expo-blur` sa ivicom (`components/postepeno-zam
 vraca `null`). Maska na roditelju (MaskedView) NE radi — iOS tada ne crta efekat. Modul se
 linkuje sam (`pod install`, i posle `prebuild --clean`).
 
-ANDROID TIHO OSTANE BEZ ZAMUCENJA. `ExpoBlurView.kt` radi
-`if (blurTarget != null) method else BlurMethod.NONE` — nema greske, samo
-providna traka. Zato je sadrzaj obmotan u `BlurTargetView` i njegov `ref` ide
-traci. Na iOS-u je `BlurTargetView` obican `View` i ne kosta nista.
+ANDROID NEMA ZAMUCENJA (Ivan, 30.9.2026): traka je PUNA podloga u boji pozadine ekrana
+koja se pojavi pri klizanju (`trakaAndroid` u `screen.tsx`), kao u Material aplikacijama.
+`expo-blur` (Dimezis) je u svakom kadru snimao ceo sadrzaj i mutio ga — seckalo je na
+120 Hz (Xiaomi 11T) — a sa `intensity` 0 je OBARAO aplikaciju (`nativePtr is null`:
+`configureBlurView` nulu ne preskace). Ne vracati `BlurView` na Android; `BlurTargetView` vise ne postoji.
+ANDROID BRZINA: `package.json` -> `reanimated.staticFeatureFlags.ANDROID_SYNCHRONOUSLY_UPDATE_UI_PROPS`
+= true — providnost, transform i boja idu mimo React commit-a u svakom kadru (bez toga je SVAKI
+pokret na Androidu prolazio kroz ceo commit). Menja se samo novim buildom. Ne paliti uz njega
+`ENABLE_SHARED_ELEMENT_TRANSITIONS` — Gradle tada pada.
 
 UNUTRASNJE STRANE (`pushed`: izmena; profil i Mesec su od 29.9.2026 listovi) imaju svoje
 zaglavlje, isto za sve (Ivan, 27.9.2026): strelica nazad + ime strane u istoj liniji,
@@ -386,6 +397,8 @@ ZIVI PRELIV STAJE KAD KORISNIK MIRUJE (baterija, 28.9.2026): mrlje teku samo na 
 fokusu, 20 s posle poslednjeg dodira uspore do nule (`store/budnost.ts`, dodir hvata koren u
 `_layout.tsx`, tab i povratak u app bude). U Low Power Mode / usteda baterije (`expo-battery`)
 pokreta nema. Nov ukrasni pokret koji traje ide kroz istu `useBudnost`.
+NA ANDROIDU MRLJE STOJE (Ivan, 30.9.2026): kao u ustedi baterije — pokret je u svakom kadru
+crtao ceo vrh ekrana i telefon nikad nije mirovao (seckanje). Preliv i boje ostaju.
 
 Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 
@@ -410,7 +423,12 @@ Besplatni vise ne vidi "staru verziju": "Tvoj dan", "Mesec danas", ocene oblasti
 nova lista Tranziti su za sve. Granice su SAMO u `lib/pristup.ts` (`BESPLATNO`):
 Tranziti prva 3 (ostali po imenu pod katancem), Tema perioda prvi, ocena samo za
 Ljubav, dan-meni samo Premium. Ekran pita `usePremium()` (`store/auth.ts`) i cita
-broj iz `BESPLATNO`, ne pise svoj. Zakljucano crta `components/zakljucano.tsx`
+broj iz `BESPLATNO`, ne pise svoj.
+TEST PREKIDAC "Placeni korisnik" (profil, sekcija "Test"; vracen 30.9.2026, Ivan: "samo za test"):
+samo u PROBNOM BUILDU (`PROBNI_BUILD` u `store/dev.ts` = `__DEV__` ili `EXPO_PUBLIC_PROBNE_CENE=1`,
+isto kao probne cene — razvoj, build iz Xcode-a sa `.env`, EAS development/preview; production NEMA).
+Menja samo prikaz kroz `useEntitlement` — zato ekrani ne citaju `s.entitlement` direktno. Duge tekstove
+i dalje salje samo server, a kes tekstova ide po PRAVOM stanju. Pravi Premium je i dalje poklon. Zakljucano crta `components/zakljucano.tsx`
 (indigo katanac `PREMIUM`, `PremiumKartica`, `ZakljucaniRedovi`) i sve vodi na `/premium`.
 PAYWALL (`app/premium.tsx`): cetiri stavke sa nasim ilustracijama, dva paketa (godisnje
 izabrano, "Uštedi N%" se RACUNA iz cena), jedno crno dugme, pa Uslovi / Vrati kupovine /
@@ -496,7 +514,9 @@ sesija i profil sa diska) i NIKAD mrezu. APLIKACIJA SE MONTIRA TEK KAD UVOD KREN
 (`onPocetak`): njeno prvo crtanje zauzme JS, pa je krug u simulatoru stajao 1,5 s pre
 okreta. Zato je vrtenje ceo u Lottie JSON-u, a zalet i otvaranje se zakazuju na
 niti za animaciju — nista od pokreta ne ceka JS.
-Uz "Smanji pokrete" uvod se samo pretopi. U Expo Go-u je splash Expo Go-ov (ikonica +
+Uz "Smanji pokrete" ide ISTA animacija (Ivan, 30.9.2026 — izabrao to umesto blaze verzije;
+do tada se uvod samo pretapao): svaki pokret nosi `ReduceMotion.Never`, jer bi ga Reanimated
+inace preskocio na kraj. U Expo Go-u je splash Expo Go-ov (ikonica +
 ime); spoj splash -> uvod se vidi tek u dev buildu.
 
 **21. Pitaj astrologa (29.9.2026): pitanje -> placanje -> glasovni odgovor.**
@@ -593,7 +613,12 @@ spolja -> natalna tacka unutra, ASC na 9 sati — trake tona, legenda), Tvoj dan
 (strelica "bolje nego juče", rucno zaokruzena petica, BEZ boje pozadine), Ide ti / Koči te (plavo / roze
 polje), Mesec (procenat, 8 faza, znak ISPRED naslova — ne na Mesecu, Ivan 30.9.2026 — "Za tebe"), savet
 (zraci iz loga, "Podeli svoj dan", "Pročitaj ceo tekst"). PRELOM NASLOVA po srpskom slogu: jednoslovna rec
-(u, i, a…) ide uz sledecu (`reciZaPrelom`, i na kartici) — "Opadajući Mesec / u Biku", ne "… u / Biku". Slika bez teksta astrologa se PRESKACE (Ide ti / Koči te, savet);
+(u, i, a…) ide uz sledecu (`reciZaPrelom`, i na kartici) — "Opadajući Mesec / u Biku", ne "… u / Biku".
+SAVET: VELICINA SLOVA PO DUZINI (Ivan, 30.9.2026 — savet od 141 znaka je prelazio preko zaglavlja i dugmeta):
+`velicinaSaveta` (`lib/prica.ts`) bira najvecu velicinu (44 -> 20; kartica 39 -> 18) pri kojoj savet staje u
+prostor koji slika stvarno ima. Model preloma je OPREZAN (`ZNAK_EM` 0,53, podesen na dva snimka: 72 znaka = 6
+redova, 141 = 12) — radije manji nego preko ivice. 596 saveta: na iPhone 16/17 589 ostaje 44, na SE 513.
+23 saveta preko 100 znakova treba da skrati astrolog (jedna recenica); do tada ih ovo drzi u okviru. Slika bez teksta astrologa se PRESKACE (Ide ti / Koči te, savet);
 naslovna i Mesec su uvek tu. Zbirne kartice NEMA. Podaci: `lib/use-prica.ts` — ISTI izbori kao pocetna
 (`pickTvojDan` + dnevnik, `pickBrief`, `useOblastiDana`), da prica ne kaze drugo nego kartice. Racun:
 `lib/prica.ts` (`check:prica`). Opis za astrologa: `docs/ASTRO-LOGIKA.md`, 4.7.
@@ -612,6 +637,36 @@ iz `files/logo-story-*.svg`; negativ na indigu i na Ide/Koči). Bezbedna zona sa
 i dole), NE za Reels. Katanaca nema ni u prici ni na slici. Tranziti i tocak
 OSTAJU na slici (Ivan prihvatio da se iz njih moze naslutiti datum rodjenja: "ostavi ovako"). Pravo u
 Instagram Stories trazi Facebook App ID i dev build — faza 2.
+SAT SLIKE (`components/prica/sat.tsx`, Ivan 30.9.2026 — zbog videa): SVI pokreti na slici i kartici (crtanje,
+reci koje ulaze, trake, brojevi, okret tocka, mrlje u pozadini) racunaju se iz JEDNOG vremena slike u ms
+(`useNapredak`, `useOkret`, `useSekunde`, `Pojava`). NIKAD Reanimated `entering` ni `withTiming` u slici ili
+kartici: ta vremena teku po satu telefona i video ne moze da ih postavi na kadar. U prici sat tece dok prica
+tece (`SatKojiTece`) — drzanje sad zaustavi i crteze; BEZ SATA (kartica za PNG, "Smanji pokrete") sve je u
+konacnom stanju. Kartica ima iste pokrete, iste redom i vremenima, kao slika price.
+VIDEO (Ivan, 30.9.2026 — "druga opcija": pravi snimak sa svim pokretima, bez cekanja): "Podeli" u prici (iOS,
+sopstveni build, prijavljen) nudi "Ova slika" / "Cela priča, video" (`ActionSheetIOS`). Video se pravi VAN
+EKRANA dok korisnik radi sta hoce: `video-radionica.tsx` (u korenu, `_layout.tsx`) crta KARTICE za deljenje
+(prvo lice, datum, logo) u nativno platno `modules/video-price` (Swift, AVAssetWriter, H.264 1080x1920, 30 fps,
+~5 Mb/s, bez zvuka — muziku dodaje Instagram); za svaki kadar postavi sat slike, saceka dva kadra, pa crta
+(`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). Raspored: `rasporedVidea` / `kadarVidea` u
+`lib/prica.ts` — ista trajanja kao prica, najvise 58 s (Instagram prica 60 s), prelaz krugom 750 ms kao kad
+prica sama ide dalje (`check:prica`, deo 11). ZAVRSNI KADAR (Ivan, 30.9.2026): logo i "astroshop.rs" na
+indigu, 2,2 s posle poslednje slike (`KarticaKraj`, logo 1260 px `logo-story-negativ-veliki.png` iz
+`files/logo-story-negative.svg`); samo u videu, vreme mu se oduzme od 58 s unapred. U simulatoru: 4 slike (23,5 s) za ~31 s, 6 slika (35,5 s) za
+~45 s, 18 MB; brojac kadrova potvrdio da je SVAKI kadar tacan. Posle dodira staje 1,5 s (skrol ne trza).
+IZLAZAK IZ APLIKACIJE = ISPOCETKA SA NOVIM KARTICAMA: iOS u pozadini gasi koder, a posle povratka su trake i broj
+na naslovnoj skocili na staro stanje i tako ostali (provereno) — ne "nastavljati" posao. Gotovo: lokalno
+obavestenje (i u aplikaciji — `ObavestenjeVidea` pokazuje SAMO ovo), vibracija, i TRAKA IZNAD TABOVA
+(`video-traka.tsx`, `NativeTabs.BottomAccessory`, samo iOS 26 — kao mini-plejer): dok se pravi napredak, kad je
+gotov "Podeli" i X; dodir otvara `/video-price`. Traka dodaje `TRAKA_VIDEA_VISINA` prostoru na dnu tabova
+(`useTabBarSpace`). Fajl "Astro Shop <dan>.mp4" u `Documents/video-price/`, SAMO ZA DANAS: cim dan prodje
+(pokretanje ili ponoc) fajl se brise; na disk ide DAN, ne putanja (iOS menja putanju kontejnera pri
+azuriranju — video se "gubio"). DO VIDEA POSLE DELJENJA (Ivan, 30.9.2026): traka posle deljenja nestaje, ali
+"Podeli" u prici za gotov video nudi "Pogledaj video" -> `/video-price`; tamo je i "Sačuvaj u Fotografije"
+(nas modul, `PHPhotoLibrary` samo `.addOnly` — aplikacija ne vidi ostale fotografije). Arhive videa u
+aplikaciji NEMA (10—20 MB po videu) — trajna kopija su Fotografije. Video je za SVE, kao prica. Expo Go
+i Android nemaju modul: "Podeli" deli sliku kao do sada. Dozvola za obavestenja se trazi pri prvom videu samo
+ako korisnik jos nije odgovorio.
 U ONBOARDINGU (Ivan, 30.9.2026): ime -> PRICA (`(onboarding)/prva-prica.tsx`) -> OBAVESTENJA (`push.tsx`) ->
 PAYWALL preko celog ekrana (`ponuda.tsx`) -> kapija. Prvo vrednost, pa zahtevi (kao pravilo 14). Obavestenja
 POSLE price: prica se zavrsava sa "Nova priča stiže svakog dana", a obavestenje je upravo to — iOS pita samo
@@ -713,7 +768,7 @@ npm run panel:build       panel za objavu -> panel/dist
 - [ ] Natalna tumacenja (stigla 27.9.2026) — parser `scripts/korpus/natal.py`,
       tabela `supabase/natal-texts.sql`, CSV `files/natal-texts.csv` (496). Kljucevi
       `natal.sun.sign.aries` / `natal.sun.house.1` / `natal.moon.square.sun`.
-      Besplatno Sunce, Mesec i podznak u znaku. FALI: podznak 0/12, aspekti na MC.
+      Besplatno Sunce, Mesec i podznak u znaku. Podznak stigao (12/12, provereno 30.9.2026); aspekti na MC NE trebaju (Ivan, 28.9.2026 — `natal.py`).
       Jos nije: uvoz u bazu, lektura, prikaz u tabu "Ti".
       PASUSI (Ivan, 29.9.2026, "da bude pitkije"): astrolog je pisao jedan blok po
       tekstu (do 534 reci); podela po temi je u `files/natal-pasusi.json` (pocetak
@@ -744,6 +799,12 @@ npm run panel:build       panel za objavu -> panel/dist
       Provereno u simulatoru (bez naloga, probni profil): slike 1, 2, 3 i 5, dodiri, drzanje, zatvaranje,
       deljenje 1080x1920. FALI: provera na telefonu SA NALOGOM (prsten i balon, slike Ide ti / Koči te i
       savet sa tekstovima, Premium ocene), Android, pravo u Instagram Stories (faza 2, FB App ID + dev build).
+- [ ] Video price (pravilo 23) — URADJENO 30.9.2026 za iOS: sat slike, nativni modul, radionica, traka iznad
+      tabova, obavestenje, list "Tvoj video". Provereno u simulatoru (Release build, probni profil, `/dev-video`):
+      tacnost kadrova, svih 6 slika, prekid u pozadini, obavestenje, traka (privremeno bez naloga), list.
+      FALI: telefon SA NALOGOM ("Podeli" -> meni u prici, brzina na pravom iPhone-u), dodir na obavestenje
+      (simulator ga ne prima), Android (MediaCodec, isti raspored), nastavak u pozadini (iOS 26
+      `BGContinuedProcessingTask`, tek posle probe).
 - [ ] Druge osobe (pravilo 22) — URADJENO (faza 1, 29.9.2026): baza (`osobe.sql` i nov
       `pitanja.sql` pokrenuti 29.9.2026), "Tvoji ljudi", strana osobe, unos/izmena, granica 1/10,
       pitanje o osobi i o odnosu, panel. FALI: politika privatnosti i App Privacy (podaci trece
@@ -761,8 +822,12 @@ npm run panel:build       panel za objavu -> panel/dist
       ponovo direktna — po datumu, sa trajanjem (do izlaska iz znaka / do stanice
       direktno; direktno kretanje nema kraj). Licni deo je
       kuca OD PODZNAKA (Whole Sign), jer tada ulazak u znak = ulazak u kucu; bez vremena
-      rodjenja kuce nema. Bez Meseca. Tekstova "planeta u kuci" nema (120, ceka
-      astrologa) — redovi ne vode nigde. Testovi: `check:natal`, deo 9f.
+      rodjenja kuce nema. Bez Meseca. TEKSTOVI PO ZNAKU, NE PO KUCI (Ivan, 30.9.2026; do tada
+      108 = 9 planeta x 12 kuca): "planeta u znaku" (ulazak, ponovo direktna) i "retrogradna u
+      znaku" (postaje retrogradna, retrogradni ulazak), `sky.<planeta>.sign|retrograde.<znak>`.
+      Samo sto se za godinu dana desi: `npx tsx scripts/korpus/promene-godine.ts` (30.9.2026: 60 =
+      46 + 14; Excel astrologu, `odgovor.py` list "Planete u znacima"). Jos nisu stigli — redovi
+      ne vode nigde. Testovi: `check:natal`, deo 9f.
 - [x] Mesec, drugi krug (27.9.2026): na pocetnoj crtez faze + procenat + znak, bez
       kruzica sa podacima (Ivan); red "Ljubav danas" se pojavi kad stignu saveti.
       Ekran Mesec (`app/moon.tsx`): veliki crtez, lunarni dan, do kad je u znaku,
