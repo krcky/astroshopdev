@@ -4,9 +4,9 @@ import { Stack } from 'expo-router';
 import { PaywallEkran } from '@/app/premium';
 
 /**
- * Poslednji korak onboardinga (Ivan, 29.9.2026): Premium POSLE obavestenja —
- * dozvola za obavestenja se trazi dok je korisnik jos raspolozen, a paywall se
- * prirodno zatvara u aplikaciju. Isti paywall kao `/premium`, ali preko celog
+ * Pretposlednji korak onboardinga (Ivan, 29.9.2026): Premium POSLE obavestenja —
+ * dozvola za obavestenja se trazi dok je korisnik jos raspolozen. Paywall se
+ * zatvara u prvu pricu dana (`prva-prica.tsx`, 30.9.2026), a ona u aplikaciju. Isti paywall kao `/premium`, ali preko celog
  * ekrana; X je tu od prvog trenutka (Apple ne dozvoljava paywall koji se ne
  * preskace). Ko vec ima Premium ovaj korak ne vidi (`push.tsx`).
  *

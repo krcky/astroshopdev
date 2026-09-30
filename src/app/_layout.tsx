@@ -140,6 +140,12 @@ export default function RootLayout() {
                   {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice
                       nazad (Ivan, 29.9.2026). SIVA pozadina: na njemu su bele kartice. */}
                   <Stack.Screen name="moon" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  {/* Dnevna prica (Ivan, 30.9.2026): preko celog ekrana, PROVIDNA — pri povlacenju
+                      nadole ispod se vidi pocetna. Ulaz i zatvaranje animira sama (`app/prica.tsx`). */}
+                  <Stack.Screen
+                    name="prica"
+                    options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
+                  />
                   {/* Paywall — sa svakog "Otključaj" (`components/zakljucano.tsx`). Na iOS-u
                       list VISINE SADRZAJA (Ivan, 30.9.2026: "ne mora da bude 100%"; do tada
                       `modal` preko celog ekrana) — `PAYWALL_LIST`. Android: `modal`. */}

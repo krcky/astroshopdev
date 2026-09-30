@@ -8,7 +8,10 @@
     "scheme": "astroshop",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.krcky.astroshop"
+      "bundleIdentifier": "com.krcky.astroshop",
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "Astro Shop dodaje sliku u Fotografije samo kad pri deljenju izabereš „Sačuvaj sliku“."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -51,7 +54,8 @@
           "cameraPermission": false,
           "microphonePermission": false
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,

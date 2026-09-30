@@ -26,10 +26,11 @@ const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
 export default function Push() {
   const [busy, setBusy] = React.useState(false);
 
-  // Posle obavestenja: Premium kao poslednji korak (`ponuda.tsx`, Ivan 29.9.2026) —
-  // osim za onoga ko ga vec ima (poklon, ranija kupovina); on ide pravo na kapiju.
+  // Posle obavestenja: Premium (`ponuda.tsx`, Ivan 29.9.2026), pa prva prica dana
+  // (`prva-prica.tsx`, 30.9.2026). Ko vec ima Premium (poklon, ranija kupovina)
+  // preskace paywall i ide pravo na pricu.
   const premium = usePremium();
-  const done = () => router.replace(premium ? '/' : '/ponuda');
+  const done = () => router.replace(premium ? '/prva-prica' : '/ponuda');
 
   const ask = async () => {
     if (busy) return;

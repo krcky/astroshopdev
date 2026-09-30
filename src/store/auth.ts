@@ -17,6 +17,7 @@ import { useProfileStore } from '@/store/profile';
 import { useOsobeStore } from '@/store/osobe';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useHeroLog } from '@/store/hero-log';
+import { usePricaLog } from '@/store/prica-log';
 
 export type Entitlement = { active: boolean; productId: string | null; expiresAt: string | null };
 
@@ -163,6 +164,7 @@ async function ocistiLokalno() {
   useOsobeStore.getState().clear();
   useTvojDanLog.getState().clear();
   useHeroLog.getState().clear();
+  usePricaLog.getState().clear();
   await obrisiKes();
   await obrisiPitanjeLokalno();
   try { await AsyncStorage.removeItem(PRAVO_KLJUC); } catch { /* nista */ }

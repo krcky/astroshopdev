@@ -55,15 +55,16 @@ export default function Premium() {
 }
 
 /**
- * Paywall. `uOnboardingu` (Ivan, 29.9.2026): poslednji korak onboardinga, posle
- * obavestenja (`(onboarding)/ponuda.tsx`) — CEO EKRAN, ne list: bez rucice, a X
- * i kupovina vode na kapiju (pravilo 11), ne nazad na obavestenja.
+ * Paywall. `uOnboardingu` (Ivan, 29.9.2026): korak onboardinga posle obavestenja
+ * (`(onboarding)/ponuda.tsx`) — CEO EKRAN, ne list: bez rucice, a X i kupovina
+ * vode na prvu pricu dana (`prva-prica.tsx`, 30.9.2026), ne nazad na obavestenja.
  */
 export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean }) {
   const insets = useSafeAreaInsets();
   // Otvoren preko drugog ekrana = iOS list; utvrdjuje se jednom, pri otvaranju.
   const [kaoList] = React.useState(() => !uOnboardingu && Platform.OS === 'ios' && router.canGoBack());
-  const zatvori = uOnboardingu ? () => router.replace('/') : zatvoriList;
+  // U onboardingu paywall (X ili kupovina) vodi na prvu pricu dana, pa ona na kapiju.
+  const zatvori = uOnboardingu ? () => router.replace('/prva-prica') : zatvoriList;
   const paketi = usePaketiPremium();
   const [izabran, setIzabran] = React.useState<PaketPremium['id']>('godisnje');
   const [poruka, setPoruka] = React.useState<string | null>(null);

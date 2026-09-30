@@ -24,8 +24,9 @@ src/
     edit.tsx         izmena podataka o rodjenju (sve na jednom ekranu)
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
     sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
-    (onboarding)/    welcome, date, time, place, reveal, account, code, name, push, ponuda
+    (onboarding)/    welcome, date, time, place, reveal, account, code, name, push, ponuda, prva-prica
                      ponuda = PAYWALL posle obavestenja, ceo ekran (`PaywallEkran uOnboardingu`); ko ima Premium ga preskace
+                     prva-prica = DNEVNA PRICA kao poslednji korak (`PricaDanaEkran uvod`, pravilo 23) -> "Počinjemo" -> kapija
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
@@ -43,6 +44,7 @@ src/
     osoba-uredi.tsx  unos/izmena druge osobe (bez id = nova), sve na jednom ekranu + pristanak
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
+    prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
   theme/
@@ -60,6 +62,7 @@ src/
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
+    prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon)
     ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
@@ -68,6 +71,7 @@ src/
     sky-place.ts     mesto posmatranja, null = grad iz profila
     sky-time.ts      pomeren trenutak na Nebu (null = sadasnjost) — BEZ persist
     osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
+    prica-log.ts     koji dan je prica pogledana — PRIPADA NALOGU, brise se pri odjavi
   lib/
     zodiac.ts        12 znakova, longituda -> znak
     astro.ts         ephemeris + aspekti        <- engine
@@ -91,6 +95,7 @@ src/
     sync.ts          profil <-> server
     pitanja.ts       Pitaj astrologa: cist racun, snimak karte   <- pravilo 21
     pitanja-api.ts   upiti (TanStack Query); kupovina.ts = mesto za RevenueCat
+    prica.ts         dnevna prica: koje slike, trajanje, geometrija crteza (cist racun); use-prica.ts = podaci dana
 supabase/
   schema.sql         tabele + RLS politike
   osobe.sql          druge osobe + okidac za granicu (1 / 10) — PRE pitanja.sql
@@ -530,6 +535,47 @@ konacan tekst ide pravniku uz politiku privatnosti. Imena se NE sklanjaju: natpi
 nominativu ("Ja i Ana", "Pita Ana"), pol se ne pita.
 REDOSLED SQL-a: schema -> pokloni -> osobe -> pitanja (pitanja.sql pamti `osoba_id`).
 
+**23. Dnevna prica (Ivan, 30.9.2026): nekoliko slika o danasnjem danu, kao Instagram story, za deljenje.**
+Za SVE korisnike, i besplatni vidi SVE: u prici nema katanaca, ni na ocenama — sve cetiri (Ivan, 30.9.2026;
+izuzetak od 18c, na pocetnoj besplatni i dalje vidi samo Ljubav). Tekstovi su za besplatne ionako kratki
+(pravilo 8). Dizajn je verzija C sa prototipa (Ivan izabrao 30.9.2026).
+ULAZ (`components/prica/ulaz.tsx`): prsten oko planete "Tvog dana" na pocetnoj — preliv svetla ljubicasta ->
+indigo DIJAGONALNO preko celog kruga (bez pocetka i kraja, kao Instagram), ISPOD Saturnovih/Uranovih
+prstenova, 2—3 pt od okruglih planeta. Puni se od vrha u smeru kazaljke SAMO dok danasnja prica nije
+pogledana (= stigao do poslednje slike, `store/prica-log.ts`); posle stoji mirno do sutra. Ispod planete
+animiran balon "▶ Priča dana" (dve tackice pa balon, kao beleska na Instagramu) — umesto natpisa; balon
+prelazi preko donjeg dela planete (Ivan, 30.9.2026).
+SLIKE (`components/prica/slajdovi.tsx`): naslovna (dvostruki tocak na PRAVIM polozajima — tranzitna planeta
+spolja -> natalna tacka unutra, ASC na 9 sati — trake tona, legenda), Tvoj dan (pravi ugao aspekta), ocene
+(strelica "bolje nego juče", rucno zaokruzena petica, BEZ boje pozadine), Ide ti / Koči te (plavo / roze
+polje), Mesec (procenat, 8 faza, znak ISPRED naslova — ne na Mesecu, Ivan 30.9.2026 — "Za tebe"), savet
+(zraci iz loga, "Podeli svoj dan", "Pročitaj ceo tekst"). PRELOM NASLOVA po srpskom slogu: jednoslovna rec
+(u, i, a…) ide uz sledecu (`reciZaPrelom`, i na kartici) — "Opadajući Mesec / u Biku", ne "… u / Biku". Slika bez teksta astrologa se PRESKACE (Ide ti / Koči te, savet);
+naslovna i Mesec su uvek tu. Zbirne kartice NEMA. Podaci: `lib/use-prica.ts` — ISTI izbori kao pocetna
+(`pickTvojDan` + dnevnik, `pickBrief`, `useOblastiDana`), da prica ne kaze drugo nego kartice. Racun:
+`lib/prica.ts` (`check:prica`). Opis za astrologa: `docs/ASTRO-LOGIKA.md`, 4.7.
+TOK (`app/prica.tsx`): ide sama (2 s + 0,4 s po reci, 5—12 s) kroz `useFrameCallback` — NE `withTiming`,
+koji uz "Smanji pokrete" skoci na kraj. Dodir: levih 30% nazad, ostalo napred (nova slika se otkriva KRUGOM
+iz mesta dodira); drzanje = pauza (traka i zaglavlje se sklone); povlacenje nadole = zatvaranje. Dodir ide
+kroz RN responder, ne Gesture Handler — dugmad u slici (Otključaj, Podeli) moraju da pobede. Tekuca slika je
+i u `ref`-u: dva brza dodira pre novog crtanja bi inace videla isto `i`. Uz "Smanji pokrete" ili VoiceOver
+prica NE ide sama (VoiceOver dobija dugmad Prethodna / Sledeća). Stoji i kad je app u pozadini ili je preko
+nje drugi ekran (paywall, tumacenje).
+DELJENJE (`components/prica/kartica.tsx`): kartica 360x640 se crta ispod price, `react-native-view-shot` je
+snimi, `expo-image-manipulator` svede na 1080x1920 PNG, `expo-sharing` otvori sistemski meni; fajl je
+"Astro Shop <dan>.png". Sadrzaj ISTI kao na slici — nista se ne izbacuje, samo smanjuje; PRVO LICE ("Moj dan",
+"Ide mi", "Koči me", "Za mene"). Gore datum · astroshop.rs, dole mali logo (`assets/images/logo-story-*.png`,
+iz `files/logo-story-*.svg`; negativ na indigu i na Ide/Koči). Bezbedna zona samo za Stories (~250 px gore
+i dole), NE za Reels. Katanaca nema ni u prici ni na slici. Tranziti i tocak
+OSTAJU na slici (Ivan prihvatio da se iz njih moze naslutiti datum rodjenja: "ostavi ovako"). Pravo u
+Instagram Stories trazi Facebook App ID i dev build — faza 2.
+U ONBOARDINGU (Ivan, 30.9.2026): ista prica je POSLEDNJI korak, posle paywalla (`(onboarding)/prva-prica.tsx`;
+paywall i X i kupovina vode tamo, Premium korisnik dolazi pravo iz `push.tsx`). Rezim `uvod` u `app/prica.tsx`:
+bez zaglavlja (logo, datum, X), bez "Podeli", bez zatvaranja povlacenjem; na POSLEDNJOJ slici (savet ili
+Mesec, koja god je poslednja) jedno dugme "Počinjemo" + red "Nova priča stiže svakog dana, na početnoj." —
+dugme vodi na kapiju (pravilo 11). "Dobrodošli" je odbijeno: Vi-oblik, a "Dobrodošao/la" trazi pol (pravilo 22).
+Bez karte (npr. nepouzdana zona) uvod posle 2,5 s ide pravo u aplikaciju — ne ostaje na krugu koji se vrti.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -558,6 +604,7 @@ npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpis
 npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)
 npm run check:osobe       druge osobe: granica, ko je otvoren, osoba = profil (ista karta, grad dijaspore)
 npm run check:osobe-baza  osobe.sql u PGlite-u: RLS, granica 1/10 sa pravim `ima_premium()`, brisanje naloga
+npm run check:prica       dnevna prica: koje slike, trajanje, mnozina u legendi, tocak (ASC levo), ugao aspekta
 npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
 npm run panel:build       panel za objavu -> panel/dist
 ```
@@ -644,6 +691,10 @@ npm run panel:build       panel za objavu -> panel/dist
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
 - [ ] Push notifikacije
+- [ ] Dnevna prica (pravilo 23) — URADJENO 30.9.2026: sve slike, prsten i balon na pocetnoj, deljenje.
+      Provereno u simulatoru (bez naloga, probni profil): slike 1, 2, 3 i 5, dodiri, drzanje, zatvaranje,
+      deljenje 1080x1920. FALI: provera na telefonu SA NALOGOM (prsten i balon, slike Ide ti / Koči te i
+      savet sa tekstovima, Premium ocene), Android, pravo u Instagram Stories (faza 2, FB App ID + dev build).
 - [ ] Druge osobe (pravilo 22) — URADJENO (faza 1, 29.9.2026): baza (`osobe.sql` i nov
       `pitanja.sql` pokrenuti 29.9.2026), "Tvoji ljudi", strana osobe, unos/izmena, granica 1/10,
       pitanje o osobi i o odnosu, panel. FALI: politika privatnosti i App Privacy (podaci trece

@@ -6,6 +6,7 @@ import { Info } from 'lucide-react-native';
 import { OdeljakIkona, type Odeljak } from '@/components/odeljak-ikona';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { Planeta, skalaSlike } from '@/components/planete-par';
+import { UlazUPricu } from '@/components/prica/ulaz';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
@@ -140,14 +141,19 @@ export function TvojDanCard({ pick, date, isToday }: {
 
         </View>
 
-        {/* Tranzitna planeta, natalna dole desno. */}
-        <View
-          accessible
-          accessibilityRole="image"
-          accessibilityLabel={ime}
-          className="items-center">
-          <PlanetaSaBedzom tranzitna={pick.transiting} natalna={pick.natal} />
-        </View>
+        {/* Tranzitna planeta, natalna dole desno. DANAS je planeta ulaz u dnevnu pricu:
+            prsten oko nje i balon "Priča dana" ispod (Ivan, 30.9.2026; `components/prica/ulaz.tsx`). */}
+        {isToday ? (
+          <UlazUPricu tranzitna={pick.transiting} natalna={pick.natal} datum={date} />
+        ) : (
+          <View
+            accessible
+            accessibilityRole="image"
+            accessibilityLabel={ime}
+            className="items-center">
+            <PlanetaSaBedzom tranzitna={pick.transiting} natalna={pick.natal} />
+          </View>
+        )}
       </View>
 
       {/* 5. Sazetak — preko cele sirine, ispod celine datum + naslov + planeta. */}

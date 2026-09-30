@@ -232,6 +232,19 @@ Svi tranziti **sporih** planeta (Jupiter–Pluton) u orbisu, po tačnosti, sa da
 
 Meni „Juče / Sutra / ±2 dana" je samo za Premium (29.9.2026). Besplatni uvek vidi danas.
 
+### 4.7 Priča dana (30.9.2026)
+
+Nekoliko slika o današnjem danu, kao „story" na Instagramu, sa dugmetom za deljenje. **Ništa se ne računa iznova** — priča uzima iste izbore kao početna, da ne bi rekla nešto drugo nego kartice:
+
+- **Naslovna:** svi tranziti sa liste „Tranziti" (poglavlje 5), prebrojani po tonu (skladan / mešovit / napet, `lib/tone.ts`). Točak pokazuje prave položaje: tranzitna planeta spolja, natalna tačka unutra, Ascendent levo. ✅
+- **Tvoj dan:** isti tranzit kao kartica „Tvoj dan" (4.0), naslov i prve rečenice **kratkog** teksta. ✅
+- **Ocene:** iste ocene kao na početnoj (poglavlje 11); strelica „bolje nego juče" kad je juče ocena bila niža. U priči **i besplatni vidi sve četiri** (30.9.2026) — na početnoj i dalje samo Ljubav. ✅
+- **Ide ti / Koči te:** isti izbor kao 4.2, rečenice `positive` i `challenge`. Bez teksta slike nema. ✅
+- **Mesec:** faza, procenat, znak, sledeća glavna faza; „Za tebe" je najjači Mesečev tranzit dana (4.3), ako ima tekst. ✅
+- **Savet:** savet iz kratkog teksta tranzita „Tvog dana". Bez saveta slike nema. ✅
+
+Na slici za deljenje isti tekst ide u prvom licu („Moj dan", „Ide mi", „Koči me").
+
 ---
 
 ## 5. Tab „Tranziti"
@@ -252,7 +265,7 @@ Besplatni i Premium vide **iste ekrane**; Premium otključava dubinu. Sve granic
 | Mesto | Besplatno | Premium |
 |---|---|---|
 | „Tvoj dan" | isti izbor, kratak tekst | ceo tekst |
-| Ocene oblasti | samo Ljubav, ostale pod katancem | sve četiri |
+| Ocene oblasti | na početnoj samo Ljubav, ostale pod katancem; u priči dana sve četiri | sve četiri |
 | Ide ti / Koči te, Mesec danas, Promene na nebu | sve | sve |
 | Tema perioda | prvi spori tranzit | svi |
 | Tab „Tranziti" | prva 3, ostali po imenu | svi |
