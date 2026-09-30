@@ -8,12 +8,12 @@
 import { buildNatalChart } from '../src/lib/natal';
 import { oblastiDana } from '../src/lib/oblasti';
 import {
-  boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, kadarVidea, legendaTonova, luk, najbolja, poluprecnikKruga, rasporedVidea, reciZaPrelom, redovaTeksta, REDOSLED, slikeDana, VIDEO,
+  boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, kadarVidea, korakReci, legendaTonova, luk, najbolja, poluprecnikKruga, rasporedVidea, reciZaPrelom, redovaTeksta, REDOSLED, slikeDana, VIDEO,
   tackaNaKrugu, tackaNaTocku, TRAJANJE, TRAJANJE_STALNO, trajanjeSlike, ugloviCrteza, velicinaSaveta, VELICINE_SAVETA, VELICINE_SAVETA_KARTICA, visinaNatpisa, ZNAK_EM, zraciDuzina,
 } from '../src/lib/prica';
 import { BEOGRAD } from '../src/lib/test-karta';
 import { LOGO_OKRET_S, polozajZnaka, ugaoLoga } from '../src/lib/logo-price';
-import { LOGO_KRUG, LOGO_ZNAKOVI } from '../src/lib/logo-price-oblici';
+import { LOGO_OBLIK } from '../src/lib/logo-price-oblici';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -158,7 +158,15 @@ console.log('\n11. Video price: raspored kadrova');
   ok(dobro && poslednja === 5, 'svaki kadar: slika po redu, sat unutar njenog trajanja, kraj na poslednjoj');
   const sKrajem = rasporedVidea(obicna, VIDEO.zavrsni);
   ok(sKrajem.trajanje.length === 7 && sKrajem.trajanje[6] === VIDEO.zavrsni && sKrajem.ukupno === 50600 + VIDEO.zavrsni,
-    'zavrsni kadar (logo): posle poslednje slike, 2,2 s', `${sKrajem.ukupno} ms`);
+    'zavrsni kadar (logo): posle poslednje slike, 1,5 s', `${sKrajem.ukupno} ms`);
+  const video6 = rasporedVidea(Array(6).fill(VIDEO.slika), VIDEO.zavrsni);
+  ok(VIDEO.slika === 4000 && video6.ukupno === 25500, 'video: svaka slika 4 s + zavrsni 1,5 s = 25,5 s za 6 slika', `${video6.ukupno} ms`);
+  ok(video6.trajanje.slice(0, 6).every((d) => d === 4000), 'video: 4 s nije ispod najkraceg (3,5 s), pa se nista ne skracuje');
+  // Najduzi savet (196 znakova, 25 reci kad se jednoslovne vezu): ceo na mestu do 2,5 s, ne 3,74 s.
+  const reci25 = reciZaPrelom(S196).length;
+  const k25 = korakReci(S196, 450);
+  ok(450 + (reci25 - 1) * k25 + 650 <= 2500, 'najduzi savet: poslednja rec na mestu do 2,5 s (1,5 s pre prelaza)', `${reci25} reci, korak ${k25} ms`);
+  ok(korakReci('Budite strpljivi i dosledni.', 450) === 110, 'kratak savet: reci ulaze kao do sada (110 ms)');
   const dugaSKrajem = rasporedVidea([12000, 12000, 12000, 12000, 12000, 12000], VIDEO.zavrsni);
   ok(dugaSKrajem.ukupno <= VIDEO.najduze && dugaSKrajem.trajanje[6] === VIDEO.zavrsni,
     'duga prica + zavrsni: i dalje najvise 58 s, zavrsni se ne skracuje', `${dugaSKrajem.ukupno} ms`);
@@ -169,16 +177,19 @@ console.log('\n11. Video price: raspored kadrova');
 }
 
 console.log('\n12. Logo u videu: krug se vrti (lice miruje, znakovi kruze uspravni)');
-ok(LOGO_ZNAKOVI.length === 12 && LOGO_ZNAKOVI.reduce((n, z) => n + z.delovi.length, 0) === 15, '12 znakova od 15 delova (Rak, Vaga, Vodolija po dva)');
-ok(Math.abs(LOGO_KRUG.rLice - 16) < 0.1, 'ivica lica: r = 13,5 / 40 poluprecnika (kao u logu)', String(LOGO_KRUG.rLice));
+for (const [ime, O] of [['pozitiv', LOGO_OBLIK.pozitiv], ['negativ', LOGO_OBLIK.negativ]] as const) {
+  ok(O.znakovi.length === 12 && O.slova.length === 2 && O.prsten.length === 1, `${ime}: 12 znakova, dva slova (ASTRO, SHOP), jedan spoljni prsten`);
+  ok(Math.abs(O.krug.rLice - 16) < 0.2, `${ime}: ivica lica r = 13,5 / 40 poluprecnika (kao u logu)`, String(O.krug.rLice));
+  const z0 = O.znakovi[0];
+  const p0 = polozajZnaka(z0, 0, O.krug);
+  ok(blizu(p0.x, z0.cx) && blizu(p0.y, z0.cy), `${ime}: ugao 0 — znak na svom mestu (slika = kao u fajlu)`);
+  const udaljenost = (p: { x: number; y: number }) => Math.hypot(p.x - O.krug.cx, p.y - O.krug.cy);
+  ok(O.znakovi.every((z) => blizu(udaljenost(polozajZnaka(z, 137, O.krug)), udaljenost({ x: z.cx, y: z.cy }), 1e-9)), `${ime}: znakovi ostaju na istom krugu dok kruze`);
+}
+ok(LOGO_OBLIK.negativ.sunce.length === 3 && LOGO_OBLIK.pozitiv.sunce.length === 2, 'negativ ima SVOJ crtez sunca (3 dela), ne prebojen pozitiv (2)');
 ok(ugaoLoga(0) === 0 && Math.abs(ugaoLoga(1500) - 90) < 1e-9 && Math.abs(ugaoLoga(LOGO_OKRET_S * 1000)) < 1e-9, 'jedan krug na 6 s; posle kruga isto kao na pocetku');
-const z0 = LOGO_ZNAKOVI[0];
-const p0 = polozajZnaka(z0, 0);
-ok(blizu(p0.x, z0.cx) && blizu(p0.y, z0.cy), 'ugao 0: znak na svom mestu (slika za deljenje = kao u fajlu)');
-const udaljenost = (p: { x: number; y: number }) => Math.hypot(p.x - LOGO_KRUG.cx, p.y - LOGO_KRUG.cy);
-ok(LOGO_ZNAKOVI.every((z) => blizu(udaljenost(polozajZnaka(z, 137)), udaljenost({ x: z.cx, y: z.cy }), 1e-9)), 'znakovi ostaju na istom krugu dok kruze');
-const desno = polozajZnaka({ cx: LOGO_KRUG.cx + 10, cy: LOGO_KRUG.cy }, 90);
-ok(blizu(desno.x, LOGO_KRUG.cx) && blizu(desno.y, LOGO_KRUG.cy + 10), 'smer kazaljke na ekranu: desno -> dole posle 90°');
+const desno = polozajZnaka({ cx: 110, cy: 50 }, 90, { cx: 100, cy: 50 });
+ok(blizu(desno.x, 100) && blizu(desno.y, 60), 'smer kazaljke na ekranu: desno -> dole posle 90°');
 
 console.log(fail ? `\n${fail} FAIL` : '\nSve provere prosle.');
 process.exit(fail ? 1 : 0);

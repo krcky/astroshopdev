@@ -15,7 +15,7 @@ import {
   BLAGO, Broj, FazeMeseca, ISKOK, KrugOko, Pojava, Reci, TackiceOcene, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
 } from '@/components/prica/crtezi';
 import { useOkret } from '@/components/prica/sat';
-import { boljeNegoJuce, fazaOsmina, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
+import { boljeNegoJuce, fazaOsmina, korakReci, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
@@ -368,7 +368,7 @@ export function SlikaSavet({ p, okvir, uvod, onPodeli, onProcitaj }: SlikaProps)
             <Reci
               tekst={s.tekst}
               kasni={450}
-              korak={110}
+              korak={korakReci(s.tekst, 450)}
               centar
               className={tezina('display')}
               style={{ fontSize: vel.velicina, lineHeight: vel.prored, letterSpacing: -0.036 * vel.velicina }}

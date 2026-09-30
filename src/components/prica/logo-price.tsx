@@ -5,17 +5,25 @@ import Svg, { Circle, Defs, G, Mask, Path, Rect } from 'react-native-svg';
 
 import { useVremeVidea } from '@/components/prica/sat';
 import { polozajZnaka, ugaoLoga } from '@/lib/logo-price';
-import { LOGO_KRUG as K, LOGO_LUKOVI, LOGO_MREZA, LOGO_PRSTEN, LOGO_SLOVA, LOGO_SUNCE, LOGO_ZNAKOVI, type Putanja, type ZnakLoga } from '@/lib/logo-price-oblici';
+import { LOGO_OBLIK, type Putanja, type ZnakLoga } from '@/lib/logo-price-oblici';
 
-/** Boje iz `files/logo-story-*.svg`: krug indigo, slova tamnosiva; negativ sve belo. */
+/**
+ * Boje iz `files/logo-story-*.svg`: krug indigo, slova tamnosiva; negativ sve belo. Negativ ima SVOJ
+ * crtez (`LOGO_OBLIK.negativ`): lice je belo, a oci i usta su rupe u boji pozadine — do 30.9.2026 je
+ * bio prebojen pozitiv i lice je ispalo naopako (Ivan).
+ */
 const BOJE = {
   pozitiv: { krug: '#403F98', slova: '#424242' },
   negativ: { krug: '#FFFFFF', slova: '#FFFFFF' },
 } as const;
 
-const Deo = ({ p, boja }: { p: Putanja; boja: string }) => (
-  <Path d={p.d} fill={boja} fillRule={p.evenodd ? 'evenodd' : 'nonzero'} clipRule={p.evenodd ? 'evenodd' : 'nonzero'} />
-);
+const Deo = ({ p, boja }: { p: Putanja; boja: string }) =>
+  p.potez ? (
+    // Samo obris (tanak potez oko znaka u negativu), bez ispune — kao u fajlu.
+    <Path d={p.d} fill="none" stroke={boja} strokeWidth={p.potez} fillRule={p.evenodd ? 'evenodd' : 'nonzero'} />
+  ) : (
+    <Path d={p.d} fill={boja} fillRule={p.evenodd ? 'evenodd' : 'nonzero'} clipRule={p.evenodd ? 'evenodd' : 'nonzero'} />
+  );
 
 /**
  * LOGO "ASTRO ◎ SHOP" na slici i u videu price (`kartica.tsx`), vektorski iz tvog SVG-a.
@@ -23,7 +31,9 @@ const Deo = ({ p, boja }: { p: Putanja; boja: string }) => (
  * okrecu, znakovi kruze uspravni. Na slici za deljenje nema vremena videa — logo miruje.
  */
 export function LogoPrice({ sirina, negativ = false, style }: { sirina: number; negativ?: boolean; style?: StyleProp<ViewStyle> }) {
-  const k = sirina / LOGO_MREZA.w;
+  const O = negativ ? LOGO_OBLIK.negativ : LOGO_OBLIK.pozitiv;
+  const K = O.krug;
+  const k = sirina / O.mreza.w;
   const boje = negativ ? BOJE.negativ : BOJE.pozitiv;
   const vreme = useVremeVidea();
   const ugao = useDerivedValue(() => (vreme ? ugaoLoga(vreme.get()) : 0), [vreme]);
@@ -32,18 +42,18 @@ export function LogoPrice({ sirina, negativ = false, style }: { sirina: number; 
   const kx = K.cx - K.r;
   const ky = K.cy - K.r;
   return (
-    <View style={[{ width: sirina, height: LOGO_MREZA.h * k }, style]}>
+    <View style={[{ width: sirina, height: O.mreza.h * k }, style]}>
       {/* Mirno: slova, spoljni prsten i lice (sunce samo unutar ivice lica). */}
-      <Svg width={sirina} height={LOGO_MREZA.h * k} viewBox={`0 0 ${LOGO_MREZA.w} ${LOGO_MREZA.h}`} style={StyleSheet.absoluteFill}>
+      <Svg width={sirina} height={O.mreza.h * k} viewBox={`0 0 ${O.mreza.w} ${O.mreza.h}`} style={StyleSheet.absoluteFill}>
         <Defs>
           <Mask id={`lice-${id}`}>
             <Circle cx={K.cx} cy={K.cy} r={K.rLice} fill="white" />
           </Mask>
         </Defs>
-        {LOGO_SLOVA.map((p, i) => <Deo key={i} p={p} boja={boje.slova} />)}
-        <Deo p={LOGO_PRSTEN} boja={boje.krug} />
+        {O.slova.map((p, i) => <Deo key={i} p={p} boja={boje.slova} />)}
+        {O.prsten.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
         <G mask={`url(#lice-${id})`}>
-          {LOGO_SUNCE.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
+          {O.sunce.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
         </G>
       </Svg>
       {/* Okrece se oko sredine kruga: unutrasnji lukovi i zraci (sunce van ivice lica). */}
@@ -55,23 +65,25 @@ export function LogoPrice({ sirina, negativ = false, style }: { sirina: number; 
               <Circle cx={K.cx} cy={K.cy} r={K.rLice} fill="black" />
             </Mask>
           </Defs>
-          <Deo p={LOGO_LUKOVI} boja={boje.krug} />
+          {O.lukovi.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
           <G mask={`url(#zraci-${id})`}>
-            {LOGO_SUNCE.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
+            {O.sunce.map((p, i) => <Deo key={i} p={p} boja={boje.krug} />)}
           </G>
         </Svg>
       </Animated.View>
       {/* Znakovi kruze, uspravni. */}
-      {LOGO_ZNAKOVI.map((z, i) => <Znak key={i} z={z} k={k} ugao={ugao} boja={boje.krug} />)}
+      {O.znakovi.map((z, i) => <Znak key={i} z={z} krug={K} k={k} ugao={ugao} boja={boje.krug} />)}
     </View>
   );
 }
 
 const RUB = 0.6; // malo mesta oko znaka, da se ivica ne odseca
 
-function Znak({ z, k, ugao, boja }: { z: ZnakLoga; k: number; ugao: SharedValue<number>; boja: string }) {
+function Znak({ z, krug, k, ugao, boja }: {
+  z: ZnakLoga; krug: { cx: number; cy: number }; k: number; ugao: SharedValue<number>; boja: string;
+}) {
   const stil = useAnimatedStyle(() => {
-    const p = polozajZnaka(z, ugao.get());
+    const p = polozajZnaka(z, ugao.get(), krug);
     return { left: (p.x - z.w / 2 - RUB) * k, top: (p.y - z.h / 2 - RUB) * k };
   });
   return (

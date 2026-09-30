@@ -656,7 +656,11 @@ reci koje ulaze, trake, brojevi, okret tocka, mrlje u pozadini) racunaju se iz J
 (`useNapredak`, `useOkret`, `useSekunde`, `Pojava`). NIKAD Reanimated `entering` ni `withTiming` u slici ili
 kartici: ta vremena teku po satu telefona i video ne moze da ih postavi na kadar. U prici sat tece dok prica
 tece (`SatKojiTece`) — drzanje sad zaustavi i crteze; BEZ SATA (kartica za PNG, "Smanji pokrete") sve je u
-konacnom stanju. Kartica ima iste pokrete, iste redom i vremenima, kao slika price.
+konacnom stanju. Kartica ima iste pokrete, iste redom i vremenima, kao slika price. TRAJANJE U VIDEU je
+KRACE (Ivan, 30.9.2026): svaka slika 4 s (`VIDEO.slika`), zavrsni kadar 1,5 s — tipican dan ~25 s umesto ~36;
+4 s jer se pokreti zavrse za 2,5—3,6 s (naslovna najduze). U aplikaciji slike traju po tekstu (vidi TOK).
+Reci saveta ulaze brze kad je savet dug (`korakReci`: najvise 110 ms, a poslednja rec na mestu do 2,5 s) —
+sa 110 ms bi savet od 25 reci bio ceo tek na 3,74 s, cetvrt sekunde pre prelaza (provereno i u prici).
 VIDEO (Ivan, 30.9.2026 — "druga opcija": pravi snimak sa svim pokretima, bez cekanja): "Podeli" u prici
 (sopstveni build, prijavljen) nudi "Ova slika" / "Cela priča, video" — iOS `ActionSheetIOS`, Android dijalog
 (Otkaži levo, video desno; dok se pravi video dugmeta nema). Video se pravi VAN
@@ -667,7 +671,7 @@ povrsina daje vreme telefona; H.264 1080x1920, 30 fps, ~5 Mb/s, bez zvuka — mu
 (`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). Raspored: `rasporedVidea` / `kadarVidea` u
 `lib/prica.ts` — ista trajanja kao prica, najvise 58 s (Instagram prica 60 s), prelaz krugom 750 ms kao kad
 prica sama ide dalje (`check:prica`, deo 11). ZAVRSNI KADAR (Ivan, 30.9.2026): logo i "astroshop.rs" na
-indigu, 2,2 s posle poslednje slike (`KarticaKraj`, logo `LogoPrice` u negativu, 280 pt, SVG iz
+indigu, 1,5 s posle poslednje slike (do 30.9.2026 2,2 s; `KarticaKraj`, logo `LogoPrice` u negativu, 280 pt, SVG iz
 `files/logo-story-negative.svg` — PNG loga vise nema, obrisan 30.9.2026); samo u videu, vreme mu se oduzme od 58 s unapred. U simulatoru: 4 slike (23,5 s) za ~31 s, 6 slika (35,5 s) za
 ~45 s, 18 MB; brojac kadrova potvrdio da je SVAKI kadar tacan. Posle dodira staje 1,5 s (skrol ne trza).
 IZLAZAK IZ APLIKACIJE = ISPOCETKA SA NOVIM KARTICAMA: iOS u pozadini gasi koder, a posle povratka su trake i broj

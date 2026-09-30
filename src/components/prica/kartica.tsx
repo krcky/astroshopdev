@@ -15,7 +15,7 @@ import {
 } from '@/components/prica/crtezi';
 import { useOkret } from '@/components/prica/sat';
 import type { Nijansa } from '@/components/prica/boje';
-import { boljeNegoJuce, fazaOsmina, velicinaSaveta, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
+import { boljeNegoJuce, fazaOsmina, korakReci, velicinaSaveta, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
@@ -313,7 +313,7 @@ function KSavet({ p }: { p: PricaDana }) {
           <Reci
             tekst={s.tekst}
             kasni={450}
-            korak={110}
+            korak={korakReci(s.tekst, 450)}
             centar
             className={tezina('display')}
             style={{ fontSize: vel.velicina, lineHeight: vel.prored, letterSpacing: -0.036 * vel.velicina }}

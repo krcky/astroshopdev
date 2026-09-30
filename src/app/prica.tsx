@@ -94,6 +94,11 @@ export function PricaDanaEkran({ uvod = false }: { uvod?: boolean }) {
 }
 
 const LOGO_KRUG = require('../../assets/images/logo-krug.png');
+/**
+ * Beli krug na tamnim slikama (naslovna, Mesec): Ivanov NEGATIV (`files/logo-negativ.svg`) — lice belo,
+ * oci i usta u boji pozadine. Do 30.9.2026 pozitiv obojen `tintColor`-om u belo, pa je lice bilo naopako.
+ */
+const LOGO_KRUG_NEGATIV = require('../../assets/images/logo-krug-negativ.png');
 /** Uvod: visina "Nastavi" (50) + razmak + red ispod dugmeta. */
 const UVOD_DUGME = 50 + 8 + 20;
 
@@ -411,7 +416,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
         </View>
         {!uvod && (
         <View style={{ position: 'absolute', top: insets.top + 18, left: 14, right: 6, height: 42, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Image source={LOGO_KRUG} style={{ width: 26, height: 26, tintColor: tamno ? neutral.white : undefined }} accessibilityIgnoresInvertColors />
+          <Image source={tamno ? LOGO_KRUG_NEGATIV : LOGO_KRUG} style={{ width: 26, height: 26 }} accessibilityIgnoresInvertColors />
           <Text className={cn('text-[14px] leading-[18px]', tezina('row'))} style={{ color: boja }}>Astro Shop</Text>
           <Text className="flex-1 text-[14px] leading-[18px]" style={{ color: boja, opacity: 0.65 }}>{p.datumTekst}</Text>
           <Pressable

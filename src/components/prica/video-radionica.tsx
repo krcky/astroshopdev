@@ -74,7 +74,8 @@ function Radionica({ p }: { p: PricaDana }) {
   const Platno = PlatnoVidea!;
   const platno = React.useRef<PlatnoVideaRef>(null);
   // Slike price, pa zavrsni kadar sa logom (indeks `p.slike.length`).
-  const raspored = React.useMemo(() => rasporedVidea(p.slike.map((k) => p.trajanja[k]), VIDEO.zavrsni), [p]);
+  // Svaka slika u videu isto traje (`VIDEO.slika`, 4 s) — kraci od price, u kojoj se cita (Ivan, 30.9.2026).
+  const raspored = React.useMemo(() => rasporedVidea(p.slike.map(() => VIDEO.slika), VIDEO.zavrsni), [p]);
   const [slojevi, setSlojevi] = React.useState<{ gore: number; dole: number | null }>({ gore: 0, dole: null });
   // Posle prekida kartice se montiraju iznova (nov kljuc) — bez ostataka od pre izlaska.
   const [pokusaj, setPokusaj] = React.useState(0);

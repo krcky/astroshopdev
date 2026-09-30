@@ -113,6 +113,18 @@ export function redovaTeksta(tekst: string, uRedu: number): number {
   return redova;
 }
 
+/**
+ * Razmak (ms) izmedju reci koje ulaze jedna po jedna (`Reci`): najvise `najvise`, a za dug tekst
+ * manji, da i POSLEDNJA rec bude na mestu do `gotovo` ms (Ivan, 30.9.2026 — u videu slika traje 4 s,
+ * pa bi savet od 25 reci sa 110 ms bio ceo tek na 3,74 s, cetvrt sekunde pre prelaza).
+ * `trajanjeReci` je koliko jedna rec ulazi (`Pojava`, 650 ms).
+ */
+export function korakReci(tekst: string, kasni: number, gotovo = 2500, najvise = 110, trajanjeReci = 650): number {
+  const n = reciZaPrelom(tekst).length;
+  if (n <= 1) return najvise;
+  return Math.max(20, Math.min(najvise, Math.floor((gotovo - kasni - trajanjeReci) / (n - 1))));
+}
+
 /** Visina sitnog natpisa ("Iz tumačenja tranzita …", 13/18) u `sirina` pt — jedan ili vise redova. */
 export function visinaNatpisa(tekst: string, sirina: number, velicina = 13, prored = 18): number {
   return redovaTeksta(tekst, Math.floor(sirina / (velicina * ZNAK_EM))) * prored;
@@ -308,8 +320,15 @@ export const VIDEO = {
   najduze: 58_000,
   /** Kad se prica skracuje, nijedna slika ne pada ispod ovoga. */
   najkrace: 3500,
-  /** Zavrsni kadar (logo i sajt, Ivan 30.9.2026) — sa prelazom krugom; ne skracuje se. */
-  zavrsni: 2200,
+  /**
+   * SVAKA slika u videu traje ovoliko (Ivan, 30.9.2026: "treba da se skrati video"; do tada ista
+   * trajanja kao u prici, ~36 s). Video se gleda, ne cita — ko hoce da cita, drzi prstom na Instagramu.
+   * 4 s jer se pokreti na kartici zavrse za 2,5—3,6 s (naslovna najduze, brojanje tranzita).
+   * Aplikacija zadrzava svoja trajanja (`trajanjeSlike`, `TRAJANJE_STALNO`).
+   */
+  slika: 4000,
+  /** Zavrsni kadar (logo i sajt, Ivan 30.9.2026) — sa prelazom krugom; ne skracuje se. Do 30.9.2026 2,2 s. */
+  zavrsni: 1500,
   /** Odakle se krug siri (udeo sirine i visine) — kao kad prica sama ide dalje. */
   krugX: 0.85,
   krugY: 0.55,
@@ -325,8 +344,8 @@ export type RasporedVidea = {
 };
 
 /**
- * Slike idu istim redom i istim trajanjem kao u prici (`trajanjeSlike`); ako je zbir
- * duzi od `najduze`, sve se skrate srazmerno, ali nijedna ispod `najkrace`.
+ * Slike idu istim redom kao u prici, svaka `trajanja[i]` (radionica salje `VIDEO.slika` za svaku);
+ * ako je zbir duzi od `najduze`, sve se skrate srazmerno, ali nijedna ispod `najkrace`.
  * `zavrsni` (ms) je poslednji kadar posle slika (logo); njegovo vreme se oduzme od
  * `najduze` unapred i ne skracuje se.
  */
