@@ -8,6 +8,7 @@
  * Suncem pod uglom faze, pa osvetljeni deo odgovara procentu (1 - cos D) / 2.
  * Uglovi su isti kao u `MESEC_SLIKA_UGLOVI` (lib/moon.ts), koji bira sliku.
  * Podesavanja: tamni deo 35%, mekoca 0,2 (Ivan, 28.9.2026, izabrano na pregledu).
+ * Posle ove skripte: `npm run slike` (pravilo 24), inace `check:slike` pada.
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';

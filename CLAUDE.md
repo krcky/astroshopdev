@@ -680,6 +680,18 @@ i paywalla stize samo NOV nalog (postojeci sa kartom ide pravo na pocetnu, `rout
 prakticno nema; osigurac je u `push.tsx` (Premium ide na kapiju, bez paywalla). Bez karte (npr. nepouzdana
 zona) uvod posle 2,5 s ide dalje, ne ostaje na krugu.
 
+**24. Slike u aplikaciji idu kroz `npm run slike` — bez gubitka kvaliteta (Ivan, 30.9.2026).**
+Svaka PNG u `assets/` se prepakuje BEZ GUBITKA: oxipng (`@jsquash/oxipng`, WASM, nista se ne instalira na
+racunar), isti pikseli, manji fajl. Skripta posle svake slike uporedi piksele sa originalom i ne dira fajl ako
+se ijedan razlikuje. Prvi put: 94 slike, 7,1 MB -> 5,4 MB (24%), proveren i drugim dekoderom (libvips).
+Otisak svake optimizovane slike je u `scripts/slike-optimizovane.json`; `check:slike` (deo `npm run check`)
+PADNE cim slika udje bez toga — nov izvoz iz Figme, ali i izlaz skripti koje prave slike (`mesec-faze.ts`,
+`build-splash.swift`, `boban-krug.swift`, `scripts/logo/*`). TOK: izvor u punoj velicini ostaje u `files/`,
+u `assets/` ide izvoz @3x NAJVECE sirine na kojoj se slika prikazuje (najvise 1320 px = 440 pt x 3), pa
+`npm run slike`. Sira slika je samo upozorenje, ne greska: smanjivanje slike sa 256 boja ume da POVECA fajl
+(`natalna-karta-objasnjenje.png`, 1774 -> 1320 px: 193 KB -> 428 KB, vraceno). Kompresija SA gubitkom
+(pngquant, WebP) nije radjena; najvise bi dala na Mesecu i planetama (fotografije, oko 4 MB) — samo uz Ivana.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -709,6 +721,8 @@ npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, sk
 npm run check:osobe       druge osobe: granica, ko je otvoren, osoba = profil (ista karta, grad dijaspore)
 npm run check:osobe-baza  osobe.sql u PGlite-u: RLS, granica 1/10 sa pravim `ima_premium()`, brisanje naloga
 npm run check:prica       dnevna prica: koje slike, trajanje, mnozina u legendi, tocak (ASC levo), ugao aspekta
+npm run slike             slike u assets/ bez gubitka (oxipng) + upis u spisak  <- posle SVAKE nove slike
+npm run check:slike       svaka slika u assets/ je prosla `npm run slike` (pravilo 24)
 npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
 npm run panel:build       panel za objavu -> panel/dist
 ```
