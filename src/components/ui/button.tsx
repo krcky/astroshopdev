@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { TextClassContext } from '@/components/ui/text';
-import { neutral, shadow } from '@/theme/tokens';
+import { neutral, obrubDugmetaAndroid, shadow } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 /*
@@ -172,6 +172,14 @@ function SjajIvice() {
 // Ublazeno (Ivan: "prejak sjaj"): ispuna blizu ravne, sjaj i linija na vrhu upola tisi.
 const ISTAKNUTO_ISPUNA = ['#26262A', '#18181A', '#111112'] as const;
 const ISTAKNUTO_ISPUNA_TACKE = [0, 0.55, 1] as const;
+/**
+ * Okvir belog dugmeta gde nema stakla — zaglavlje (`GlassIconButton`), mehur
+ * (`GlassBubble`), kapsule (`ui/kapsule.tsx`). iOS: senka `shadow.soft`. Android: tanak
+ * obrub bez senke (`obrubDugmetaAndroid`, Ivan 30.9.2026) — od `soft` tamo ostane samo
+ * nevidljiva `elevation`.
+ */
+export const OKVIR_DUGMETA = Platform.OS === 'android' ? obrubDugmetaAndroid : shadow.soft;
+
 export const ISTAKNUTO_SENKA = {
   // Prvo je bila indigo 0,35 / 14 — "previse naglaseno, i da nije ljubicasta" (Ivan):
   // sada crna, tisa i bliza dugmetu.
@@ -279,8 +287,8 @@ export function Button({
         // Senka istaknutog dugmeta je na samom dugmetu (vidi `ISTAKNUTO_SENKA`); na
         // Androidu `elevation` prati pozadinu i zaobljenje dugmeta.
         style={typeof style === 'function'
-          ? (stanje) => [meka ? shadow.soft : null, sjajno ? ISTAKNUTO_SENKA : null, style(stanje)]
-          : [meka ? shadow.soft : null, sjajno ? ISTAKNUTO_SENKA : null, style]}
+          ? (stanje) => [meka ? OKVIR_DUGMETA : null, sjajno ? ISTAKNUTO_SENKA : null, style(stanje)]
+          : [meka ? OKVIR_DUGMETA : null, sjajno ? ISTAKNUTO_SENKA : null, style]}
         className={cn(
           buttonVariants({ variant: stvarni, size }),
           // Bez seckanja, inace iOS ne crta senku; sjajeve secka njihov sloj.

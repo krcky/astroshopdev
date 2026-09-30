@@ -339,7 +339,8 @@ IZUZETAK: ASTROLOSKI KRUG ("Ti", "Nebo") stoji IZNAD preliva, beo (Ivan, 30.9.20
 Ne spusta se preliv, nego `IznadPreliva` (`screen.tsx`) crta PRIMERAK kruga u sloju
 3b, izmedju preliva i natpisa, ispod trake, pomeren za skrol; primerak u sadrzaju
 ostaje za klizanje pod traku, a podignuti izbledi posle 24 pt klizanja. Mora biti
-direktno dete sadrzaja `Screen`-a (meri se `onLayout`).
+direktno dete sadrzaja `Screen`-a (meri se `onLayout`). TABOVI POCETNE ostaju ISPOD preliva,
+providni (Ivan, 30.9.2026: podignuti iznad preliva, cisto beli, probani na Androidu i vraceni).
 
 ZAMUCENJE IDE PREKO `animatedProps`, NE PREKO RN-ovog `Animated`. Pali se tek
 kad sadrzaj predje `headerBar.blurAt` — na vrhu liste nema sta da se zamuti,
@@ -386,6 +387,11 @@ preko `@expo/ui`, sadrzaj CIST SwiftUI (SF Symbol + tekst, bez `RNHostView`).
 rezerva za Android / iOS < 26 i tamo gde trake nema (kapsule u karticama). Providan
 roditelj (`active:opacity`) kvari staklo — nikad oko `GlassView`. `@expo/ui`
 SwiftUI dugme sa `RNHostView` sadrzajem je u Expo Go-u oborilo ceo bundle.
+ANDROID IZGLED DUGMADI (Ivan, 30.9.2026, varijanta C sa snimaka telefona): gde nema stakla,
+dugme, mehur i neizabrana kapsula su BELI sa TANKIM OBRUBOM, bez senke (`OKVIR_DUGMETA` u
+`ui/button.tsx`, `obrubDugmetaAndroid` u `tokens.ts`) — `shadow.soft` je na Androidu samo
+nevidljiva `elevation: 3`. Odbijeno istog dana: A bela sa mekom senkom (probana na telefonu,
+"ne svidja mi se kad su beli") i B siva ispuna (= izgled ugasenog dugmeta). iOS ostaje kakav je bio.
 
 UMETAK VRHA U TABU (29.9.2026): expo-router svaki native tab obmota SVOJIM
 `SafeAreaProvider`-om, a skriven tab (montiran unapred) dobije od njega vrh 0 — pa je
@@ -399,6 +405,9 @@ fokusu, 20 s posle poslednjeg dodira uspore do nule (`store/budnost.ts`, dodir h
 pokreta nema. Nov ukrasni pokret koji traje ide kroz istu `useBudnost`.
 NA ANDROIDU MRLJE STOJE (Ivan, 30.9.2026): kao u ustedi baterije — pokret je u svakom kadru
 crtao ceo vrh ekrana i telefon nikad nije mirovao (seckanje). Preliv i boje ostaju.
+I KRUG LOGA MIRUJE (Ivan, 30.9.2026, obe platforme): do tada Lottie `loop` bez kraja — telefon je
+crtao 120 kadrova u sekundi i kad niko ne dira ekran. Sada `useKrugKojiMiruje` (`logo.tsx`): uvodni
+okret na fokus, stane posle mirovanja, stoji uz "Smanji pokrete" i ustedu. Bez `autoPlay`.
 
 Merenja i cela slika su u `DESIGN.md`, poglavlje 5.
 
@@ -648,11 +657,13 @@ reci koje ulaze, trake, brojevi, okret tocka, mrlje u pozadini) racunaju se iz J
 kartici: ta vremena teku po satu telefona i video ne moze da ih postavi na kadar. U prici sat tece dok prica
 tece (`SatKojiTece`) — drzanje sad zaustavi i crteze; BEZ SATA (kartica za PNG, "Smanji pokrete") sve je u
 konacnom stanju. Kartica ima iste pokrete, iste redom i vremenima, kao slika price.
-VIDEO (Ivan, 30.9.2026 — "druga opcija": pravi snimak sa svim pokretima, bez cekanja): "Podeli" u prici (iOS,
-sopstveni build, prijavljen) nudi "Ova slika" / "Cela priča, video" (`ActionSheetIOS`). Video se pravi VAN
+VIDEO (Ivan, 30.9.2026 — "druga opcija": pravi snimak sa svim pokretima, bez cekanja): "Podeli" u prici
+(sopstveni build, prijavljen) nudi "Ova slika" / "Cela priča, video" — iOS `ActionSheetIOS`, Android dijalog
+(Otkaži levo, video desno; dok se pravi video dugmeta nema). Video se pravi VAN
 EKRANA dok korisnik radi sta hoce: `video-radionica.tsx` (u korenu, `_layout.tsx`) crta KARTICE za deljenje
-(prvo lice, datum, logo) u nativno platno `modules/video-price` (Swift, AVAssetWriter, H.264 1080x1920, 30 fps,
-~5 Mb/s, bez zvuka — muziku dodaje Instagram); za svaki kadar postavi sat slike, saceka dva kadra, pa crta
+(prvo lice, datum, logo) u nativno platno `modules/video-price` (iOS Swift/AVAssetWriter; Android Kotlin/
+MediaCodec — kartica se crta PRAVO u ulaznu povrsinu kodera, a vreme kadra se upisuje po redu izlaza, jer
+povrsina daje vreme telefona; H.264 1080x1920, 30 fps, ~5 Mb/s, bez zvuka — muziku dodaje Instagram); za svaki kadar postavi sat slike, saceka dva kadra, pa crta
 (`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). Raspored: `rasporedVidea` / `kadarVidea` u
 `lib/prica.ts` — ista trajanja kao prica, najvise 58 s (Instagram prica 60 s), prelaz krugom 750 ms kao kad
 prica sama ide dalje (`check:prica`, deo 11). ZAVRSNI KADAR (Ivan, 30.9.2026): logo i "astroshop.rs" na
@@ -661,16 +672,18 @@ indigu, 2,2 s posle poslednje slike (`KarticaKraj`, logo `LogoPrice` u negativu,
 ~45 s, 18 MB; brojac kadrova potvrdio da je SVAKI kadar tacan. Posle dodira staje 1,5 s (skrol ne trza).
 IZLAZAK IZ APLIKACIJE = ISPOCETKA SA NOVIM KARTICAMA: iOS u pozadini gasi koder, a posle povratka su trake i broj
 na naslovnoj skocili na staro stanje i tako ostali (provereno) — ne "nastavljati" posao. Gotovo: lokalno
-obavestenje (i u aplikaciji — `ObavestenjeVidea` pokazuje SAMO ovo), vibracija, i TRAKA IZNAD TABOVA
-(`video-traka.tsx`, `NativeTabs.BottomAccessory`, samo iOS 26 — kao mini-plejer): dok se pravi napredak, kad je
-gotov "Podeli" i X; dodir otvara `/video-price`. Traka dodaje `TRAKA_VIDEA_VISINA` prostoru na dnu tabova
+obavestenje (i u aplikaciji — `ObavestenjeVidea` pokazuje SAMO ovo; Android kanal "Video priče"), vibracija, i
+TRAKA IZNAD TABOVA (`video-traka.tsx`): iOS 26 sistemska (`NativeTabs.BottomAccessory`, kao mini-plejer),
+Android i iOS < 26 nasa bela kapsula preko tabova (`VideoTrakaPlutajuca`); dok se pravi napredak, kad je gotov
+"Podeli" i X; dodir otvara `/video-price`. Traka dodaje `TRAKA_VIDEA_VISINA` prostoru na dnu tabova
 (`useTabBarSpace`). Fajl "Astro Shop <dan>.mp4" u `Documents/video-price/`, SAMO ZA DANAS: cim dan prodje
 (pokretanje ili ponoc) fajl se brise; na disk ide DAN, ne putanja (iOS menja putanju kontejnera pri
 azuriranju — video se "gubio"). DO VIDEA POSLE DELJENJA (Ivan, 30.9.2026): traka posle deljenja nestaje, ali
 "Podeli" u prici za gotov video nudi "Pogledaj video" -> `/video-price`; tamo je i "Sačuvaj u Fotografije"
-(nas modul, `PHPhotoLibrary` samo `.addOnly` — aplikacija ne vidi ostale fotografije). Arhive videa u
+(nas modul: iOS `PHPhotoLibrary` samo `.addOnly` — aplikacija ne vidi ostale fotografije; Android Galerija,
+Movies/Astro Shop, od Androida 10 bez dozvole — na starijem dugmeta nema, `MOZE_CUVANJE`). Arhive videa u
 aplikaciji NEMA (10—20 MB po videu) — trajna kopija su Fotografije. Video je za SVE, kao prica. Expo Go
-i Android nemaju modul: "Podeli" deli sliku kao do sada. Dozvola za obavestenja se trazi pri prvom videu samo
+nema modul: "Podeli" deli sliku kao do sada. Dozvola za obavestenja se trazi pri prvom videu samo
 ako korisnik jos nije odgovorio.
 U ONBOARDINGU (Ivan, 30.9.2026): ime -> PRICA (`(onboarding)/prva-prica.tsx`) -> OBAVESTENJA (`push.tsx`) ->
 PAYWALL preko celog ekrana (`ponuda.tsx`) -> kapija. Prvo vrednost, pa zahtevi (kao pravilo 14). Obavestenja
@@ -821,9 +834,11 @@ npm run panel:build       panel za objavu -> panel/dist
 - [ ] Video price (pravilo 23) — URADJENO 30.9.2026 za iOS: sat slike, nativni modul, radionica, traka iznad
       tabova, obavestenje, list "Tvoj video". Provereno u simulatoru (Release build, probni profil, `/dev-video`):
       tacnost kadrova, svih 6 slika, prekid u pozadini, obavestenje, traka (privremeno bez naloga), list.
-      FALI: telefon SA NALOGOM ("Podeli" -> meni u prici, brzina na pravom iPhone-u), dodir na obavestenje
-      (simulator ga ne prima), Android (MediaCodec, isti raspored), nastavak u pozadini (iOS 26
-      `BGContinuedProcessingTask`, tek posle probe).
+      ANDROID (30.9.2026, Kotlin/MediaCodec): provereno na emulatoru (Pixel 9, Release APK) — kadrovi, prelazi,
+      zavrsni kadar, prekid u pozadini, "Sačuvaj u Galeriju", obavestenje (kanal HIGH, bez zvuka) i dodir
+      na njega, dijalog u prici i plutajuca traka (privremeno bez naloga). ~34—48 s za 20 s videa.
+      FALI: telefon SA NALOGOM ("Podeli" -> meni u prici, brzina na pravom iPhone-u i Xiaomi-ju), dodir na
+      obavestenje na iOS-u (simulator ga ne prima), nastavak u pozadini (iOS 26 `BGContinuedProcessingTask`).
 - [ ] Druge osobe (pravilo 22) — URADJENO (faza 1, 29.9.2026): baza (`osobe.sql` i nov
       `pitanja.sql` pokrenuti 29.9.2026), "Tvoji ljudi", strana osobe, unos/izmena, granica 1/10,
       pitanje o osobi i o odnosu, panel. FALI: politika privatnosti i App Privacy (podaci trece

@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
-import { Button } from '@/components/ui/button';
+import { Button, OKVIR_DUGMETA } from '@/components/ui/button';
 import { neutral, shadow, size } from '@/theme/tokens';
 
 /*
@@ -83,6 +83,15 @@ export function GlassBubble({ children, style, interaktivno = true }: {
   interaktivno?: boolean;
 }) {
   const pilula: ViewStyle = { height: D, borderRadius: D / 2, overflow: 'hidden', flexDirection: 'row', alignItems: 'center' };
+  if (Platform.OS === 'android') {
+    // Android (Ivan, 30.9.2026, varijanta C): bela sa tankim obrubom, bez senke — ivica
+    // `separator` (#F0F0F0) i `elevation: 3` su se na sivoj pozadini jedva videle.
+    return (
+      <View style={[pilula, { backgroundColor: neutral.white }, OKVIR_DUGMETA, style]}>
+        {children}
+      </View>
+    );
+  }
   if (!isLiquidGlassAvailable()) {
     return (
       <View style={[pilula, { backgroundColor: neutral.white, borderWidth: 1, borderColor: neutral.separator, ...shadow.soft }, style]}>

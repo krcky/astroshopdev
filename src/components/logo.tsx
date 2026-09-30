@@ -2,8 +2,10 @@ import * as React from 'react';
 import { View } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { useFocusEffect } from 'expo-router';
+import { useReducedMotion } from 'react-native-reanimated';
 
 import { Text } from '@/components/ui/text';
+import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
 import { brand } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
@@ -27,11 +29,13 @@ import { cn } from '@/lib/utils';
  *
  * `autoPlay` sam po sebi na iOS-u (nova arhitektura) ume da ne krene — poznata
  * mana biblioteke — pa se `play()` zove i rucno kad se pogled izmeri. Provereno
- * 26.9.2026: sa samim `autoPlay` krug je stajao.
+ * 26.9.2026: sa samim `autoPlay` krug je stajao. Od 30.9.2026 `autoPlay` nema
+ * uopste — vrtenje vodi `useKrugKojiMiruje`.
  *
- * Smanjeno kretanje se ovde NAMERNO ne postuje: okret od jednog kruga u minut
- * je jedva pokret, a logo je jedina animacija na ekranu. Ako se doda jos
- * pokreta, ovo je mesto gde se `useReducedMotion` vraca.
+ * KRUG MIRUJE KAD I KORISNIK (Ivan, 30.9.2026, obe platforme): ukrasni pokret koji
+ * traje, kao preliv i okret planete (CLAUDE.md, pravilo 17) — vidi `useKrugKojiMiruje`.
+ * Uz "Smanji pokrete" i u ustedi baterije stoji (do tada se "Smanji pokrete" ovde
+ * namerno nije postovao, dok je logo bio jedina animacija na ekranu).
  */
 export const LOGO_SIZE = 48;
 const GAP = 12;
@@ -101,24 +105,55 @@ export function LogoKrug({ ref, size, onSpreman }: {
 }
 
 /**
- * SAMO KRUG LOGA, onaj iz zaglavlja: pri svakom fokusu ekrana uvodni okret, pa
- * jedan krug u minut. Koriste ga zaglavlje (`Logo`) i dobrodoslica, iznad naslova
- * (Ivan, 29.9.2026). Ukras je — ime cita natpis pored ili ispod njega.
+ * Vrtenje kruga loga kao UKRASNI POKRET KOJI TRAJE (CLAUDE.md, pravilo 17; Ivan,
+ * 30.9.2026): samo na ekranu u fokusu, 20 s posle poslednjeg dodira stane
+ * (`useBudnost`), a prvi dodir ga pusti dalje odakle je stao. Uz "Smanji pokrete" i u
+ * ustedi baterije stoji na kadru 0. Do tada se vrteo bez kraja (`loop`), pa je
+ * telefon crtao svaki kadar i kad niko ne dira ekran (Xiaomi 11T: 614 kadrova za 5 s
+ * mirovanja, na 120 Hz). Vraca `pusti` za `onLayout` (iOS, vidi gore) — pusta samo
+ * kad krug sme da se vrti, inace bi krenuo i krug skrivenog taba.
  */
-export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: string }) {
-  const krug = React.useRef<LottieView>(null);
-  const pusti = React.useCallback(() => krug.current?.play(), []);
-  React.useEffect(() => { pusti(); }, [pusti]);
+function useKrugKojiMiruje(krug: React.RefObject<LottieView | null>) {
+  const budan = useBudnost((s) => s.budan);
+  const usteda = useUstedaBaterije();
+  const bezPokreta = useReducedMotion();
+  const miruje = usteda || bezPokreta;
+  const sme = React.useRef(false);
 
   // Svaki put kad ekran dodje u fokus (promena taba, povratak sa drugog ekrana)
   // krug krece ISPOCETKA, sa uvodnim okretom (Ivan, 26.9.2026). Tabovi ostaju
   // montirani, pa bez ovoga animacija samo nastavlja gde je bila.
   useFocusEffect(
     React.useCallback(() => {
+      probudi();
       krug.current?.reset();
-      krug.current?.play();
-    }, [])
+      sme.current = !miruje;
+      if (!miruje) krug.current?.play();
+      return () => { sme.current = false; krug.current?.pause(); };
+    }, [krug, miruje])
   );
+  // Mirovanje: stane gde je bio, na prvi dodir nastavi.
+  useFocusEffect(
+    React.useCallback(() => {
+      if (miruje) return;
+      sme.current = budan;
+      if (budan) krug.current?.resume();
+      else krug.current?.pause();
+    }, [krug, miruje, budan])
+  );
+
+  return React.useCallback(() => { if (sme.current) krug.current?.play(); }, [krug]);
+}
+
+/**
+ * SAMO KRUG LOGA, onaj iz zaglavlja: pri svakom fokusu ekrana uvodni okret, pa
+ * jedan krug u minut dok korisnik nesto radi (`useKrugKojiMiruje`). Koriste ga
+ * zaglavlje (`Logo`) i dobrodoslica, iznad naslova (Ivan, 29.9.2026). Ukras je —
+ * ime cita natpis pored ili ispod njega.
+ */
+export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: string }) {
+  const krug = React.useRef<LottieView>(null);
+  const pusti = useKrugKojiMiruje(krug);
 
   return (
     // Omotac nosi skrivanje od citaca ekrana — LottieView ta svojstva ne prima.
@@ -126,7 +161,6 @@ export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: s
       <LottieView
         ref={krug}
         source={require('@/assets/lottie/logo-krug.json')}
-        autoPlay
         loop
         resizeMode="contain"
         onLayout={pusti}
@@ -145,17 +179,10 @@ export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: s
  * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
 export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
-  // Pun logo ima svoj Lottie; krug sam (`KrugLoga`) vodi svoje okretanje. Kuke su
-  // ovde bezuslovne (pravilo kuka), a bez punog loga ref je prazan pa ne rade nista.
+  // Pun logo ima svoj Lottie; krug sam (`KrugLoga`) vodi svoje okretanje. Kuka je
+  // ovde bezuslovna (pravilo kuka), a bez punog loga ref je prazan pa ne radi nista.
   const krug = React.useRef<LottieView>(null);
-  const pusti = React.useCallback(() => krug.current?.play(), []);
-  React.useEffect(() => { pusti(); }, [pusti]);
-  useFocusEffect(
-    React.useCallback(() => {
-      krug.current?.reset();
-      krug.current?.play();
-    }, [])
-  );
+  const pusti = useKrugKojiMiruje(krug);
 
   if (full) {
     return (
@@ -169,7 +196,6 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
         <LottieView
           ref={krug}
           source={require('@/assets/lottie/logo-full.json')}
-          autoPlay
           loop
           resizeMode="contain"
           onLayout={pusti}

@@ -3,10 +3,10 @@ import { Platform, type ViewProps } from 'react-native';
 import { requireNativeView, requireOptionalNativeModule } from 'expo';
 
 /**
- * Platno za video price — NATIVNI modul `modules/video-price` (Ivan, 30.9.2026).
- * Deca se crtaju u kadar 1080 × 1920 i slazu u MP4 (H.264). Postoji SAMO u sopstvenom
- * buildu na iOS-u: Expo Go ga nema (i Android jos ne), pa je `PlatnoVidea` tada `null`
- * i prica nudi samo sliku.
+ * Platno za video price — NATIVNI modul `modules/video-price` (Ivan, 30.9.2026): iOS (Swift,
+ * AVAssetWriter) i Android (Kotlin, MediaCodec). Deca se crtaju u kadar 1080 × 1920 i slazu u
+ * MP4 (H.264). Postoji SAMO u sopstvenom buildu: Expo Go ga nema, pa je `PlatnoVidea` tada
+ * `null` i prica nudi samo sliku.
  */
 export type PlatnoVideaRef = {
   /** `uri` je `file://` putanja; postojeci fajl se brise. */
@@ -25,9 +25,12 @@ type Modul = {
   sacuvajUFotografije(uri: string): Promise<'sacuvano' | 'bez-dozvole'>;
 };
 
-const modul = Platform.OS === 'ios' ? requireOptionalNativeModule<Modul>('VideoPrice') : null;
+const modul = Platform.OS === 'ios' || Platform.OS === 'android' ? requireOptionalNativeModule<Modul>('VideoPrice') : null;
 
 export const IMA_VIDEO = modul != null;
+
+/** Android pre 10 trazi dozvolu za skladiste da bi dodao u galeriju — tamo dugmeta nema (ostaje "Podeli"). */
+export const MOZE_CUVANJE = IMA_VIDEO && (Platform.OS === 'ios' || Number(Platform.Version) >= 29);
 
 /** "Sačuvaj u Fotografije": `bez-dozvole` kad korisnik nije dozvolio dodavanje (ili ga je ranije odbio). */
 export function sacuvajUFotografije(uri: string): Promise<'sacuvano' | 'bez-dozvole'> {

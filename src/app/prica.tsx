@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  AccessibilityInfo, ActionSheetIOS, ActivityIndicator, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
+  AccessibilityInfo, ActionSheetIOS, ActivityIndicator, Alert, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
   type GestureResponderEvent,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
@@ -300,31 +300,51 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
 
   // --- VIDEO (Ivan, 30.9.2026): "Podeli" nudi sliku ili celu pricu kao video. Video se pravi
   // van ekrana dok korisnik radi sta hoce (`video-radionica.tsx`); prica za to vreme ide dalje.
-  // Bez nativnog modula (Expo Go, Android) i bez naloga "Podeli" odmah deli sliku, kao do sada.
+  // iOS: sistemski meni (`ActionSheetIOS`); Android: dijalog sa tri dugmeta (Otkaži levo, video desno).
+  // Bez nativnog modula (Expo Go, veb) i bez naloga "Podeli" odmah deli sliku, kao do sada.
   const video = useVideoDana(userId, p.dan);
   const ponudi = React.useCallback((k: SlikaKljuc) => {
-    if (!IMA_VIDEO || !userId || Platform.OS !== 'ios') { podeli(k); return; }
+    if (!IMA_VIDEO || !userId) { podeli(k); return; }
     pauzaJs.set(1);
     const gotov = video?.stanje === 'gotov' && video.uri ? video.uri : null;
     const pravi = video?.stanje === 'pravi';
+    const opis = 'Video pravimo oko minut. Za to vreme koristi aplikaciju — javićemo ti kad bude gotov.';
+    const video1 = () => {
+      pauzaJs.set(0);
+      // Gotov video: list sa pregledom, deljenjem i cuvanjem — i posle deljenja.
+      if (gotov) router.push('/video-price');
+      else if (!pravi) {
+        useVideoPrice.getState().pokreni(userId, p);
+        void pitajZaObavestenje();
+      }
+    };
+    const otkazi = () => pauzaJs.set(0);
+    if (Platform.OS === 'android') {
+      // Android: najvise tri dugmeta — levo "Otkaži", desno slika i video. Dok se pravi, video dugmeta nema.
+      Alert.alert(
+        'Podeli svoj dan',
+        pravi ? `Video se pravi · ${procenat(video!.napredak)}. Javićemo ti kad bude gotov.` : gotov ? 'Video cele priče je spreman.' : opis,
+        [
+          { text: 'Otkaži', style: 'cancel', onPress: otkazi },
+          { text: 'Ova slika', onPress: () => podeli(k) },
+          ...(pravi ? [] : [{ text: gotov ? 'Pogledaj video' : 'Cela priča, video', onPress: video1 }]),
+        ],
+        { cancelable: true, onDismiss: otkazi },
+      );
+      return;
+    }
     ActionSheetIOS.showActionSheetWithOptions(
       {
         title: 'Podeli svoj dan',
-        message: gotov || pravi ? undefined : 'Video pravimo oko minut. Za to vreme koristi aplikaciju — javićemo ti kad bude gotov.',
+        message: gotov || pravi ? undefined : opis,
         options: ['Ova slika', gotov ? 'Pogledaj video' : pravi ? `Video se pravi · ${procenat(video!.napredak)}` : 'Cela priča, video', 'Otkaži'],
         cancelButtonIndex: 2,
         disabledButtonIndices: pravi ? [1] : undefined,
       },
       (izbor) => {
         if (izbor === 0) { podeli(k); return; }
-        pauzaJs.set(0);
-        if (izbor !== 1) return;
-        // Gotov video: list sa pregledom, deljenjem i cuvanjem u Fotografije — i posle deljenja.
-        if (gotov) router.push('/video-price');
-        else if (!pravi) {
-          useVideoPrice.getState().pokreni(userId, p);
-          void pitajZaObavestenje();
-        }
+        if (izbor === 1) video1();
+        else otkazi();
       },
     );
   }, [userId, video, podeli, pauzaJs, p]);

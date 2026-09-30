@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Pressable, ScrollView, View, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, View, type ViewStyle } from 'react-native';
 import { GlassContainer, GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
+import { OKVIR_DUGMETA } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
@@ -105,6 +106,14 @@ export const LILA_SVETLA = hexAlpha(OBLAST_BOJA, 0.45);
  */
 const SIVO_STAKLO = 'rgba(21, 21, 21, 0.06)';
 
+/**
+ * ANDROID (Ivan, 30.9.2026, varijanta C sa telefona): neizabrana kapsula je BELA sa tankim
+ * obrubom, kao dugmad (`OKVIR_DUGMETA`) — `bg-fill` (#F5F5F5) se na sivoj pozadini
+ * (#F6F7F8) uopste nije videla. Izabrana ostaje lila (indigo na tabovima pocetne), bez obruba.
+ */
+const ANDROID = Platform.OS === 'android';
+const NEIZABRANA_ANDROID: ViewStyle = { backgroundColor: neutral.white, ...OKVIR_DUGMETA };
+
 /** `GlassView` ne poznaje klase — sve kroz `style`. Visina = `h-chip`. */
 const KAPSULA: ViewStyle = {
   height: size.chip, borderRadius: size.chip / 2, overflow: 'hidden',
@@ -156,10 +165,13 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = fal
         onPress={onPress}
         accessibilityRole="tab"
         accessibilityState={{ selected }}
-        style={[uspravna ? USPRAVNA : null, selected ? { backgroundColor: izabranaBoja } : null]}
+        style={[
+          uspravna ? USPRAVNA : null,
+          selected ? { backgroundColor: izabranaBoja } : ANDROID ? NEIZABRANA_ANDROID : null,
+        ]}
         className={cn(
           uspravna ? 'flex-1 active:opacity-70' : 'h-chip flex-row items-center gap-2 rounded-pill px-4 active:opacity-70',
-          !selected && 'bg-fill',
+          !selected && !ANDROID && 'bg-fill',
         )}>
         {sadrzaj}
       </Pressable>

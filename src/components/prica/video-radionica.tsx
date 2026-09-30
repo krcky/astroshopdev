@@ -214,6 +214,7 @@ function Sloj({ p, i, sat, r }: { p: PricaDana; i: number; sat: SharedValue<numb
  * ------------------------------------------------------------------------- */
 
 const VRSTA = 'video-price';
+const KANAL = 'video-price';
 
 /** Lokalno obavestenje — i dok je aplikacija otvorena (`ObavestenjeVidea`). Bez dozvole nista; traka i dalje javlja. */
 async function obavesti(p: PricaDana) {
@@ -221,13 +222,24 @@ async function obavesti(p: PricaDana) {
     const d = await Notifications.getPermissionsAsync();
     const moze = d.granted || d.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL;
     if (!moze) return;
+    // Android 8+: obavestenje ide kroz kanal (korisnik ga moze iskljuciti posebno u podesavanjima).
+    // HIGH = iskoci na vrhu ekrana, kao baner na iOS-u; bez zvuka i vibracije, kao i tamo.
+    // Vaznost kanala se posle prvog pravljenja ne moze menjati iz aplikacije — samo nov kanal.
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync(KANAL, {
+        name: 'Video priče',
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: null,
+        enableVibrate: false,
+      });
+    }
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Tvoj video je spreman',
         body: `Priča dana, ${p.datumTekst}. Dodirni da je podeliš.`,
         data: { vrsta: VRSTA },
       },
-      trigger: null,
+      trigger: Platform.OS === 'android' ? { channelId: KANAL } : null,
     });
   } catch { /* nista — traka iznad tabova i dalje javlja */ }
 }

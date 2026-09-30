@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ActivityIndicator, Linking, Pressable, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, Pressable, useWindowDimensions, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
@@ -9,7 +9,7 @@ import { Check, Download, Share } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { dnoLista } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
-import { sacuvajUFotografije } from '@/components/prica/platno-videa';
+import { MOZE_CUVANJE, sacuvajUFotografije } from '@/components/prica/platno-videa';
 import { KrugNapretka, podeliVideo, procenat } from '@/components/prica/video-traka';
 import { dayKey } from '@/lib/transits';
 import { cn } from '@/lib/utils';
@@ -52,9 +52,9 @@ export default function VideoPriceEkran() {
               <Text>Podeli video</Text>
             </View>
           </Button>
-          <Sacuvaj uri={v.uri} />
+          {MOZE_CUVANJE && <Sacuvaj uri={v.uri} />}
           <Text className="mt-3 text-center text-[13px] leading-[18px] text-muted-foreground">
-            U aplikaciji je do kraja dana, a u Fotografijama ostaje.
+            {MOZE_CUVANJE ? `U aplikaciji je do kraja dana, a u ${GALERIJA_U} ostaje.` : 'U aplikaciji je do kraja dana.'}
           </Text>
         </>
       ) : v?.stanje === 'pravi' ? (
@@ -78,7 +78,14 @@ export default function VideoPriceEkran() {
   );
 }
 
-/** Trajna kopija u Fotografije — samo dozvola za dodavanje (`modules/video-price`). */
+/** Ime mesta za slike kako ga telefon zove: iOS "Fotografije", Android "Galerija". */
+const GALERIJA_AK = Platform.OS === 'ios' ? 'Fotografije' : 'Galeriju';
+const GALERIJA_U = Platform.OS === 'ios' ? 'Fotografijama' : 'Galeriji';
+
+/**
+ * Trajna kopija: iOS u Fotografije (samo dozvola za dodavanje), Android u Galeriju
+ * (Movies/Astro Shop, od Androida 10 bez dozvole) — `modules/video-price`.
+ */
 function Sacuvaj({ uri }: { uri: string }) {
   const [stanje, setStanje] = React.useState<'ceka' | 'cuva' | 'sacuvano' | 'bez-dozvole' | 'greska'>('ceka');
   const cuvaj = async () => {
@@ -93,7 +100,7 @@ function Sacuvaj({ uri }: { uri: string }) {
     return (
       <View className="mt-3 items-center self-stretch">
         <Text className="text-center text-[13px] leading-[18px] text-muted-foreground">
-          Astro Shop nema dozvolu da dodaje u Fotografije.
+          {`Astro Shop nema dozvolu da dodaje u ${GALERIJA_AK}.`}
         </Text>
         <Pressable
           onPress={() => Linking.openSettings()}
@@ -114,7 +121,7 @@ function Sacuvaj({ uri }: { uri: string }) {
             : sacuvano
               ? <Check size={19} color={neutral.inkMuted} strokeWidth={2.2} />
               : <Download size={19} color={neutral.ink} strokeWidth={2} />}
-          <Text>{sacuvano ? 'Sačuvano u Fotografijama' : 'Sačuvaj u Fotografije'}</Text>
+          <Text>{sacuvano ? `Sačuvano u ${GALERIJA_U}` : `Sačuvaj u ${GALERIJA_AK}`}</Text>
         </View>
       </Button>
       {stanje === 'greska' && (

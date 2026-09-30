@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import Svg, { Circle } from 'react-native-svg';
@@ -14,7 +14,7 @@ import { useAuthStore } from '@/store/auth';
 import { useDanas } from '@/store/danas';
 import { useVideoDana, useVideoPrice } from '@/store/video-price';
 import { tezina } from '@/theme/tipografija';
-import { brand, neutral } from '@/theme/tokens';
+import { brand, neutral, shadow } from '@/theme/tokens';
 
 /**
  * TRAKA VIDEA iznad tabova (Ivan, 30.9.2026): iOS 26 "bottom accessory", kao mini-plejer
@@ -22,19 +22,22 @@ import { brand, neutral } from '@/theme/tokens';
  * gotov: "Podeli". Dodir na traku otvara list sa videom (`app/video-price.tsx`).
  * Nestaje kad se video podeli ili skloni (X), i sutra.
  *
- * Na iOS-u < 26 i Androidu sistem je ne crta; tamo do videa vode obavestenje i
- * "Podeli" u prici.
+ * Na Androidu i iOS-u < 26 te sistemske trake nema: ISTI sadrzaj je nasa bela kapsula
+ * koja pluta iznad trake tabova (`VideoTrakaPlutajuca`, `(tabs)/_layout.tsx`).
  */
 
 /** Koliko traka zauzme iznad trake tabova (sa razmakom) — za prostor na dnu ekrana (`screen.tsx`). */
 export const TRAKA_VIDEA_VISINA = 56;
 
-/** Video danas za ovaj nalog, ako traka treba da stoji (samo iOS 26 je crta). */
+/** Sistem crta traku sam (iOS 26); inace je nasa plutajuca kapsula. */
+export const SISTEMSKA_TRAKA = Platform.OS === 'ios' && !STARI_IOS;
+
+/** Video danas za ovaj nalog, ako traka treba da stoji. */
 export function useTrakaVidea() {
   const uid = useAuthStore((s) => s.user?.id ?? null);
   const dan = dayKey(useDanas());
   const v = useVideoDana(uid, dan);
-  if (!IMA_VIDEO || STARI_IOS || !v) return null;
+  if (!IMA_VIDEO || !v) return null;
   if (v.stanje === 'pravi') return v;
   return v.sklonjen ? null : v;
 }
@@ -122,6 +125,22 @@ export function VideoTrakaSadrzaj({ v }: { v: NonNullable<ReturnType<typeof useV
           <X size={19} color={neutral.inkMuted} strokeWidth={2} />
         </Pressable>
       )}
+    </View>
+  );
+}
+
+/**
+ * Traka bez sistemske podrske (Android, iOS < 26): bela kapsula sa mekom senkom, iznad trake
+ * tabova, na svih pet tabova. `odDna` = gde pocinje traka tabova (`visinaTrakeTabova`).
+ */
+export function VideoTrakaPlutajuca({ odDna }: { odDna: number }) {
+  const v = useTrakaVidea();
+  if (!v) return null;
+  return (
+    <View pointerEvents="box-none" style={{ position: 'absolute', left: 12, right: 12, bottom: odDna + 6 }}>
+      <View style={[{ height: TRAKA_VIDEA_VISINA - 8, borderRadius: 999, backgroundColor: neutral.white, justifyContent: 'center' }, shadow.soft]}>
+        <VideoTrakaSadrzaj v={v} />
+      </View>
     </View>
   );
 }

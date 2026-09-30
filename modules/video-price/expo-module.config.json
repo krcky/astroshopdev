@@ -1,6 +1,9 @@
 {
-  "platforms": ["apple"],
+  "platforms": ["apple", "android"],
   "apple": {
     "modules": ["VideoPriceModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.videoprice.VideoPriceModule"]
   }
 }

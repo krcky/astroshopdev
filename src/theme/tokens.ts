@@ -207,6 +207,19 @@ export const size = {
 } as const;
 
 /**
+ * OBRUB BELOG DUGMETA NA ANDROIDU gde nema stakla (Ivan, 30.9.2026 — varijanta C sa
+ * snimaka telefona): bela ispuna + tanak obrub, BEZ senke. `shadow.soft` je na Androidu
+ * samo `elevation: 3` (Android ne zna `shadowOpacity`), koja se na #F6F7F8 ne vidi.
+ * Probano i odbijeno: A bela sa mekom senkom ("ne svidja mi se kad su beli"), B siva
+ * ispuna (= izgled ugasenog dugmeta). Obrub je `neutral.ink` na 16%. Bira ga
+ * `OKVIR_DUGMETA` (`ui/button.tsx`); ovde nema `Platform`, jer fajl citaju provere u Node-u.
+ */
+export const obrubDugmetaAndroid = {
+  borderWidth: 1,
+  borderColor: 'rgba(21, 21, 21, 0.16)',
+} as const;
+
+/**
  * Senke. Referentna aplikacija ih koristi STEDLJIVO — samo lebdeca traka i
  * modalni list imaju senku. Kartice na sivoj pozadini nemaju nijednu; razdvaja
  * ih razlika u boji, ne senka.

@@ -265,6 +265,9 @@ export default function Home() {
           kapsule sirine natpisa, izabrana svetlo lila — kao oblasti na "Mesec danas".
           Na promenu taba sadrzaj ulazi sa strane taba, BEZ pretapanja: u sadrzaju ima
           stakla, a providan roditelj ga kvari na iOS-u (`ui/kapsule.tsx`). */}
+      {/* Red ostaje ISPOD preliva, i na Androidu: neizabrane kapsule su providne, sa
+          nijansom preliva (Ivan, 30.9.2026 — podignute iznad preliva, cisto bele, probane
+          istog dana i vracene: "ipak da budu providni"). */}
       <View className="pt-4">
         <KapsuleRed tabovi stavke={TABOVI} izabrana={tab} onIzbor={izaberiTab} />
       </View>

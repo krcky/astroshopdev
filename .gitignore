@@ -41,6 +41,8 @@ example
 # generated native folders
 /ios
 /android
+# izlaz Gradle-a u lokalnim nativnim modulima (pravi ga svaki Android build)
+/modules/*/android/build/
 
 # lokalne promenljive okruzenja
 .env

@@ -1,10 +1,11 @@
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { STARI_IOS } from '@/lib/platform';
 import { useBrojNeprocitanih } from '@/lib/pitanja-api';
-import { useTrakaVidea, VideoTraka } from '@/components/prica/video-traka';
+import { SISTEMSKA_TRAKA, useTrakaVidea, VideoTraka, VideoTrakaPlutajuca } from '@/components/prica/video-traka';
+import { useVisinaTrakeTabova } from '@/components/screen';
 import { brand, neutral } from '@/theme/tokens';
 import { fontUloge } from '@/theme/tipografija';
 
@@ -69,64 +70,69 @@ const IZABRANI = '#B39DDB';
 export default function TabsLayout() {
   // Novi odgovori astrologa (Ivan, 29.9.2026): broj u indigo krugu na tabu "Pitaj".
   const noviOdgovori = useBrojNeprocitanih();
-  // Video price (Ivan, 30.9.2026): traka iznad tabova dok se pravi i kad je gotov (iOS 26).
+  // Video price (Ivan, 30.9.2026): traka iznad tabova dok se pravi i kad je gotov — na iOS-u 26
+  // sistemska (BottomAccessory), na Androidu i starijem iOS-u nasa kapsula preko tabova.
   const video = !!useTrakaVidea();
+  const odDna = useVisinaTrakeTabova();
   return (
-    <NativeTabs
-      // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
-      // (#9C9C9D, `inkSubtle`), izabrani u `IZABRANI` (Ivan, 27.9.2026;
-      // do tada `ink`). `tintColor` bi na nivou UITabBar-a mogao da preboji i
-      // neaktivne, pa ga nema.
-      iconColor={{ default: neutral.inkSubtle, selected: IZABRANI }}
-      // Natpisi u Medium rezu pisma aplikacije (`theme/font.ts`).
-      labelStyle={{
-        default: { color: neutral.inkSubtle, fontFamily: fontUloge('tabTraka') },
-        selected: { color: IZABRANI, fontFamily: fontUloge('tabTraka') },
-      }}
-      // iOS 26: traka se NE skuplja pri skrolu (Ivan, 27.9.2026). Sistem ume samo
-      // da je sazme u jedno dugme, a trazeno je blago smanjenje kao na Instagramu —
-      // to sistemska traka nema. Skupljanje radi (vidi `belina` u `Screen`) ako se vrati.
-      minimizeBehavior="never"
-      // Bela podloga: Android (Material 3) i iOS 18 i stariji (vidi `STARI_IOS`).
-      // Siva kapsula iza izabrane ikone i siv talas na dodir su samo Android.
-      backgroundColor={neutral.white}
-      disableTransparentOnScrollEdge={STARI_IOS}
-      indicatorColor={neutral.fillStrong}
-      rippleColor={neutral.fill}
-      // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).
-      // Material podrazumevano ("auto") sa 4+ tabova prikaze samo izabrani.
-      labelVisibilityMode="labeled"
-      // Oznaka novog odgovora: indigo iz loga, ne sistemska crvena (Ivan, 29.9.2026).
-      badgeBackgroundColor={brand.indigo}
-      badgeTextColor={neutral.white}
-      screenListeners={SLUSAOCI}>
-      {video && (
-        <NativeTabs.BottomAccessory>
-          <VideoTraka />
-        </NativeTabs.BottomAccessory>
-      )}
-      <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
-        <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
-        <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="daily" disableAutomaticContentInsets>
-        <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
-        <NativeTabs.Trigger.Label>Tranziti</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="ask" disableAutomaticContentInsets>
-        <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.message', selected: 'ellipsis.message.fill' }} md="sms" />
-        <NativeTabs.Trigger.Label>Pitaj</NativeTabs.Trigger.Label>
-        {/* Bez teksta nema oznake. `hidden` sam ne sklanja vec prikazanu — ostajalo je "0". */}
-        <NativeTabs.Trigger.Badge hidden={noviOdgovori === 0}>{noviOdgovori > 0 ? String(noviOdgovori) : undefined}</NativeTabs.Trigger.Badge>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="chart" disableAutomaticContentInsets>
-        <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
-        <NativeTabs.Trigger.Label>Ti</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="sky" disableAutomaticContentInsets>
-        <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
-        <NativeTabs.Trigger.Label>Nebo</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <View style={{ flex: 1 }}>
+      <NativeTabs
+        // Boje za OBA stanja eksplicitno, bez `tintColor`: neaktivni u tercijarnoj sivoj
+        // (#9C9C9D, `inkSubtle`), izabrani u `IZABRANI` (Ivan, 27.9.2026;
+        // do tada `ink`). `tintColor` bi na nivou UITabBar-a mogao da preboji i
+        // neaktivne, pa ga nema.
+        iconColor={{ default: neutral.inkSubtle, selected: IZABRANI }}
+        // Natpisi u Medium rezu pisma aplikacije (`theme/font.ts`).
+        labelStyle={{
+          default: { color: neutral.inkSubtle, fontFamily: fontUloge('tabTraka') },
+          selected: { color: IZABRANI, fontFamily: fontUloge('tabTraka') },
+        }}
+        // iOS 26: traka se NE skuplja pri skrolu (Ivan, 27.9.2026). Sistem ume samo
+        // da je sazme u jedno dugme, a trazeno je blago smanjenje kao na Instagramu —
+        // to sistemska traka nema. Skupljanje radi (vidi `belina` u `Screen`) ako se vrati.
+        minimizeBehavior="never"
+        // Bela podloga: Android (Material 3) i iOS 18 i stariji (vidi `STARI_IOS`).
+        // Siva kapsula iza izabrane ikone i siv talas na dodir su samo Android.
+        backgroundColor={neutral.white}
+        disableTransparentOnScrollEdge={STARI_IOS}
+        indicatorColor={neutral.fillStrong}
+        rippleColor={neutral.fill}
+        // Android: natpis ispod SVAKE ikone, ne samo izabrane (Ivan, 27.9.2026).
+        // Material podrazumevano ("auto") sa 4+ tabova prikaze samo izabrani.
+        labelVisibilityMode="labeled"
+        // Oznaka novog odgovora: indigo iz loga, ne sistemska crvena (Ivan, 29.9.2026).
+        badgeBackgroundColor={brand.indigo}
+        badgeTextColor={neutral.white}
+        screenListeners={SLUSAOCI}>
+        {video && SISTEMSKA_TRAKA && (
+          <NativeTabs.BottomAccessory>
+            <VideoTraka />
+          </NativeTabs.BottomAccessory>
+        )}
+        <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
+          <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="daily" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
+          <NativeTabs.Trigger.Label>Tranziti</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="ask" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.message', selected: 'ellipsis.message.fill' }} md="sms" />
+          <NativeTabs.Trigger.Label>Pitaj</NativeTabs.Trigger.Label>
+          {/* Bez teksta nema oznake. `hidden` sam ne sklanja vec prikazanu — ostajalo je "0". */}
+          <NativeTabs.Trigger.Badge hidden={noviOdgovori === 0}>{noviOdgovori > 0 ? String(noviOdgovori) : undefined}</NativeTabs.Trigger.Badge>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="chart" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
+          <NativeTabs.Trigger.Label>Ti</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="sky" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
+          <NativeTabs.Trigger.Label>Nebo</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+      </NativeTabs>
+      {!SISTEMSKA_TRAKA && <VideoTrakaPlutajuca odDna={odDna} />}
+    </View>
   );
 }

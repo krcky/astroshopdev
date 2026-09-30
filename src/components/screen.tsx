@@ -170,6 +170,12 @@ function TabBarSpacer() {
  * Za sve sto mora da stoji IZNAD trake nezavisno od visine ekrana — npr.
  * indikator slajdova na pocetnoj. Isti broj kao `TabBarSpacer`, da se ne raziđu.
  */
+/** Od dna ekrana do vrha trake tabova, bez prostora za traku videa — gde ona pocinje (`video-traka.tsx`). */
+export function useVisinaTrakeTabova(): number {
+  const insets = useSafeAreaInsets();
+  return TAB_BAR_SPACE + insets.bottom;
+}
+
 export function useTabBarSpace(): number {
   const insets = useSafeAreaInsets();
   // Traka videa price iznad tabova (iOS 26, `video-traka.tsx`) pokrije jos toliko dna.

@@ -17,6 +17,7 @@ import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import { REDOSLED } from '@/lib/prica';
 import { PROBNI_BUILD } from '@/store/dev';
 import { useVideoPrice } from '@/store/video-price';
+import { useProfileStore, type Profile } from '@/store/profile';
 
 /**
  * Slike kojima bez naloga fali tekst (Ide ti / Koči te, savet) — sa PROBNIM recenicama,
@@ -34,8 +35,21 @@ function saProbnimTekstovima(p: PricaDana): PricaDana {
 }
 
 /** Cela prica kao video, sa probnim profilom (bez naloga: uid "proba"), preko prave radionice. */
+/** Probni profil za uredjaj bez naloga (emulator) — isti kao u proveri u simulatoru. */
+const PROBNI_PROFIL: Profile = {
+  name: 'Proba',
+  birth: { year: 1990, month: 7, day: 10 },
+  time: { hour: 14, minute: 30 },
+  cityId: 792680,
+  cityName: 'Beograd',
+  latitude: 44.804,
+  longitude: 20.4651,
+  timeZone: 'Europe/Belgrade',
+};
+
 function PravaPrica() {
   const p = usePricaDana();
+  const imaProfil = useProfileStore((s) => !!s.profile);
   const posao = useVideoPrice();
   const [pocetak, setPocetak] = React.useState<number | null>(null);
   const [trajalo, setTrajalo] = React.useState<number | null>(null);
@@ -46,6 +60,12 @@ function PravaPrica() {
   return (
     <View style={{ gap: 10, marginTop: 16 }}>
       <Text className="text-[18px]">Prava prica ({p ? `${p.slike.length} slika: ${p.slike.join(', ')}` : 'nema profila'})</Text>
+      {/* Samo kad profila NEMA (emulator bez naloga) — nikad ne prepisuje pravi profil. */}
+      {!imaProfil && (
+        <Pressable onPress={() => useProfileStore.getState().setProfile(PROBNI_PROFIL)} className="rounded-lg bg-fill-strong p-3">
+          <Text>Upiši probni profil (Beograd, 10.7.1990. 14:30)</Text>
+        </Pressable>
+      )}
       {p && (
         <Pressable
           onPress={() => { setPocetak(Date.now()); setTrajalo(null); useVideoPrice.getState().pokreni('proba', p); void pitajZaObavestenje(); }}
