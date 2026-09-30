@@ -5,7 +5,9 @@ import { Redirect, router } from 'expo-router';
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
 import { ZnakIkona } from '@/components/znak-ikona';
+import { useAuthStore } from '@/store/auth';
 import { useDraft } from '@/store/draft';
+import { completeSignup, routeAfterSignup } from '@/lib/signup';
 import { placeFields, resolveProfile } from '@/store/profile';
 import { traitsForSign } from '@/lib/traits';
 import { signRulers } from '@/lib/rulers';
@@ -24,6 +26,37 @@ const PLANETA: Record<string, ImageSourcePropType> = {
 
 export default function Reveal() {
   const draft = useDraft();
+  const user = useAuthStore((s) => s.user);
+  const [cuva, setCuva] = React.useState(false);
+  const [greska, setGreska] = React.useState(false);
+
+  // VEC PRIJAVLJEN (Ivan, 30.9.2026): nalog bez karte — npr. "Već imam nalog" sa emailom koji
+  // jos nema kartu. Karta ide pravo na taj nalog i tok ide dalje (ime, prica...); do tada ga je
+  // "Nastavi" slao na email, pa je email trazen dvaput. Bez naloga: "Napravi nalog" kao i uvek.
+  const nastavi = async () => {
+    if (!user) {
+      router.push({ pathname: '/account', params: { nov: '1' } });
+      return;
+    }
+    if (cuva) return;
+    setCuva(true);
+    setGreska(false);
+    // Upis se ponavlja do 3 puta, kao posle koda (`code.tsx`): sveze osvezen token baza ume
+    // sekund-dva da odbije (`PGRST303 JWT issued at future`, sat Auth-a je ispred baze) —
+    // videno na telefonu 30.9.2026: prvi "Nastavi" je pao, drugi prosao.
+    let ishod: Awaited<ReturnType<typeof completeSignup>> | null = null;
+    for (let i = 0; i < 3 && ishod === null; i++) {
+      try {
+        ishod = await completeSignup(user.id, user.email ?? '');
+      } catch (e) {
+        if (__DEV__) console.log(`[reveal] upis karte pao, pokusaj ${i + 1}/3:`, (e as { code?: string })?.code, (e as Error)?.message);
+        if (i < 2) await new Promise((r) => setTimeout(r, 800 * (i + 1)));
+      }
+    }
+    setCuva(false);
+    if (ishod === null) { setGreska(true); return; }
+    router.replace(routeAfterSignup(ishod));
+  };
 
   const resolved = React.useMemo(() => {
     if (!draft.date || !draft.city) return null;
@@ -64,8 +97,10 @@ export default function Reveal() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      note="Pozicije računamo iz podataka o kretanju planeta, za tvoj tačan trenutak i mesto rođenja."
-      primary={{ label: 'Nastavi', onPress: () => router.push({ pathname: '/account', params: { nov: '1' } }) }}>
+      note={greska
+        ? 'Karta nije sačuvana — nismo uspeli da stignemo do servera. Proveri internet pa pritisni Nastavi ponovo.'
+        : 'Pozicije računamo iz podataka o kretanju planeta, za tvoj tačan trenutak i mesto rođenja.'}
+      primary={{ label: 'Nastavi', onPress: nastavi, ucitava: cuva, disabled: cuva }}>
 
       <View className="items-center">
         <Image source={PLANETA[vladar.key]} style={{ width: 200, height: 200 }}

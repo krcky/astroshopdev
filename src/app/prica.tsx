@@ -49,10 +49,10 @@ import { neutral } from '@/theme/tokens';
  * (Podeli, Pročitaj ceo tekst) su dublje u stablu i dobiju dodir pre roditelja, pa dodir
  * na dugme ne pomera i sliku.
  *
- * UVOD (`uvod`, Ivan 30.9.2026): ista prica kao POSLEDNJI korak onboardinga, posle
- * paywalla (`(onboarding)/prva-prica.tsx`). Bez zaglavlja (logo, datum, X), bez
- * "Podeli" i bez zatvaranja povlacenjem; na poslednjoj slici umesto dugmadi saveta
- * jedno dugme "Počinjemo", koje vodi na kapiju (pravilo 11).
+ * UVOD (`uvod`, Ivan 30.9.2026): ista prica u onboardingu, posle imena a PRE
+ * obavestenja i paywalla (`(onboarding)/prva-prica.tsx`) — prvo vrednost, pa zahtevi.
+ * Bez zaglavlja (logo, datum, X), bez "Podeli" i bez zatvaranja povlacenjem; na
+ * poslednjoj slici umesto dugmadi saveta jedno dugme "Nastavi", koje vodi na obavestenja.
  */
 export default function Prica() {
   return <PricaDanaEkran />;
@@ -60,13 +60,14 @@ export default function Prica() {
 
 export function PricaDanaEkran({ uvod = false }: { uvod?: boolean }) {
   const prica = usePricaDana();
+  const dalje = useDaljeIzUvoda();
   // Bez karte nema ni price (npr. nepouzdana zona, pravilo 4): ne ostaje se na
-  // krugu koji se vrti — uvod ide u aplikaciju, a sa pocetne se prica zatvara.
+  // krugu koji se vrti — uvod ide dalje (obavestenja), a sa pocetne se prica zatvara.
   React.useEffect(() => {
     if (prica) return;
-    const t = setTimeout(uvod ? zavrsiUvod : zatvori, 2500);
+    const t = setTimeout(uvod ? dalje : zatvori, 2500);
     return () => clearTimeout(t);
-  }, [prica, uvod]);
+  }, [prica, uvod, dalje]);
   // Prica se "zamrzne" kad tekstovi stignu (najvise 2,5 s): redosled slika se ne
   // menja dok je otvorena, cak i ako neki tekst stigne kasnije.
   const [z, setZ] = React.useState<PricaDana | null>(null);
@@ -84,11 +85,11 @@ export function PricaDanaEkran({ uvod = false }: { uvod?: boolean }) {
       </View>
     );
   }
-  return <Plejer p={z} uvod={uvod} />;
+  return <Plejer p={z} uvod={uvod} onDalje={dalje} />;
 }
 
 const LOGO_KRUG = require('../../assets/images/logo-krug.png');
-/** Uvod: visina "Počinjemo" (50) + razmak + red ispod dugmeta. */
+/** Uvod: visina "Nastavi" (50) + razmak + red ispod dugmeta. */
 const UVOD_DUGME = 50 + 8 + 20;
 
 /** Zatvaranje: nazad na pocetnu; bez nje (otvoreno linkom) na kapiju, pravilo 11. */
@@ -97,12 +98,15 @@ function zatvori() {
   else router.replace('/');
 }
 
-/** Kraj onboardinga: kapija odlucuje dalje (pravilo 11) — posle naloga i karte to je pocetna. */
-function zavrsiUvod() {
-  router.replace('/');
+/**
+ * Posle price u onboardingu: obavestenja (`push.tsx`) — prica se zavrsava sa "Nova priča
+ * stiže svakog dana", a obavestenja je donose (Ivan, 30.9.2026). Dalje ide `push.tsx`.
+ */
+function useDaljeIzUvoda() {
+  return React.useCallback(() => router.replace('/push'), []);
 }
 
-function Plejer({ p, uvod }: { p: PricaDana; uvod: boolean }) {
+function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: () => void }) {
   const insets = useSafeAreaInsets();
   const { width: W, height: H } = useWindowDimensions();
   const slike = p.slike;
@@ -299,7 +303,7 @@ function Plejer({ p, uvod }: { p: PricaDana; uvod: boolean }) {
     visina: H,
     donjiUmetak: insets.bottom,
   };
-  // U uvodu poslednja slika ima dole "Počinjemo" i red ispod njega — sadrzaj ide iznad.
+  // U uvodu poslednja slika ima dole "Nastavi" i red ispod njega — sadrzaj ide iznad.
   const okvirZa = (idx: number): OkvirSlike => (uvod && idx === n - 1 ? { ...okvir, dno: insets.bottom + 16 + UVOD_DUGME + 12 } : okvir);
   const procitaj = () => {
     const kljuc = p.savet?.kljuc ?? p.tvojDan?.kljuc;
@@ -379,13 +383,13 @@ function Plejer({ p, uvod }: { p: PricaDana; uvod: boolean }) {
         </Animated.View>
       )}
 
-      {/* Uvod: na poslednjoj slici "Počinjemo" vodi u aplikaciju (Ivan, 30.9.2026). "Dobrodošli"
-          je Vi-oblik, a "Dobrodošao/la" trazi pol koji se ne pita — zato glagol u prvom licu mnozine. */}
+      {/* Uvod: na poslednjoj slici "Nastavi" vodi na obavestenja, pa na paywall (Ivan, 30.9.2026).
+          NE "Počinjemo": to obecava aplikaciju, a iza dugmeta su jos dva koraka. */}
       {uvod && i === n - 1 && (
         <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16 }, hromStil]}>
           <Animated.View entering={FadeInDown.delay(bezPokreta ? 0 : 700).duration(500)} style={{ gap: 8 }}>
-            <Button variant={tamno ? 'soft' : 'default'} onPress={zavrsiUvod} accessibilityLabel="Počinjemo, otvara aplikaciju">
-              <Text>Počinjemo</Text>
+            <Button variant={tamno ? 'soft' : 'default'} onPress={onDalje}>
+              <Text>Nastavi</Text>
             </Button>
             <Text className="text-center text-[13px] leading-[20px]" style={{ color: tamno ? 'rgba(255,255,255,0.8)' : neutral.inkMuted }}>
               Nova priča stiže svakog dana, na početnoj.

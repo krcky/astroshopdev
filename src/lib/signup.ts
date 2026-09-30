@@ -68,8 +68,10 @@ export async function completeSignup(userId: string, email: string): Promise<Sig
 }
 
 /** Kuda ici posle prijave. */
-export function routeAfterSignup(outcome: SignupOutcome): '/home' | '/name' | '/' {
+export function routeAfterSignup(outcome: SignupOutcome): '/home' | '/name' | '/date' {
   if (outcome === 'existing') return '/home';
   if (outcome === 'created') return '/name';
-  return '/'; // kapija ce poslati na unos podataka o rodjenju
+  // Nalog bez karte (npr. "Već imam nalog" sa novim emailom): odmah unos podataka o rodjenju.
+  // Ne preko kapije — ona prijavljenog bez karte salje na dobrodoslicu (pravilo 11).
+  return '/date';
 }

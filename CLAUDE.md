@@ -30,9 +30,9 @@ src/
     index.tsx        KAPIJA — jedino mesto koje odlucuje gde korisnik ide
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
     sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
-    (onboarding)/    welcome, date, time, place, reveal, account, code, name, push, ponuda, prva-prica
-                     ponuda = PAYWALL posle obavestenja, ceo ekran (`PaywallEkran uOnboardingu`); ko ima Premium ga preskace
-                     prva-prica = DNEVNA PRICA kao poslednji korak (`PricaDanaEkran uvod`, pravilo 23) -> "Počinjemo" -> kapija
+    (onboarding)/    welcome, date, time, place, reveal, account, code, name, prva-prica, push, ponuda
+                     prva-prica = DNEVNA PRICA posle imena (`PricaDanaEkran uvod`, pravilo 23) -> "Nastavi" -> push
+                     ponuda = PAYWALL, POSLEDNJI korak, ceo ekran (`PaywallEkran uOnboardingu`) -> kapija; ko ima Premium ga preskace
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
@@ -241,8 +241,11 @@ onboarding vodi korak po korak jer korisnik tada ne zna sta ga ceka; kod izmene 
 
 **11. Bez naloga se ne vidi nista.**
 `app/index.tsx` je jedina kapija: nema sesije -> welcome, ima sesiju bez karte
--> unos podataka, sve postoji -> tabovi. Nijedan ekran ne sme sam da odlucuje
-o preusmeravanju.
+-> TAKODJE welcome (Ivan, 30.9.2026; do tada pravo na datum rodjenja — korisnik nije znao
+da je prijavljen), sve postoji -> tabovi. Nijedan ekran ne sme sam da odlucuje
+o preusmeravanju. PRIJAVLJEN BEZ KARTE (npr. "Već imam nalog" sa emailom koji nema kartu):
+posle koda ide pravo na datum (`routeAfterSignup` -> `/date`), a ekran sa znakom (`reveal.tsx`)
+tada NE trazi email ponovo — upisuje kartu na taj nalog i nastavlja na ime.
 
 **12. Onboarding draft NE ide na disk.**
 `store/draft.ts` je namerno bez `persist` — dogovoreno je da prekid znaci
@@ -573,8 +576,10 @@ ULAZ (`components/prica/ulaz.tsx`): prsten oko planete "Tvog dana" na pocetnoj �
 indigo DIJAGONALNO preko celog kruga (bez pocetka i kraja, kao Instagram), ISPOD Saturnovih/Uranovih
 prstenova, 2—3 pt od okruglih planeta. Puni se od vrha u smeru kazaljke SAMO dok danasnja prica nije
 pogledana (= stigao do poslednje slike, `store/prica-log.ts`); posle stoji mirno do sutra. Ispod planete
-animiran balon "▶ Priča dana" (dve tackice pa balon, kao beleska na Instagramu) — umesto natpisa; balon
-prelazi preko donjeg dela planete (Ivan, 30.9.2026).
+animiran balon "▶ Priča dana" (dve tackice pa balon, kao beleska na Instagramu) — umesto natpisa. Balon
+prelazi preko donjeg dela planete, ali je ISPOD male (natalne) planete i pomeren ulevo da ona ne pokrije
+natpis; slojevi: planeta -> balon -> mala planeta (Ivan, 30.9.2026). Planeta je 80 pt (do tada 96), ista i za
+druge dane (`tvoj-dan-card.tsx`).
 SLIKE (`components/prica/slajdovi.tsx`): naslovna (dvostruki tocak na PRAVIM polozajima — tranzitna planeta
 spolja -> natalna tacka unutra, ASC na 9 sati — trake tona, legenda), Tvoj dan (pravi ugao aspekta), ocene
 (strelica "bolje nego juče", rucno zaokruzena petica, BEZ boje pozadine), Ide ti / Koči te (plavo / roze
@@ -599,12 +604,18 @@ iz `files/logo-story-*.svg`; negativ na indigu i na Ide/Koči). Bezbedna zona sa
 i dole), NE za Reels. Katanaca nema ni u prici ni na slici. Tranziti i tocak
 OSTAJU na slici (Ivan prihvatio da se iz njih moze naslutiti datum rodjenja: "ostavi ovako"). Pravo u
 Instagram Stories trazi Facebook App ID i dev build — faza 2.
-U ONBOARDINGU (Ivan, 30.9.2026): ista prica je POSLEDNJI korak, posle paywalla (`(onboarding)/prva-prica.tsx`;
-paywall i X i kupovina vode tamo, Premium korisnik dolazi pravo iz `push.tsx`). Rezim `uvod` u `app/prica.tsx`:
-bez zaglavlja (logo, datum, X), bez "Podeli", bez zatvaranja povlacenjem; na POSLEDNJOJ slici (savet ili
-Mesec, koja god je poslednja) jedno dugme "Počinjemo" + red "Nova priča stiže svakog dana, na početnoj." —
-dugme vodi na kapiju (pravilo 11). "Dobrodošli" je odbijeno: Vi-oblik, a "Dobrodošao/la" trazi pol (pravilo 22).
-Bez karte (npr. nepouzdana zona) uvod posle 2,5 s ide pravo u aplikaciju — ne ostaje na krugu koji se vrti.
+U ONBOARDINGU (Ivan, 30.9.2026): ime -> PRICA (`(onboarding)/prva-prica.tsx`) -> OBAVESTENJA (`push.tsx`) ->
+PAYWALL preko celog ekrana (`ponuda.tsx`) -> kapija. Prvo vrednost, pa zahtevi (kao pravilo 14). Obavestenja
+POSLE price: prica se zavrsava sa "Nova priča stiže svakog dana", a obavestenje je upravo to — iOS pita samo
+jednom, pa se pita kad korisnik zna sta dobija; obavestenja prave naviku, a navika donosi Premium. Paywall je
+POSLEDNJI i preko CELOG ekrana, ne list preko pocetne (Ivan odbio: "lako ga iskljuce"). Istog dana su bili i
+redosledi obavestenja -> paywall -> prica i obavestenja -> prica -> paywall — ne vracati. Prica se u
+onboardingu MORA odgledati (nema X ni povlacenja). Rezim `uvod` u `app/prica.tsx`: bez zaglavlja (logo, datum,
+X), bez "Podeli"; na POSLEDNJOJ slici (savet ili Mesec, koja god je poslednja) jedno dugme "NASTAVI" + red
+"Nova priča stiže svakog dana, na početnoj." — NE "Počinjemo": iza dugmeta su jos dva koraka. Do obavestenja
+i paywalla stize samo NOV nalog (postojeci sa kartom ide pravo na pocetnu, `routeAfterSignup`), pa Premium tu
+prakticno nema; osigurac je u `push.tsx` (Premium ide na kapiju, bez paywalla). Bez karte (npr. nepouzdana
+zona) uvod posle 2,5 s ide dalje, ne ostaje na krugu.
 
 ## Kanonski kljucevi sadrzaja
 

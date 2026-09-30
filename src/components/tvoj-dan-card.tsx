@@ -36,7 +36,8 @@ export const OZNAKA_12 = 'text-[12px] leading-[16px]';
  * (Ivan, 29.9.2026): VELIKA je tranzitna (ona pravi dogadjaj), MALA dole desno je
  * natalna (deo tvoje karte koji je pogodjen), kao znak na Mesecu. Mere iste kao tamo.
  */
-const PLANETA = 96;
+// 80 (Ivan, 30.9.2026: manja; do tada 96) — ista kao u prstenu price danas (`prica/ulaz.tsx`).
+const PLANETA = 80;
 const BEDZ = 28;
 /**
  * Planete sa prstenovima: koliki deo slike je TELO (izmereno, `planete-par.tsx`)
@@ -229,7 +230,7 @@ function PlanetaSaBedzom({ tranzitna, natalna }: {
   const mala = BEDZ / skalaSlike(natalna.key);
   // Bedz se kaci na TELO, ne na ugao okvira: kod Saturna i Urana je okvir siri i
   // telo manje, pa bi ugao ostao daleko od planete (Ivan, 29.9.2026). Centar bedza
-  // je 0,75 poluprecnika tela dole desno od centra — kod obicne planete (96) to je
+  // je 0,75 poluprecnika tela dole desno od centra — kod obicne planete (80) to je
   // tacno mesto na kom je bio i stoji znak na Mesecu.
   const r = (p ? PLANETA * p.cilj : PLANETA) / 2;
   const spolja = BEDZ + 4; // sa sivim obodom (`p-[2px]`)

@@ -6,10 +6,10 @@ import { BellRing } from 'lucide-react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { OnboardingStep } from '@/components/onboarding-step';
+import { usePremium } from '@/store/auth';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { Text } from '@/components/ui/text';
 import { ASTROLOG } from '@/lib/pitanja';
-import { usePremium } from '@/store/auth';
 import { shadow } from '@/theme/tokens';
 
 const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
@@ -26,11 +26,11 @@ const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
 export default function Push() {
   const [busy, setBusy] = React.useState(false);
 
-  // Posle obavestenja: Premium (`ponuda.tsx`, Ivan 29.9.2026), pa prva prica dana
-  // (`prva-prica.tsx`, 30.9.2026). Ko vec ima Premium (poklon, ranija kupovina)
-  // preskace paywall i ide pravo na pricu.
+  // Obavestenja dolaze POSLE prve price dana (`prva-prica.tsx`, Ivan 30.9.2026): korisnik
+  // je upravo video sta ce mu jutarnje obavestenje donositi. Posle njih Premium kao
+  // poslednji korak (`ponuda.tsx`) — osim za onoga ko ga vec ima (poklon); on ide na kapiju.
   const premium = usePremium();
-  const done = () => router.replace(premium ? '/prva-prica' : '/ponuda');
+  const done = () => router.replace(premium ? '/' : '/ponuda');
 
   const ask = async () => {
     if (busy) return;

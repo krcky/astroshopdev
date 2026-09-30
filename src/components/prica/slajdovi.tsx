@@ -28,7 +28,7 @@ export type SlikaProps = {
   p: PricaDana;
   tece: Tece;
   okvir: OkvirSlike;
-  /** Prica u onboardingu: bez dugmadi saveta — dole je "Počinjemo" (`app/prica.tsx`). */
+  /** Prica u onboardingu: bez dugmadi saveta — dole je "Nastavi" (`app/prica.tsx`). */
   uvod?: boolean;
   onPodeli: () => void;
   onProcitaj: () => void;

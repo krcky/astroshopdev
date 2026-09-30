@@ -26,7 +26,8 @@ export default function Name() {
     setProfile(updated);
     if (user) await pushProfile(user.id, updated);
     setBusy(false);
-    router.replace('/push');
+    // Posle imena: prva prica dana, pa obavestenja, pa Premium (Ivan, 30.9.2026).
+    router.replace('/prva-prica');
   };
 
   return (

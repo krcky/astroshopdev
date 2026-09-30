@@ -19,14 +19,27 @@ import { cn } from '@/lib/utils';
 
 const ACircle = Animated.createAnimatedComponent(Circle);
 
-/** Spoljni precnik prstena. Okrugla planeta je 96, kao na "Tvom danu": 107 − 2 × 3 (prsten) − 2 × 2,5 (razmak). */
-const D = 107;
+/**
+ * Spoljni precnik prstena. Okrugla planeta je 80 (Ivan, 30.9.2026: manja; do tada 96),
+ * kao na "Tvom danu" za druge dane: 91 = 80 + 2 × 3 (prsten) + 2 × 2,5 (razmak).
+ */
+const D = 91;
 const POTEZ = 3;
-const PLANETA = 96;
+const PLANETA = 80;
 /** Planete sa prstenom: telo ~0,52 prstena (Ivan: "smanji malo Saturn"); udeo tela u slici je izmeren. */
 const TELO: Record<string, number> = { saturn: 0.4, uranus: 0.6 };
 const TELO_U_PRSTENU = 0.52;
 const BEDZ = 30;
+/**
+ * Balon (Ivan, 30.9.2026): prelazi preko donjeg dela planete, ali ISPOD male planete, i
+ * pomeren ulevo da mala planeta ne pokrije natpis. `BALON_GORE`: koliko balon (sa
+ * tackicama) ulazi u krug; `BALON_LEVO`: pomak ulevo od sredine planete. Okvir je
+ * sirok `SIRINA` da balon stane, planeta je uz desnu ivicu.
+ */
+const BALON_GORE = 20;
+const BALON_LEVO = 12;
+const BALON_VISINA = 45; // tackice 5 + 1 + 8, razmak 2, balon 29
+const SIRINA = 114;
 
 /**
  * ULAZ U DNEVNU PRICU (Ivan, 30.9.2026) — planeta "Tvog dana" u prstenu, ispod nje balon.
@@ -59,30 +72,39 @@ export function UlazUPricu({ tranzitna, natalna, datum }: {
     ? <Image source={slika} style={{ width: sirinaSlike, height: sirinaSlike }} resizeMode="contain" />
     : <Planeta t={tranzitna} size={PLANETA} />;
 
-  // Znacka natalne tacke dole desno, na prstenu (45°).
+  // Planeta uz desnu ivicu okvira; znacka natalne tacke dole desno, na prstenu (45°).
+  const x0 = SIRINA - D;
   const c = D / 2 + (D / 2) * Math.SQRT1_2 * 0.96;
+  // Sredina balona: sredina planete pomerena ulevo.
+  const balon = x0 + D / 2 - BALON_LEVO;
 
+  // Slojevi redom: prsten i planeta, pa balon, pa mala planeta — balon je IZMEDJU njih.
   return (
     <Pressable
       onPress={() => router.push('/prica')}
       accessibilityRole="button"
       accessibilityLabel="Priča dana"
       accessibilityHint="Otvara kratku priču o tvom danu"
-      className="items-center active:opacity-80">
-      <View style={{ width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
+      style={{ width: SIRINA, height: D - BALON_GORE + BALON_VISINA }}
+      className="active:opacity-80">
+      <View style={{ position: 'absolute', left: x0, top: 0, width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
         <Prsten key={pogledana ? 'miran' : `puni-${ciklus}`} puni={!pogledana} />
         <View style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center' }}>
           {okrece ? <Okret>{planeta}</Okret> : planeta}
         </View>
-        <View
-          className="absolute items-center justify-center rounded-pill bg-grouped"
-          style={{ left: c - BEDZ / 2 - 3, top: c - BEDZ / 2 - 3, padding: 3 }}>
-          <View style={{ width: BEDZ, height: BEDZ }} className="items-center justify-center">
-            <Planeta t={natalna} size={BEDZ / skalaSlike(natalna.key)} />
-          </View>
+      </View>
+      {/* Sirina 2 × `balon`, pa je sredina tacno na `balon` — sirina balona se ne meri. */}
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, width: 2 * balon, top: D - BALON_GORE, alignItems: 'center' }}>
+        <Balon key={pogledana ? 'miran' : `balon-${ciklus}`} animiraj={!pogledana} />
+      </View>
+      <View
+        pointerEvents="none"
+        className="absolute items-center justify-center rounded-pill bg-grouped"
+        style={{ left: x0 + c - BEDZ / 2 - 3, top: c - BEDZ / 2 - 3, padding: 3 }}>
+        <View style={{ width: BEDZ, height: BEDZ }} className="items-center justify-center">
+          <Planeta t={natalna} size={BEDZ / skalaSlike(natalna.key)} />
         </View>
       </View>
-      <Balon key={pogledana ? 'miran' : `balon-${ciklus}`} animiraj={!pogledana} />
     </Pressable>
   );
 }
@@ -127,8 +149,7 @@ const PLAY = 'M3 1.9v8.2c0 .7.8 1.1 1.4.7l6.2-4.1c.5-.3.5-1.1 0-1.4L4.4 1.2C3.8.
 function Balon({ animiraj }: { animiraj: boolean }) {
   const ulaz = (kasni: number) => (animiraj ? ZoomIn.delay(kasni).duration(420).easing(Easing.out(Easing.back(1.8))) : undefined);
   return (
-    // Balon prelazi preko donjeg dela planete (Ivan, 30.9.2026) — kao beleska na Instagramu.
-    <View style={{ alignItems: 'center', marginTop: -24 }} pointerEvents="none">
+    <View style={{ alignItems: 'center' }} pointerEvents="none">
       <Animated.View entering={ulaz(600)} className="rounded-pill bg-background" style={{ width: 5, height: 5, marginLeft: -12, ...shadow.soft }} />
       <Animated.View entering={ulaz(720)} className="rounded-pill bg-background" style={{ width: 8, height: 8, marginLeft: -20, marginTop: 1, ...shadow.soft }} />
       <Animated.View
