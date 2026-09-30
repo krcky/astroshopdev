@@ -104,6 +104,13 @@ import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
  */
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+
+/**
+ * Koliko je traka na Androidu NIZE od statusne (`headerBar.androidVrh`) — i razmak na
+ * vrhu sadrzaja (`traka`). Izvezeno za ono sto se ravna po traci van `Screen`-a (meni dana
+ * na pocetnoj, gornji red onboardinga). iOS: 0.
+ */
+export const VRH_ANDROID = Platform.OS === 'android' ? headerBar.androidVrh : 0;
 /**
  * POSTEPENO ZAMUCENJE (Ivan, 30.9.2026): u sopstvenom buildu traka nema ostru donju
  * ivicu — nativni modul (`components/postepeno-zamucenje.tsx`) bledi nadole. Expo Go
@@ -291,7 +298,7 @@ export function Screen({
   }, [bgAktivan, bgGlobalna, belina]);
 
   /** Visina trake zajedno sa statusnom trakom — jedini broj koji se racuna. */
-  const traka = insets.top + headerBar.height;
+  const traka = insets.top + VRH_ANDROID + headerBar.height;
 
   const pomeraj = useSharedValue(0);
   const prati = useAnimatedScrollHandler((e) => {
@@ -405,7 +412,7 @@ export function Screen({
         // dugmad u `left` i `right` moraju da ga hvataju. `none` bi ubilo i njih.
         pointerEvents="box-none"
         className="absolute inset-x-0 top-0 flex-row items-center gap-2 px-screen"
-        style={{ height: traka, paddingTop: insets.top }}>
+        style={{ height: traka, paddingTop: insets.top + VRH_ANDROID }}>
         {left ?? (pushed ? <BackButton /> : null)}
         <View className="flex-1">
           {/* UNUTRASNJA STRANA (gurnuta, sa "nazad"): bez loga, samo ime strane u istoj

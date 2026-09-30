@@ -33,13 +33,19 @@ import { fajlVidea, folderVidea, useVideoPrice } from '@/store/video-price';
  *  - Prava greska (koder, fajl): ispocetka, najvise tri puta, pa "Video nije uspeo".
  *  - Na kraju ZAVRSNI KADAR (logo i astroshop.rs, `KarticaKraj`, ~2 s), sa istim prelazom krugom.
  *  - Samo jedan posao; nov posao brise stari fajl (`store/video-price.ts`).
+ *  - SVE SLIKE SE MONTIRAJU PRE PRVOG KADRA, skrivene (krug 0), i tokom snimanja React nista ne
+ *    crta iznova — samo se menjaju satovi i krugovi (Ivan, 30.9.2026: "nesto isfleshira" na svakom
+ *    prelazu). Do tada se nova slika montirala tek na prelazu: prva dva kadra su pokazala nju u
+ *    obliku zvezde (zaobljenje od punog kruga na sloju od 0 pt, pa `layer.render(in:)` nacrta
+ *    putanju koja sama sebe sece), a donja slika, crtana iznova zbog novog `r`, vratila se na
+ *    pocetno stanje ("Su…" umesto celog naslova). Isti uzrok kao skok posle izlaska iz aplikacije.
  */
 
 /** Kako platno crta kadar: `sloj` (CALayer, CPU) je ~2x brzi od `hijerarhija`, isti kadar. */
 const NACIN: 'sloj' | 'hijerarhija' = 'sloj';
 /** Posle dodira snimanje stoji ovoliko (ms): skrol i prelazi idu glatko. */
 const POSLE_DODIRA = 1500;
-/** Kad se pojavi nova slika: vreme za raspored i slike (lokalne, vec dekodirane). */
+/** Posle montiranja slika: vreme za raspored i slike (lokalne, vec dekodirane). */
 const NOVA_SLIKA_MS = 250;
 const POKUSAJA = 3;
 
@@ -51,6 +57,9 @@ const PREKID = new Error('prekid');
 const KX = KARTICA.w * VIDEO.krugX;
 const KY = KARTICA.h * VIDEO.krugY;
 const KR = poluprecnikKruga(KARTICA.w, KARTICA.h, KX, KY);
+
+/** Za koliko se krug "gurne" posle montiranja, da se stil sigurno primeni na vec napravljen pogled. */
+const GURNI = 0.01;
 
 const cekaj = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 /** Dva kadra: sat postavljen iz JS-a stize na UI nit, pa se kadar nacrta. */
@@ -76,11 +85,10 @@ function Radionica({ p }: { p: PricaDana }) {
   // Slike price, pa zavrsni kadar sa logom (indeks `p.slike.length`).
   // Svaka slika u videu isto traje (`VIDEO.slika`, 4 s) — kraci od price, u kojoj se cita (Ivan, 30.9.2026).
   const raspored = React.useMemo(() => rasporedVidea(p.slike.map(() => VIDEO.slika), VIDEO.zavrsni), [p]);
-  const [slojevi, setSlojevi] = React.useState<{ gore: number; dole: number | null }>({ gore: 0, dole: null });
   // Posle prekida kartice se montiraju iznova (nov kljuc) — bez ostataka od pre izlaska.
   const [pokusaj, setPokusaj] = React.useState(0);
 
-  // Sat za svaku sliku (najvise sest, pa zavrsni kadar) i poluprecnik kruga kojim se otkriva gornja.
+  // Sat za svaku sliku (najvise sest, pa zavrsni kadar).
   const s0 = useSharedValue(0);
   const s1 = useSharedValue(0);
   const s2 = useSharedValue(0);
@@ -89,10 +97,18 @@ function Radionica({ p }: { p: PricaDana }) {
   const s5 = useSharedValue(0);
   const s6 = useSharedValue(0);
   const satovi = React.useMemo(() => [s0, s1, s2, s3, s4, s5, s6], [s0, s1, s2, s3, s4, s5, s6]);
-  const krug = useSharedValue(KR);
-  const pun = useSharedValue(KR);
+  // Poluprecnik kruga svake slike: 0 = skrivena, KR = cela. Svaka ima SVOJ, da se sloj nikad ne crta iznova.
+  const r0 = useSharedValue(KR);
+  const r1 = useSharedValue(0);
+  const r2 = useSharedValue(0);
+  const r3 = useSharedValue(0);
+  const r4 = useSharedValue(0);
+  const r5 = useSharedValue(0);
+  const r6 = useSharedValue(0);
+  const krugovi = React.useMemo(() => [r0, r1, r2, r3, r4, r5, r6], [r0, r1, r2, r3, r4, r5, r6]);
   // Vreme od prvog kadra — za krug loga, koji se vrti kroz ceo video (`logo-price.tsx`).
   const vreme = useSharedValue(0);
+  const slika = raspored.pocetak.length;
 
   React.useEffect(() => {
     let otkazano = false;
@@ -108,12 +124,22 @@ function Radionica({ p }: { p: PricaDana }) {
       javiNapredak(0);
       folderVidea().create({ intermediates: true, idempotent: true });
       const fajl = fajlVidea(p.dan);
-      let tekuci = { gore: 0, dole: null as number | null };
-      setSlojevi(tekuci);
-      satovi[0].set(0);
+      // Pocetno stanje: prva slika cela, ostale skrivene, svi satovi na nuli. Slike su vec
+      // montirane (i posle prekida — nov `pokusaj`, nove kartice); daj im vreme za raspored i slike.
+      const krugSada = krugovi.map(() => -1);
+      const krugNa = (j: number, r: number) => {
+        if (krugSada[j] === r) return;
+        krugSada[j] = r;
+        krugovi[j].set(r);
+      };
+      satovi.forEach((sat) => sat.set(0));
       vreme.set(0);
-      krug.set(KR);
-      await cekaj(NOVA_SLIKA_MS * 2);
+      await cekaj(NOVA_SLIKA_MS * 4);
+      // Krug se "gurne" i vrati, da mapper stila sigurno prodje posle montiranja pogleda.
+      for (let j = 0; j < slika; j++) krugNa(j, (j === 0 ? KR : 0) + GURNI);
+      await dvaKadra();
+      for (let j = 0; j < slika; j++) krugNa(j, j === 0 ? KR : 0);
+      await dvaKadra();
       await ja.pocni(fajl.uri, VIDEO.sirina, VIDEO.visina, VIDEO.fps, VIDEO.bitrate);
       for (let f = 0; f < raspored.kadrova; f++) {
         await dozvola(jeOtkazano);
@@ -121,15 +147,11 @@ function Radionica({ p }: { p: PricaDana }) {
         if (prekinuto) throw PREKID;
         const k = kadarVidea(raspored, f);
         vreme.set((f * 1000) / VIDEO.fps);
-        const novi = { gore: k.gore.i, dole: k.dole?.i ?? null };
         satovi[k.gore.i].set(k.gore.sat);
         if (k.dole) satovi[k.dole.i].set(k.dole.sat);
-        krug.set(KR * ZAVESA(k.prelaz));
-        if (novi.gore !== tekuci.gore || novi.dole !== tekuci.dole) {
-          const nova = novi.gore !== tekuci.gore;
-          tekuci = novi;
-          setSlojevi(novi);
-          if (nova) await cekaj(NOVA_SLIKA_MS);
+        // Gornja se otkriva krugom, donja je cela dok traje prelaz, ostale su skrivene.
+        for (let j = 0; j < slika; j++) {
+          krugNa(j, j === k.gore.i ? KR * ZAVESA(k.prelaz) : j === k.dole?.i ? KR : 0);
         }
         await dvaKadra();
         if (otkazano) return null;
@@ -171,9 +193,9 @@ function Radionica({ p }: { p: PricaDana }) {
       pratiApp.remove();
       platno.current?.otkazi().catch(() => {});
     };
-  }, [p, raspored, satovi, krug, vreme]);
+  }, [p, raspored, satovi, krugovi, vreme, slika]);
 
-  const vidljive = slojevi.dole === null ? [slojevi.gore] : [slojevi.dole, slojevi.gore];
+  const sve = React.useMemo(() => Array.from({ length: slika }, (_, i) => i), [slika]);
   return (
     // Van ekrana: korisnik je ne vidi, VoiceOver je ne nalazi, dodir ne stize.
     <View
@@ -183,8 +205,9 @@ function Radionica({ p }: { p: PricaDana }) {
       style={{ position: 'absolute', left: -2 * KARTICA.w - 100, top: 0, width: KARTICA.w, height: KARTICA.h }}>
       <Platno ref={platno} collapsable={false} style={{ width: KARTICA.w, height: KARTICA.h }}>
         <VremeVidea vreme={vreme}>
-          {vidljive.map((i) => (
-            <Sloj key={`${pokusaj}-${i}`} p={p} i={i} sat={satovi[i]} r={i === slojevi.gore ? krug : pun} />
+          {/* Redom: kasnija slika je iznad ranije, pa se nova uvek otkriva preko prethodne. */}
+          {sve.map((i) => (
+            <Sloj key={`${pokusaj}-${i}`} p={p} i={i} sat={satovi[i]} r={krugovi[i]} />
           ))}
         </VremeVidea>
       </Platno>
@@ -192,11 +215,15 @@ function Radionica({ p }: { p: PricaDana }) {
   );
 }
 
-/** Jedna slika u krugu (kao `Otkrivanje` u `app/prica.tsx`); donja ima pun krug. */
-function Sloj({ p, i, sat, r }: { p: PricaDana; i: number; sat: SharedValue<number>; r: SharedValue<number> }) {
+/**
+ * Jedna slika u krugu (kao `Otkrivanje` u `app/prica.tsx`). `memo`: svi propovi su stalni, pa se
+ * sloj posle montiranja nikad ne crta iznova — novo crtanje bi vratilo pokrete na pocetne vrednosti.
+ * Skrivena (krug 0) je i providna: tada se ne crta nista, ni ako raspored jos kasni.
+ */
+const Sloj = React.memo(function Sloj({ p, i, sat, r }: { p: PricaDana; i: number; sat: SharedValue<number>; r: SharedValue<number> }) {
   const spolja = useAnimatedStyle(() => {
-    const rr = r.get();
-    return { left: KX - rr, top: KY - rr, width: 2 * rr, height: 2 * rr, borderRadius: rr };
+    const rr = Math.max(0, r.get());
+    return { left: KX - rr, top: KY - rr, width: 2 * rr, height: 2 * rr, borderRadius: rr, opacity: rr > 0 ? 1 : 0 };
   });
   const unutra = useAnimatedStyle(() => ({ left: r.get() - KX, top: r.get() - KY }));
   return (
@@ -208,7 +235,7 @@ function Sloj({ p, i, sat, r }: { p: PricaDana; i: number; sat: SharedValue<numb
       </Animated.View>
     </Animated.View>
   );
-}
+});
 
 /* ------------------------------------------------------------------------- *
  * Obavestenje: "Tvoj video je spreman"

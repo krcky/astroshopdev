@@ -363,6 +363,13 @@ koja se pojavi pri klizanju (`trakaAndroid` u `screen.tsx`), kao u Material apli
 `expo-blur` (Dimezis) je u svakom kadru snimao ceo sadrzaj i mutio ga — seckalo je na
 120 Hz (Xiaomi 11T) — a sa `intensity` 0 je OBARAO aplikaciju (`nativePtr is null`:
 `configureBlurView` nulu ne preskace). Ne vracati `BlurView` na Android; `BlurTargetView` vise ne postoji.
+ANDROID RASPORED (Ivan, 30.9.2026, Xiaomi 11T): traka je `headerBar.androidVrh` (8) NIZE od
+statusne — logo je ulazio u nju; sabira ga samo `Screen` (`VRH_ANDROID`, izvezen za meni dana na
+pocetnoj i gornji red onboardinga). Tastatura: aplikacija je edge-to-edge, pa `adjustResize` vise
+ne smanjuje prozor — `OnboardingStep` na Androidu dize sadrzaj kroz `useAnimatedKeyboard`
+(`IznadTastature`), kao `pitanje-novo`; bez toga je dugme ostajalo ispod tastature. "Napisi pitanje"
+je na Androidu `modal` preko celog ekrana: umetak statusne trake + X umesto rucice (povlacenje
+nadole tamo otvara sistemski meni).
 ANDROID BRZINA: `package.json` -> `reanimated.staticFeatureFlags.ANDROID_SYNCHRONOUSLY_UPDATE_UI_PROPS`
 = true — providnost, transform i boja idu mimo React commit-a u svakom kadru (bez toga je SVAKI
 pokret na Androidu prolazio kroz ceo commit). Menja se samo novim buildom. Ne paliti uz njega
@@ -643,10 +650,17 @@ DELJENJE (`components/prica/kartica.tsx`): kartica 360x640 se crta ispod price, 
 snimi, `expo-image-manipulator` svede na 1080x1920 PNG, `expo-sharing` otvori sistemski meni; fajl je
 "Astro Shop <dan>.png". Sadrzaj ISTI kao na slici — nista se ne izbacuje, samo smanjuje; PRVO LICE ("Moj dan",
 "Ide mi", "Koči me", "Za mene"). Gore datum · astroshop.rs, dole mali logo — VEKTORSKI
-(`components/prica/logo-price.tsx`, oblici iz `files/logo-story-positive.svg` skriptom `scripts/logo/build-logo-price.py`;
-negativ na indigu i na Ide/Koči), vrh na 540 od 640 (Ivan, 30.9.2026: "spusti jos dole"; do tada 512). U VIDEU se
+(`components/prica/logo-price.tsx`, oblici skriptom `scripts/logo/build-logo-price.py` iz `files/logo-story-positive.svg`
+i `files/logo-story-negative.svg`; negativ na indigu i na Ide/Koči). NEGATIV JE SVOJ CRTEZ, ne prebojen pozitiv
+(Ivan, 30.9.2026): lice belo, oci i usta u boji pozadine — prebojen pozitiv (ili `tintColor` bela) okrene lice
+naopako. Isto u zaglavlju price na tamnoj slici: `logo-krug-negativ.png` iz `files/logo-negativ.svg`, bez `tintColor`. Logo je
+198 pt sirok (Ivan, 30.9.2026: "1.5x veci"; do tada 132), vrh na 532 od 640 (dno ~585; "spusti jos dole", pa "spusti malo
+logo jos dole ako ne staju recenice") — donja ivica ulazi malo u pojas polja za odgovor na Instagramu. Recenica
+"Ide mi / Koči me" na kartici je 25/30, a MANJA samo kad ne staje (`VELICINE_IDE_KOCI_KARTICA`, do 17): od 1192
+recenica iz korpusa 97% ostaje 25, sve staju (`check:prica`, deo 10). U VIDEU se
 krug loga VRTI ceo video, i na zavrsnom kadru (Ivan: "da ljudi znaju da je animirano"): kao logo i uvod — lice
-miruje, zraci i lukovi se okrecu, znakovi kruze uspravni, jedan krug na 6 s (`lib/logo-price.ts`). Ugao ide po
+miruje, zraci i lukovi se okrecu, znakovi kruze uspravni, jedan krug na 12 s (`lib/logo-price.ts`; do 30.9.2026 6 s,
+Ivan: "sporije"). Ugao ide po
 VREMENU VIDEA (`useVremeVidea`, `sat.tsx`), ne po satu slike, inace bi krug na svakoj slici skocio nazad. Bezbedna zona samo za Stories (~250 px gore
 i dole), NE za Reels. Katanaca nema ni u prici ni na slici. Tranziti i tocak
 OSTAJU na slici (Ivan prihvatio da se iz njih moze naslutiti datum rodjenja: "ostavi ovako"). Pravo u
@@ -668,7 +682,10 @@ EKRANA dok korisnik radi sta hoce: `video-radionica.tsx` (u korenu, `_layout.tsx
 (prvo lice, datum, logo) u nativno platno `modules/video-price` (iOS Swift/AVAssetWriter; Android Kotlin/
 MediaCodec — kartica se crta PRAVO u ulaznu povrsinu kodera, a vreme kadra se upisuje po redu izlaza, jer
 povrsina daje vreme telefona; H.264 1080x1920, 30 fps, ~5 Mb/s, bez zvuka — muziku dodaje Instagram); za svaki kadar postavi sat slike, saceka dva kadra, pa crta
-(`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). Raspored: `rasporedVidea` / `kadarVidea` u
+(`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). SVE SLIKE SE MONTIRAJU PRE PRVOG KADRA (skrivene,
+krug 0 i providne), svaka sa SVOJIM krugom, `Sloj` je `memo` — tokom snimanja React NISTA ne crta iznova (Ivan,
+30.9.2026: "nesto isfleshira" na svakom prelazu: nova slika montirana na prelazu je prva dva kadra bila zvezda
+preko cele slike, a donja, crtana iznova, skocila na pocetne vrednosti pokreta). Raspored: `rasporedVidea` / `kadarVidea` u
 `lib/prica.ts` — ista trajanja kao prica, najvise 58 s (Instagram prica 60 s), prelaz krugom 750 ms kao kad
 prica sama ide dalje (`check:prica`, deo 11). ZAVRSNI KADAR (Ivan, 30.9.2026): logo i "astroshop.rs" na
 indigu, 1,5 s posle poslednje slike (do 30.9.2026 2,2 s; `KarticaKraj`, logo `LogoPrice` u negativu, 280 pt, SVG iz

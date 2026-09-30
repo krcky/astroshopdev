@@ -10,6 +10,7 @@ import { oblastiDana } from '../src/lib/oblasti';
 import {
   boljeNegoJuce, brojTonova, brojTranzita, fazaOsmina, kadarVidea, korakReci, legendaTonova, luk, najbolja, poluprecnikKruga, rasporedVidea, reciZaPrelom, redovaTeksta, REDOSLED, slikeDana, VIDEO,
   tackaNaKrugu, tackaNaTocku, TRAJANJE, TRAJANJE_STALNO, trajanjeSlike, ugloviCrteza, velicinaSaveta, VELICINE_SAVETA, VELICINE_SAVETA_KARTICA, visinaNatpisa, ZNAK_EM, zraciDuzina,
+  PRORED_IDE_KOCI, VELICINE_IDE_KOCI_KARTICA,
 } from '../src/lib/prica';
 import { BEOGRAD } from '../src/lib/test-karta';
 import { LOGO_OKRET_S, polozajZnaka, ugaoLoga } from '../src/lib/logo-price';
@@ -130,6 +131,12 @@ for (const [ime, t] of [['141', S141], ['196 (najduzi)', S196]] as const) {
   ok(k.redova * k.prored <= KARTICA_H, `${ime} staje na karticu za deljenje`, `${k.velicina} pt, ${k.redova} redova`);
 }
 ok(VELICINE_SAVETA.includes(velicinaSaveta(S196, 100, 50).velicina as never), 'kad nista ne staje: najmanja iz spiska, ne izmisljena', String(velicinaSaveta(S196, 100, 50).velicina));
+// "Ide mi / Koči me" na kartici, donja polovina: od 342 do loga (vrh 532, uz 8 razmaka), bez natpisa i imena (62).
+const DOLE = 532 - 8 - 342 - 62;
+const ik72 = velicinaSaveta(S72, 316, DOLE, VELICINE_IDE_KOCI_KARTICA, PRORED_IDE_KOCI);
+ok(ik72.velicina === 25 && ik72.redova === 4, 'Koči me: recenica od 4 reda ostaje 25/30 i staje iznad loga', `${ik72.velicina} pt, ${ik72.redova} redova, ${ik72.redova * ik72.prored}/${DOLE} pt`);
+const ik141 = velicinaSaveta(S141, 316, DOLE, VELICINE_IDE_KOCI_KARTICA, PRORED_IDE_KOCI);
+ok(ik141.velicina < 25 && ik141.redova * ik141.prored <= DOLE, 'Koči me: duga (141 znak, kao najduza u korpusu) je manja i staje', `${ik141.velicina} pt, ${ik141.redova} redova`);
 
 console.log('\n11. Video price: raspored kadrova');
 {
@@ -187,7 +194,7 @@ for (const [ime, O] of [['pozitiv', LOGO_OBLIK.pozitiv], ['negativ', LOGO_OBLIK.
   ok(O.znakovi.every((z) => blizu(udaljenost(polozajZnaka(z, 137, O.krug)), udaljenost({ x: z.cx, y: z.cy }), 1e-9)), `${ime}: znakovi ostaju na istom krugu dok kruze`);
 }
 ok(LOGO_OBLIK.negativ.sunce.length === 3 && LOGO_OBLIK.pozitiv.sunce.length === 2, 'negativ ima SVOJ crtez sunca (3 dela), ne prebojen pozitiv (2)');
-ok(ugaoLoga(0) === 0 && Math.abs(ugaoLoga(1500) - 90) < 1e-9 && Math.abs(ugaoLoga(LOGO_OKRET_S * 1000)) < 1e-9, 'jedan krug na 6 s; posle kruga isto kao na pocetku');
+ok(ugaoLoga(0) === 0 && Math.abs(ugaoLoga(3000) - 90) < 1e-9 && Math.abs(ugaoLoga(LOGO_OKRET_S * 1000)) < 1e-9, 'jedan krug na 12 s; posle kruga isto kao na pocetku');
 const desno = polozajZnaka({ cx: 110, cy: 50 }, 90, { cx: 100, cy: 50 });
 ok(blizu(desno.x, 100) && blizu(desno.y, 60), 'smer kazaljke na ekranu: desno -> dole posle 90°');
 

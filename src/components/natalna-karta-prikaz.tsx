@@ -14,10 +14,11 @@ import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import {
-  AspektRed, KUCA_KOLONA, Tacka, TrojkaPlocica, ZnakKolona, redosledPlaneta, stepenMinut, TockInfo,
+  AspektRed, BALON_PREKO, BALON_VISINA, KUCA_KOLONA, Tacka, TrojkaPlocica, ZnakKolona, redosledPlaneta, stepenMinut, TockInfo,
 } from '@/components/karta-lista';
 import { PREMIUM } from '@/components/zakljucano';
-import { useEntitlement } from '@/store/auth';
+import { useAuthStore, useEntitlement } from '@/store/auth';
+import { usePricaZnakaPogledana } from '@/store/prica-znaka-log';
 import type { ResolvedProfile } from '@/store/profile';
 import {
   allNatalKeys, isFreeNatalKey, moonSignForUnknownTime, natalAspects, natalTopic,
@@ -62,6 +63,11 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   );
   const naslovi = useNatalNaslovi(kljucevi);
   const premium = !!useEntitlement()?.active;
+  // Prica o znaku (pravilo 25) je samo za SVOJU kartu: Sunce u trojci je ulaz, a tumacenje je na njenoj poslednjoj slici.
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+  const sunceZnak = resolved.chart.planets.find((x) => x.key === 'sun')?.position.sign.key ?? null;
+  const pricaPogledana = usePricaZnakaPogledana(userId, sunceZnak);
+  const imaPricu = !osobaId && !resolved.zoneUnreliable;
   const zakljucan = (k: string) => !premium && !isFreeNatalKey(k);
   // Rasklopljena planeta; Sunce je otvoreno na ulazu, kao na sajtu.
   const [otvorena, setOtvorena] = React.useState<string | null>('sun');
@@ -126,8 +132,14 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
 
       {/* Velika trojka: Sunce, Mesec, podznak (Ivan, 28.9.2026 — kao na sajtu, plus Mesec) */}
       {!zoneUnreliable && (
-        <View className="mx-5 mt-5 flex-row gap-2">
-          <TrojkaPlocica oznaka="Sunce" slika="sun" znak={sunce.position.sign} onPress={() => otvori('sun')} />
+        <View className="mx-5 mt-5 flex-row gap-2" style={imaPricu ? { paddingBottom: BALON_VISINA - BALON_PREKO - 8 } : undefined}>
+          <TrojkaPlocica
+            oznaka="Sunce"
+            slika="sun"
+            znak={sunce.position.sign}
+            onPress={imaPricu ? () => router.push('/prica-znak') : () => otvori('sun')}
+            prica={imaPricu ? { pogledana: pricaPogledana, natpis: 'Tvoj znak' } : undefined}
+          />
           {mesecZnak.certain ? (
             <TrojkaPlocica oznaka="Mesec" slika="moon" znak={mesecZnak.sign} onPress={() => otvori('moon')} />
           ) : (

@@ -153,6 +153,11 @@ export default function RootLayout() {
                     name="prica"
                     options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
                   />
+                  {/* Prica o znaku (Ivan, 30.9.2026; pravilo 25): sa Sunca u velikoj trojci na tabu "Ti", isto kao dnevna. */}
+                  <Stack.Screen
+                    name="prica-znak"
+                    options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
+                  />
                   {/* Paywall — sa svakog "Otključaj" (`components/zakljucano.tsx`). Na iOS-u
                       list VISINE SADRZAJA (Ivan, 30.9.2026: "ne mora da bude 100%"; do tada
                       `modal` preko celog ekrana) — `PAYWALL_LIST`. Android: `modal`. */}

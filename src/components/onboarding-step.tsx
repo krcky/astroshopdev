@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack } from 'expo-router';
 import { ChevronLeft, X, type LucideIcon } from 'lucide-react-native';
@@ -8,7 +9,7 @@ import { ChevronLeft, X, type LucideIcon } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { GlassBubble, GlassIconButton } from '@/components/ui/glass-button';
 import { Text } from '@/components/ui/text';
-import { ScreenBackdrop } from '@/components/screen';
+import { ScreenBackdrop, VRH_ANDROID } from '@/components/screen';
 import { STARI_IOS } from '@/lib/platform';
 import { FONT } from '@/theme/font';
 import { neutral } from '@/theme/tokens';
@@ -66,6 +67,26 @@ type Props = {
 /** Visina pretapanja na dnu sadrzaja (`pretapanje`). */
 const PRETAPANJE = 32;
 
+/**
+ * Sadrzaj se skuplja iznad tastature, pa glavno dugme ostaje vidljivo. iOS:
+ * `KeyboardAvoidingView`. ANDROID (Ivan, 30.9.2026, Xiaomi 11T): aplikacija je
+ * edge-to-edge, pa sistemski `adjustResize` vise ne smanjuje prozor — dugme je ostajalo
+ * ISPOD tastature. Zato razmak na dnu prati visinu tastature (`useAnimatedKeyboard`, kao
+ * `pitanje-novo.tsx`), umanjen za donji umetak koji `SafeAreaView` vec daje. Klase na
+ * Reanimated-ovom `Animated.View` ne stizu (NativeWind) — zato samo `style`.
+ */
+function IznadTastature({ children }: { children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+  const tastatura = useAnimatedKeyboard();
+  const razmak = useAnimatedStyle(() => ({
+    paddingBottom: Math.max(tastatura.height.value - insets.bottom, 0),
+  }));
+  if (Platform.OS === 'ios') {
+    return <KeyboardAvoidingView className="flex-1" behavior="padding">{children}</KeyboardAvoidingView>;
+  }
+  return <Animated.View style={[{ flex: 1 }, razmak]}>{children}</Animated.View>;
+}
+
 /** Native traka postoji samo na iOS-u 26 (vidi `(onboarding)/_layout.tsx`). */
 const NATIVE_TRAKA = Platform.OS === 'ios' && !STARI_IOS;
 
@@ -79,9 +100,7 @@ export function OnboardingStep({
   return (
     <View className="flex-1 bg-grouped">
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
-        <KeyboardAvoidingView
-          className="flex-1"
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <IznadTastature>
 
           {NATIVE_TRAKA && (
             <Stack.Screen
@@ -104,8 +123,9 @@ export function OnboardingStep({
             />
           )}
 
-          {/* Na iOS-u 26 ovaj red je samo razmak ispod native trake. */}
-          <View className="h-14 flex-row items-center px-5">
+          {/* Na iOS-u 26 ovaj red je samo razmak ispod native trake. Android: malo nize
+              od statusne trake, kao traka ostalih ekrana (`VRH_ANDROID`). */}
+          <View className="h-14 flex-row items-center px-5" style={{ marginTop: VRH_ANDROID }}>
             {!NATIVE_TRAKA && exit && (
               <GlassIconButton
                 onPress={exit.onPress}
@@ -180,7 +200,7 @@ export function OnboardingStep({
               </Pressable>
             )}
           </View>
-        </KeyboardAvoidingView>
+        </IznadTastature>
       </SafeAreaView>
       {/* Samo preliv: sadrzaj ovde ne klizi ispod trake (dugme je prikovano za
           dno), pa zamucenje nema sta da zamuti. Bez ovoga bi se pri prelasku sa

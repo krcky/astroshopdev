@@ -19,6 +19,7 @@ import { useOsobeStore } from '@/store/osobe';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useHeroLog } from '@/store/hero-log';
 import { usePricaLog } from '@/store/prica-log';
+import { usePricaZnakaLog } from '@/store/prica-znaka-log';
 import { useVideoPrice } from '@/store/video-price';
 import { PREKIDAC_PRODUCT_ID, PROBNI_BUILD, useDevStore } from '@/store/dev';
 
@@ -216,6 +217,7 @@ async function ocistiLokalno() {
   useTvojDanLog.getState().clear();
   useHeroLog.getState().clear();
   usePricaLog.getState().clear();
+  usePricaZnakaLog.getState().clear();
   useVideoPrice.getState().clear();
   await obrisiKes();
   await obrisiPitanjeLokalno();

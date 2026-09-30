@@ -15,7 +15,7 @@ import {
 } from '@/components/prica/crtezi';
 import { useOkret } from '@/components/prica/sat';
 import type { Nijansa } from '@/components/prica/boje';
-import { boljeNegoJuce, fazaOsmina, korakReci, velicinaSaveta, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
+import { boljeNegoJuce, fazaOsmina, korakReci, PRORED_IDE_KOCI, velicinaSaveta, VELICINE_IDE_KOCI_KARTICA, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
@@ -42,13 +42,16 @@ import { neutral } from '@/theme/tokens';
  */
 export const KARTICA = { w: 360, h: 640 } as const;
 
-const LOGO_W = 132;
+/** Sirina loga dole (Ivan, 30.9.2026: "1.5x veci"; do tada 132). */
+const LOGO_W = 198;
 /**
- * Logo dole (Ivan, 30.9.2026: "spusti jos dole"; do tada vrh na 512). Dno mu je na ~575 od 640,
- * tj. ~195 px od dna u 1080 × 1920 — tik iznad polja za odgovor koje Instagram crta preko price.
- * U videu mu se krug vrti (`logo-price.tsx`).
+ * Logo dole (Ivan, 30.9.2026: "spusti jos dole"; do tada vrh na 512, pa 540 sa sirinom 132).
+ * Uz veci logo spusten jos malo, da recenica "Koči me" od cetiri reda stane iznad njega (Ivan:
+ * "spusti malo logo jos dole ako ne staju recenice"): dno na ~585 od 640, tj. ~165 px od dna
+ * u 1080 × 1920 — donja ivica ulazi malo u pojas polja za odgovor koje Instagram crta preko price.
+ * Visina loga je 198 × 95/355 ≈ 53. U videu mu se krug vrti (`logo-price.tsx`).
  */
-const LOGO_VRH = 540;
+const LOGO_VRH = 532;
 
 const BELA = neutral.white;
 const BELA_80 = 'rgba(255,255,255,0.8)';
@@ -195,10 +198,18 @@ function KOcene({ p }: { p: PricaDana }) {
   );
 }
 
+/**
+ * Visina za recenicu "Ide mi / Koči me" (pt), bez reda sa natpisom (30 + 10) i imena tranzita (6 + 16).
+ * Gore: od ispod datuma (116) do dna gornje polovine (320 − 22). Dole: od 342 do loga, uz 8 razmaka.
+ * Jedna recenica: ceo prostor izmedju datuma i loga (`Okvir`, 116—502).
+ */
+const IDE_KOCI_VISINA = { gore: 320 - 22 - 116 - 62, dole: LOGO_VRH - 8 - 342 - 62, sama: 502 - 116 - 62 } as const;
+
 function KIdeKoci({ p }: { p: PricaDana }) {
   const { ide, koci } = p.ideKoci!;
-  const blok = (znak: 'plus' | 'minus', natpis: string, t: { tekst: string; ime: string }, kasni: number) => {
+  const blok = (znak: 'plus' | 'minus', natpis: string, t: { tekst: string; ime: string }, kasni: number, visina: number) => {
     const Ikona = znak === 'plus' ? Plus : Minus;
+    const vel = velicinaSaveta(t.tekst, KARTICA.w - 44, visina, VELICINE_IDE_KOCI_KARTICA, PRORED_IDE_KOCI);
     return (
       <View>
         <Pojava kasni={kasni} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -208,7 +219,13 @@ function KIdeKoci({ p }: { p: PricaDana }) {
           <Text className={cn('text-[17px] leading-[22px]', tezina('display'))}>{natpis}</Text>
         </Pojava>
         <View style={{ marginTop: 10 }}>
-          <Reci tekst={t.tekst} kasni={kasni + 150} korak={55} className={cn('text-[25px] leading-[30px] tracking-[-0.6px]', tezina('display'))} />
+          <Reci
+            tekst={t.tekst}
+            kasni={kasni + 150}
+            korak={55}
+            className={tezina('display')}
+            style={{ fontSize: vel.velicina, lineHeight: vel.prored, letterSpacing: -0.024 * vel.velicina }}
+          />
         </View>
         <Pojava kasni={kasni + 800} style={{ marginTop: 6 }}>
           <Text className="text-[12px] leading-[16px]" style={{ color: INK, opacity: 0.6 }}>{t.ime}</Text>
@@ -222,12 +239,12 @@ function KIdeKoci({ p }: { p: PricaDana }) {
       <View style={{ width: KARTICA.w, height: KARTICA.h, backgroundColor: MINUS, overflow: 'hidden' }} collapsable={false}>
         {/* Gornja polovina se spusti kao zavesa, sa svojom recenicom (kao na slici price). */}
         <Pojava trajanje={900} ublazavanje={ZAVESA} pomak={-KARTICA.h} bledi={false} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: KARTICA.h / 2, backgroundColor: PLUS }}>
-          <View style={{ position: 'absolute', left: 22, right: 22, bottom: 22 }}>{blok('plus', 'Ide mi', ide, 500)}</View>
+          <View style={{ position: 'absolute', left: 22, right: 22, bottom: 22 }}>{blok('plus', 'Ide mi', ide, 500, IDE_KOCI_VISINA.gore)}</View>
         </Pojava>
         <Text className={OZN} style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: 'rgba(21,21,21,0.6)' }}>
           {`${p.datumTekst} · astroshop.rs`}
         </Text>
-        <View style={{ position: 'absolute', left: 22, right: 22, top: KARTICA.h / 2 + 22 }}>{blok('minus', 'Koči me', koci, 1400)}</View>
+        <View style={{ position: 'absolute', left: 22, right: 22, top: KARTICA.h / 2 + 22 }}>{blok('minus', 'Koči me', koci, 1400, IDE_KOCI_VISINA.dole)}</View>
         <LogoPrice sirina={LOGO_W} negativ style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
       </View>
     );
@@ -235,7 +252,7 @@ function KIdeKoci({ p }: { p: PricaDana }) {
   const jedna = ide ?? koci!;
   return (
     <Okvir pozadina={ide ? PLUS : MINUS} datum={p.datumTekst} boja="rgba(21,21,21,0.6)" negativ>
-      {blok(ide ? 'plus' : 'minus', ide ? 'Ide mi' : 'Koči me', jedna, 400)}
+      {blok(ide ? 'plus' : 'minus', ide ? 'Ide mi' : 'Koči me', jedna, 400, IDE_KOCI_VISINA.sama)}
     </Okvir>
   );
 }

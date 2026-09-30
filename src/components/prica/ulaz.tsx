@@ -109,8 +109,11 @@ export function UlazUPricu({ tranzitna, natalna, datum }: {
   );
 }
 
-/** Prsten: preliv dole levo (svetla ljubicasta) -> gore desno (indigo); puni se od vrha u smeru kazaljke. */
-function Prsten({ puni }: { puni: boolean }) {
+/**
+ * Prsten: preliv dole levo (svetla ljubicasta) -> gore desno (indigo); puni se od vrha u smeru kazaljke.
+ * Isti prsten je i ulaz u pricu o znaku (Sunce u velikoj trojci, `karta-lista.tsx`) — zato `D` kao prop.
+ */
+export function Prsten({ puni, D = 91 }: { puni: boolean; D?: number }) {
   const id = `prica-prsten-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const r = (D - POTEZ) / 2;
   const O = 2 * Math.PI * r;
@@ -145,8 +148,8 @@ function Prsten({ puni }: { puni: boolean }) {
 
 const PLAY = 'M3 1.9v8.2c0 .7.8 1.1 1.4.7l6.2-4.1c.5-.3.5-1.1 0-1.4L4.4 1.2C3.8.8 3 1.2 3 1.9z';
 
-/** Balon ispod planete, kao beleska na Instagramu: dve tackice pa balon sa "▶ Priča dana". */
-function Balon({ animiraj }: { animiraj: boolean }) {
+/** Balon ispod planete, kao beleska na Instagramu: dve tackice pa balon sa "▶ Priča dana" (ili `natpis`). */
+export function Balon({ animiraj, natpis = 'Priča dana' }: { animiraj: boolean; natpis?: string }) {
   const ulaz = (kasni: number) => (animiraj ? ZoomIn.delay(kasni).duration(420).easing(Easing.out(Easing.back(1.8))) : undefined);
   return (
     <View style={{ alignItems: 'center' }} pointerEvents="none">
@@ -157,7 +160,7 @@ function Balon({ animiraj }: { animiraj: boolean }) {
         className="mt-0.5 flex-row items-center gap-1.5 rounded-pill bg-background px-3 py-1.5"
         style={shadow.soft}>
         <Svg width={11} height={11} viewBox="0 0 12 12"><Path d={PLAY} fill={INDIGO} /></Svg>
-        <Text className={cn('text-[13px] leading-[17px]', tezina('dugme'))}>Priča dana</Text>
+        <Text className={cn('text-[13px] leading-[17px]', tezina('dugme'))}>{natpis}</Text>
       </Animated.View>
     </View>
   );

@@ -28,7 +28,7 @@ function saProbnimTekstovima(p: PricaDana): PricaDana {
   return {
     ...p,
     slike: [...REDOSLED],
-    ideKoci: p.ideKoci ?? { ide: { tekst: PROBA, ime: 'Venera trigon Sunce' }, koci: { tekst: PROBA, ime: 'Mars kvadrat Mesec' } },
+    ideKoci: p.ideKoci ?? { ide: { tekst: 'Probna rečenica za proveru prikaza, ovo nije tekst astrologa, nego je namerno mnogo duža da se vidi smanjivanje slova na kartici.', ime: 'Venera trigon Sunce' }, koci: { tekst: 'Probna rečenica za proveru prikaza, ovo nije tekst astrologa, ide u četiri reda.', ime: 'Mars kvadrat Mesec' } },
     savet: p.savet ?? { tekst: 'Probni savet dana, dovoljno dug da se vidi prelom u tri reda.', ime: 'Sunce kvadrat Uran', kljuc: 'proba' },
     trajanja: { ...p.trajanja, ideKoci: p.trajanja.ideKoci ?? 7000, savet: p.trajanja.savet ?? 6000 },
   };

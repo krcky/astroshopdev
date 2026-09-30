@@ -3,9 +3,12 @@ import { Platform, ScrollView, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { X } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { GlassIconButton } from '@/components/ui/glass-button';
+import { VRH_ANDROID } from '@/components/screen';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { BezInterneta } from '@/components/bez-interneta';
 import { PitajUvod } from '@/components/pitaj-uvod';
@@ -174,7 +177,7 @@ export default function PitanjeNovo() {
   if (korak === 'uvod') {
     return (
       <View className="flex-1 bg-background">
-        <Rucica />
+        <Vrh />
         <ScrollView className="flex-1" contentContainerClassName="px-6 pb-4 pt-6" showsVerticalScrollIndicator={false}>
           <PitajUvod naBelom />
         </ScrollView>
@@ -195,7 +198,7 @@ export default function PitanjeNovo() {
 
   return (
     <View className="flex-1 bg-background">
-      <Rucica />
+      <Vrh />
 
       <View className="flex-row items-center gap-3 px-6 pt-5">
         <AstrologSlika velicina={44} />
@@ -269,6 +272,25 @@ export default function PitanjeNovo() {
           </Button>
         </View>
       </Animated.View>
+    </View>
+  );
+}
+
+/**
+ * Vrh strane. iOS: ručica — pageSheet se zatvara povlačenjem. ANDROID (Ivan, 30.9.2026,
+ * Xiaomi 11T): `modal` je preko celog ekrana, pa je sadržaj išao pod statusnu traku, a
+ * povlačenje nadole je otvaralo sistemski meni umesto da zatvori stranu. Zato umetak
+ * statusne trake i X gore DESNO (Ivan, 30.9.2026; prvo je bio levo, kao Material strana
+ * preko celog ekrana); sistemsko "nazad" i dalje radi.
+ */
+function Vrh() {
+  const insets = useSafeAreaInsets();
+  if (Platform.OS !== 'android') return <Rucica />;
+  return (
+    <View className="flex-row justify-end px-5" style={{ paddingTop: insets.top + VRH_ANDROID }}>
+      <GlassIconButton onPress={() => router.back()} accessibilityLabel="Zatvori">
+        <X size={20} color={neutral.ink} />
+      </GlassIconButton>
     </View>
   );
 }

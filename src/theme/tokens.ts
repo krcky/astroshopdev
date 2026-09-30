@@ -412,6 +412,12 @@ export type BackdropTint = keyof typeof backdrop.tints;
 export const headerBar = {
   /** Visina trake ISPOD statusne trake. */
   height: 53,
+  /**
+   * ANDROID: traka ide jos toliko NIZE od statusne (Ivan, 30.9.2026, Xiaomi 11T: logo je
+   * ulazio u statusnu traku). Logo je -5 pt da bi na iOS-u stao u liniju sa sistemskom
+   * dugmadi trake, a Android tu traku nema. Sabira ga samo `Screen` (`VRH_ANDROID`).
+   */
+  androidVrh: 8,
   /** Poluprecnik zamucenja u referenci — cuva se radi traga, ne koristi se direktno. */
   cssBlur: 16,
   /** Udeo sistemskog materijala na iOS-u (1-100), kad je traka puna. */

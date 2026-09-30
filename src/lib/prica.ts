@@ -97,6 +97,13 @@ export const PRORED = 1.09;
 export const VELICINE_SAVETA = [44, 40, 36, 33, 30, 27, 24, 22, 20] as const;
 /** Isto za karticu za deljenje (360 × 640). */
 export const VELICINE_SAVETA_KARTICA = [39, 36, 33, 30, 27, 24, 22, 20, 18] as const;
+/**
+ * Recenica "Ide mi / Koči me" na kartici: 25/30 kao do sada; manja samo kad ne staje (5+ redova,
+ * ~3% tekstova) — inace bi presla preko loga ili datuma (Ivan, 30.9.2026, uz veci logo).
+ */
+export const VELICINE_IDE_KOCI_KARTICA = [25, 23, 21, 19, 17] as const;
+/** Prored recenice "Ide mi / Koči me" (30 / 25). */
+export const PRORED_IDE_KOCI = 1.2;
 
 /** Koliko redova tekst zauzme kad se lomi rec po rec (kao `Reci`), sa `uRedu` znakova po redu. */
 export function redovaTeksta(tekst: string, uRedu: number): number {
@@ -136,9 +143,10 @@ export function velicinaSaveta(
   sirina: number,
   visina: number,
   velicine: readonly number[] = VELICINE_SAVETA,
+  odnosProreda: number = PRORED,
 ): { velicina: number; prored: number; redova: number } {
   const za = (v: number) => {
-    const prored = Math.round(v * PRORED);
+    const prored = Math.round(v * odnosProreda);
     return { velicina: v, prored, redova: redovaTeksta(tekst, Math.floor(sirina / (v * ZNAK_EM))) };
   };
   for (const v of velicine) {

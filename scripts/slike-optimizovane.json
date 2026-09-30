@@ -17,6 +17,8 @@
  "images/ikone/ljubav.png": "54654f3ee10338d3",
  "images/ikone/pazi.png": "d15b78c6728399b4",
  "images/ikone/savet.png": "0dc033e76f367a27",
+ "images/ikone/srce.png": "1401af6ee611a184",
+ "images/ikone/torba.png": "a7fd70c17d6f1079",
  "images/ikone/zdravlje.png": "9b13e5d684ceedff",
  "images/ikonica-obavestenja.png": "3dd607600f5b71ec",
  "images/kartica-premium-krug.png": "666f588293044a0c",
@@ -75,5 +77,17 @@
  "images/planete/sun.png": "b5a106d9ec332d38",
  "images/planete/uranus.png": "fcd578e3f72f99d0",
  "images/planete/venus.png": "7d1db5fec0fd0353",
- "images/splash-krug.png": "40b10b7f6bfb47e7"
+ "images/splash-krug.png": "40b10b7f6bfb47e7",
+ "images/znakovi/aquarius.png": "fae41fb8e97ce820",
+ "images/znakovi/aries.png": "0026abdec43fd117",
+ "images/znakovi/cancer.png": "17cf49276dc1ff87",
+ "images/znakovi/capricorn.png": "5f86589e914b191f",
+ "images/znakovi/gemini.png": "77ac88e2068d1725",
+ "images/znakovi/leo.png": "388191bbfc6cf971",
+ "images/znakovi/libra.png": "765c4288380d8d15",
+ "images/znakovi/pisces.png": "cb41b45ba316b271",
+ "images/znakovi/sagittarius.png": "75c489638197a3a4",
+ "images/znakovi/scorpio.png": "61a7a22aa44cfa61",
+ "images/znakovi/taurus.png": "f138480f100f0328",
+ "images/znakovi/virgo.png": "596397382e613fc2"
 }

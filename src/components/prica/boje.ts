@@ -25,7 +25,7 @@ export const TON_BOJA: Record<Tone, string> = { povoljno: PLUS, mesovito: LILA, 
 export const TON_MASTILO: Record<Tone, string> = { povoljno: '#3FA9D6', mesovito: '#9B85CC', izazovno: '#E97F9A' };
 
 /** Nijanse zivog preliva po slici: boja i jacina u sredini svake mrlje. */
-export type Nijansa = 'noc' | 'indigo' | 'zlato';
+export type Nijansa = 'noc' | 'indigo' | 'zlato' | 'lila' | 'roze';
 export const NIJANSE: Record<Nijansa, readonly (readonly [string, number])[]> = {
   /** Na indigu: lila, plavoljubicasta, svetlo plava — svetle mrlje u tamnoj boji. */
   noc: [['rgb(179, 157, 219)', 0.42], ['rgb(99, 102, 220)', 0.36], ['rgb(122, 204, 234)', 0.22]],
@@ -33,4 +33,8 @@ export const NIJANSE: Record<Nijansa, readonly (readonly [string, number])[]> = 
   indigo: [['rgb(99, 102, 180)', 0.42], ['rgb(125, 83, 230)', 0.36], ['rgb(64, 63, 152)', 0.22]],
   /** Na sivoj: `backdrop.tints.gold`. */
   zlato: [['rgb(244, 200, 68)', 0.42], ['rgb(245, 158, 11)', 0.36], ['rgb(244, 200, 68)', 0.22]],
+  /** Prica o znaku (Ivan, 30.9.2026): svetlo ljubicasta — lila ikonica oblasti i prstena price. */
+  lila: [['rgb(179, 157, 219)', 0.42], ['rgb(214, 200, 247)', 0.3], ['rgb(179, 157, 219)', 0.26]],
+  /** Prica o znaku, "U ljubavi": roze iz "Koči te" (`MINUS_BOJA`). */
+  roze: [['rgb(248, 179, 195)', 0.42], ['rgb(244, 154, 184)', 0.3], ['rgb(248, 179, 195)', 0.26]],
 };

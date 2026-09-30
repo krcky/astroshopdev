@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Image, Pressable, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { ChevronRight, Info, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils';
 import type { SignPosition, ZodiacSign } from '@/lib/zodiac';
 import { neutral } from '@/theme/tokens';
 import { PREMIUM } from '@/components/zakljucano';
+import { Balon, Prsten } from '@/components/prica/ulaz';
 
 /**
  * Delovi liste ispod tocka — zajednicki za natalnu kartu (tab "Ti") i
@@ -121,32 +123,54 @@ const ZNACKA = 28;
 const PRSTEN = 3;
 /** Pola od koliko znak viri desno od slike tela. */
 const VIRI = Math.round((ZNACKA * 0.45) / 2);
+/** Prsten price oko Sunca: potez 3 + razmak 2,5 od slike, kao oko planete "Tvog dana". */
+const PRSTEN_RAZMAK = 5.5;
+/** Koliko balon "Tvoj znak" ulazi u plocicu odozdo: njena donja margina (`py-4`) — tu su tackice. */
+export const BALON_PREKO = 16;
+/** Visina balona sa tackicama (5 + 1 + 8 + 2 + 29), da red ispod trojke ne ode pod njega. */
+export const BALON_VISINA = 45;
 
 /**
  * Jedna plocica velike trojke: slika tela, dole desno mali znak u belom prstenu,
  * oznaka, ime znaka. `znak = null` = nepoznat (znak pitanja umesto znaka).
  * Za sada samo na "Ti" — Nebo je bez trojke (Ivan, 28.9.2026: "samo lista").
  */
-export function TrojkaPlocica({ oznaka, slika, znak, ime, onPress }: {
+export function TrojkaPlocica({ oznaka, slika, znak, ime, onPress, prica }: {
   oznaka: string;
   slika: keyof typeof SLIKA_TELA;
   znak: ZodiacSign | null;
   /** Umesto imena znaka ("Blizanci ili Rak"). */
   ime?: string;
   onPress?: () => void;
+  /**
+   * Ulaz u PRICU O ZNAKU (pravilo 25, samo Sunce na tabu "Ti"): isti prsten i balon kao ulaz u dnevnu
+   * pricu. Dok prica nije pogledana, prsten se puni i balon iskace pri svakom fokusu taba.
+   */
+  prica?: { pogledana: boolean; natpis: string };
 }) {
   const tekst = ime ?? (znak ? znak.name : 'Nepoznat');
   const nepoznat = !znak && !ime;
+  const [ciklus, setCiklus] = React.useState(0);
+  const pogledana = prica?.pogledana ?? true;
+  useFocusEffect(React.useCallback(() => {
+    if (!pogledana) setCiklus((c) => c + 1);
+  }, [pogledana]));
   return (
     <Pressable
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={`${oznaka}: ${tekst}${onPress ? '. Tumačenje' : ''}`}
+      accessibilityLabel={`${oznaka}: ${tekst}${prica ? `. ${prica.natpis}` : onPress ? '. Tumačenje' : ''}`}
       // Obicna bela kartica (Ivan, 28.9.2026: Liquid Glass probano pa vraceno).
-      className={cn(CARD_SURFACE, 'flex-1 items-center px-2 py-4 active:opacity-80')}>
+      className={cn(CARD_SURFACE, 'flex-1 items-center px-2 py-4 active:opacity-80')}
+      style={prica ? { zIndex: 1 } : undefined}>
       {/* Pomereno ulevo za pola koliko znak viri desno: slika i znak su centrirani kao par. */}
       <View style={{ width: TELO, height: TELO, marginLeft: -VIRI }}>
+        {prica && (
+          <View pointerEvents="none" style={{ position: 'absolute', left: -PRSTEN_RAZMAK, top: -PRSTEN_RAZMAK, width: TELO + 2 * PRSTEN_RAZMAK, height: TELO + 2 * PRSTEN_RAZMAK }}>
+            <Prsten key={pogledana ? 'miran' : `puni-${ciklus}`} puni={!pogledana} D={TELO + 2 * PRSTEN_RAZMAK} />
+          </View>
+        )}
         <Image source={SLIKA_TELA[slika]} style={{ width: TELO, height: TELO, opacity: nepoznat ? 0.5 : 1 }}
           resizeMode="contain" accessibilityIgnoresInvertColors />
         <View
@@ -166,6 +190,14 @@ export function TrojkaPlocica({ oznaka, slika, znak, ime, onPress }: {
         className={cn('mt-0.5 text-center', nepoznat && 'text-muted-foreground')}>
         {tekst}
       </Text>
+      {/* Balon ispod imena, kao beleska na Instagramu (tackice ka Suncu): u toku, sa negativnom donjom
+          marginom — ne menja visinu plocice, tackice su u njenoj donjoj margini, sam balon visi ispod nje.
+          (`top: '100%'` u apsolutnom polozaju je stavio balon preko imena znaka — simulator, 1.10.2026.) */}
+      {prica && (
+        <View pointerEvents="none" style={{ alignItems: 'center', marginTop: 2, marginBottom: -(BALON_VISINA + 2) }}>
+          <Balon key={pogledana ? 'miran' : `balon-${ciklus}`} animiraj={!pogledana} natpis={prica.natpis} />
+        </View>
+      )}
     </Pressable>
   );
 }

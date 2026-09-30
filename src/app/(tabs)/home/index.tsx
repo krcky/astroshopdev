@@ -5,7 +5,7 @@ import { Redirect, Stack, router } from 'expo-router';
 import type { NativeStackHeaderItem } from 'expo-router';
 
 import { Text } from '@/components/ui/text';
-import { Screen } from '@/components/screen';
+import { Screen, VRH_ANDROID } from '@/components/screen';
 import { KapsuleRed } from '@/components/ui/kapsule';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { GlassBubble } from '@/components/ui/glass-button';
@@ -365,7 +365,7 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
         <Pressable className="flex-1" onPress={() => setOtvoren(false)} accessibilityLabel="Zatvori meni" />
         <View
           className="absolute overflow-hidden rounded-lg bg-background"
-          style={{ top: insets.top + headerBar.height - 4, right: space.screen, width: 260, ...shadow.floating }}>
+          style={{ top: insets.top + VRH_ANDROID + headerBar.height - 4, right: space.screen, width: 260, ...shadow.floating }}>
           {ponude.map((o, i) => (
             <React.Fragment key={o}>
               {i > 0 && <View className="h-px bg-border" />}
