@@ -5,7 +5,7 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { formatDatum } from '@/lib/horoscope';
-import { useT } from '@/i18n';
+import { useJezik, useT, type Jezik } from '@/i18n';
 
 /**
  * Native tockic za datum/vreme.
@@ -25,7 +25,18 @@ type Props = {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+/**
+ * Jezik iOS birača (imena meseci). Pismo MORA u oznaku: "sr-RS" na iOS-u daje CIRILICU, pa
+ * "sr-Latn-RS"; isto "bs-Latn-BA". Engleski je "en-GB", ne "en": britanski format drzi
+ * 24 sata u biracu vremena (rodjenje u 3 ujutru i 3 popodne nisu ista karta). Android birac
+ * prati jezik telefona — tamo se jezik ne moze zadati.
+ */
+const LOCALE_BIRACA: Record<Jezik, string> = {
+  sr: 'sr-Latn-RS', hr: 'hr-HR', bs: 'bs-Latn-BA', sl: 'sl-SI', mk: 'mk-MK', en: 'en-GB',
+};
+
 export function WheelPicker({ mode, value, onChange, maximumDate, minimumDate }: Props) {
+  const jezik = useJezik();
   if (Platform.OS === 'web') {
     return <WebFallback mode={mode} value={value} onChange={onChange} />;
   }
@@ -39,9 +50,8 @@ export function WheelPicker({ mode, value, onChange, maximumDate, minimumDate }:
           display="spinner"
           // 24-casovni format: rodjenje u 3 ujutru i 3 popodne nisu ista karta.
           is24Hour
-          // "sr-RS" na iOS-u daje CIRILICU. Za latinicu je neophodan zapis
-          // pisma u oznaci jezika — "sr-Latn-RS", ne "sr-RS".
-          locale="sr-Latn-RS"
+          // Meseci na jeziku aplikacije (Ivan, 2.10.2026: bili su uvek srpski).
+          locale={LOCALE_BIRACA[jezik]}
           maximumDate={maximumDate}
           minimumDate={minimumDate}
           onChange={(_e: DateTimePickerEvent, d?: Date) => d && onChange(d)}
