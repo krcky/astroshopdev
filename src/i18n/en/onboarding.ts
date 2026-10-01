@@ -1,4 +1,5 @@
 import type { Recnik } from '../sr';
+import { ASPEKT_GLAGOL } from './aspekti';
 import { nebo } from './nebo';
 
 /** Onboarding steps, sign-in and account — see `sr/onboarding.ts`. One object per screen, in flow order. */
@@ -195,9 +196,8 @@ export const onboarding: Recnik['onboarding'] = {
     /** Three sample notifications on the phone illustration (the second one's title is the astrologer's name). */
     primerDanNaslov: 'Your day',
     primerDanTekst: "Today's horoscope is ready.",
-    /** "Venus is trine your Sun." */
-    primerAspektTekst: (tranzitna, aspekt, natalna) =>
-      `${nebo.tela[tranzitna]} is ${({ conjunction: 'conjunct', opposition: 'opposite' } as Record<string, string>)[aspekt] ?? nebo.aspekti[aspekt]} your ${nebo.tela[natalna]}.`,
+    /** "Venus trines your Sun." */
+    primerAspektTekst: (tranzitna, aspekt, natalna) => `${nebo.tela[tranzitna]} ${ASPEKT_GLAGOL[aspekt]} your ${nebo.tela[natalna]}.`,
     primerOdgovorTekst: 'Answered your question.',
     sada: 'now',
     preSat: '1h ago',

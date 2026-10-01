@@ -118,7 +118,7 @@ async function proveraJezika() {
     ['vladar', () => SIGNS[7].ruler, 'Pluton', 'Pluto'],
     ['planeta', () => BODIES[0].name, 'Mesec', 'Moon'],
     ['aspekt', () => ASPECTS[2].name, 'kvadrat', 'square'],
-    ['padezi', () => tr().onboarding.push.primerAspektTekst('venus', 'trine', 'sun'), 'Venera je u trigonu sa tvojim Suncem.', 'Venus is trine your Sun.'],
+    ['padezi', () => tr().onboarding.push.primerAspektTekst('venus', 'trine', 'sun'), 'Venera je u trigonu sa tvojim Suncem.', 'Venus trines your Sun.'],
     ['rod', () => tr().onboarding.push.primerAspektTekst('mars', 'conjunction', 'venus'), 'Mars je u konjunkciji sa tvojom Venerom.', 'Mars is conjunct your Venus.'],
   ];
   for (const [ime, f, sr, en] of ocekivano) {
