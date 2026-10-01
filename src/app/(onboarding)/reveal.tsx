@@ -29,6 +29,10 @@ export default function Reveal() {
   const user = useAuthStore((s) => s.user);
   const [cuva, setCuva] = React.useState(false);
   const [greska, setGreska] = React.useState(false);
+  // Upis karte je u toku ili je prosao (1.10.2026): `completeSignup` posle upisa BRISE draft, pa bi
+  // ekran — jos montiran dok `router.replace` ne stigne — video prazan draft i poslao korisnika na
+  // dobrodoslicu (`Redirect` dole). Ivan je tako sa ekrana sa znakom zavrsavao na pocetku aplikacije.
+  const odlazi = React.useRef(false);
 
   // VEC PRIJAVLJEN (Ivan, 30.9.2026): nalog bez karte — npr. "Već imam nalog" sa emailom koji
   // jos nema kartu. Karta ide pravo na taj nalog i tok ide dalje (ime, prica...); do tada ga je
@@ -39,6 +43,7 @@ export default function Reveal() {
       return;
     }
     if (cuva) return;
+    odlazi.current = true;
     setCuva(true);
     setGreska(false);
     // Upis se ponavlja do 3 puta, kao posle koda (`code.tsx`): sveze osvezen token baza ume
@@ -54,7 +59,7 @@ export default function Reveal() {
       }
     }
     setCuva(false);
-    if (ishod === null) { setGreska(true); return; }
+    if (ishod === null) { odlazi.current = false; setGreska(true); return; }
     router.replace(routeAfterSignup(ishod));
   };
 
@@ -69,7 +74,7 @@ export default function Reveal() {
   }, [draft.date, draft.time, draft.city]);
 
   // Ako je draft izgubljen (npr. ponovo ucitana aplikacija), pocinje se ispocetka.
-  if (!resolved) return <Redirect href="/welcome" />;
+  if (!resolved) return odlazi.current ? null : <Redirect href="/welcome" />;
 
   // Bolje zaustaviti ovde nego pustiti korisnika da napravi nalog sa kartom
   // koju ne umemo da izracunamo.

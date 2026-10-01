@@ -106,6 +106,8 @@ export type PricaZnaka = {
    * `null` kad znak vladara nije poznat.
    */
   vladarRecenica: string | null;
+  /** Ista recenica u prvom licu, za karticu i video ("U mojoj natalnoj karti…", Ivan 1.10.2026). */
+  vladarRecenicaJa: string | null;
   /** Naslov poglavlja sa tackom na kraju: "Otvorenost i ishitrenost." */
   ukratko: string;
   /** Prve recenice poglavlja; `null` kad su preduge za sliku. */
@@ -149,10 +151,10 @@ const VLADAR_MIT: Record<string, string> = { sun: 'Grci su ga zvali Helios.' };
  * "U tvojoj natalnoj karti Mars je u Biku." Dva znaka (Mesec bez vremena rodjenja) -> "u Blizancima ili Raku",
  * kao trojka na tabu "Ti" — radije priznati nego pogadjati (pravilo 4).
  */
-export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null): string | null {
+export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null, lice: 'ti' | 'ja' = 'ti'): string | null {
   if (VLADAR_MIT[vladarKey]) return VLADAR_MIT[vladarKey];
   if (!znaci?.length) return null;
-  return `U tvojoj natalnoj karti ${vladarIme} je u ${znaci.map((z) => SIGN_CASES[z].loc).join(' ili ')}.`;
+  return `U ${lice === 'ja' ? 'mojoj' : 'tvojoj'} natalnoj karti ${vladarIme} je u ${znaci.map((z) => SIGN_CASES[z].loc).join(' ili ')}.`;
 }
 
 /**
@@ -188,6 +190,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: 
     vladarNaslov,
     vladar: { key: znak.rulerKey, ime: znak.ruler },
     vladarRecenica: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci),
+    vladarRecenicaJa: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci, 'ja'),
     ukratko,
     ukratkoRecenica: recenica(opis.ukratkoRecenica),
     ljubavRecenica: recenica(opis.ljubavRecenica),

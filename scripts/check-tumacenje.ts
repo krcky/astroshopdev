@@ -5,7 +5,7 @@
  * razidju, stavke se na telefonu prikazu kao obican tekst sa bulletom u sebi,
  * ili se naslov ne podebljava — tiho, bez greske.
  */
-import { blokovi, stavka, vrstaSekcije, vrstaOdeljka } from '../src/lib/tumacenje';
+import { blokovi, prvaRecenica, rasporedDuge, stavka, UVOD_MAX, vrstaSekcije, vrstaOdeljka } from '../src/lib/tumacenje';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -50,6 +50,28 @@ const vrste: [string, string | null][] = [
 ];
 for (const [n, v] of vrste) ok(vrstaSekcije(n) === v, n, String(vrstaSekcije(n)));
 ok(vrstaOdeljka('Opšte preporuke') === null, 'preporuke NISU savet u kartici "Tvoj dan"');
+
+console.log('\n=== Raspored duge verzije (uvod, stavke, nastavak) ===');
+const r1 = prvaRecenica('Sunce u kvadratu sa Neptunom donosi period zbunjenosti. Pod uticajem ovog aspekta, možete se osetiti izgubljeno.');
+ok(r1?.recenica === 'Sunce u kvadratu sa Neptunom donosi period zbunjenosti.', 'prva recenica do tacke', r1?.recenica);
+ok(r1?.ostatak === 'Pod uticajem ovog aspekta, možete se osetiti izgubljeno.', 'ostatak pasusa', r1?.ostatak);
+const r2 = prvaRecenica('U periodu između 83. i 85. godine života dolazi do promene. Drugo.');
+ok(r2?.recenica === 'U periodu između 83. i 85. godine života dolazi do promene.', 'redni broj "83." ne zavrsava recenicu', r2?.recenica);
+ok(prvaRecenica('Srećan rođendan! Danas vam je divan dan.')?.recenica === 'Srećan rođendan!', 'uzvicnik zavrsava recenicu');
+ok(prvaRecenica('Samo jedna rečenica.')?.ostatak === '', 'pasus od jedne recenice: ostatak prazan');
+ok(prvaRecenica(`${'a'.repeat(UVOD_MAX)}. Drugo.`) === null, `preko ${UVOD_MAX} znakova nema uvoda`);
+const sek = [
+  { heading: 'Suština', body: 'x' }, { heading: 'Opšte preporuke', body: 'p' },
+  { heading: 'Pozitivni efekti', body: '• a' }, { heading: 'Izazovi', body: '• b' }, { heading: 'Saveti', body: '• c' },
+];
+const rd = rasporedDuge('Prva. Ostatak prvog.\n\nDrugi pasus.\n\nTreći pasus.', sek);
+ok(rd.uvod === 'Prva.' && rd.prviPasus === 'Ostatak prvog.', 'uvod i ostatak prvog pasusa', `${rd.uvod} | ${rd.prviPasus}`);
+ok(rd.odeljci.map((s) => s.heading).join('|') === 'Suština|Opšte preporuke|Pozitivni efekti|Izazovi|Saveti', 'SVI odeljci gore, redom astrologa');
+ok(rd.nastavakTekst === 'Drugi pasus.\n\nTreći pasus.', 'ostali pasusi u nastavak');
+const sve = [rd.uvod, rd.prviPasus, rd.nastavakTekst].join(' ');
+ok(['Prva.', 'Ostatak prvog.', 'Drugi pasus.', 'Treći pasus.'].every((x) => sve.includes(x)), 'nijedan deo teksta se ne gubi');
+const dug = rasporedDuge(`${'b'.repeat(UVOD_MAX + 5)}. Dalje.`, []);
+ok(dug.uvod === null && dug.prviPasus.startsWith('bbb'), 'bez uvoda ceo prvi pasus ostaje siv');
 
 console.log(fail ? `\n${fail} FAIL` : '\nsve OK');
 process.exit(fail ? 1 : 0);

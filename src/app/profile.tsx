@@ -46,6 +46,19 @@ const ZNACKA = 30;
  * (Ivan: "ne treba da bude dostupno odmah") — i dalje u aplikaciji, kako Apple
  * trazi (5.1.1(v)), samo ne na dohvat palca.
  */
+/** Adresa podrske — ista kao na sajtu (`web/podrska.html`). */
+const PODRSKA = 'podrska@astroshop.rs';
+
+/**
+ * Mejl podrsci. Bez mejl aplikacije na telefonu `openURL` pada — tada se adresa
+ * pokaze, da korisnik moze da je prepise.
+ */
+function pisiPodrsci() {
+  const telo = `\n\n—\nAstro Shop ${Constants.expoConfig?.version ?? ''} · ${Platform.OS} ${Platform.Version}`;
+  Linking.openURL(`mailto:${PODRSKA}?subject=${encodeURIComponent('Astro Shop')}&body=${encodeURIComponent(telo)}`)
+    .catch(() => Alert.alert('Pišite nam', `Na telefonu nema aplikacije za mejl. Adresa je ${PODRSKA}.`));
+}
+
 export default function ProfileSheet() {
   const hydrated = useProfileStore((s) => s.hydrated);
   const { user, loading } = useAuthStore();
@@ -238,6 +251,14 @@ export default function ProfileSheet() {
           onPress={odjava ? undefined : doSignOut}
           trailing={odjava ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
         />
+      </Group>
+
+      {/* Pomoc (B10 iz UX recenzije, Ivan 1.10.2026): mejl podrsci, sa verzijom aplikacije i
+          telefona u telu poruke. Adresa je ista kao na sajtu (`web/podrska.html`). Obavestenja
+          dolaze ovde kad push postoji. */}
+      <GroupHeader variant="oznaka" className={NASLOV}>Pomoć</GroupHeader>
+      <Group className={GRUPA}>
+        <ListRow title="Pišite nam" subtitle={PODRSKA} onPress={pisiPodrsci} />
       </Group>
 
       {/* Pravila na sajtu — isti linkovi kao na paywall-u. */}

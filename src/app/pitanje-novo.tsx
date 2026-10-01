@@ -58,7 +58,9 @@ const POSLE_KUPOVINE: Record<Exclude<IshodKupovine, 'placeno'>, string> = {
  */
 export default function PitanjeNovo() {
   // `osoba`: otvoreno sa strane osobe (29.9.2026) — pitanje je o njoj.
-  const { korak: pocetniKorak, osoba: pocetnaOsoba } = useLocalSearchParams<{ korak?: string; osoba?: string }>();
+  // `tema`: otvoreno sa lista tranzita ("Pitaj astrologa o ovom tranzitu", 1.10.2026) — ime
+  // tranzita je pocetak teksta, ali samo kad nema necega vec kucanog ni nacrta.
+  const { korak: pocetniKorak, osoba: pocetnaOsoba, tema } = useLocalSearchParams<{ korak?: string; osoba?: string; tema?: string }>();
   const [korak, setKorak] = React.useState<'uvod' | 'pisanje'>(pocetniKorak === 'uvod' ? 'uvod' : 'pisanje');
   const uid = useAuthStore((s) => s.user?.id);
   const resolved = useResolvedProfile();
@@ -98,7 +100,7 @@ export default function PitanjeNovo() {
     let otkazano = false;
     (uid ? procitajLokalno(uid) : Promise.resolve(null)).then((lokalno) => {
       if (otkazano) return;
-      setTekst(lokalno ?? nacrt ?? '');
+      setTekst(lokalno ?? nacrt ?? (tema ? `${tema}: ` : ''));
       // Nacrt o drugoj osobi vraca i izbor — osim kad je list otvoren sa strane osobe.
       if (!pocetnaOsoba && nacrtRed?.osoba_id && otvorene.has(nacrtRed.osoba_id)) {
         setOsobaId(nacrtRed.osoba_id);

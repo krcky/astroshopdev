@@ -90,18 +90,16 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
         ))}
       </View>
 
-      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti pod katancem — vidi se da postoje,
-          ne i sta pisu. Od 1.10.2026 (UX recenzija) sa naslovom tumacenja i tonom, kao
-          otvorene kartice: naslov je iz kratke verzije, koju besplatni ionako dobija
-          (pravilo 8 cuva ceo tekst, ne naslov). */}
+      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti po imenu, pod katancem — vidi se
+          da postoje, ne i sta pisu. */}
       {zakljucani.length > 0 && (
         <>
           <ZakljucaniRedovi
             className="mt-3"
             redovi={zakljucani.map((t) => ({
               key: t.red.key,
-              naslov: tekstReda(t.red, naslov(t.red.key)).veci,
-              ispod: [TONE_LABEL[t.ton], trajanja.get(t.red.key)].filter(Boolean).join(' · '),
+              naslov: tekstReda(t.red, '').veci,
+              ispod: trajanja.get(t.red.key),
             }))}
           />
           <PremiumKartica

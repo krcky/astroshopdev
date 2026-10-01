@@ -9,7 +9,6 @@ import { Text } from '@/components/ui/text';
 import { ScreenBackdrop } from '@/components/screen';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
-import { Planeta } from '@/components/planete-par';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { PREMIUM as PREMIUM_GRANICE } from '@/lib/pristup';
@@ -22,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { PREMIUM, PREMIUM_IZABRAN } from '@/components/zakljucano';
 import { neutral } from '@/theme/tokens';
+import { AstrologSlika } from '@/components/astrolog-slika';
+import { ASTROLOG } from '@/lib/pitanja';
 
 /** Prostor za rucicu i X iznad naslova. */
 const RUCICA_PROSTOR = 44;
@@ -100,18 +101,22 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
     <>
       {/* U onboardingu (ceo ekran, Ivan 30.9.2026): naslov GORE, odmah ispod X-a; visak
           visine ide IZMEDJU delova (vidi dole), ne iznad naslova. */}
-      <View style={uOnboardingu ? { height: RUCICA_PROSTOR + 12 } : kaoList ? { height: RUCICA_PROSTOR } : { flexGrow: 1, minHeight: RUCICA_PROSTOR }} />
+      {/* Onboarding: bez dodatnih 12 pt (Ivan, 1.10.2026: "podigni sve na gore", bez skrola). */}
+      <View style={uOnboardingu ? { height: RUCICA_PROSTOR } : kaoList ? { height: RUCICA_PROSTOR } : { flexGrow: 1, minHeight: RUCICA_PROSTOR }} />
       <View className="px-5">
 
         <Text variant="naslovLista" className="text-center" accessibilityRole="header">
           Otvori sva tumačenja
         </Text>
-        {/* Uze od ekrana, da se prelomi u dva ujednacena reda — ne jedna rec sama u drugom (Ivan, 29.9.2026). */}
+        {/* Uze od ekrana, da se prelomi u dva ujednacena reda — ne jedna rec sama u drugom (Ivan, 29.9.2026).
+            "Besplatno ostaje…" (B7) je probano 1.10.2026 i vraceno — Ivan: paywall treba da nagovara
+            na placanje, ne da kaze sta ostaje besplatno. */}
         <Text variant="muted" className="mt-3 self-center text-center" style={{ maxWidth: 280 }}>
           Svi tvoji tranziti, teme perioda i pogled na sutra i prekosutra.
         </Text>
 
-        <View className={uOnboardingu ? 'mt-10 gap-7' : 'mt-7 gap-5'}>
+        {/* Kao list gap 16 (do 1.10.2026 20) — peta stavka (astrolog) mora da stane bez skrola. */}
+        <View className={uOnboardingu ? 'mt-7 gap-5' : 'mt-6 gap-4'}>
           <Stavka
             slika={
               <Image
@@ -137,19 +142,7 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
             // "Sledeća dva dana" vise nije stavka (Ivan, 29.9.2026) — samo deo ovog teksta.
             tekst="Svi tranziti dana sa celim tumačenjem — i za sutra i prekosutra."
           />
-          {/* Spori tranziti (Jupiter—Pluton), slajd "Tema perioda"; besplatni vidi prvi. */}
-          <Stavka
-            slika={
-              <View className="flex-row items-center">
-                <Planeta t={{ key: 'saturn', glyph: '♄\uFE0E' }} size={40} />
-                <View className="-ml-2">
-                  <Planeta t={{ key: 'pluto', glyph: '♇\uFE0E' }} size={28} />
-                </View>
-              </View>
-            }
-            naslov="Teme perioda"
-            tekst="Tranziti koji traju nedeljama i mesecima."
-          />
+          {/* "Teme perioda" izbacena iz liste (Ivan, 1.10.2026). */}
           {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
           <Stavka
             slika={
@@ -166,13 +159,19 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
             naslov="Tvoji ljudi"
             tekst={`Karte i tranziti do ${PREMIUM_GRANICE.osobe} bliskih osoba.`}
           />
+          {/* Ko pise (B7 iz UX recenzije, Ivan 1.10.2026): najveca razlika od drugih aplikacija. */}
+          <Stavka
+            slika={<AstrologSlika velicina={52} />}
+            naslov="Piše astrolog"
+            tekst={`Sva tumačenja piše astrolog ${ASTROLOG.ime}.`}
+          />
         </View>
 
       </View>
 
       {/* Izmedju stavki i paketa NAJVISE 32pt (Ivan, 29.9.2026: "preveliki razmak"); visak
           visine ide iznad naslova, pa ceo sadrzaj stoji zajedno, uz pakete i dugme na dnu. */}
-      <View style={uOnboardingu ? { flexGrow: 1, minHeight: 32 } : kaoList ? { height: 32 } : { flexGrow: 1, minHeight: 20, maxHeight: 32 }} />
+      <View style={uOnboardingu ? { flexGrow: 1, minHeight: 20 } : kaoList ? { height: 24 } : { flexGrow: 1, minHeight: 20, maxHeight: 32 }} />
 
       <View className="px-5">
         {/* Paketi — samo kad je cena stigla iz prodavnice. */}
@@ -204,7 +203,7 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
       </View>
 
       {/* Dno: jedno dugme i pravila, odmah ispod paketa (Ivan: manja rupa). */}
-      <View className={uOnboardingu ? 'px-5 pt-6' : 'px-5 pt-5'}>
+      <View className={uOnboardingu ? 'px-5 pt-5' : 'px-5 pt-5'}>
         {!!poruka && <Text variant="muted" className="mb-3 text-center" accessibilityLiveRegion="polite">{poruka}</Text>}
         <Button disabled={!paket} ucitava={radi} onPress={kupi}>
           <Text>{paket?.probaDana ? `Probaj ${dana(paket.probaDana)} besplatno` : 'Pretplati se'}</Text>
@@ -215,6 +214,8 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
               ? `Posle probe ${paket.cena} ${paket.id === 'godisnje' ? 'godišnje' : 'mesečno'}. `
               : ''}
             Pretplata se obnavlja sama dok je ne otkažeš u podešavanjima {Platform.OS === 'ios' ? 'App Store-a' : 'Google Play-a'}.
+            {/* B7 (1.10.2026): da Premium ne izgleda kao da ukljucuje i pitanje astrologu. */}
+            {' '}Pitanja astrologu se plaćaju posebno.
           </Text>
         )}
         <View className="mt-2 flex-row items-center justify-center">

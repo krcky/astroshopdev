@@ -6,7 +6,7 @@ import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { Text } from '@/components/ui/text';
 import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
-import { SheetScroll } from '@/components/sheet';
+import { leaveSheetTo, SheetScroll } from '@/components/sheet';
 import { PremiumKartica } from '@/components/zakljucano';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
@@ -21,7 +21,11 @@ import { TransitTrajanje } from '@/components/transit-trajanje';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { OdeljakIkona } from '@/components/odeljak-ikona';
-import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
+import { rasporedDuge, vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
+import { AstrologSlika } from '@/components/astrolog-slika';
+import { ASTROLOG, OKVIRNI_ROK } from '@/lib/pitanja';
+import { cn } from '@/lib/utils';
+import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 import { useNaMrezi } from '@/lib/mreza';
 
@@ -117,26 +121,39 @@ export default function TransitDetail() {
           {dugaLoading ? (
             <TextPlaceholder lines={8} />
           ) : puna ? (
-            <>
-              {!!puna.body && <TumacenjeTekst tekst={puna.body} />}
-              {puna.sections.map((s) => {
-                const vrsta = vrstaSekcije(s.heading);
-
-                return (
-                <View key={s.heading} className="mt-7">
-                  {/* Efekat, Pazi, Savet: Ivanove 3D slike, iste kao na "Tvom danu"; ostali odeljci SF/Material.
-                      Ikonice vece nego uz nekadasnji sivi `label` — podnaslov je sad `h2`. */}
-                  <NaslovSekcije
-                    ikona={vrsta === 'efekat' || vrsta === 'pazi' || vrsta === 'savet'
-                      ? <OdeljakIkona odeljak={vrsta} size={26} />
-                      : vrsta ? <SymbolView name={IKONA_SEKCIJE[vrsta]} size={20} tintColor={neutral.inkSubtle} /> : undefined}>
-                    {s.heading}
-                  </NaslovSekcije>
-                  <TumacenjeTekst tekst={s.body} />
-                </View>
-                );
-              })}
-            </>
+            // Redosled (Ivan, 1.10.2026, posle UX recenzije): prva recenica veca i crna, ostatak
+            // prvog pasusa sivo, pa stavke (efekti, izazovi, saveti), pa nastavak teksta, pa
+            // "Pitaj astrologa". Racun je `rasporedDuge` (`lib/tumacenje.ts`, `check:tumacenje`).
+            (() => {
+              const r = rasporedDuge(puna.body ?? '', puna.sections);
+              const imaNastavak = !!r.nastavakTekst;
+              return (
+                <>
+                  {!!r.uvod && (
+                    <Text variant="default" className={cn('text-[20px] leading-[29px] tracking-[-0.2px]', tezina('naslovUTekstu'))}>
+                      {r.uvod}
+                    </Text>
+                  )}
+                  {!!r.prviPasus && (
+                    <View className={r.uvod ? 'mt-3' : undefined}><TumacenjeTekst tekst={r.prviPasus} /></View>
+                  )}
+                  {r.odeljci.map((s) => <OdeljakDuge key={s.heading} s={s} />)}
+                  {/* Isti naslov kao odeljci iznad, samo bez ikonice (Ivan, 1.10.2026). */}
+                  {imaNastavak && (
+                    <View className="mt-7">
+                      <NaslovSekcije>Više o ovom tranzitu</NaslovSekcije>
+                      <TumacenjeTekst tekst={r.nastavakTekst} />
+                    </View>
+                  )}
+                  {tranzit && (
+                    <PitajOTranzitu
+                      tema={`${tranzit.transiting.name} ${tranzit.aspect.name} ${tranzit.natal.name}`}
+                      osoba={osoba}
+                    />
+                  )}
+                </>
+              );
+            })()
           ) : (
             <>
               {!!sazeta?.body && <Text variant="reading">{sazeta.body}</Text>}
@@ -174,3 +191,55 @@ const SIMBOL = 26;
 function Simbol({ tacka }: { tacka: { key: string; glyph: string } }) {
   return <IkonaTacke tacka={tacka} size={SIMBOL} />;
 }
+
+/**
+ * Odeljak duge verzije: naslov sa ikonicom pa tekst. Efekat, Pazi, Savet: Ivanove 3D slike,
+ * iste kao na "Tvom danu"; ostali odeljci SF/Material. Ikonice vece nego uz nekadasnji
+ * sivi `label` — podnaslov je `h2`.
+ */
+function OdeljakDuge({ s }: { s: { heading: string; body: string } }) {
+  const vrsta = vrstaSekcije(s.heading);
+  return (
+    <View className="mt-7">
+      <NaslovSekcije
+        ikona={vrsta === 'efekat' || vrsta === 'pazi' || vrsta === 'savet'
+          ? <OdeljakIkona odeljak={vrsta} size={26} />
+          : vrsta ? <SymbolView name={IKONA_SEKCIJE[vrsta]} size={20} tintColor={neutral.inkSubtle} /> : undefined}>
+        {s.heading}
+      </NaslovSekcije>
+      <TumacenjeTekst tekst={s.body} />
+    </View>
+  );
+}
+
+/**
+ * Kraj lista: pitanje astrologu o ovom tranzitu (Ivan, 1.10.2026). Korisnik je upravo
+ * procitao nesto sto se tice njega — najprirodnije mesto za pitanje. Isti izgled kao
+ * kartica "Otključaj" (`PremiumKartica`), samo umesto katanca Bobanova slika (Ivan).
+ * Cene nema: dolazi samo iz RevenueCat-a (pravilo 21). Pitanje pocinje imenom tranzita.
+ */
+function PitajOTranzitu({ tema, osoba }: { tema: string; osoba?: string }) {
+  return (
+    <PremiumKartica
+      className="mt-14"
+      naslov="Pitaj astrologa o ovom tranzitu"
+      opis={`${ASTROLOG.ime} vidi ${osoba ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, ${OKVIRNI_ROK}.`}
+      dugme="Postavi pitanje"
+      znacka={{
+        velicina: SLIKA_ASTROLOGA,
+        sadrzaj: (
+          // Beo obod odvaja sliku od ivice kartice, kao sto indigo krug odvaja katanac.
+          // 4 pt navise (Ivan, 1.10.2026) — samo ovde, katanac na Premium kartici ostaje gde je.
+          <View className="rounded-full bg-card p-[3px]" style={{ transform: [{ translateY: -4 }] }}>
+            <AstrologSlika velicina={SLIKA_ASTROLOGA - 6} />
+          </View>
+        ),
+      }}
+      // Prvo uvod (astrolog, uslovi, cena), pa pisanje — kao "Postavi pitanje" na tabu Pitaj (Ivan, 1.10.2026).
+      onPress={() => leaveSheetTo({ pathname: '/pitanje-novo', params: osoba ? { korak: 'uvod', tema, osoba } : { korak: 'uvod', tema } })}
+    />
+  );
+}
+
+/** Precnik Bobanove slike na kartici (sa belim obodom) — veci od kruga sa katancem, da se lice vidi. */
+const SLIKA_ASTROLOGA = 64;

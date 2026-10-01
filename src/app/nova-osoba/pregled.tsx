@@ -95,7 +95,8 @@ export default function NovaOsobaPregled() {
       note={poruka ?? (naMrezi
         ? `Ove podatke vidiš samo ti. Ako postaviš pitanje o ovoj osobi, vidi ih i ${ASTROLOG.kratko}.`
         : 'Za dodavanje osobe potreban je internet.')}
-      primary={{ label: 'Dodaj osobu', onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
+      // Ugaseno dugme kaze sta fali (B14 iz UX recenzije, 1.10.2026; isto kao "Izaberi datum").
+      primary={{ label: pristanak ? 'Dodaj osobu' : 'Potvrdi pristanak', onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
       <View className="items-center">
         {/* Velika trojka, kao na kraju onboardinga. */}
         <View className="w-full flex-row justify-center gap-8">

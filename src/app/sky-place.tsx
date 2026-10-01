@@ -58,6 +58,8 @@ export default function SkyPlace() {
             placeholder="Traži grad"
             autoCorrect={false}
             returnKeyType="search"
+            // Polje u fokusu i tastatura otvorena cim se list otvori (Ivan, 1.10.2026).
+            autoFocus
           />
 
           <View className="mt-4">
