@@ -57,6 +57,8 @@ export const pitaj: Recnik['pitaj'] = {
       ? 'You have one paid question.'
       : `You have ${n} ${mnozina(n, 'paid question', 'paid questions')}.`),
     pitaj: 'Ask',
+    /** Iznad "Postavi pitanje" kad vec ima pitanja (Ivan, 1.10.2026). */
+    josJedno: (ime: string) => `Have a new question? ${ime} looks at your birth chart and answers with a voice message.`,
     postavi: 'Ask a question',
     mojaPitanja: 'My questions',
     /** Draft in the list — right side, next to the arrow. */

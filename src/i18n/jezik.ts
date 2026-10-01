@@ -15,6 +15,8 @@
 import { bs } from './bs';
 import { en } from './en';
 import { hr } from './hr';
+import { mk } from './mk';
+import { sl } from './sl';
 import { sr, type Recnik } from './sr';
 
 export type { Recnik };
@@ -32,7 +34,7 @@ export type Delimicno<T> = T extends (...a: never[]) => unknown
       ? { [K in keyof T]?: Delimicno<T[K]> }
       : T;
 
-const recnici: Partial<Record<Jezik, Recnik>> = { sr, hr, bs, en };
+const recnici: Partial<Record<Jezik, Recnik>> = { sr, hr, bs, sl, mk, en };
 
 /** Ime jezika NA TOM JEZIKU — za izbor u profilu (ne prevodi se). */
 export const IME_JEZIKA: Record<Jezik, string> = {

@@ -164,3 +164,42 @@ je napisano; delovi aplikacije se prevode iz srpskog. Množina i padeži su isti
 | nedelja (7 dana) | tjedan | sedmica |
 | Poslednja četvrt | Zadnja četvrt | Posljednja četvrt |
 | "Pitaj astrologa" | odgovor je na srpskom — NE pisati posebnu napomenu (hr i bs razumiju srpski) | isto |
+
+## Slovenački i makedonski (korak 4, 1.10.2026)
+
+Celi rečnici (`src/i18n/sl/`, `src/i18n/mk/`). Zajedničko je napisano. "Pitaj astrologa": oba jezika
+KAŽU da je odgovor glasovna poruka NA SRPSKOM (Ivan) — u `pitaj.uvod.glasovno`, `pitaj.pitanje.ceka` i
+`danas.tumacenje.pitajOpis`, kao engleski.
+
+### Slovenački — pravila
+
+- **Množina ima četiri oblika** (dvojina): `mnozina(n, [1, 2, 3–4, 5+])` iz `./gramatika` — "1 oseba,
+  2 osebi, 3 osebe, 5 oseb". Glagol se slaže: "2 tranzita trajata".
+- **Šest padeža**; u rečniku: genitiv = rodilnik, dativ = dajalnik, akuzativ = tožilnik,
+  instrumental = orodnik, lokativ = mestnik. Predlog "s/z" po glasu: "s tvojim Soncem", "z Luno".
+- **Mesec (planeta) = Luna** (ženski rod). Znakovi: Oven, Bik, Dvojčka, Rak, Lev, Devica, Tehtnica,
+  Škorpijon, Strelec, Kozorog, Vodnar, Ribi. "v Levu" (`nebo.uZnaku`), "v Leva" (`nebo.uZnak`).
+- **Reči:** račun (nalog), e-pošta / e-poštni naslov, obvestila, nastavitve, shrani, izbriši, prekliči,
+  naročnina (pretplata), nakup, obnovi nakupe (Vrati kupovine), teden, kdo/kaj, rojstni podatki,
+  rojstna karta (natalna karta), razlaga (tumačenje), ascendent / podznak, hiša (5. hiša).
+- **Ti-forma**, isti glas (`copywriter-sr`): tumači, ne proriče; bez uzvičnika.
+
+### Makedonski — pravila
+
+- **Ćirilica, ceo tekst.** Latinica samo za vlastita imena koja se tako pišu: "Astro Shop",
+  "astroshop.rs", App Store, Google Play, Instagram, iPhone. Ime astrologa ćirilicom: "Бобан Вујовиќ".
+- **Nema padeža**; ima **član** (определен член): "твојот Марс", "твојата Венера", "твоето Сонце" —
+  rod je u `nebo.padeziTela[k].rod`. Množina: `mnozina(n, jedan, vise)` iz `./gramatika`
+  ("1 ден, 2 дена", "1 месец, 3 месеци").
+- **Mesec (planeta) = Месечина** (ženski rod). Znakovi: Овен, Бик, Близнаци, Рак, Лав, Девица, Вага,
+  Скорпија, Стрелец, Јарец, Водолија, Риби; "во Лав" (`nebo.uZnaku`, isto i `uZnak`).
+- **Reči:** сметка (nalog), е-пошта, известувања, поставки, зачувај, избриши, откажи, претплата,
+  купување, Врати купувања, недела (7 dana), кој/што, роденден / податоци за раѓање,
+  натална карта, толкување, асцендент / подзнак, куќа (5. куќа — "5-та куќа").
+- Glas isti (`copywriter-sr`): ti-forma, tumači, ne proriče.
+
+### FONT ZA MAKEDONSKI
+
+Plus Jakarta Sans NEMA ćirilicu. Dok se ne doda font sa ćirilicom, telefon crta ćirilicu sistemskim
+fontom (iOS i Android sami zamenjuju slova koja font nema) — čitljivo, ali latinica i brojevi ostaju u
+Jakarti, pa se pismo vidno meša.

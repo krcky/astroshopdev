@@ -94,8 +94,11 @@ if (nalazi.length) {
  * Hrvatski i bosanski: bez EKAVICE — cesta ekavska rec ("vreme", "posle") znaci da je tekst prepisan iz srpskog.
  */
 const VLASTITA = /Vujović|Boban Vujović/g;
-const EKAVICA = /\b(vreme|mesto|mesta|mestu|mesec|meseca|mesecu|meseci|dete|deca|deteta|reč|reči|lepo|lepa|svet|sveta|uvek|gde|posle|primer|cena|cenu|deo|delu|delova|menja|menjaš|promeni|promena|promene|videti|ceo|cela|celu|celi|celog|nedelja|nedelju|sneg|verovatno|beleška|razumeš)\b/i;
-for (const j of ['en', 'hr', 'bs']) {
+// Granica reci preko \p{L}: `\b` u JS-u ne smatra č/š/ž slovom ("E-pošta" bi sadrzala "šta").
+const EKAVICA = /(?<!\p{L})(vreme|mesto|mesta|mestu|mesec|meseca|mesecu|meseci|dete|deca|deteta|reč|reči|lepo|lepa|svet|sveta|uvek|gde|posle|primer|cena|cenu|deo|delu|delova|menja|menjaš|promeni|promena|promene|videti|ceo|cela|celu|celi|celog|nedelja|nedelju|sneg|verovatno|beleška|razumeš)(?!\p{L})/iu;
+/** Slovenacki nema ć ni đ; ove reci su srpske/hrvatske, ne slovenacke. */
+const NIJE_SLOVENSKI = /[ćđĆĐ]|(?<!\p{L})(nije|šta|ovde|ovdje|uvek|uvijek|sutra|juče|jučer|takođe|između)(?!\p{L})/iu;
+for (const j of ['en', 'hr', 'bs', 'sl', 'mk']) {
   const dir = path.join(KOREN, 'i18n', j);
   for (const f of fs.readdirSync(dir)) {
     const izvor = fs.readFileSync(path.join(dir, f), 'utf8');
@@ -105,8 +108,12 @@ for (const j of ['en', 'hr', 'bs']) {
       // samo tekst u navodnicima, ne kljucevi ni imena promenljivih
       const tekst = (bez.match(/(['"`])(?:\\.|(?!\1).)*\1/g) ?? []).join(' ').replace(/\$\{[^}]*\}/g, ' ');
       if (j === 'en' && SRPSKO.test(tekst)) { console.error(`✗ en/${f}:${i + 1}  srpsko slovo: ${red.trim().slice(0, 70)}`); greske++; }
-      const e = j !== 'en' && tekst.match(EKAVICA);
+      const e = (j === 'hr' || j === 'bs') && tekst.match(EKAVICA);
       if (e) { console.error(`✗ ${j}/${f}:${i + 1}  ekavica "${e[0]}": ${red.trim().slice(0, 70)}`); greske++; }
+      const sl = j === 'sl' && tekst.match(NIJE_SLOVENSKI);
+      if (sl) { console.error(`✗ sl/${f}:${i + 1}  nije slovenacki "${sl[0]}": ${red.trim().slice(0, 70)}`); greske++; }
+      // Makedonski je cirilica: srpsko latinicno slovo u tekstu = zaboravljen prevod.
+      if (j === 'mk' && SRPSKO.test(tekst)) { console.error(`✗ mk/${f}:${i + 1}  latinica: ${red.trim().slice(0, 70)}`); greske++; }
     });
   }
 }
@@ -122,6 +129,8 @@ async function proveraJezika() {
   const ocekivano: [string, () => string, string, string][] = [
     ['datum', () => datum(dan, { dan: true, godina: true }), 'Uto, 29. sep 2026', 'Tue, Sep 29, 2026'],
     ['datum hr/bs', () => { postaviJezik('hr'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('bs'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.', 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.'],
+    ['datum sl/mk', () => { postaviJezik('sl'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('mk'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Tor, 29. sep. 2026 / Вто, 29 сеп 2026', 'Tor, 29. sep. 2026 / Вто, 29 сеп 2026'],
+    ['trajanje sl (dvojina)', () => { postaviJezik('sl'); return [1, 2, 3, 5, 102].map((n) => josTraje(n)).join(' / '); }, 'Traja še 1 dan / Traja še 2 dneva / Traja še 3 dnevi / Traja še 5 dni / Traja še 3 meseci', 'Traja še 1 dan / Traja še 2 dneva / Traja še 3 dnevi / Traja še 5 dni / Traja še 3 meseci'],
     ['znak hr/bs', () => { postaviJezik('hr'); const h = SIGNS[10].name; postaviJezik('bs'); return `${h} / ${SIGNS[10].name}`; }, 'Vodenjak / Vodolija', 'Vodenjak / Vodolija'],
     ['trajanje', () => josTraje(3), 'Traje još 3 dana', '3 days left'],
     ['znak', () => signFromLongitude(42.5).formatted, "12° 30' Bik", "12° 30' Taurus"],
@@ -143,5 +152,5 @@ async function proveraJezika() {
 
 proveraJezika().then(() => {
   if (greske) process.exit(1);
-  console.log('Prevod: engleski, hrvatski i bosanski recnik su celi, racun prati jezik.');
+  console.log('Prevod: en, hr, bs, sl i mk recnici su celi, racun prati jezik.');
 });

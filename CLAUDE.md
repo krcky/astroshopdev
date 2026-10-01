@@ -816,7 +816,10 @@ korpusa se poredi sa SRPSKIM imenima (`tekstReda`). ODGOVOR ASTROLOGA JE NA SRPS
 kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. HRVATSKI I BOSANSKI (1.10.2026): `src/i18n/hr/`, `src/i18n/bs/`, isto CELI
 recnici, isti izbor u profilu (Test). Ijekavica — `check:prevod` pada na cestu ekavsku rec; datum sa tackom
 posle godine ("29. ruj 2026."). Hr: Škorpion, Vodenjak, račun, mobitel, infinitiv; bs: Škorpija, Vodolija,
-sedmica, telefon. Pojmovnik i glas: `docs/PREVOD.md`.
+sedmica, telefon. SLOVENACKI I MAKEDONSKI (1.10.2026): `src/i18n/sl/` (mnozina sa
+DVOJINOM, cetiri oblika; Mesec = Luna) i `src/i18n/mk/` (CIRILICA, bez padeza, clan po rodu; Mesec =
+Месечина); oba kazu da je odgovor astrologa na srpskom. Plus Jakarta Sans NEMA cirilicu — telefon je crta
+sistemskim fontom dok se ne doda font za mk. Pojmovnik i glas: `docs/PREVOD.md`.
 VAN RECNIKA, namerno: korpus i tekst sa sajta (`simbolika.ts`, `znak-opis-podaci.ts`, `traits.ts` — drugi
 korak), dev ekrani, panel astrologa, mejl sa kodom (Supabase sablon), nativni tekst (`app.json`, Swift/Kotlin).
 SNIMAK KARTE ZA ASTROLOGA (`pitanja.ts`) uzima imena iz SRPSKOG recnika po kljucu, ne iz tekuceg — panel je
