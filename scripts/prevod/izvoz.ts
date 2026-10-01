@@ -55,7 +55,8 @@ function prikaz(v: unknown): string {
   if (typeof v === 'number') return String(v);
   if (Array.isArray(v)) return v.map(prikaz).join(' | ');
   if (typeof v === 'function') {
-    const src = v.toString();
+    // tsx/esbuild zapisuje ne-ASCII slova kao \uXXXX — vraca se u slova (\u0107 -> ć)
+    const src = v.toString().replace(/\\u([0-9a-fA-F]{4})/g, (_, h: string) => String.fromCharCode(parseInt(h, 16)));
     // sablon(i) iz tela funkcije; bez njih ceo izvor (retko — npr. grananje)
     const sabloni = src.match(/`(?:\\.|[^`\\])*`|'(?:\\.|[^'\\])*'/g)?.filter((s) => /[A-Za-zčćšžđА-я]{2}/.test(s));
     return sabloni?.length ? `ƒ ${sabloni.join('  …  ')}` : `ƒ ${src.replace(/\s+/g, ' ').slice(0, 400)}`;
