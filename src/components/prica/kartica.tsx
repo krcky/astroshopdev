@@ -171,11 +171,15 @@ function KOcene({ p }: { p: PricaDana }) {
           <Reci tekst={naj.name} kasni={550} className={cn('text-[34px] leading-[38px] tracking-[-1px]', tezina('display'))} />
         </View>
       )}
+      {/* VIDEO: linija izmedju redova je traka visine 1, ne `border-t` — ivicu samo sa jedne strane RN crta
+          kao sliku koju `layer.render` razvuce u debelu sivu prugu (Ivan, 1.10.2026; pravilo 23). */}
       <Pojava kasni={900} className="mt-4 overflow-hidden rounded-lg border border-card bg-card/80">
         {o.redovi.map((r, i) => {
           const bolje = boljeNegoJuce(r.ocena, r.juce);
           return (
-            <View key={r.key} className={cn('flex-row items-center gap-2.5 px-3.5 py-2.5', i > 0 && 'border-t border-border')}>
+            <React.Fragment key={r.key}>
+            {i > 0 && <View className="h-px bg-border" />}
+            <View className="flex-row items-center gap-2.5 px-3.5 py-2.5">
               <OblastIkona oblast={r.key} size={24} />
               <View style={{ flex: 1 }}>
                 <Text className="text-[16px] leading-[20px]">{r.name}</Text>
@@ -191,6 +195,7 @@ function KOcene({ p }: { p: PricaDana }) {
                 {r.ocena === 5 && <KrugOko sirina={50} />}
               </View>
             </View>
+            </React.Fragment>
           );
         })}
       </Pojava>
@@ -295,7 +300,9 @@ function KMesec({ p }: { p: PricaDana }) {
         />
       </View>
       {m.zaTebe && (
-        <Pojava kasni={2500} style={{ marginTop: 12, borderRadius: 12, padding: 11, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)' }}>
+        // `overflow: hidden`: bez njega RN crta podlogu i ivicu u posebnim slojevima, a `layer.render` (video) ih
+        // stavi PREKO teksta (pravilo 23).
+        <Pojava kasni={2500} style={{ marginTop: 12, borderRadius: 12, padding: 11, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)', overflow: 'hidden' }}>
           <Ozn boja={BELA_80}>Za mene</Ozn>
           <Text className={cn('mt-0.5 text-[15px] leading-[19px]', tezina('naslovUTekstu'))} style={{ color: BELA }}>{m.zaTebe.naslov}</Text>
           {!!m.zaTebe.tekst && <Text className="text-[13px] leading-[18px]" style={{ color: BELA_80 }}>{m.zaTebe.tekst}</Text>}

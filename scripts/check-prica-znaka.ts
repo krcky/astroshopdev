@@ -4,7 +4,7 @@
  *
  *   npm run check:prica-znaka
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { VIDEO } from '../src/lib/prica';
 import {
   datumiZnaka, LATINSKO_IME, NAJDUZA_RECENICA, NATPIS_SAZVEZDJA, NATPISI, POPUNA_SAZVEZDJA, pricaZnaka, SLIKE_ZNAKA, sunceU,
@@ -135,6 +135,28 @@ const dva = rakovi.filter((r) => / ili /.test(pricaZaKartu(r)?.vladarRecenica ??
 const jedan = rakovi.filter((r) => !/ ili /.test(pricaZaKartu(r)?.vladarRecenica ?? '') && pricaZaKartu(r)?.vladarRecenica?.startsWith('U tvojoj natalnoj karti Mesec je u '));
 ok(rakovi.length > 20 && dva.length > 0 && jedan.length > 0 && dva.length + jedan.length === rakovi.length,
   'Rak bez vremena: Mesec u jednom znaku ili "X ili Y" kad promeni znak tog dana', `${jedan.length} + ${dva.length} od ${rakovi.length}`);
+
+console.log('\n=== 8. Video: bez RN ivica koje `layer.render` crta pogresno (pravilo 23) ===');
+// Kartica sa ivicom koja ne sece sadrzaj dobija od RN-a sloj podloge iza sadrzaja (zPosition), a `layer.render`
+// ga crta PREKO — u videu bleda kartica; ivicu samo sa jedne strane crta kao sliku koju razvuce u debelu sivu
+// prugu (Ivan, 1.10.2026). Zato u fajlovima koje video snima: linija = View visine 1, puna ivica samo uz overflow.
+const FAJLOVI_VIDEA = [
+  'src/components/prica/kartica.tsx', 'src/components/prica/crtezi.tsx', 'src/components/prica/logo-price.tsx',
+  'src/components/prica/pozadina.tsx', 'src/components/prica-znaka/slike.tsx', 'src/components/prica-znaka/kartica.tsx',
+  'src/components/prica-znaka/sazvezdje.tsx', 'src/components/prica-znaka/ikona-osnove.tsx',
+];
+const JEDNA_STRANA = /border(Top|Bottom|Left|Right|Start|End)Width|(?<![\w-])border-(t|b|l|r|x|y|s|e)(-\d+)?(?![\w-])/;
+const PUNA = /borderWidth|(?<![\w-])border(-\d+)?(?![\w-])|CARD_SURFACE\b(?!\s*=)/;
+for (const f of FAJLOVI_VIDEA) {
+  if (!existsSync(f)) { ok(false, `${f} postoji`); continue; }
+  const redovi = readFileSync(f, 'utf8').split('\n');
+  const kod = (r: string) => !/^\s*(\/\/|\*|\/\*|\{\/\*)/.test(r);
+  const jedna = redovi.map((r, i) => [r, i + 1] as const).filter(([r]) => kod(r) && JEDNA_STRANA.test(r)).map(([, i]) => i);
+  const bezOverflow = redovi.map((r, i) => [r, i + 1] as const)
+    .filter(([r]) => kod(r) && PUNA.test(r) && !/import /.test(r) && !/overflow/.test(r)).map(([, i]) => i);
+  ok(jedna.length === 0 && bezOverflow.length === 0, `${f.replace('src/components/', '')}: bez ivice sa jedne strane, puna ivica uz overflow`,
+    [jedna.length ? `jedna strana: ${jedna.join(', ')}` : '', bezOverflow.length ? `bez overflow: ${bezOverflow.join(', ')}` : ''].filter(Boolean).join('; '));
+}
 
 console.log(greske ? `\n${greske} provera pala.` : '\nSve provere prosle.');
 // Izlaz odmah: `store/profile` posle uvoza pokusa da pise u AsyncStorage, koga u Node-u nema (kao check-osobe).

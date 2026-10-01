@@ -690,7 +690,11 @@ EKRANA dok korisnik radi sta hoce: `video-radionica.tsx` (u korenu, `_layout.tsx
 (prvo lice, datum, logo) u nativno platno `modules/video-price` (iOS Swift/AVAssetWriter; Android Kotlin/
 MediaCodec — kartica se crta PRAVO u ulaznu povrsinu kodera, a vreme kadra se upisuje po redu izlaza, jer
 povrsina daje vreme telefona; H.264 1080x1920, 30 fps, ~5 Mb/s, bez zvuka — muziku dodaje Instagram); za svaki kadar postavi sat slike, saceka dva kadra, pa crta
-(`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). SVE SLIKE SE MONTIRAJU PRE PRVOG KADRA (skrivene,
+(`layer.render`, ~2x brzi od `drawHierarchy`, isti kadar). ALI `layer.render` ne postuje redosled slojeva
+(zPosition) ni rastezanje slike ivice (Ivan, 1.10.2026: u videu bleda "Osnove znaka" i debele sive linije izmedju
+ocena): u KARTICI nema ivice sa jedne strane (`border-t`, `borderTopWidth`) — linija je View visine 1 — a puna ivica
+ide samo uz `overflow-hidden` (bez njega RN crta podlogu u posebnom sloju iza sadrzaja, a video je stavi PREKO).
+Na ekranu i na PNG-u se to ne vidi. Drzi `check:prica-znaka`, deo 8, za fajlove obe price. SVE SLIKE SE MONTIRAJU PRE PRVOG KADRA (skrivene,
 krug 0 i providne), svaka sa SVOJIM krugom, `Sloj` je `memo` — tokom snimanja React NISTA ne crta iznova (Ivan,
 30.9.2026: "nesto isfleshira" na svakom prelazu: nova slika montirana na prelazu je prva dva kadra bila zvezda
 preko cele slike, a donja, crtana iznova, skocila na pocetne vrednosti pokreta). Raspored: `rasporedVidea` / `kadarVidea` u
@@ -770,7 +774,8 @@ muskarac/zena (pol se ne pita), poznate licnosti (na sajtu Kusturica pogresno, p
 SLIKE U APLIKACIJI (Ivan izabrao ostre, +11 MB): gravire iz `files/*-ilustracija@2x.png` smanjene na @3x prikaza
 (najvise 1050 x 990; Vodolija je u `files/` kao `blizanac-…`), fotografije sa sajta bajt po bajt (JPEG).
 VIDEO OD STARTA (Ivan): svi pokreti kroz `sat.tsx`/`crtezi.tsx`; KARTICA ZA SVAKU SLIKU je ISTA komponenta u
-razmeri 0,74 (`kartica` u `components/prica-znaka/slike.tsx`, okvir `kartica.tsx`: gore "Ovan · astroshop.rs",
+razmeri 0,74 (`kartica` u `components/prica-znaka/slike.tsx`, okvir `kartica.tsx`: gore "Ovan · astroshop.rs" — u
+VIDEU NE, `bezZaglavlja`, Ivan 1.10.2026 —
 dole `LogoPrice` kao na dnevnoj), prvo lice ("Moje sazvežđe", "Kako da me osvojiš"), bez dugmadi. Radionica
 videa jos zna samo dnevnu pricu. Trajanje po pravilu dnevne (1 s + 0,25 s po reci, 4—8 s; sazvezdje i naslovna
 4,5 s): 45—53 s, staje u video bez skracivanja. PLEJER je opsti (`components/prica/plejer.tsx`, prepisan iz

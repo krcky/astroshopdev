@@ -22,17 +22,23 @@ const OKVIR: OkvirSlike = { vrh: 116, dno: 138, sirina: KARTICA.w, visina: KARTI
 const LOGO_W = 198;
 const LOGO_VRH = 532;
 
-export function KarticaZnaka({ p, k }: { p: PricaZnaka; k: SlikaZnaka }) {
+/**
+ * @param bezZaglavlja VIDEO priče o znaku (Ivan, 1.10.2026): bez "Ovan · astroshop.rs" gore — adresa je na
+ *   završnom kadru, a ime znaka na naslovnoj. Slika za deljenje (PNG) ga zadržava.
+ */
+export function KarticaZnaka({ p, k, bezZaglavlja = false }: { p: PricaZnaka; k: SlikaZnaka; bezZaglavlja?: boolean }) {
   const Slika = SLIKE_PRICE_ZNAKA[k];
   const tamno = tamnaSlikaZnaka(k);
   return (
     <View style={{ width: KARTICA.w, height: KARTICA.h, overflow: 'hidden' }} collapsable={false}>
       <Slika p={p} okvir={OKVIR} kartica />
+      {!bezZaglavlja && (
       <Text
         className={cn('uppercase', tezina('statOznaka'))}
         style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: tamno ? 'rgba(255,255,255,0.75)' : neutral.inkMuted }}>
         {`${p.znak.name} · astroshop.rs`}
       </Text>
+      )}
       <LogoPrice sirina={LOGO_W} negativ={tamno} style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
     </View>
   );

@@ -39,6 +39,7 @@ export function posaoPriceZnaka(p: PricaZnaka): PosaoVidea {
     naslov: 'Tvoj znak',
     opis: `Priča o tvom znaku, ${p.znak.name}.`,
     trajanja: p.trajanja.map((t) => Math.max(t, VIDEO.slika)),
-    kartica: (i) => <KarticaZnaka p={p} k={SLIKE_ZNAKA[i]} />,
+    // Bez "Ovan · astroshop.rs" gore (Ivan, 1.10.2026) — samo u videu; slika za deljenje ga ima.
+    kartica: (i) => <KarticaZnaka p={p} k={SLIKE_ZNAKA[i]} bezZaglavlja />,
   };
 }

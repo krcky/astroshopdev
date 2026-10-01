@@ -70,6 +70,14 @@ function tipovi(s: number) {
   };
 }
 
+/**
+ * Tanka linija preko cele sirine. Traka visine 1, NE `borderTopWidth`: ivicu samo sa jedne strane RN crta kao
+ * sliku, a `layer.render` (video) je razvuce u debelu sivu prugu (Ivan, 1.10.2026; pravilo 23).
+ */
+function Linija() {
+  return <View style={{ height: 1, backgroundColor: 'rgba(21,21,21,0.12)' }} />;
+}
+
 /** Prostor sadrzaja: izmedju zaglavlja i dugmeta "Podeli", sa stranicnim marginama. */
 function sadrzaj(okvir: OkvirSlike, kartica?: boolean) {
   const strana = kartica ? 22 : 24;
@@ -251,8 +259,9 @@ function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
             <Text className={tezina('reading')} style={[T.manji, { color: MUTNO }]}>{p.ukratkoRecenica}</Text>
           </Pojava>
         )}
-        <Pojava kasni={2100} style={{ marginTop: 24 * s, paddingTop: 16 * s, borderTopWidth: 1, borderTopColor: 'rgba(21,21,21,0.12)' }}>
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Najveće vrednosti</Text>
+        <Pojava kasni={2100} style={{ marginTop: 24 * s }}>
+          <Linija />
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 16 * s }]}>Najveće vrednosti</Text>
         </Pojava>
         <View style={{ marginTop: 8 * s }}>
           {p.opis.vrednosti.map((v, i) => (
@@ -361,7 +370,9 @@ function KarticaOsnove({ ikona, oznaka, vrednost, opis, dugo, kasni, s, T }: {
   T: ReturnType<typeof tipovi>;
 }) {
   return (
-    <Pojava kasni={kasni} className={CARD_SURFACE}
+    // `overflow-hidden`: kartica sa ivicom koja NE sece sadrzaj dobija od RN-a poseban sloj podloge, a `layer.render`
+    // (video) ga crta PREKO teksta — u videu je sve bilo bledo (Ivan, 1.10.2026; pravilo 23).
+    <Pojava kasni={kasni} className={cn(CARD_SURFACE, 'overflow-hidden')}
       style={{ flexDirection: 'row', alignItems: dugo ? 'flex-start' : 'center', gap: 14 * s, paddingVertical: 10 * s, paddingHorizontal: 16 * s }}>
       <View style={{ width: 40 * s, height: 40 * s, alignItems: 'center', justifyContent: 'center' }}>{ikona}</View>
       <View style={{ flex: 1 }}>
@@ -452,8 +463,9 @@ function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
             </Pojava>
           ))}
         </View>
-        <Pojava kasni={1700} style={{ marginTop: 16 * s, paddingTop: 12 * s, borderTopWidth: 1, borderTopColor: 'rgba(21,21,21,0.12)' }}>
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Životinja</Text>
+        <Pojava kasni={1700} style={{ marginTop: 16 * s }}>
+          <Linija />
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 12 * s }]}>Životinja</Text>
           <Text className={tezina('naslovUTekstu')} style={{ fontSize: velZ, lineHeight: velZ * 1.25, marginTop: 4 * s }}>{z}</Text>
         </Pojava>
       </View>
