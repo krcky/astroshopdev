@@ -148,7 +148,7 @@ export const profil: Recnik['profil'] = {
     tabPitaj: 'Pitaj',
     uzPremium: (ime) => `${ime} je uz Premium`,
     uzPremiumOpis: (n) =>
-      `Bez Premiuma otvorena je samo prva osoba na popisu. Uz njega imaš karte i tranzite za do ${osobaGen(n)}.`,
+      `Bez Premiuma otvorena je samo prva osoba na popisu. Uz njega imaš karte i tranzite za najviše ${osobaGen(n)}.`,
     otkljucajSve: 'Otključaj sve osobe',
     tranzitiNeMogu: 'Tranziti se ne mogu izračunati',
     tranzitiNeMoguTekst: (grad) =>

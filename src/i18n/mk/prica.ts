@@ -8,7 +8,7 @@ import { nebo, subjekat } from './nebo';
  *
  * DVA LICA, kao u srpskom: slika u prici je drugo lice ("Твојот ден", "Ти оди"), kartica za deljenje
  * i video prvo lice ("Мојот ден", "Ми оди"). BROJ RECI ODREDJUJE TRAJANJE SLIKE — kratko.
- * Vladar: "Со Овен владее Марс" (isto za svih 12, bez padeza); Близнаци i Риби su mnozina ("владеат").
+ * Vladar: "Марс владее со Овен" (isto za svih 12, bez padeza); Близнаци i Риби su mnozina ("владеат").
  */
 /** Redni broj znaka u zodijaku, od Ovna. */
 const REDNI = ['Прв', 'Втор', 'Трет', 'Четврти', 'Петти', 'Шести', 'Седми', 'Осми', 'Деветти', 'Десетти', 'Единаесетти', 'Дванаесетти'];
@@ -87,7 +87,7 @@ export const prica: Recnik['prica'] = {
 
   znak: {
     podnaslov: 'Твојот знак',
-    redni: (i) => `${REDNI[i]} знак во зодијакот`,
+    redni: (i) => `${REDNI[i]} знак на зодијакот`,
     element: { vatra: 'Оган', zemlja: 'Земја', vazduh: 'Воздух', voda: 'Вода' },
     kvalitet: { kardinalan: 'Кардинален', fiksni: 'Фиксен', promenljiv: 'Променлив' },
     polaritet: { pozitivan: 'Позитивен', negativan: 'Негативен' },
@@ -103,9 +103,9 @@ export const prica: Recnik['prica'] = {
     srodni: (imena) => `како ${imena.join(' и ')}`,
     /** "Дел од телото со кој владее Овен" / "… владеат Близнаци". */
     teloOznaka: (znakKljuc, ime) => `Дел од телото со кој ${MNOZINA_ZNAKA.has(znakKljuc) ? 'владеат' : 'владее'} ${ime}`,
-    /** "Со Овен владее Марс". */
+    /** "Марс владее со Овен". */
     vladarNaslov: (znakKljuc, vladar) =>
-      `Со ${nebo.znaci[znakKljuc as keyof typeof nebo.znaci]?.ime ?? znakKljuc} владее ${vladar}`,
+      `${subjekat(vladar)} владее со ${nebo.znaci[znakKljuc as keyof typeof nebo.znaci]?.ime ?? znakKljuc}`,
     vladarMit: { sun: 'Грците го нарекувале Хелиос.' },
     vladarRecenica: (vladar, lokativi, lice = 'ti') =>
       `Во ${lice === 'ja' ? 'мојата' : 'твојата'} натална карта ${subjekat(vladar)} е во ${lokativi.join(' или ')}.`,
@@ -148,10 +148,10 @@ export const prica: Recnik['prica'] = {
   },
 
   ponudi: {
-    upravoPravimo: (drugi) => `Во моментов правиме видео: ${drugi}. Ова ќе можеш штом тоа биде готово.`,
+    upravoPravimo: (drugi) => `Во моментов правиме видео: ${drugi}. Ова ќе може штом тоа ќе биде готово.`,
     sePravi: (procenat) => `Видеото се прави · ${procenat}. Ќе ти јавиме кога ќе биде готово.`,
     spreman: 'Видеото од целата приказна е подготвено.',
-    pravimoOkoMinut: 'Видеото го правиме околу една минута. Дотогаш користи ја апликацијата — ќе ти јавиме кога ќе биде готово.',
+    pravimoOkoMinut: 'За видеото ни треба околу една минута. Дотогаш користи ја апликацијата — ќе ти јавиме кога ќе биде готово.',
     ovaSlika: 'Оваа слика',
     pogledajVideo: 'Погледни го видеото',
     celaPrica: 'Целата приказна, видео',

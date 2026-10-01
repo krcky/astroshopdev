@@ -207,7 +207,7 @@ export const karta: Recnik['karta'] = {
   /** `app/nebo-info.tsx` — "What is the sky right now?". */
   neboInfo: {
     naslov: 'What is the sky right now?',
-    uvod: 'The sky at this moment, seen from the chosen place: which sign the Sun, Moon and planets are in now and how they stand toward each other. The planets’ positions are the same for everyone, wherever you are. The houses, the 12 sections of the wheel, depend on the place, and they shift from minute to minute.',
+    uvod: 'The sky at this moment, seen from the chosen place: which sign the Sun, Moon and planets are in now and how they relate to each other. The planets’ positions are the same for everyone, wherever you are. The houses, the 12 sections of the wheel, depend on the place, and they shift from minute to minute.',
     strelice: 'Use the arrows to move the hour and the day, and tap the date to choose any day.',
     krug: 'The outer ring is the 12 signs. The numbers from 1 to 12 are the houses, the symbols are the planets. On the left is the Ascendant: the sign rising in the east right now. At the top is the MC, the highest point of the sky at this moment. The colored lines in the middle are the aspects, and the gray symbols are points.',
     tacke: 'Points',
@@ -237,7 +237,7 @@ export const karta: Recnik['karta'] = {
     /** TEMPORARY: one sentence per phase until the astrologer sends real ones. */
     fazaPrivremeno: {
       new: 'The start of a new lunar cycle, a good moment to set an intention.',
-      first: 'The first obstacle on the path of what you started calls for a decision and action.',
+      first: 'The first obstacle to what you’ve started calls for a decision and action.',
       full: 'The peak of the cycle: feelings are stronger, and things come to light.',
       last: 'Time to finish, tidy up and let go of what you no longer need.',
       waxing: 'Energy is growing, so it’s easier to build and begin.',

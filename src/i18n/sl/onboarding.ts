@@ -24,7 +24,7 @@ export const onboarding: Recnik['onboarding'] = {
   vreme: {
     naslov: 'Ura rojstva',
     izaberi: 'Izberi uro',
-    neZnam: 'Ure ne vem',
+    neZnam: 'Ne vem ure',
   },
 
   mesto: {
@@ -41,7 +41,7 @@ export const onboarding: Recnik['onboarding'] = {
     zonaNepouzdana: (grad, zona) =>
       `Ne vemo zanesljivo, koliko je bila ura po UTC v kraju ${grad} na ta datum. Poskusi z drugim krajem rojstva ali nam sporoči — časovni pas: ${zona}`,
     nazadNaMesto: 'Nazaj na kraj rojstva',
-    greskaCuvanja: 'Karta ni shranjena — do strežnika nismo prišli. Preveri internet in znova pritisni Nadaljuj.',
+    greskaCuvanja: 'Karta ni shranjena — strežnika nismo mogli doseči. Preveri internet in znova pritisni Nadaljuj.',
     izvorPozicija: 'Položaje izračunamo iz podatkov o gibanju planetov, za tvoj točen trenutek in kraj rojstva.',
     vladajucaPlaneta: (planeta) => `Vladajoči planet: ${planeta}`,
     vladarZnaka: (planeta) => `Vladar tvojega znamenja: ${planeta}`,
@@ -50,7 +50,7 @@ export const onboarding: Recnik['onboarding'] = {
     mesec: 'Luna',
     podznak: 'Ascendent',
     uloga: (uloga, znak) => `${uloga}: ${znak}`,
-    nepoznat: 'neznan',
+    nepoznat: 'neznano',
     bezVremena: 'Brez ure rojstva ascendenta ni mogoče izračunati. Dodaš jo lahko pozneje v profilu.',
   },
 
@@ -96,9 +96,9 @@ export const onboarding: Recnik['onboarding'] = {
       pre: 'V računu ',
       posle: ` je karta za ${datum}, ${grad}. Za nov račun vnesi drug naslov.`,
     }),
-    zauzetNapomena: 'Če vstopiš v obstoječi račun, se podatki iz prejšnjih korakov ne shranijo.',
+    zauzetNapomena: 'Če se prijaviš v obstoječi račun, se podatki iz prejšnjih korakov ne shranijo.',
     unesiDrugi: 'Vnesi drug naslov',
-    udjiUTaj: 'Vstopi v ta račun',
+    udjiUTaj: 'Prijavi se v ta račun',
   },
 
   poljeZaKod: 'Šestmestna koda',
@@ -153,7 +153,7 @@ export const onboarding: Recnik['onboarding'] = {
     bezVremena: 'Brez ure rojstva ascendent in hiše niso zanesljivi. Tapni „Ura rojstva“, da jo dodaš.',
     odjavaSvuda: 'Odjavi se iz vseh naprav',
     odjavaNaslov: 'Se odjaviš iz vseh naprav?',
-    odjavaTekst: 'Odjavljen boš v tem telefonu in v vseh drugih napravah, v katerih si prijavljen.',
+    odjavaTekst: 'Odjavljen boš na tem telefonu in v vseh drugih napravah, v katerih si prijavljen.',
     odustani: 'Prekliči',
     odjaviSeSvuda: 'Odjavi se povsod',
     brisanjeNaslov: 'Izbris računa',

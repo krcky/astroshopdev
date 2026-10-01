@@ -55,7 +55,7 @@ export const nebo: Recnik['nebo'] = {
   /** "u Lava" — kamo ide. */
   uZnak: (k) => `u ${znaci[k].akuzativ}`,
   fazeMeseca: [
-    'Mladi Mjesec', 'Mladi srp', 'Prva četvrt', 'Rastući Mjesec',
+    'Mlađak', 'Mladi srp', 'Prva četvrt', 'Rastući Mjesec',
     'Pun Mjesec', 'Opadajući Mjesec', 'Zadnja četvrt', 'Stari srp',
   ],
 };

@@ -54,7 +54,7 @@ export const onboarding: Recnik['onboarding'] = {
     podznak: 'Podznak',
     uloga: (uloga, znak) => `${uloga}: ${znak}`,
     nepoznat: 'nepoznat',
-    bezVremena: 'Ako ne znaš vrijeme rođenja, ascendent se ne može izračunati. Možeš ga dodati kasnije u profilu.',
+    bezVremena: 'Bez vremena rođenja ascendent se ne može izračunati. Dopunit ćeš ga kasnije u profilu.',
   },
 
   nalogEmail: {

@@ -53,7 +53,7 @@ export const danas: Recnik['danas'] = {
     nemaPromena: 'No planet changes sign or direction soon.',
     temeNadnaslov: 'Transits that last for weeks and months',
     temeNaslov: 'Themes of the period',
-    nemaTema: 'Right now no slow planet is in aspect with your chart.',
+    nemaTema: 'Right now, no slow planet is in aspect with your chart.',
     /** "4 more in Transits" — link to the Transits tab. */
     josUTranzitima: (n: number) => `${n} more in Transits`,
     profil: 'Profile',
@@ -64,7 +64,7 @@ export const danas: Recnik['danas'] = {
     /** Screen reader: "Selected day: Yesterday. Change day". */
     izabranDan: (dan: string, opis: string) => `Selected day: ${dan}. ${opis}`,
     /** Screen reader for a locked day. */
-    danUzPremium: (dan: string) => `${dan}. With Premium`,
+    danUzPremium: (dan: string) => `${dan}. Included with Premium`,
     zatvoriMeni: 'Close menu',
     /** Days around today, -2 to +2 (index = offset + 2). */
     relativniDani: ['2 days ago', 'Yesterday', 'Today', 'Tomorrow', 'In 2 days'],
@@ -98,7 +98,7 @@ export const danas: Recnik['danas'] = {
       kuca: 'Home and garden',
     },
     /** Short label next to the 1–5 rating. */
-    oznakaOcene: { 5: 'Great day', 4: 'Good day', 3: 'Calm day', 2: 'Take care', 1: 'Hard day' } as Record<number, string>,
+    oznakaOcene: { 5: 'Great day', 4: 'Good day', 3: 'Calm day', 2: 'Go carefully', 1: 'Hard day' } as Record<number, string>,
     /** Row title for a New and Full Moon in a natal house. */
     lunacijaMlad: 'New beginning',
     lunacijaPun: 'Peak',
@@ -107,7 +107,7 @@ export const danas: Recnik['danas'] = {
   /** Screen reader for area ratings. */
   ocene: {
     otvorena: (oblast: string, ocena: number, oznaka: string) => `${oblast}, rated ${ocena} out of 5, ${oznaka}`,
-    zakljucana: (oblast: string) => `${oblast}, with Premium`,
+    zakljucana: (oblast: string) => `${oblast}, included with Premium`,
     otvaraPremium: 'Opens Premium',
     otvaraTranzite: 'Opens transits',
   },
@@ -143,7 +143,7 @@ export const danas: Recnik['danas'] = {
   tvojDan: {
     /** Uppercase label above the title, next to the date. */
     oznaka: 'Your day',
-    zastoOvajTekst: 'Why this text?',
+    zastoOvajTekst: 'Why this reading?',
     saznajVise: 'Learn more',
     /** Labels of the three items from the text. */
     efekat: 'Positive effect',
@@ -151,9 +151,9 @@ export const danas: Recnik['danas'] = {
     savet: 'Tip',
   },
 
-  /** Sheet "Why this text?". */
+  /** Sheet "Why this reading?". */
   tvojDanInfo: {
-    naslov: 'Why this text?',
+    naslov: 'Why this reading?',
     uvod: 'The text is written for the transit that matters most in your birth chart today.',
     tranzitDana: 'Transit of the day',
     /** Aspect angle in degrees. */
@@ -165,7 +165,7 @@ export const danas: Recnik['danas'] = {
       `${planeta} is the ruler of your Ascendant ${uZnaku}. When a transit touches it, the day feels more personal and stronger, so this transit comes first today.`,
     /** The ruler is the transiting planet; `koga` comes from `tvojAkuzativ`. */
     vladarTranzitni: (planeta: string, uZnaku: string, koga: string) =>
-      `${planeta} is the ruler of your Ascendant ${uZnaku}, and today it sets ${koga} in motion. That is why this transit comes first today.`,
+      `${planeta} is the ruler of your Ascendant ${uZnaku}, and today it activates ${koga}. That is why this transit comes first today.`,
     /** "your Venus" — English has no case, same form for every planet. */
     tvojAkuzativ: {
       sun: 'your Sun', moon: 'your Moon', mercury: 'your Mercury', venus: 'your Venus',

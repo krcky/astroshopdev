@@ -120,7 +120,7 @@ export const onboarding: Recnik['onboarding'] = {
 
   ime: {
     naslov: 'What should we call you?',
-    podnaslov: 'That way your horoscope talks to you, not like a notice board.',
+    podnaslov: 'That way your horoscope speaks to you directly, not like a notice board.',
     placeholder: 'Your name',
   },
 
@@ -190,7 +190,7 @@ export const onboarding: Recnik['onboarding'] = {
 
   push: {
     naslov: "So you don’t miss your day",
-    podnaslov: "Once in the morning, with that day’s horoscope, and when the astrologer answers you. Nothing else.",
+    podnaslov: "Once in the morning, with that day’s horoscope, and when the astrologer answers you. We don’t send anything else.",
     podnaslovWeb: 'Notifications work on your phone; on the web we skip this step.',
     ukljuci: 'Turn on notifications',
     /** Three sample notifications on the phone illustration (the second one’s title is the astrologer’s name). */

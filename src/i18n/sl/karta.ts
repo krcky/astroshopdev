@@ -71,8 +71,8 @@ export const karta: Recnik['karta'] = {
   nebo: {
     naslov: 'Trenutno na nebu',
     infoA11y: 'Kaj je trenutno nebo?',
-    datumA11y: (datum) => `Datum: ${datum}. Dotakni se, da izbereš dan.`,
-    mestoA11y: (grad) => `Kraj opazovanja: ${grad}. Dotakni se, da ga spremeniš.`,
+    datumA11y: (datum) => `Datum: ${datum}. Tapni, da izbereš dan.`,
+    mestoA11y: (grad) => `Kraj opazovanja: ${grad}. Tapni, da ga spremeniš.`,
     dan: 'dan',
     sat: 'ura',
     trenutno: 'Zdaj',

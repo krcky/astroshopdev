@@ -86,7 +86,7 @@ export const prica: Recnik['prica'] = {
       izazovno: (n) => `${n} ${mnozina(n, ['napet', 'napeta', 'napeti', 'napetih'])}`,
     },
     momenat: {
-      egzaktan: 'točen danes',
+      egzaktan: 'natančen danes',
       pocinje: 'začne se danes',
       zavrsava: 'zadnji dan',
     },
@@ -98,7 +98,7 @@ export const prica: Recnik['prica'] = {
     podnaslov: 'Tvoje znamenje',
     redni: (i) => `${REDNI[i]} znamenje zodiaka`,
     element: { vatra: 'Ogenj', zemlja: 'Zemlja', vazduh: 'Zrak', voda: 'Voda' },
-    /** Ob oznaki "Kvaliteta" (zenski spol). */
+    /** Ob oznaki "Modalnost" (zenski spol). */
     kvalitet: { kardinalan: 'Kardinalna', fiksni: 'Fiksna', promenljiv: 'Spremenljiva' },
     /** Ob oznaki "Polarnost" (zenski spol). */
     polaritet: { pozitivan: 'Pozitivna', negativan: 'Negativna' },
@@ -131,11 +131,11 @@ export const prica: Recnik['prica'] = {
     ukratko: (ime) => `${ime} na kratko`,
     najveceVrednosti: 'Največje vrednote',
     uLjubavi: 'V ljubezni',
-    naPoslu: 'Pri delu',
+    naPoslu: 'V službi',
     osvojitiOznaka: { ti: 'Kako te osvojiti', ja: 'Kako me osvojiš' },
     osnoveZnaka: 'Osnove znamenja',
     oznakaElement: 'Element',
-    oznakaKvalitet: 'Kvaliteta',
+    oznakaKvalitet: 'Modalnost',
     oznakaPol: 'Spol',
     oznakaPolaritet: 'Polarnost',
     oznakaIzgled: 'Videz',
@@ -156,7 +156,7 @@ export const prica: Recnik['prica'] = {
     opisDana: (datum) => `Zgodba dneva, ${datum.replace(/\.$/, '')}.`,
     opisZnaka: (znak) => `Zgodba o tvojem znamenju, ${znak}.`,
     obavestenjeNaslov: 'Tvoj video je pripravljen',
-    obavestenjeTekst: (opis) => `${opis} Dotakni se, da ga deliš.`,
+    obavestenjeTekst: (opis) => `${opis} Tapni, da ga deliš.`,
     kanal: 'Video zgodbe',
   },
 

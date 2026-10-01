@@ -113,7 +113,7 @@ export const onboarding: Recnik['onboarding'] = {
   captcha: 'Samo da potvrdimo da nisi robot.',
 
   ime: {
-    naslov: 'Kako da te zovemo?',
+    naslov: 'Kako ćemo te zvati?',
     podnaslov: 'Tako ti se horoskop obraća izravno, a ne kao oglasna ploča.',
     placeholder: 'Tvoje ime',
   },

@@ -121,18 +121,19 @@ for (const j of ['en', 'hr', 'bs', 'sl', 'mk']) {
 /* Racun koji sklapa tekst mora da prati jezik (getteri, datum, mnozina). */
 async function proveraJezika() {
   const { postaviJezik, tr } = await import('../src/i18n/jezik');
-  const { datum } = await import('../src/lib/horoscope');
+  const { datum, sat } = await import('../src/lib/horoscope');
   const { josTraje } = await import('../src/lib/mnozina');
   const { signFromLongitude, SIGNS } = await import('../src/lib/zodiac');
   const { BODIES, ASPECTS } = await import('../src/lib/astro');
   const dan = new Date(2026, 8, 29, 12);
   const ocekivano: [string, () => string, string, string][] = [
     ['datum', () => datum(dan, { dan: true, godina: true }), 'Uto, 29. sep 2026', 'Tue, Sep 29, 2026'],
-    ['datum hr/bs', () => { postaviJezik('hr'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('bs'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.', 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.'],
+    ['datum hr/bs', () => { postaviJezik('hr'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('bs'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Uto, 29. ruj. 2026. / Uto, 29. sep 2026.', 'Uto, 29. ruj. 2026. / Uto, 29. sep 2026.'],
     ['datum sl/mk', () => { postaviJezik('sl'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('mk'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Tor, 29. sep. 2026 / Вто, 29 сеп 2026', 'Tor, 29. sep. 2026 / Вто, 29 сеп 2026'],
     ['trajanje sl (dvojina)', () => { postaviJezik('sl'); return [1, 2, 3, 5, 102].map((n) => josTraje(n)).join(' / '); }, 'Traja še 1 dan / Traja še 2 dneva / Traja še 3 dni / Traja še 5 dni / Traja še 3 mesece', 'Traja še 1 dan / Traja še 2 dneva / Traja še 3 dni / Traja še 5 dni / Traja še 3 mesece'],
     ['znak hr/bs', () => { postaviJezik('hr'); const h = SIGNS[10].name; postaviJezik('bs'); return `${h} / ${SIGNS[10].name}`; }, 'Vodenjak / Vodolija', 'Vodenjak / Vodolija'],
     ['trajanje', () => josTraje(3), 'Traje još 3 dana', '3 days left'],
+    ['sat', () => sat(14, 5) + ' / ' + sat(0, 30), '14:05 / 00:30', '2:05 PM / 12:30 AM'],
     ['znak', () => signFromLongitude(42.5).formatted, "12° 30' Bik", "12° 30' Taurus"],
     ['vladar', () => SIGNS[7].ruler, 'Pluton', 'Pluto'],
     ['planeta', () => BODIES[0].name, 'Mesec', 'Moon'],

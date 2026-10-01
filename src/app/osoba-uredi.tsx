@@ -10,12 +10,11 @@ import { Group, ListRow } from '@/components/ui/list';
 import { VrednostReda } from '@/components/ui/vrednost-reda';
 import { obrisiOsobu, useOsoba } from '@/lib/osobe-api';
 import { porukaOsobe, type PoljeOsobe } from '@/lib/osobe';
-import { datumRodjenja } from '@/lib/horoscope';
+import { datumRodjenja, sat } from '@/lib/horoscope';
 import { ASTROLOG } from '@/lib/pitanja';
 import { useAuthStore } from '@/store/auth';
 import { neutral } from '@/theme/tokens';
 
-const dvo = (n: number) => String(n).padStart(2, '0');
 
 /**
  * Izmena druge osobe (Ivan, 29.9.2026): TABELA sa svim podacima; dodir na red
@@ -86,7 +85,7 @@ export default function OsobaUredi() {
         <ListRow title={tp.datum} trailing={<VrednostReda>{datumRodjenja(osoba.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
         <ListRow
           title={tp.vreme}
-          trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : tu.neZnaSe}</VrednostReda>}
+          trailing={<VrednostReda>{t ? sat(t.hour, t.minute) : tu.neZnaSe}</VrednostReda>}
           onPress={() => otvori('vreme')}
         />
         <ListRow title={tp.mesto} trailing={<VrednostReda>{osoba.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />

@@ -33,7 +33,7 @@ export const onboarding: Recnik['onboarding'] = {
 
   pretragaGrada: {
     placeholder: 'Град',
-    trazimDalje: 'Барам понатаму…',
+    trazimDalje: 'Барам уште…',
   },
 
   reveal: {
@@ -143,7 +143,7 @@ export const onboarding: Recnik['onboarding'] = {
       apple: 'Apple сметка',
       google: 'Google сметка',
     } as Record<string, string>,
-    nalogOd: 'Сметка од',
+    nalogOd: 'Сметка отворена',
     podaciORodjenju: 'Податоци за раѓање',
     datumRodjenja: 'Датум на раѓање',
     vremeRodjenja: 'Време на раѓање',
@@ -161,7 +161,7 @@ export const onboarding: Recnik['onboarding'] = {
     obrisiNalog: 'Избриши ја сметката',
     obrisatiNaslov: 'Да се избрише сметката?',
     obrisatiTekst:
-      'Се бришат сметката, името, сликата и сите податоци за раѓање. Ова не може да се врати.\n\n' +
+      'Се бришат сметката, името, сликата и сите податоци за раѓање. Ова не може да се поништи.\n\n' +
       'Претплатата со ова НЕ се откажува — ја откажуваш во поставките на Apple или Google сметката.',
     nijeUspelo: 'Не успеа',
     nijeObrisan: 'Сметката не е избришана. Провери го интернетот и пробај повторно.',

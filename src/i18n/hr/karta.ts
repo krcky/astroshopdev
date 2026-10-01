@@ -7,6 +7,9 @@ import { gramatika } from './gramatika';
 import { nebo } from './nebo';
 
 /** "2,3°" — decimalni zarez, jedna decimala. */
+/** Faze koje su same ime Mjeseca — naslov ih ne dopunjuje s "Mjeseca" ("Mlađak u Ovnu"). */
+const BEZ_DOPUNE = ['Mlađak'];
+
 const stepenDecimalno = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
 
 const MJESECI_PUNO = [
@@ -171,7 +174,7 @@ export const karta: Recnik['karta'] = {
 
   luna: {
     faze: {
-      new: 'Mladi Mjesec', first: 'Prva četvrt', full: 'Pun Mjesec', last: 'Zadnja četvrt',
+      new: 'Mlađak', first: 'Prva četvrt', full: 'Pun Mjesec', last: 'Zadnja četvrt',
       waxing: 'Rastući Mjesec', waning: 'Opadajući Mjesec',
     },
     biljka: { vatra: 'Plod', zemlja: 'Korijen', vazduh: 'Cvijet', voda: 'List' },
@@ -190,16 +193,16 @@ export const karta: Recnik['karta'] = {
       7: 'partnerstva', 8: 'zajednički novac i promjene', 9: 'putovanja i učenje',
       10: 'karijera i ugled', 11: 'prijatelji i planovi', 12: 'odmor i unutarnji svijet',
     },
-    /** "Pun Mjesec u Biku", "Prva četvrt Mjeseca u Strijelcu". */
+    /** "Pun Mjesec u Biku", "Mlađak u Ovnu", "Prva četvrt Mjeseca u Strijelcu". */
     naslov: (faza, lokativ) =>
-      `${faza.includes('Mjesec') ? faza : `${faza} Mjeseca`} u ${lokativ}`,
+      `${faza.includes('Mjesec') || BEZ_DOPUNE.includes(faza) ? faza : `${faza} Mjeseca`} u ${lokativ}`,
   },
 
   mesec: {
     odSata: (sat, z) => `Od ${sat}, prije toga ${nebo.uZnaku(z)}`,
     doSata: (sat, z) => `Do ${sat}, zatim ${nebo.uZnaku(z)}`,
     lunarniKalendar: 'Lunarni kalendar',
-    otvoriKalendarA11y: (datum) => `${datum}. Otvori kalendar`,
+    otvoriKalendarA11y: (datum) => `${datum}${datum.endsWith('.') ? '' : '.'} Otvori kalendar`,
     danas: 'Danas',
     nazadNaDanas: 'Natrag na danas',
     osvetljen: (procenat, lunarniDan) => `${procenat} osvijetljen · ${lunarniDan}. lunarni dan`,

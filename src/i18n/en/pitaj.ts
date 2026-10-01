@@ -137,7 +137,7 @@ export const pitaj: Recnik['pitaj'] = {
     /** Screen reader: "0:35 of 1:20". */
     vremeOd: (sada, ukupno) => `${sada} of ${ukupno}`,
     brzinaNormalna: 'Normal speed',
-    brzinaPoIPo: 'One and a half times speed',
+    brzinaPoIPo: '1.5x speed',
     /** Speed button label. */
     brzina1: '1x',
     brzina15: '1.5x',

@@ -10,7 +10,7 @@ import { SheetScroll } from '@/components/sheet';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { deleteAccount, signOut, useAuthStore } from '@/store/auth';
 import { useProfileStore } from '@/store/profile';
-import { datum, datumRodjenja } from '@/lib/horoscope';
+import { datum, datumRodjenja, sat } from '@/lib/horoscope';
 import type { PoljeOsobe } from '@/lib/osobe';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
@@ -18,7 +18,6 @@ import { useT } from '@/i18n';
 
 /** Naslov sekcije kao na profilu — kao datum na pocetnoj (`oznaka` 12pt). */
 const NASLOV = cn('ml-0', OZNAKA_12);
-const dvo = (n: number) => String(n).padStart(2, '0');
 
 /**
  * NALOG — list sa profila (Ivan, 29.9.2026): email (i njegova promena, `/email`),
@@ -115,7 +114,7 @@ export default function NalogSheet() {
             <ListRow title={tn.datumRodjenja} trailing={<VrednostReda>{datumRodjenja(profil.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
             <ListRow
               title={tn.vremeRodjenja}
-              trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : tn.neZnam}</VrednostReda>}
+              trailing={<VrednostReda>{t ? sat(t.hour, t.minute) : tn.neZnam}</VrednostReda>}
               onPress={() => otvori('vreme')}
             />
             <ListRow title={tn.mestoRodjenja} trailing={<VrednostReda>{profil.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />

@@ -71,9 +71,17 @@ export function opsegDatuma(start: Date, end: Date): string {
   return tr().datum.opseg(datum(start), datum(end, { godina: end.getFullYear() !== start.getFullYear() }));
 }
 
+/**
+ * Sat u danu po jeziku: "14:05", na engleskom "2:05 PM". JEDINO mesto koje ispisuje vreme
+ * (uz `zoneClock`); vreme rodjenja ide kroz `sat()`. Snimak karte za astrologa ostaje 24h.
+ */
+export function sat(hour: number, minute: number): string {
+  return tr().datum.sat(hour, minute);
+}
+
 /** "14:05" po lokalnom vremenu uredjaja. */
 export function formatTime(date: Date): string {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return sat(date.getHours(), date.getMinutes());
 }
 
 /**

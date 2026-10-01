@@ -96,7 +96,7 @@ export const prica: Recnik['prica'] = {
     podnaslov: 'Tvoj znak',
     redni: (i) => `${REDNI[i]} znak zodijaka`,
     element: { vatra: 'Vatra', zemlja: 'Zemlja', vazduh: 'Zrak', voda: 'Voda' },
-    kvalitet: { kardinalan: 'Kardinalan', fiksni: 'Fiksni', promenljiv: 'Promjenjiv' },
+    kvalitet: { kardinalan: 'Kardinalni', fiksni: 'Fiksni', promenljiv: 'Promjenjivi' },
     polaritet: { pozitivan: 'Pozitivan', negativan: 'Negativan' },
     polaritetOpis: {
       pozitivan: 'kao svi vatreni i zračni znakovi',
@@ -147,7 +147,7 @@ export const prica: Recnik['prica'] = {
   posao: {
     naslovDana: 'Priča dana',
     /** Datum vec zavrsava tockom ("1. lis 2026.") — bez dvostruke. */
-    opisDana: (datum) => `Priča dana, ${datum.replace(/\.$/, '')}.`,
+    opisDana: (datum) => `Priča dana, ${datum}${datum.endsWith('.') ? '' : '.'}`,
     opisZnaka: (znak) => `Priča o tvom znaku, ${znak}.`,
     obavestenjeNaslov: 'Tvoj video je spreman',
     obavestenjeTekst: (opis) => `${opis} Dodirni da ga podijeliš.`,
@@ -158,7 +158,7 @@ export const prica: Recnik['prica'] = {
     upravoPravimo: (drugi) => `Upravo izrađujemo video: ${drugi}. Ovaj možeš čim taj bude gotov.`,
     sePravi: (procenat) => `Video se izrađuje · ${procenat}. Javit ćemo ti kad bude gotov.`,
     spreman: 'Video cijele priče je spreman.',
-    pravimoOkoMinut: 'Video izrađujemo oko minutu. Za to vrijeme koristi aplikaciju — javit ćemo ti kad bude gotov.',
+    pravimoOkoMinut: 'Izrada videa traje oko minutu. Za to vrijeme koristi aplikaciju — javit ćemo ti kad bude gotov.',
     ovaSlika: 'Ova slika',
     pogledajVideo: 'Pogledaj video',
     celaPrica: 'Cijela priča, video',
@@ -195,7 +195,7 @@ export const prica: Recnik['prica'] = {
     nemaZnaka: 'Video znaka još nije izrađen. Izradit ćeš ga iz priče o znaku (tab „Ti“): gumb „Podijeli“, pa „Cijela priča, video“.',
     bezDozvole: (ios) => `Astro Shop nema dopuštenje za dodavanje u ${uFotoKamo(ios)}.`,
     otvoriPodesavanja: 'Otvori Postavke',
-    sacuvano: (ios) => `Spremljeno u ${uFoto(ios)}`,
+    sacuvano: (ios) => `Spremljeno u ${uFotoKamo(ios)}`,
     sacuvaj: (ios) => `Spremi u ${uFotoKamo(ios)}`,
     nijeSacuvan: 'Video nije spremljen. Pokušaj ponovno.',
     a11yPregled: 'Video priče dana',

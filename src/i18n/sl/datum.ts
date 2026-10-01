@@ -16,7 +16,9 @@ export const datum: Recnik['datum'] = {
   opseg: (od, do_) => `${od} – ${do_}`,
   doDana: (d) => `do ${d}`,
   josGodinama: 'še leta',
-  trajeGodinama: 'Traja leta',
+  trajeGodinama: 'Traja več let',
   poslednjiDan: 'Zadnji dan',
   trajeJos: (koliko) => `Traja še ${koliko}`,
+  /** Sat u danu: 24 sata, "14:05". */
+  sat: (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
 };

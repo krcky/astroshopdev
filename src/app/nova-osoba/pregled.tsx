@@ -10,7 +10,7 @@ import { ZnakIkona } from '@/components/znak-ikona';
 import { otvoriPremium } from '@/components/zakljucano';
 import { dodajOsobu } from '@/lib/osobe-api';
 import { nazivOdnosa, porukaOsobe } from '@/lib/osobe';
-import { datumRodjenja } from '@/lib/horoscope';
+import { datumRodjenja, sat } from '@/lib/horoscope';
 import { useNaMrezi } from '@/lib/mreza';
 import { ASTROLOG } from '@/lib/pitanja';
 import type { ZodiacSign } from '@/lib/zodiac';
@@ -18,7 +18,6 @@ import { useAuthStore } from '@/store/auth';
 import { useNovaOsoba } from '@/store/nova-osoba';
 import { placeFields, resolveProfile } from '@/store/profile';
 
-const dvo = (n: number) => String(n).padStart(2, '0');
 
 /**
  * Nova osoba, poslednji korak: velika trojka te osobe (kao "reveal" u
@@ -68,7 +67,7 @@ export default function NovaOsobaPregled() {
   const odnos = nazivOdnosa(nacrt.odnos);
   const rodjenje = [
     profil.time
-      ? tn.datumUVreme(datumRodjenja(profil.birth), `${dvo(profil.time.hour)}:${dvo(profil.time.minute)}`)
+      ? tn.datumUVreme(datumRodjenja(profil.birth), sat(profil.time.hour, profil.time.minute))
       : datumRodjenja(profil.birth),
     profil.cityName,
   ].join(' · ');

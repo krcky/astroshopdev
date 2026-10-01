@@ -1,6 +1,6 @@
 # Pregled prevoda, 1.10.2026
 
-Nezavisni recenzenti (model u ulozi izvornog lektora, novi kontekst), po jedan za svaki jezik. "ISPRAVLJENO" je već u kodu; "PREDLOZI" čekaju odluku.
+Nezavisni recenzenti (model u ulozi izvornog lektora, novi kontekst), po jedan za svaki jezik. "ISPRAVLJENO" je već u kodu. PREDLOZI su PRIHVAĆENI i primenjeni 2.10.2026 (Ivan: "prihvati sve"), osim: makedonski "AI" i "Premium" ostaju latinicom; gde je predlog bio "ostaviti", ostalo je.
 
 ---
 

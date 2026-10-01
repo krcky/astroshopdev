@@ -20,4 +20,6 @@ export const datum: Recnik['datum'] = {
   trajeGodinama: 'Lasts for years',
   poslednjiDan: 'Last day',
   trajeJos: (koliko) => `${koliko} left`,
+  /** 12-hour clock for English: "2:05 PM", "12:30 AM". */
+  sat: (h, m) => `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`,
 };

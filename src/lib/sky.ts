@@ -15,6 +15,7 @@
  * postoji, a sistemska dozvola za lokaciju bi trazila i razlog i objasnjenje
  * u prodavnici.
  */
+import { tr } from '@/i18n/jezik';
 import { findAspects, moonPhase, type Aspect, type PlanetPosition } from '@/lib/astro';
 import { buildNatalChart, houseOf, type NatalChart } from '@/lib/natal';
 import { computeSkyPoints, isDayChart, type SkyPoint } from '@/lib/points';
@@ -71,9 +72,7 @@ export function buildSky(date: Date, latitude: number, longitude: number): SkyNo
  */
 export function zoneClock(date: Date, tz: TimeZoneInfo): string {
   const pomeren = zoneShift(date, tz);
-  const h = String(pomeren.getUTCHours()).padStart(2, '0');
-  const m = String(pomeren.getUTCMinutes()).padStart(2, '0');
-  return `${h}:${m}`;
+  return tr().datum.sat(pomeren.getUTCHours(), pomeren.getUTCMinutes());
 }
 
 /**

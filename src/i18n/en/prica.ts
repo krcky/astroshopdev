@@ -53,7 +53,7 @@ export const prica: Recnik['prica'] = {
     nemaAspekata: 'Today no planet makes an aspect to your chart.',
     /** "Most important today · exact today" (all caps). */
     najvaznijeDanas: (momenat) => `Most important today · ${momenat}`,
-    najboljeTiIde: 'Going best for you',
+    najboljeTiIde: 'Your best area',
     /** All caps, under the area name. */
     boljeNegoJuce: '↑ better than yesterday',
     /** VoiceOver for a rating row: "Love, 4 of 5, good, better than yesterday". */
@@ -75,7 +75,7 @@ export const prica: Recnik['prica'] = {
   /** SHARE CARD and VIDEO frame of the story of the day — FIRST PERSON. */
   kartica: {
     mojDan: 'My day',
-    najboljeMiIde: 'Going best for me',
+    najboljeMiIde: 'My best area',
     ideMi: 'Going my way',
     kociMe: 'Holding me back',
     zaMene: 'For me',
@@ -156,7 +156,7 @@ export const prica: Recnik['prica'] = {
     oznakaPolaritet: 'Polarity',
     oznakaIzgled: 'Appearance',
     /** Slide 8. The title counts toward slide duration (word count). */
-    znakUStvarima: 'The sign in things',
+    znakUStvarima: 'Your sign’s symbols',
     stvariNaslov: 'Stone, color, plant and food',
     dragiKamen: 'Gemstone',
     boja: 'Color',

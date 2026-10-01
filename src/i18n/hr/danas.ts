@@ -117,7 +117,7 @@ export const danas: Recnik['danas'] = {
     tranzitVladara: 'Tranzit tvog vladara',
     nijeDeoKarte: 'Ovaj tranzit nije dio tvoje karte.',
     vladarNatalni: (planeta, uZnaku) =>
-      `${planeta} je vladar tvog Ascendenta ${uZnaku}. Kad ga tranzit dotakne, dan se osjeća osobnije i jače, zato ovaj tranzit danas ima prednost.`,
+      `${planeta} je vladar tvog Ascendenta ${uZnaku}. Kad ga tranzit dotakne, dan je osobniji i jači, zato ovaj tranzit danas ima prednost.`,
     vladarTranzitni: (planeta, uZnaku, koga) =>
       `${planeta} je vladar tvog Ascendenta ${uZnaku}, a danas pokreće ${koga}. Zato ovaj tranzit danas ima prednost.`,
     tvojAkuzativ: {

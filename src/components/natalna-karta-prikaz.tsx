@@ -8,7 +8,7 @@ import { IznadPreliva } from '@/components/screen';
 import { Text } from '@/components/ui/text';
 
 import { cn } from '@/lib/utils';
-import { datumRodjenja } from '@/lib/horoscope';
+import { datumRodjenja, sat } from '@/lib/horoscope';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { ZnakIkona } from '@/components/znak-ikona';
@@ -125,7 +125,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
         <Text variant="muted" className="mt-1 text-center">
           {tp.rodjenje(
             datumRodjenja(b),
-            t ? `${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}` : null,
+            t ? sat(t.hour, t.minute) : null,
             city.name,
           )}
         </Text>

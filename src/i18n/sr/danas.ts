@@ -3,6 +3,19 @@
  * imena oblasti, ton, trajanje, "Tvoj dan", "Mesec danas", "Promene na nebu".
  * Jedan objekat po ekranu ili komponenti, sa imenom fajla u komentaru.
  */
+import { nebo } from './nebo';
+
+/**
+ * "natalni / natalna / natalno" po rodu natalne tacke (Ivan, 2.10.2026; do tada uvek "natalni",
+ * pa "natalni Venera", "natalni Sunce"). Funkcija dobija IME, pa se kljuc trazi po imenu;
+ * Ascendent i MC (nisu u `nebo.tela`) su muskog roda.
+ */
+const natalni = (ime: string) => {
+  const kljuc = (Object.keys(nebo.tela) as (keyof typeof nebo.tela)[]).find((k) => nebo.tela[k] === ime);
+  const rod = kljuc ? nebo.padeziTela[kljuc].rod : 'm';
+  return rod === 'z' ? 'natalna' : rod === 's' ? 'natalno' : 'natalni';
+};
+
 export const danas = {
   /** `app/(tabs)/_layout.tsx` — natpisi ispod ikonica tabova; isti su i naslovi strana tabova. */
   tabovi: {
@@ -54,7 +67,7 @@ export const danas = {
     /** "Sunce konjunkcija Jupiter" — tranzitna planeta, aspekt, natalna tacka. */
     ime: (tranzitna: string, aspekt: string, natalna: string) => `${tranzitna} ${aspekt} ${natalna}`,
     /** "Sunce konjunkcija natalni Jupiter" — kad se vidi samo ime, bez teksta. */
-    imeNatalni: (tranzitna: string, aspekt: string, natalna: string) => `${tranzitna} ${aspekt} natalni ${natalna}`,
+    imeNatalni: (tranzitna: string, aspekt: string, natalna: string) => `${tranzitna} ${aspekt} ${natalni(natalna)} ${natalna}`,
     /** Ascendent i MC kao natalne mete tranzita. */
     ascendent: 'Ascendent',
     mc: 'MC',

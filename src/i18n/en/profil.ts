@@ -29,7 +29,7 @@ export const profil: Recnik['profil'] = {
     nalog: 'Account',
     pravila: 'Legal',
     pomoc: 'Help',
-    pisiteNam: 'Write to us',
+    pisiteNam: 'Contact us',
     obavestenja: 'Notifications',
     obavestenjaUskoro: 'Coming soon',
     nemaMejlAplikacije: (adresa) => `There is no email app on this phone. The address is ${adresa}.`,
@@ -116,7 +116,7 @@ export const profil: Recnik['profil'] = {
   /** `components/zakljucano.tsx` — locks and the "Unlock" card. */
   zakljucano: {
     /** Screen reader for a locked row. */
-    red: (naslov) => `${naslov}. With Premium`,
+    red: (naslov) => `${naslov}. Included with Premium`,
   },
 
   /** `components/tvoji-ljudi.tsx` — other people on the profile. */
@@ -126,7 +126,7 @@ export const profil: Recnik['profil'] = {
     naslovSaBrojem: (n) => `Your people  ·  ${n}`,
     /** Screen reader for a person row: name, then relationship and sign, then lock. */
     redOsobe: (ime, ispod, zakljucana) =>
-      `${ime}${ispod ? `, ${ispod}` : ''}${zakljucana ? '. With Premium' : ''}`,
+      `${ime}${ispod ? `, ${ispod}` : ''}${zakljucana ? '. Included with Premium' : ''}`,
     dodajOsobu: 'Add a person',
     dodajOsobuOpis: (ispod) => `Add a person${ispod ? `. ${ispod}` : ''}`,
     uzPremiumDo: (n) => `Up to ${ljudi(n)} with Premium`,

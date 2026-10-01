@@ -110,7 +110,7 @@ export const karta: Recnik['karta'] = {
     mesecPresaoOsoba: (od, u) =>
       `Na dan rođenja Mjesec je bio ${nebo.uZnaku(od)}, pa prešao ${nebo.uZnak(u)}. Dok ne znamo vrijeme rođenja, ne znamo ni u kojem je znaku bio u trenutku rođenja, pa tumačenje ne prikazujemo.`,
     dodajVreme: 'Dodaj vrijeme rođenja',
-    kucaBezVremena: 'U kojoj je kući planeta, može se reći tek uz tačno vrijeme rođenja. Kad ga uneseš, ovdje će biti i tumačenje kuće.',
+    kucaBezVremena: 'U kojoj je kući planeta, zavisi od tačnog vremena rođenja. Kad ga uneseš, ovdje će biti i tumačenje kuće.',
     premiumNaslov: 'Tvoja cijela karta',
     premiumNaslovOsoba: 'Cijela karta ove osobe',
     premiumOpis: 'Sunce, Mjesec i podznak su već otvoreni. Ostale planete u znacima i kućama i svi aspekti su uz Premium.',

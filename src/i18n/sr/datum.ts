@@ -26,4 +26,6 @@ export const datum = {
   trajeGodinama: 'Traje godinama',
   poslednjiDan: 'Poslednji dan',
   trajeJos: (koliko: string) => `Traje još ${koliko}`,
+  /** Sat u danu: 24 sata, "14:05". */
+  sat: (h: number, m: number) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
 };

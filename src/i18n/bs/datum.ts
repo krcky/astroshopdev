@@ -22,4 +22,6 @@ export const datum: Recnik['datum'] = {
   trajeGodinama: 'Traje godinama',
   poslednjiDan: 'Posljednji dan',
   trajeJos: (koliko) => `Traje još ${koliko}`,
+  /** Sat u danu: 24 sata, "14:05". */
+  sat: (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
 };
