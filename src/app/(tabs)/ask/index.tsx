@@ -9,10 +9,11 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { PitajUvod } from '@/components/pitaj-uvod';
+import { AstrologSlika } from '@/components/astrolog-slika';
 import { PodvuceniTabovi } from '@/components/ui/podvuceni-tabovi';
 import { cn } from '@/lib/utils';
 import { useT } from '@/i18n';
-import { datumPitanja, natpisStatusa, neprocitan, oKome, type Pitanje } from '@/lib/pitanja';
+import { ASTROLOG, datumPitanja, natpisStatusa, neprocitan, oKome, type Pitanje } from '@/lib/pitanja';
 import { useKrediti, useMojaPitanja } from '@/lib/pitanja-api';
 import { brand, neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
@@ -88,13 +89,27 @@ function PitajCoveka() {
     );
   }
 
-  // Ima pitanja (Ivan, 29.9.2026): samo dugme i lista; uvod je prvi korak lista odozdo.
+  // Ima pitanja (Ivan, 29.9.2026): dugme i lista; uvod je prvi korak lista odozdo.
+  // Iznad dugmeta astrolog i jedna recenica (Ivan, 1.10.2026: bez toga je strana delovala prazno).
   return (
     <View className="mt-6">
+      {/* Slika, naslov i jedan red ko odgovara (Ivan, 1.10.2026: manje teksta nego pre). */}
+      <View className="mb-5 items-center">
+        <AstrologSlika velicina={64} />
+        <Text variant="h2" className="mt-3 text-center">{t.josJednoNaslov}</Text>
+        <Text variant="body" className="mt-1 text-center">{t.josJedno(ASTROLOG.ime)}</Text>
+      </View>
       {kredit}
-      <Button istaknuto onPress={() => router.push({ pathname: '/pitanje-novo', params: { korak: 'uvod' } })}>
-        <Text>{t.postavi}</Text>
-      </Button>
+      {/* Manje dugme, isto kao "Saznaj više" na pocetnoj, centrirano (Ivan, 1.10.2026). */}
+      <View className="self-center">
+        <Button
+          size="compact"
+          istaknuto
+          className="h-auto px-5 py-[10px]"
+          onPress={() => router.push({ pathname: '/pitanje-novo', params: { korak: 'uvod' } })}>
+          <Text className="text-[16px] leading-[20px]">{t.postavi}</Text>
+        </Button>
+      </View>
 
       <Text variant="label" className="mb-3 mt-8">{t.mojaPitanja}</Text>
       <View className={CARD_SURFACE}>

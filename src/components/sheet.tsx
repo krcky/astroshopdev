@@ -66,6 +66,10 @@ export function SheetScroll({ children, keyboardShouldPersistTaps, siva = false,
       scrollEventThrottle={onScrollY ? 16 : undefined}
       className={siva ? 'flex-1 bg-grouped' : 'flex-1 bg-background'}
       stickyHeaderIndices={[0]}
+      // ANDROID (Ivan, 1.10.2026): list odozdo je `BottomSheetBehavior`, koji skrol unutar sebe
+      // prepoznaje samo kao "nested scroll" — RN ScrollView ga na Androidu podrazumevano iskljucuje,
+      // pa je svako povlacenje nadole (i skrol teksta nagore) zatvaralo list. Na iOS-u nema efekta.
+      nestedScrollEnabled
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
       showsVerticalScrollIndicator={false}>

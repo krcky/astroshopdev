@@ -287,6 +287,9 @@ export default function ProfileSheet() {
           dolaze ovde kad push postoji. */}
       <GroupHeader variant="oznaka" className={NASLOV}>{tp.pomoc}</GroupHeader>
       <Group className={GRUPA}>
+        {/* PRIVREMENO (Ivan, 1.10.2026): samo red, ne radi nista — prava podesavanja kad stigne
+            push. Zapisano u CLAUDE.md, "Jos nije uradjeno" (Push notifikacije). */}
+        <ListRow title={tp.obavestenja} subtitle={tp.obavestenjaUskoro} chevron={false} />
         <ListRow title={tp.pisiteNam} subtitle={PODRSKA} onPress={pisiPodrsci} />
       </Group>
 

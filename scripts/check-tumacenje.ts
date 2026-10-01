@@ -44,7 +44,7 @@ const vrste: [string, string | null][] = [
   ['Izazovi', 'pazi'],
   ['Izazov', 'pazi'],
   ['Saveti', 'savet'],
-  ['Opšte preporuke', 'savet'],
+  ['Opšte preporuke', 'preporuke'],
   ['Mitološke paralele', null],
   ['Kako najbolje iskoristiti ovaj tranzit?', null],
 ];

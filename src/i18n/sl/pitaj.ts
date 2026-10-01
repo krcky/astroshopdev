@@ -54,7 +54,8 @@ export const pitaj: Recnik['pitaj'] = {
       : `Imaš ${n} ${mnozina(n, ['plačano vprašanje', 'plačani vprašanji', 'plačana vprašanja', 'plačanih vprašanj'])}.`),
     pitaj: 'Vprašaj',
     /** Iznad "Postavi pitanje" kad vec ima pitanja (Ivan, 1.10.2026). */
-    josJedno: (ime: string) => `Imaš novo vprašanje? ${ime} pogleda tvojo natalno karto in ti odgovori z glasovnim sporočilom.`,
+    josJednoNaslov: 'Imaš novo vprašanje?',
+    josJedno: (ime: string) => `Na vprašanja odgovarja astrolog ${ime}.`,
     postavi: 'Postavi vprašanje',
     mojaPitanja: 'Moja vprašanja',
     zavrsi: 'Dokončaj',

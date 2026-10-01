@@ -70,14 +70,15 @@ export function vrstaOdeljka(naslov: string): Odeljak | null {
  * ikonu — ali NE i odeljak kartice "Tvoj dan", zato je ovo zasebna funkcija.
  * Jednokratni naslovi (~20, iz tekstova drugacije grade) vracaju null: bez ikone.
  */
-export type VrstaSekcije = 'sustina' | 'dugorocno' | 'sfere' | Odeljak;
+export type VrstaSekcije = 'sustina' | 'dugorocno' | 'sfere' | 'preporuke' | Odeljak;
 
 export function vrstaSekcije(naslov: string): VrstaSekcije | null {
   const n = naslov.trim().toLowerCase();
   if (/^su[sš]tin/.test(n)) return 'sustina';
   if (/^dugoro[cč]n/.test(n)) return 'dugorocno';
   if (/^specifi[cč]n\S* (sfer|oblast)/.test(n)) return 'sfere';
-  if (/^op[sš]t\S* preporuk/.test(n)) return 'savet';
+  // Od 1.10.2026 svoja ikonica (kompas) — do tada ista sijalica kao "Saveti" odmah ispod.
+  if (/^op[sš]t\S* preporuk/.test(n)) return 'preporuke';
   return vrstaOdeljka(naslov);
 }
 

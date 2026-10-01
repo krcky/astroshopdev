@@ -12,8 +12,12 @@ import { neutral } from '@/theme/tokens';
 
 export type { StakloDugmeProps };
 
-/** Visina sadrzaja dugmeta; staklo (`controlSize('small')`) dodaje svoj razmak do ~40pt, kao dugmad u traci. */
-const VISINA = 30;
+/**
+ * Visina sadrzaja dugmeta; staklo (`controlSize('small')`) dodaje svoj razmak. Do 1.10.2026 30
+ * (~40pt ukupno); 34 daje 44pt, Apple-ov minimum za dodir (B15 iz UX recenzije). SwiftUI dugme
+ * nema `hitSlop`, pa polje za dodir raste samo sa dugmetom. Rezerva (Android) to resava `hitSlop`-om.
+ */
+const VISINA = 34;
 
 /**
  * STAKLENO DUGME U SADRZAJU (Ivan, 29.9.2026: "pravi glass buttoni a ne ovi lazni").

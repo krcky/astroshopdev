@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 
 import { Text } from '@/components/ui/text';
 import { NaslovSekcije } from '@/components/naslov-sekcije';
@@ -21,29 +20,15 @@ import { TransitTrajanje } from '@/components/transit-trajanje';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { OdeljakIkona } from '@/components/odeljak-ikona';
-import { rasporedDuge, vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
+import { rasporedDuge, vrstaSekcije } from '@/lib/tumacenje';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { ASTROLOG } from '@/lib/pitanja';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
-import { neutral } from '@/theme/tokens';
 import { useNaMrezi } from '@/lib/mreza';
 import { useT } from '@/i18n';
 
 
-/**
- * Ikona uz naslov sekcije duge verzije — boja naslova (`label`), ne akcenat.
- * SF Symbols na iOS-u; Android i web crtaju isti znak iz Material Symbols
- * (expo-symbols nosi font sam, radi i u Expo Go).
- */
-const IKONA_SEKCIJE: Record<VrstaSekcije, SymbolViewProps['name']> = {
-  sustina: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
-  dugorocno: { ios: 'hourglass', android: 'hourglass_empty', web: 'hourglass_empty' },
-  sfere: { ios: 'square.grid.2x2', android: 'grid_view', web: 'grid_view' },
-  efekat: { ios: 'checkmark.circle', android: 'check_circle', web: 'check_circle' },
-  pazi: { ios: 'exclamationmark.triangle', android: 'warning', web: 'warning' },
-  savet: { ios: 'lightbulb', android: 'lightbulb', web: 'lightbulb' },
-};
 
 /**
  * Detaljno tumacenje jednog tranzita — duga verzija.
@@ -196,18 +181,15 @@ function Simbol({ tacka }: { tacka: { key: string; glyph: string } }) {
 }
 
 /**
- * Odeljak duge verzije: naslov sa ikonicom pa tekst. Efekat, Pazi, Savet: Ivanove 3D slike,
- * iste kao na "Tvom danu"; ostali odeljci SF/Material. Ikonice vece nego uz nekadasnji
- * sivi `label` — podnaslov je `h2`.
+ * Odeljak duge verzije: naslov sa ikonicom pa tekst. Svi poznati odeljci imaju Ivanove 3D
+ * slike (`OdeljakIkona`); jednokratni naslovi su bez ikonice.
  */
 function OdeljakDuge({ s }: { s: { heading: string; body: string } }) {
   const vrsta = vrstaSekcije(s.heading);
   return (
     <View className="mt-7">
       <NaslovSekcije
-        ikona={vrsta === 'efekat' || vrsta === 'pazi' || vrsta === 'savet'
-          ? <OdeljakIkona odeljak={vrsta} size={26} />
-          : vrsta ? <SymbolView name={IKONA_SEKCIJE[vrsta]} size={20} tintColor={neutral.inkSubtle} /> : undefined}>
+        ikona={vrsta ? <OdeljakIkona odeljak={vrsta} size={26} /> : undefined}>
         {s.heading}
       </NaslovSekcije>
       <TumacenjeTekst tekst={s.body} />
