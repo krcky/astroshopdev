@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  AccessibilityInfo, ActionSheetIOS, ActivityIndicator, Alert, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
+  AccessibilityInfo, ActivityIndicator, AppState, Image, Platform, Pressable, StyleSheet, useWindowDimensions, View,
   type GestureResponderEvent,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
@@ -22,15 +22,14 @@ import { Text } from '@/components/ui/text';
 import { KarticaZaDeljenje } from '@/components/prica/kartica';
 import { SLIKE, tamnaSlika, type OkvirSlike } from '@/components/prica/slajdovi';
 import { SatKojiTece } from '@/components/prica/sat';
-import { IMA_VIDEO } from '@/components/prica/platno-videa';
-import { pitajZaObavestenje } from '@/components/prica/video-radionica';
 import { KrugNapretka, procenat } from '@/components/prica/video-traka';
+import { usePonudiVideo } from '@/components/prica/ponudi-video';
+import { posaoDnevnePrice } from '@/components/prica/poslovi-videa';
 import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import type { SlikaKljuc } from '@/lib/prica';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { usePricaLog } from '@/store/prica-log';
-import { useVideoDana, useVideoPrice } from '@/store/video-price';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 
@@ -303,56 +302,12 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
     return () => { otkazano = true; };
   }, [deli, pauzaJs, p.dan]);
 
-  // --- VIDEO (Ivan, 30.9.2026): "Podeli" nudi sliku ili celu pricu kao video. Video se pravi
-  // van ekrana dok korisnik radi sta hoce (`video-radionica.tsx`); prica za to vreme ide dalje.
-  // iOS: sistemski meni (`ActionSheetIOS`); Android: dijalog sa tri dugmeta (Otkaži levo, video desno).
-  // Bez nativnog modula (Expo Go, veb) i bez naloga "Podeli" odmah deli sliku, kao do sada.
-  const video = useVideoDana(userId, p.dan);
-  const ponudi = React.useCallback((k: SlikaKljuc) => {
-    if (!IMA_VIDEO || !userId) { podeli(k); return; }
-    pauzaJs.set(1);
-    const gotov = video?.stanje === 'gotov' && video.uri ? video.uri : null;
-    const pravi = video?.stanje === 'pravi';
-    const opis = 'Video pravimo oko minut. Za to vreme koristi aplikaciju — javićemo ti kad bude gotov.';
-    const video1 = () => {
-      pauzaJs.set(0);
-      // Gotov video: list sa pregledom, deljenjem i cuvanjem — i posle deljenja.
-      if (gotov) router.push('/video-price');
-      else if (!pravi) {
-        useVideoPrice.getState().pokreni(userId, p);
-        void pitajZaObavestenje();
-      }
-    };
-    const otkazi = () => pauzaJs.set(0);
-    if (Platform.OS === 'android') {
-      // Android: najvise tri dugmeta — levo "Otkaži", desno slika i video. Dok se pravi, video dugmeta nema.
-      Alert.alert(
-        'Podeli svoj dan',
-        pravi ? `Video se pravi · ${procenat(video!.napredak)}. Javićemo ti kad bude gotov.` : gotov ? 'Video cele priče je spreman.' : opis,
-        [
-          { text: 'Otkaži', style: 'cancel', onPress: otkazi },
-          { text: 'Ova slika', onPress: () => podeli(k) },
-          ...(pravi ? [] : [{ text: gotov ? 'Pogledaj video' : 'Cela priča, video', onPress: video1 }]),
-        ],
-        { cancelable: true, onDismiss: otkazi },
-      );
-      return;
-    }
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        title: 'Podeli svoj dan',
-        message: gotov || pravi ? undefined : opis,
-        options: ['Ova slika', gotov ? 'Pogledaj video' : pravi ? `Video se pravi · ${procenat(video!.napredak)}` : 'Cela priča, video', 'Otkaži'],
-        cancelButtonIndex: 2,
-        disabledButtonIndices: pravi ? [1] : undefined,
-      },
-      (izbor) => {
-        if (izbor === 0) { podeli(k); return; }
-        if (izbor === 1) video1();
-        else otkazi();
-      },
-    );
-  }, [userId, video, podeli, pauzaJs, p]);
+  // --- VIDEO (Ivan, 30.9.2026): "Podeli" nudi sliku ili celu pricu kao video (`ponudi-video.tsx`,
+  // isto kao prica o znaku). Video se pravi van ekrana dok korisnik radi sta hoce; prica ide dalje.
+  const posao = React.useMemo(() => posaoDnevnePrice(p), [p]);
+  const pauza = React.useCallback((stoji: boolean) => pauzaJs.set(stoji ? 1 : 0), [pauzaJs]);
+  const { ponudi: ponudiVideo, video } = usePonudiVideo({ posao, pauza, naslov: 'Podeli svoj dan' });
+  const ponudi = React.useCallback((k: SlikaKljuc) => ponudiVideo(() => podeli(k)), [ponudiVideo, podeli]);
 
   const k = slike[i];
   const tamno = tamnaSlika(k);

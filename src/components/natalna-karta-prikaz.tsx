@@ -170,7 +170,9 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
               Ascendent i MC su na kraju iste liste; ASC je i u trojki, ali ovde ima stepen. */}
           <View className={cn(KARTICA, 'mx-5 mt-4 overflow-hidden')}>
             {/* Redosled (Ivan, 28.9.2026): Ascendent, Sunce, Mesec, pa ostale planete; MC na kraju. */}
-            <UgaoRed tacka="ascendant" ime="Ascendent" pos={chart.ascendantSign} muted={timeUnknown}
+            {/* "Podznak", kao plocica iznad (UX recenzija 1.10.2026): isti pojam je na istom ekranu
+                imao dva imena. Ikonica ASC ostaje i veze ga sa tockom. */}
+            <UgaoRed tacka="ascendant" ime="Podznak" pos={chart.ascendantSign} muted={timeUnknown}
               // Bez vremena rodjenja podznak nije poznat — nema ni tumacenja.
               onPress={timeUnknown ? undefined : () => otvori('ascendant')} />
             {redosledPlaneta(chart.planets).map((p) => {

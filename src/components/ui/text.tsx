@@ -38,8 +38,12 @@ const textVariants = cva('text-foreground', {
        * 17pt kao iOS body, prored 26 (Ivan, 28.9.2026: "malo veci tekst na tumacenju").
        */
       reading: cn('text-row leading-[26px] text-muted-foreground', tezina('reading')),
-      /** Naslov grupe iznad kartica ("Preferences"). Siv, BEZ verzala. */
-      label: cn('text-group text-subtle', tezina('label')),
+      /**
+       * Naslov grupe iznad kartica ("Preferences"). Siv, BEZ verzala. `muted-foreground`
+       * (4,5:1), ne `subtle` (2,6:1 na sivoj) — UX recenzija 1.10.2026: "Moja pitanja",
+       * "O kome je pitanje" su se citali kao ugaseni.
+       */
+      label: cn('text-group text-muted-foreground', tezina('label')),
       /** Natpis u kapsuli kategorije. */
       chip: cn('text-chip', tezina('chip')),
       /** Meta podatak uz stavku: vreme, mesto, broj. */

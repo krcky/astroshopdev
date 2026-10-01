@@ -57,7 +57,9 @@ function tik() {
 const SLUSAOCI = { tabPress: tik };
 
 /** Boja izabranog taba. PROBA (Ivan, 27.9.2026): svetla lila umesto indiga iz loga (`brand.indigo`). */
-const IZABRANI = '#B39DDB';
+// Tamnija lila (UX recenzija 1.10.2026): `#B39DDB` je imao 2,4:1, pa je izabrani tab bio
+// SLABIJI od neizabranih. Ista nijansa kao tekst oblasti (`OBLAST_TEKST`).
+const IZABRANI = '#7E57C2';
 
 /*
  * `disableAutomaticContentInsets` na SVAKOM tabu: bez njega react-native-screens

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Pressable, ScrollView, TextInput, View } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import Animated, { useAnimatedProps, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { File, Paths } from 'expo-file-system';
@@ -13,11 +13,13 @@ import { INDIGO } from '@/components/prica/boje';
 import { PlatnoVidea, type PlatnoVideaRef } from '@/components/prica/platno-videa';
 import { procenat, VideoTrakaSadrzaj } from '@/components/prica/video-traka';
 import { pitajZaObavestenje } from '@/components/prica/video-radionica';
+import { posaoDnevnePrice, posaoPriceZnaka } from '@/components/prica/poslovi-videa';
+import { pricaZnaka } from '@/lib/prica-znaka';
 import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import { REDOSLED } from '@/lib/prica';
 import { PROBNI_BUILD } from '@/store/dev';
-import { useVideoPrice } from '@/store/video-price';
-import { useProfileStore, type Profile } from '@/store/profile';
+import { useVideoPrice, type PosaoVidea } from '@/store/video-price';
+import { useProfileStore, useResolvedProfile, type Profile } from '@/store/profile';
 
 /**
  * Slike kojima bez naloga fali tekst (Ide ti / Koči te, savet) — sa PROBNIM recenicama,
@@ -28,7 +30,7 @@ function saProbnimTekstovima(p: PricaDana): PricaDana {
   return {
     ...p,
     slike: [...REDOSLED],
-    ideKoci: p.ideKoci ?? { ide: { tekst: 'Probna rečenica za proveru prikaza, ovo nije tekst astrologa, nego je namerno mnogo duža da se vidi smanjivanje slova na kartici.', ime: 'Venera trigon Sunce' }, koci: { tekst: 'Probna rečenica za proveru prikaza, ovo nije tekst astrologa, ide u četiri reda.', ime: 'Mars kvadrat Mesec' } },
+    ideKoci: p.ideKoci ?? { ide: { tekst: PROBA, ime: 'Venera trigon Sunce' }, koci: { tekst: PROBA, ime: 'Mars kvadrat Mesec' } },
     savet: p.savet ?? { tekst: 'Probni savet dana, dovoljno dug da se vidi prelom u tri reda.', ime: 'Sunce kvadrat Uran', kljuc: 'proba' },
     trajanja: { ...p.trajanja, ideKoci: p.trajanja.ideKoci ?? 7000, savet: p.trajanja.savet ?? 6000 },
   };
@@ -49,14 +51,41 @@ const PROBNI_PROFIL: Profile = {
 
 function PravaPrica() {
   const p = usePricaDana();
+  const resolved = useResolvedProfile();
+  // Prica o znaku za isti profil (kao `app/prica-znak.tsx`).
+  const znak = React.useMemo(() => {
+    const sunce = resolved?.chart.planets.find((x) => x.key === 'sun');
+    if (!resolved || resolved.zoneUnreliable || !sunce) return null;
+    return pricaZnaka(sunce.position.sign.key, resolved.timeUnknown ? null : sunce.position.deg);
+  }, [resolved]);
   const imaProfil = useProfileStore((s) => !!s.profile);
-  const posao = useVideoPrice();
+  const vrsta = useVideoPrice((s) => s.poslednja) ?? 'dan';
+  const x = useVideoPrice((s) => s.videi[vrsta]);
   const [pocetak, setPocetak] = React.useState<number | null>(null);
   const [trajalo, setTrajalo] = React.useState<number | null>(null);
   React.useEffect(() => {
-    if (posao.stanje === 'gotov' && pocetak && trajalo === null) setTrajalo(Date.now() - pocetak);
-  }, [posao.stanje, pocetak, trajalo]);
-  const v = posao.stanje ? { stanje: posao.stanje, napredak: posao.napredak, uri: posao.uri, sklonjen: false } : null;
+    if (x?.stanje === 'gotov' && pocetak && trajalo === null) setTrajalo(Date.now() - pocetak);
+  }, [x?.stanje, pocetak, trajalo]);
+  const pokreni = (posao: PosaoVidea) => {
+    setPocetak(Date.now());
+    setTrajalo(null);
+    useVideoPrice.getState().pokreni('proba', posao);
+    void pitajZaObavestenje();
+  };
+  const v = x ? { vrsta, stanje: x.stanje, napredak: x.napredak, uri: x.uri, sklonjen: false, naslov: x.naslov } : null;
+  // `astroshop://dev-video?napravi=dan|znak` pokrene video bez dodira (provera u simulatoru bez dozvole za dodir).
+  const { napravi } = useLocalSearchParams<{ napravi?: string }>();
+  // Pamti koji je `napravi` vec pokrenut — isti ekran moze dobiti nov link sa drugom vrstom.
+  const pokrenuto = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (!napravi || pokrenuto.current === napravi) return;
+    const posao = napravi === 'znak' ? (znak ? posaoPriceZnaka(znak) : null) : p ? posaoDnevnePrice(p) : null;
+    if (!posao) return;
+    pokrenuto.current = napravi;
+    pokreni(posao);
+    // Jednom, kad podaci stignu.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [napravi, znak, p]);
   return (
     <View style={{ gap: 10, marginTop: 16 }}>
       <Text className="text-[18px]">Prava prica ({p ? `${p.slike.length} slika: ${p.slike.join(', ')}` : 'nema profila'})</Text>
@@ -67,31 +96,32 @@ function PravaPrica() {
         </Pressable>
       )}
       {p && (
-        <Pressable
-          onPress={() => { setPocetak(Date.now()); setTrajalo(null); useVideoPrice.getState().pokreni('proba', p); void pitajZaObavestenje(); }}
-          className="rounded-lg bg-fill-strong p-3">
+        <Pressable onPress={() => pokreni(posaoDnevnePrice(p))} className="rounded-lg bg-fill-strong p-3">
           <Text>Napravi video price</Text>
         </Pressable>
       )}
       {p && (
-        <Pressable
-          onPress={() => { setPocetak(Date.now()); setTrajalo(null); useVideoPrice.getState().pokreni('proba', saProbnimTekstovima(p)); }}
-          className="rounded-lg bg-fill-strong p-3">
+        <Pressable onPress={() => pokreni(posaoDnevnePrice(saProbnimTekstovima(p)))} className="rounded-lg bg-fill-strong p-3">
           <Text>Napravi video sa svih 6 slika (probne recenice)</Text>
         </Pressable>
       )}
+      {znak && (
+        <Pressable onPress={() => pokreni(posaoPriceZnaka(znak))} className="rounded-lg bg-fill-strong p-3">
+          <Text>{`Napravi video price o znaku (${znak.znak.name}, ${znak.trajanja.length} slika)`}</Text>
+        </Pressable>
+      )}
       <Text selectable>
-        {`stanje: ${posao.stanje ?? '-'} ${posao.stanje === 'pravi' ? procenat(posao.napredak) : ''}`}
+        {`${vrsta} — stanje: ${x?.stanje ?? '-'} ${x?.stanje === 'pravi' ? procenat(x.napredak) : ''}`}
         {trajalo !== null ? `\nnapravljen za ${(trajalo / 1000).toFixed(1)} s` : ''}
-        {posao.uri ? `\n${posao.uri}` : ''}
+        {x?.uri ? `\n${x.uri}` : ''}
       </Text>
-      {posao.uri && (
-        <Pressable onPress={() => router.push('/video-price?proba=1')} className="rounded-lg bg-fill-strong p-3">
+      {x?.uri && (
+        <Pressable onPress={() => router.push(`/video-price?proba=1&vrsta=${vrsta}`)} className="rounded-lg bg-fill-strong p-3">
           <Text>Otvori list "Tvoj video"</Text>
         </Pressable>
       )}
-      {posao.uri && (
-        <Pressable onPress={() => Sharing.shareAsync(posao.uri!, { mimeType: 'video/mp4', UTI: 'public.mpeg-4' })} className="rounded-lg bg-fill-strong p-3">
+      {x?.uri && (
+        <Pressable onPress={() => Sharing.shareAsync(x.uri!, { mimeType: 'video/mp4', UTI: 'public.mpeg-4' })} className="rounded-lg bg-fill-strong p-3">
           <Text>Podeli video price</Text>
         </Pressable>
       )}

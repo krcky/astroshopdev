@@ -43,7 +43,7 @@ import { neutral } from '@/theme/tokens';
 export const KARTICA = { w: 360, h: 640 } as const;
 
 /** Sirina loga dole (Ivan, 30.9.2026: "1.5x veci"; do tada 132). */
-const LOGO_W = 198;
+export const LOGO_W = 198;
 /**
  * Logo dole (Ivan, 30.9.2026: "spusti jos dole"; do tada vrh na 512, pa 540 sa sirinom 132).
  * Uz veci logo spusten jos malo, da recenica "Koči me" od cetiri reda stane iznad njega (Ivan:
@@ -51,7 +51,7 @@ const LOGO_W = 198;
  * u 1080 × 1920 — donja ivica ulazi malo u pojas polja za odgovor koje Instagram crta preko price.
  * Visina loga je 198 × 95/355 ≈ 53. U videu mu se krug vrti (`logo-price.tsx`).
  */
-const LOGO_VRH = 532;
+export const LOGO_VRH = 532;
 
 const BELA = neutral.white;
 const BELA_80 = 'rgba(255,255,255,0.8)';

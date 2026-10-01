@@ -7,12 +7,15 @@
 import { existsSync } from 'node:fs';
 import { VIDEO } from '../src/lib/prica';
 import {
-  datumiZnaka, NAJDUZA_RECENICA, NATPISI, pricaZnaka, SLIKE_ZNAKA, sunceU, tamnaSlikaZnaka, velicinaNaslova,
+  datumiZnaka, LATINSKO_IME, NAJDUZA_RECENICA, NATPIS_SAZVEZDJA, NATPISI, POPUNA_SAZVEZDJA, pricaZnaka, SLIKE_ZNAKA, sunceU,
+  pricaZaKartu, tamnaSlikaZnaka, velicinaNaslova, vrhNatpisaSazvezdja,
 } from '../src/lib/prica-znaka';
+import { cityByName } from '../src/lib/cities';
+import { resolveProfile, type Profile } from '../src/store/profile';
 import { IKONE_OSNOVA } from '../src/lib/ikone-osnova';
 import { SAZVEZDJA } from '../src/lib/sazvezdja';
 import { ZNAK_OPIS } from '../src/lib/znak-opis-podaci';
-import { SIGNS, signByKey } from '../src/lib/zodiac';
+import { SIGN_CASES, SIGNS, signByKey } from '../src/lib/zodiac';
 
 let greske = 0;
 function ok(uslov: boolean, opis: string, detalj = '') {
@@ -91,5 +94,48 @@ const v2 = velicinaNaslova('Jedinstvena kombinacija mudrosti i humora.', 342, 44
 ok(v1 >= v2 && v1 <= 44 && v2 >= 30, 'duzi naslov nije veci od kraceg', `${v1} / ${v2}`);
 ok(velicinaNaslova('a b', 342, 40, 30, 1) === 40, 'kratak tekst ostaje najveci');
 
+console.log('\n=== 6. Latinsko ime sazvezdja ispod crteza ===');
+ok(SIGNS.every((z) => LATINSKO_IME[z.key]) && new Set(Object.values(LATINSKO_IME)).size === 12, 'latinsko ime za svih 12, sva razlicita');
+ok(LATINSKO_IME.scorpio === 'Scorpius' && LATINSKO_IME.capricorn === 'Capricornus', 'ime SAZVEZDJA (IAU): Scorpius, Capricornus');
+// Prostor crteza (sirina × visina, razmera): iPhone SE, iPhone 16/17 Pro, kartica za deljenje 360 × 640.
+const PROSTORI: [string, number, number, number][] = [['SE', 327, 412, 0.82], ['Pro', 354, 521, 1], ['kartica', 316, 299, 0.74]];
+for (const [ime, w, h, r] of PROSTORI) {
+  const van = SIGNS.filter((z) => {
+    const najnize = Math.max(...SAZVEZDJA[z.key].zvezde.map((t) => t[1]));
+    const vrh = vrhNatpisaSazvezdja(najnize, w, h, POPUNA_SAZVEZDJA, NATPIS_SAZVEZDJA.razmak * r);
+    const ispodZvezda = vrh > h / 2 + najnize * Math.min(w, h) * POPUNA_SAZVEZDJA;
+    return !ispodZvezda || vrh + NATPIS_SAZVEZDJA.red * r > h;
+  }).map((z) => z.name);
+  ok(van.length === 0, `${ime}: natpis ispod najnize zvezde i u prostoru crteza, svih 12`, van.join(', '));
+}
+
+console.log('\n=== 7. Recenica ispod vladara (Ivan, 1.10.2026) ===');
+ok(pricaZnaka('aries', 14, ['taurus']).vladarRecenica === 'U tvojoj natalnoj karti Mars je u Biku.', 'U tvojoj natalnoj karti Mars je u Biku.');
+ok(pricaZnaka('cancer', null, ['gemini', 'cancer']).vladarRecenica === 'U tvojoj natalnoj karti Mesec je u Blizancima ili Raku.',
+  'dva znaka: "u Blizancima ili Raku"', String(pricaZnaka('cancer', null, ['gemini', 'cancer']).vladarRecenica));
+ok(pricaZnaka('leo', 14, ['leo']).vladarRecenica === 'Grci su ga zvali Helios.' && pricaZnaka('leo', null).vladarRecenica === 'Grci su ga zvali Helios.',
+  'Lav: Sunce je uvek u Lavu, pa ime iz mita');
+ok(pricaZnaka('aries', 14).vladarRecenica === null, 'bez znaka vladara nema recenice (ne izmisljati)');
+// Iz prave karte: znak vladara je onaj koji karta kaze; Mesec bez vremena rodjenja ume da bude u dva znaka.
+const beograd = cityByName('Beograd')!;
+const profil = (y: number, m: number, d: number, vreme: boolean): Profile => ({
+  name: 'Proba', birth: { year: y, month: m, day: d }, time: vreme ? { hour: 14, minute: 20 } : null,
+  cityId: beograd.id, cityName: beograd.name, latitude: beograd.latitude, longitude: beograd.longitude, timeZone: beograd.tz.name,
+});
+const ovan = resolveProfile(profil(1994, 4, 4, true))!;
+const mars = ovan.chart.planets.find((x) => x.key === 'mars')!.position.sign;
+ok(pricaZaKartu(ovan)?.vladarRecenica === `U tvojoj natalnoj karti Mars je u ${SIGN_CASES[mars.key].loc}.`, 'prava karta: Mars u znaku iz karte',
+  String(pricaZaKartu(ovan)?.vladarRecenica));
+ok(pricaZaKartu(ovan)?.stepen !== null && pricaZaKartu(resolveProfile(profil(1994, 4, 4, false))!)?.stepen === null, 'stepen Sunca samo uz tacno vreme');
+const rakovi = Array.from({ length: 33 }, (_, i) => {
+  const d = new Date(Date.UTC(1990, 5, 21 + i));
+  return resolveProfile(profil(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate(), false))!;
+}).filter((r) => r.chart.planets.find((x) => x.key === 'sun')!.position.sign.key === 'cancer');
+const dva = rakovi.filter((r) => / ili /.test(pricaZaKartu(r)?.vladarRecenica ?? ''));
+const jedan = rakovi.filter((r) => !/ ili /.test(pricaZaKartu(r)?.vladarRecenica ?? '') && pricaZaKartu(r)?.vladarRecenica?.startsWith('U tvojoj natalnoj karti Mesec je u '));
+ok(rakovi.length > 20 && dva.length > 0 && jedan.length > 0 && dva.length + jedan.length === rakovi.length,
+  'Rak bez vremena: Mesec u jednom znaku ili "X ili Y" kad promeni znak tog dana', `${jedan.length} + ${dva.length} od ${rakovi.length}`);
+
 console.log(greske ? `\n${greske} provera pala.` : '\nSve provere prosle.');
-if (greske) process.exit(1);
+// Izlaz odmah: `store/profile` posle uvoza pokusa da pise u AsyncStorage, koga u Node-u nema (kao check-osobe).
+process.exit(greske ? 1 : 0);

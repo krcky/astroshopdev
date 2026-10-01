@@ -165,7 +165,7 @@ export default function PitanjeNovo() {
         <AstrologSlika velicina={88} />
         <Text variant="h1" className="mt-6 text-center">Pitanje je poslato.</Text>
         <Text variant="body" className="mt-2 text-center">
-          {ASTROLOG.kratko} odgovara {OKVIRNI_ROK}. Odgovor će se pojaviti u „Mojim pitanjima".
+          {ASTROLOG.kratko} odgovara {OKVIRNI_ROK}. Odgovor će se pojaviti u „Mojim pitanjima“.
         </Text>
         <Button className="mt-8 self-stretch" onPress={() => router.back()}>
           <Text>Zatvori</Text>
@@ -209,7 +209,7 @@ export default function PitanjeNovo() {
               ? `${ASTROLOG.kratko} vidi tvoju kartu, pa ne moraš da pišeš datum ni mesto rođenja.`
               : oOdnosu
                 ? `${ASTROLOG.kratko} vidi obe karte, pa ne moraš da pišeš podatke o rođenju.`
-                : `${ASTROLOG.kratko} vidi kartu osobe o kojoj pitaš, pa ne moraš da pišeš njene podatke.`}
+                : `${ASTROLOG.kratko} vidi kartu osobe o kojoj pitaš, pa ne moraš da pišeš podatke te osobe.`}
           </Text>
         </View>
       </View>

@@ -87,7 +87,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
       <View className="flex-row items-start gap-4">
         <View className="flex-1">
           {/* Osvetljenost uz oznaku, ne ispod ilustracije; mala tacka, po dva razmaka (Ivan, 28.9.2026). */}
-          <Text variant="oznaka" className={OZNAKA_12}>Mesec danas{'\u00A0\u00A0·\u00A0\u00A0'}{faza.illuminationPct}%</Text>
+          <Text variant="oznaka" className={OZNAKA_12}>Mesec danas{'\u00A0\u00A0·\u00A0\u00A0'}{faza.illuminationPct}% osvetljen</Text>
           <Text variant="display" className="mt-3">{naslov}</Text>
           {/* PRIVREMENA recenica faze dok astrolog ne posalje prave (`PHASE_SUMMARY_PRIVREMENO`).
               U koloni naslova, pored ilustracije, blizu naslova (Ivan, 28.9.2026). Ista mera

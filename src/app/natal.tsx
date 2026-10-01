@@ -136,7 +136,7 @@ export default function NatalTumacenje() {
             {osoba ? 'Na dan rođenja' : 'Na dan tvog rođenja'} Mesec je bio u {SIGN_CASES[topic.moon.from.key].loc}, pa prešao u {SIGN_CASES[topic.moon.to.key].acc}.
             {osoba
               ? ' Bez vremena rođenja ne znamo u kom je znaku bio u trenutku rođenja, pa tumačenje ne prikazujemo.'
-              : ' Bez vremena rođenja ne znamo u kom je znaku bio kad si se rodio, pa tumačenje ne prikazujemo.'}
+              : ' Bez vremena rođenja ne znamo u kom je znaku bio u trenutku tvog rođenja, pa tumačenje ne prikazujemo.'}
           </Text>
           <Button variant="secondary" className="mt-4 self-start"
             onPress={() => leaveSheetTo({ pathname: '/rodjenje-polje', params: osoba ? { osoba, polje: 'vreme' } : { polje: 'vreme' } })}>
@@ -146,7 +146,8 @@ export default function NatalTumacenje() {
       )}
 
       {kljucevi.map((k, i) => (
-        <Odeljak key={k} tekst={texts.get(k)} loading={loading} zakljucan={zakljucani.includes(k)} prvi={i === 0} />
+        <Odeljak key={k} tekst={texts.get(k)} loading={loading} zakljucan={zakljucani.includes(k)} prvi={i === 0}
+          bezNaslova={topic.kind === 'aspect'} />
       ))}
 
       {/* Kuca zavisi od vremena rodjenja — bez njega se ne tumaci (pravilo 5). */}
@@ -246,13 +247,21 @@ function Glava({ tacke, aspekt, slika, oznaka, naslov, traka }: {
  * Lavu") u sivom natpisu sa linijom ispod, pa tekst. Podnaslov prvog teksta je
  * vec veliki naslov gore, pa se ovde ponavlja samo kod drugog (kuca).
  */
-function Odeljak({ tekst, loading, zakljucan, prvi }: { tekst?: NatalText; loading: boolean; zakljucan: boolean; prvi: boolean }) {
+function Odeljak({ tekst, loading, zakljucan, prvi, bezNaslova = false }: {
+  tekst?: NatalText; loading: boolean; zakljucan: boolean; prvi: boolean;
+  /**
+   * Aspekt: naslov astrologa je samo ime aspekta ("Sunce opozicija Mesec"), koje vec stoji
+   * u oznaci iznad — i to cesto obrnutim redom tela, pa je ekran pisao isti aspekt na dva
+   * nacina (UX recenzija 1.10.2026). Tada se naslov sekcije ne ponavlja.
+   */
+  bezNaslova?: boolean;
+}) {
   if (zakljucan) return null; // jedna kartica za otkljucavanje ispod svih
   return (
     <View className="mt-7">
       {tekst ? (
         <>
-          <NaslovSekcije>{tekst.title}</NaslovSekcije>
+          {!bezNaslova && <NaslovSekcije>{tekst.title}</NaslovSekcije>}
           {!prvi && !!tekst.subtitle && <Text variant="h3" className="mb-2">{tekst.subtitle}</Text>}
           <TumacenjeTekst tekst={tekst.body} />
         </>

@@ -31,12 +31,14 @@ src/
     sky-place.tsx    izbor mesta odakle se gleda nebo (NE dira profil) — LIST odozdo (formSheet)
     sky-datum.tsx    kalendar za Nebo — LIST odozdo sa dugmeta sa datumom
     (onboarding)/    welcome, date, time, place, reveal, account, code, name, prva-prica, push, ponuda
-                     prva-prica = DNEVNA PRICA posle imena (`PricaDanaEkran uvod`, pravilo 23) -> "Nastavi" -> push
+                     prva-prica = PRICA O ZNAKU posle imena (`PricaZnakaEkran uvod`, pravilo 25; do 1.10.2026 dnevna) -> "Nastavi" -> push
                      ponuda = PAYWALL, POSLEDNJI korak, ceo ekran (`PaywallEkran uOnboardingu`) -> kapija; ko ima Premium ga preskace
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-video.tsx    SAMO PROBNI BUILD: video price — merenje kadrova i ceo video sa probnim profilom (pravilo 23)
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
+    dev-prica-znaka.tsx SAMO DEV: kartice price o znaku (?znak=); ?sve=se = svih 12 x 9 slika redom u okviru
+                     iPhone SE (sve=1 pravi ekran), crvene linije = granice okvira — provera snimkom ekrana
     premium.tsx      PAYWALL (po uzoru na CHANI) — modal preko celog ekrana, sa svakog "Otključaj"; paketi iz `kupovina.ts`
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
@@ -55,6 +57,7 @@ src/
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
+    prica-znak.tsx   PRICA O ZNAKU (pravilo 25) — devet slika o Suncevom znaku, sa prstena oko Sunca u velikoj trojci ("Ti")
     video-price.tsx  "Tvoj video" — LIST odozdo (traka iznad tabova, obavestenje, "Podeli" u prici): pregled, "Podeli", "Sačuvaj u Fotografije"
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
@@ -77,7 +80,9 @@ src/
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
     turnstile.tsx        CAPTCHA kapija pred slanje koda
     prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon);
-                         sat.tsx = SAT SLIKE (svi pokreti), video-radionica / video-traka / platno-videa = VIDEO
+                         sat.tsx = SAT SLIKE (svi pokreti), video-radionica / video-traka / platno-videa = VIDEO;
+                         plejer.tsx = OPSTI PLEJER price (koristi ga prica o znaku; dnevna jos ima svoj u app/prica.tsx)
+    prica-znaka/         prica o znaku: slike.tsx (9 slika, iste i za karticu), kartica.tsx, sazvezdje.tsx, ikone
     ui/                  text, button, card, input, list, chip, glyph, row, wheel-picker
   store/
     draft.ts         onboarding pre naloga — BEZ persist (prekid = ispocetka)
@@ -88,6 +93,7 @@ src/
     osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
     nova-osoba.ts    nova osoba dok se unosi po koracima — BEZ persist (kao draft.ts)
     prica-log.ts     koji dan je prica pogledana — PRIPADA NALOGU, brise se pri odjavi
+    prica-znaka-log.ts  da li je prica o znaku pogledana (pamti ZNAK) — PRIPADA NALOGU, brise se pri odjavi
     video-price.ts   video price: pravi se / gotov (fajl za danas) — PRIPADA NALOGU, brise se pri odjavi
   lib/
     zodiac.ts        12 znakova, longituda -> znak
@@ -113,6 +119,8 @@ src/
     pitanja.ts       Pitaj astrologa: cist racun, snimak karte   <- pravilo 21
     pitanja-api.ts   upiti (TanStack Query); kupovina.ts = mesto za RevenueCat
     prica.ts         dnevna prica: koje slike, trajanje, geometrija crteza (cist racun); use-prica.ts = podaci dana
+    prica-znaka.ts   prica o znaku: slike, natpisi, element/kvalitet/doba/polaritet, trajanje (cist racun)
+                     znak-opis-podaci.ts, sazvezdja.ts, ikone-osnova.ts = GENERISANO (`scripts/znak/pripremi.py`)
 supabase/
   schema.sql         tabele + RLS politike
   osobe.sql          druge osobe + okidac za granicu (1 / 10) — PRE pitanja.sql
@@ -703,9 +711,19 @@ azuriranju — video se "gubio"). DO VIDEA POSLE DELJENJA (Ivan, 30.9.2026): tra
 "Podeli" u prici za gotov video nudi "Pogledaj video" -> `/video-price`; tamo je i "Sačuvaj u Fotografije"
 (nas modul: iOS `PHPhotoLibrary` samo `.addOnly` — aplikacija ne vidi ostale fotografije; Android Galerija,
 Movies/Astro Shop, od Androida 10 bez dozvole — na starijem dugmeta nema, `MOZE_CUVANJE`). Arhive videa u
-aplikaciji NEMA (10—20 MB po videu) — trajna kopija su Fotografije. Video je za SVE, kao prica. Expo Go
+aplikaciji NEMA (10—20 MB po videu) — trajna kopija su Fotografije. ZA SVAKU PRICU (1.10.2026): radionica zna samo
+`PosaoVidea` (kartice po redu + trajanja, `store/video-price.ts`); sta se snima za koju pricu je u
+`components/prica/poslovi-videa.tsx` (dnevna: 4 s po slici; o znaku: trajanja iz price, najmanje 4 s — tekst
+do 34 reci — pa 45—54 s). Po JEDAN video za svaku vrstu (`videi.dan`, `videi.znak`), fajl po imenu ("Astro Shop
+Rak.mp4"); video znaka ne istice sutra, vazi dok je Sunce u istom znaku (`useKljucVidea`). Radionica pravi
+jedan po jedan: dok traje video druge price, "Podeli" nudi samo sliku. Izbor slika/video je zajednicki
+(`ponudi-video.tsx`) za `app/prica.tsx` i opsti plejer (`plejer.tsx`, `OpisPrice.video`). Nova prica sa
+izvozom = nova funkcija u `poslovi-videa.tsx`. Video je za SVE, kao prica. Expo Go
 nema modul: "Podeli" deli sliku kao do sada. Dozvola za obavestenja se trazi pri prvom videu samo
 ako korisnik jos nije odgovorio.
+OD 1.10.2026 (Ivan) je prica u onboardingu PRICA O ZNAKU (pravilo 25), NE dnevna — ista pravila ispod: rezim `uvod`
+u `components/prica/plejer.tsx` (`PricaZnakaEkran uvod`), poslednja slika je "vladar". `uvod` dnevne (`app/prica.tsx`)
+ostaje — povratak je jedna linija u `prva-prica.tsx`.
 U ONBOARDINGU (Ivan, 30.9.2026): ime -> PRICA (`(onboarding)/prva-prica.tsx`) -> OBAVESTENJA (`push.tsx`) ->
 PAYWALL preko celog ekrana (`ponuda.tsx`) -> kapija. Prvo vrednost, pa zahtevi (kao pravilo 14). Obavestenja
 POSLE price: prica se zavrsava sa "Nova priča stiže svakog dana", a obavestenje je upravo to — iOS pita samo
@@ -730,6 +748,39 @@ u `assets/` ide izvoz @3x NAJVECE sirine na kojoj se slika prikazuje (najvise 13
 `npm run slike`. Sira slika je samo upozorenje, ne greska: smanjivanje slike sa 256 boja ume da POVECA fajl
 (`natalna-karta-objasnjenje.png`, 1774 -> 1320 px: 193 KB -> 428 KB, vraceno). Kompresija SA gubitkom
 (pngquant, WebP) nije radjena; najvise bi dala na Mesecu i planetama (fotografije, oko 4 MB) — samo uz Ivana.
+
+**25. Prica o znaku (Ivan, 30.9.2026): devet slika o Suncevom znaku, ulaz sa Sunca u velikoj trojci.**
+Ivanova kombinacija iz prototipa (artifact claude.ai/artifact/BLUENt5csVaB3xjJ8z7D6d): 1 sazvezdje (indigo, BEZ
+srpskog imena znaka: "Po ovim zvezdama je tvoj znak dobio ime."; ispod crteza LATINSKO ime sazvezdja kao u atlasu —
+"ARIES", "SCORPIUS", `LATINSKO_IME`, Ivan 1.10.2026) -> 2 naslovna: gravira, ime, datumi, element, vladar,
+stepen Sunca (lila) -> 3 ukratko + najvece vrednosti (lila) -> 4 u ljubavi (ROZE, srce) -> 5 na poslu (ZUTA, torba;
+isti raspored kao 4, par) -> 6 kako te osvojiti (indigo, citat) -> 7 osnove znaka: element (`ElementIkona`),
+kvalitet, pol, polaritet, izgled, deo tela — SVAKI RED SVOJA KARTICA, ulaze jedna za drugom, Ivanove ikonice
+(`files/*.svg` -> `lib/ikone-osnova.ts`), BEZ vladara -> 8 kamen, boja, biljka, hrana (fotografije sa sajta; CEO
+SLAJD BEO, bez plocica, da se ne vidi granica slike — Ivan 1.10.2026; providnost/mesanje boja video ne bi snimio) i zivotinja -> 9 vladar (planeta u zracima),
+recenica "U tvojoj natalnoj karti Mars je u Biku." iz KARTE (`pricaZaKartu`; Mesec bez vremena "u Blizancima ili Raku",
+Lav: "Grci su ga zvali Helios." — Ivan 1.10.2026; samo u prici, ne na kartici),
+"Podeli svoj znak" i "Pročitaj: Sunce u Ovnu" (`/natal?tema=sun`). Opis za astrologa: `docs/ASTRO-LOGIKA.md`, 4.8. Boje NE zavise od elementa (Ivan). Slike 3, 4 i 5 imaju sadrzaj na SREDINI visine (Ivan, 1.10.2026), i na kartici.
+TEKST je sa astroshop.rs/znak/* (javan) — `lib/znak-opis-podaci.ts`, GENERISANO `scripts/znak/pripremi.py`:
+naslov poglavlja (deo posle dvotacke) i prva recenica (samo do 34 reci); ispravljene samo slovne greske.
+Element, kvalitet, doba godine, polaritet, srodni znaci i padezi se RACUNAJU (`lib/prica-znaka.ts`,
+`check:prica-znaka`). Datumi iz `SIGNS`, bez "otprilike" (Ivan). Stepen Sunca samo uz tacno vreme rodjenja,
+nikad na kartici (uz ime znaka odaje dan rodjenja). VAN PRICE: zdravlje, ishrana, sport (zdravstveni savet),
+muskarac/zena (pol se ne pita), poznate licnosti (na sajtu Kusturica pogresno, petoro na granici znaka).
+SLIKE U APLIKACIJI (Ivan izabrao ostre, +11 MB): gravire iz `files/*-ilustracija@2x.png` smanjene na @3x prikaza
+(najvise 1050 x 990; Vodolija je u `files/` kao `blizanac-…`), fotografije sa sajta bajt po bajt (JPEG).
+VIDEO OD STARTA (Ivan): svi pokreti kroz `sat.tsx`/`crtezi.tsx`; KARTICA ZA SVAKU SLIKU je ISTA komponenta u
+razmeri 0,74 (`kartica` u `components/prica-znaka/slike.tsx`, okvir `kartica.tsx`: gore "Ovan · astroshop.rs",
+dole `LogoPrice` kao na dnevnoj), prvo lice ("Moje sazvežđe", "Kako da me osvojiš"), bez dugmadi. Radionica
+videa jos zna samo dnevnu pricu. Trajanje po pravilu dnevne (1 s + 0,25 s po reci, 4—8 s; sazvezdje i naslovna
+4,5 s): 45—53 s, staje u video bez skracivanja. PLEJER je opsti (`components/prica/plejer.tsx`, prepisan iz
+`app/prica.tsx`); dnevna jos ima svoj — kad se prebaci, dupliranja nema. Pogledana = poslednja slika
+(`store/prica-znaka-log.ts`, pamti ZNAK). ULAZ: prsten + balon "Tvoj znak" oko Sunca u trojci, samo na SVOJOJ
+karti (`TrojkaPlocica prica`); balon je u toku ispod imena sa negativnom marginom (`top: '100%'` ga je stavio
+preko imena). Na strani osobe Sunce i dalje otvara tumacenje.
+U ONBOARDINGU (Ivan, 1.10.2026): ova prica, UMESTO dnevne, po pravilima iz pravila 23 ("U ONBOARDINGU"): bez
+zaglavlja, X, deljenja i povlacenja; na slici "vladar" umesto "Podeli svoj znak" / "Pročitaj" jedno "Nastavi" (plejer)
+i red "Nova priča stiže svakog dana, na početnoj." -> obavestenja. Bez karte posle 2,5 s dalje.
 
 ## Kanonski kljucevi sadrzaja
 
@@ -762,6 +813,7 @@ npm run check:osobe-baza  osobe.sql u PGlite-u: RLS, granica 1/10 sa pravim `ima
 npm run check:prica       dnevna prica: koje slike, trajanje, mnozina u legendi, tocak (ASC levo), ugao aspekta
 npm run slike             slike u assets/ bez gubitka (oxipng) + upis u spisak  <- posle SVAKE nove slike
 npm run check:slike       svaka slika u assets/ je prosla `npm run slike` (pravilo 24)
+npm run check:prica-znaka prica o znaku: tekst i slike za 12 znakova, element/kvalitet/doba, padezi, trajanje
 npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
 npm run panel:build       panel za objavu -> panel/dist
 ```

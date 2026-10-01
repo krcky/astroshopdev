@@ -7,6 +7,7 @@ import type { NativeStackHeaderItem } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Screen, VRH_ANDROID } from '@/components/screen';
 import { KapsuleRed } from '@/components/ui/kapsule';
+import { GledasDrugo } from '@/components/gledas-drugo';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { GlassBubble } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -150,8 +151,9 @@ export default function Home() {
       </Odeljak>
     ),
     // Spori tranziti — tema perioda. Svi brzi tranziti su u tabu "Tranziti".
+    // Naziv i opis isti kao na paywallu (UX recenzija 1.10.2026).
     teme: (
-      <Odeljak nadnaslov="Tranziti koji traju nedeljama" naslov="Tema perioda">
+      <Odeljak nadnaslov="Tranziti koji traju nedeljama i mesecima" naslov="Teme perioda">
         {daily.bySpeed.slow.length > 0
           ? <TransitList list={daily.bySpeed.slow} texts={texts} today={date} chart={resolved.chart} timeUnknown={resolved.timeUnknown} besplatno={premium ? undefined : BESPLATNO.temaPerioda} />
           : <Prazno>Ovih dana nijedna spora planeta nije u aspektu sa tvojom kartom.</Prazno>}
@@ -271,6 +273,10 @@ export default function Home() {
       <View className="pt-4">
         <KapsuleRed tabovi stavke={TABOVI} izabrana={tab} onIzbor={izaberiTab} />
       </View>
+      {offset !== 0 && (
+        <GledasDrugo className="mt-4" tekst={`${RELATIVE[offset]} · ${formatDate(date)}`}
+          dugme="Nazad na danas" onPress={() => setOffset(0)} />
+      )}
       <Animated.View key={tab} entering={ODOZDO} className="pt-7">
         {sadrzaj[tab]}
       </Animated.View>
@@ -511,6 +517,10 @@ function TransitList({ list, texts, today, chart, timeUnknown, besplatno }: {
 }) {
   // Rucne oznake tona astrologa, jednim upitom — isto kao na tabu "Tranziti".
   const potpis = list.map((t) => t.contentKey).join('|');
+  // Naslov kao na tabu "Tranziti": prvo iz DUGE verzije, pa iz kratke. Do 1.10.2026 je
+  // ovde stajao naslov kratke, pa je isti tranzit na dva taba imao dva razlicita naslova.
+  const kljucevi = React.useMemo(() => list.map((t) => t.contentKey), [potpis]); // eslint-disable-line react-hooks/exhaustive-deps
+  const { texts: duge } = useTransitTexts(kljucevi, 'long');
   const [tonovi, setTonovi] = React.useState<Map<string, string>>(new Map());
   React.useEffect(() => {
     if (!potpis) return;
@@ -543,7 +553,7 @@ function TransitList({ list, texts, today, chart, timeUnknown, besplatno }: {
               ruler: rulerRole(t.transiting.key, t.natal.key, vladari),
             }}
             ton={transitTone(t.transiting.key, t.aspect.key, t.natal.key, tonovi.get(t.contentKey)).tone}
-            naslov={texts.get(t.contentKey)?.title ?? ''}
+            naslov={duge.get(t.contentKey)?.title || texts.get(t.contentKey)?.title || ''}
             loading={false}
             trajanje={trajanjeTekst(trajanjeTranzita(t, today))}
           />

@@ -9,7 +9,7 @@ import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { SheetScroll, leaveSheetTo } from '@/components/sheet';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { GlasovnaPoruka } from '@/components/glasovna-poruka';
-import { ASTROLOG, OKVIRNI_ROK, datumPitanja, natpisStatusa, trajanjeZvuka } from '@/lib/pitanja';
+import { ASTROLOG, OKVIRNI_ROK, datumPitanja, natpisStatusa } from '@/lib/pitanja';
 import { useLinkZvuka, useOznaciProcitano, usePitanje } from '@/lib/pitanja-api';
 
 /**
@@ -56,9 +56,9 @@ export default function PitanjeDetalj() {
               <AstrologSlika velicina={44} />
               <View className="flex-1">
                 <Text variant="row">{ASTROLOG.ime}</Text>
-                <Text variant="caption">
-                  Glasovna poruka{p.audio_trajanje ? ` · ${trajanjeZvuka(p.audio_trajanje)}` : ''}
-                </Text>
+                {/* Bez trajanja (UX recenzija 1.10.2026): baza ga cuva zaokruzeno (panel), a plejer
+                    odmah ispod pokazuje pravo, odseceno — isti snimak je imao 0:06 i 0:05. */}
+                <Text variant="caption">Glasovna poruka</Text>
               </View>
             </View>
             <GlasovnaPoruka url={link.data ?? null} trajanje={p.audio_trajanje} greska={link.isError} />

@@ -18,7 +18,7 @@ import type { OkvirSlike } from '@/components/prica/slajdovi';
 import { IkonaOsnove } from '@/components/prica-znaka/ikona-osnove';
 import { Sazvezdje } from '@/components/prica-znaka/sazvezdje';
 import { SLIKE_ZNAKA, SRCE, TORBA, type Slika } from '@/components/prica-znaka/slike-znaka';
-import { NATPISI, sunceU, velicinaNaslova, type PricaZnaka, type SlikaZnaka } from '@/lib/prica-znaka';
+import { NATPIS_SAZVEZDJA, NATPISI, sunceU, velicinaNaslova, type PricaZnaka, type SlikaZnaka } from '@/lib/prica-znaka';
 import { SAZVEZDJA } from '@/lib/sazvezdja';
 import type { Element } from '@/lib/zodiac';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,8 @@ export type SlikaZnakaProps = {
   okvir: OkvirSlike;
   /** Kartica za deljenje: prvo lice, bez dugmadi. */
   kartica?: boolean;
+  /** Prica u onboardingu: bez dugmadi na poslednjoj slici — dole je "Nastavi" (`plejer.tsx`). */
+  uvod?: boolean;
   onPodeli?: () => void;
   onProcitaj?: () => void;
 };
@@ -108,7 +110,13 @@ function SlikaSazvezdje({ p, okvir, kartica }: SlikaZnakaProps) {
       <Pozadina nijansa="noc" okvir={okvir} kartica={kartica} />
       <View style={sadrzaj(okvir, kartica)}>
         <View style={{ flex: 1 }} onLayout={onLayout}>
-          {m && <Sazvezdje podaci={SAZVEZDJA[p.znak.key]} sirina={m.w} visina={m.h} />}
+          {m && (
+            <Sazvezdje
+              podaci={SAZVEZDJA[p.znak.key]} sirina={m.w} visina={m.h} razmera={s}
+              natpis={p.latinsko} natpisKlasa={OZN}
+              natpisStil={{ fontSize: 12 * s, lineHeight: NATPIS_SAZVEZDJA.red * s, letterSpacing: 3.2 * s, color: 'rgba(255,255,255,0.62)' }}
+            />
+          )}
         </View>
         <View style={{ paddingTop: 12 * s }}>
           <Pojava kasni={1600}>
@@ -229,7 +237,8 @@ function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
       <Pozadina nijansa="lila" okvir={okvir} kartica={kartica} />
-      <View style={[sadrzaj(okvir, kartica), { paddingTop: 16 * s }]}>
+      {/* Sadrzaj na sredini visine (Ivan, 1.10.2026) — i na kartici, pa je isti raspored. */}
+      <View style={[sadrzaj(okvir, kartica), { justifyContent: 'center' }]}>
         <Pojava kasni={300}>
           <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{`${p.znak.name} ukratko`}</Text>
         </Pojava>
@@ -273,7 +282,8 @@ function SlikaTema({ okvir, kartica, nijansa, ikona, sirinaIkone, oznaka, naslov
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
       <Pozadina nijansa={nijansa} okvir={okvir} kartica={kartica} />
-      <View style={[sadrzaj(okvir, kartica), { paddingTop: 12 * s }]}>
+      {/* Ikonica, natpis i tekst na sredini visine (Ivan, 1.10.2026), kao "ukratko". */}
+      <View style={[sadrzaj(okvir, kartica), { justifyContent: 'center' }]}>
         <Pojava kasni={300} trajanje={600} ublazavanje={ISKOK} zum bledi={false} pomak={0} style={{ alignSelf: 'flex-start', marginBottom: 20 * s }}>
           <Image source={ikona.src} style={staje(ikona, sirinaIkone * s, sirinaIkone * s)} resizeMode="contain" accessibilityIgnoresInvertColors />
         </Pojava>
@@ -368,7 +378,8 @@ function KarticaOsnove({ ikona, oznaka, vrednost, opis, dugo, kasni, s, T }: {
 }
 
 function SlikaOsnove({ p, okvir, kartica }: SlikaZnakaProps) {
-  const s = razmera(okvir, kartica);
+  // Sest kartica sa izgledom od 3—4 reda: na kartici za deljenje manja razmera, inace idu preko loga.
+  const s = kartica ? 0.62 : razmera(okvir, kartica);
   const T = tipovi(s);
   const sirina = okvir.sirina - 2 * (kartica ? 22 : 24);
   const vel = velicinaNaslova(p.osnove, sirina, 34 * s, 26 * s, 2);
@@ -400,7 +411,7 @@ function SlikaOsnove({ p, okvir, kartica }: SlikaZnakaProps) {
 }
 
 /* ------------------------------------------------------------------------- *
- * 8 · Kamen, boja, biljka i hrana — fotografije sa sajta na belim plocicama
+ * 8 · Kamen, boja, biljka i hrana — ceo slajd beo, fotografije sa sajta bez granice (Ivan, 1.10.2026)
  * ------------------------------------------------------------------------- */
 
 function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
@@ -419,7 +430,7 @@ function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
   const plocica = (okvir.sirina - 2 * strana - 10 * s) / 2;
   const foto = 92 * s;
   return (
-    <View style={{ flex: 1, backgroundColor: SIVA }}>
+    <View style={{ flex: 1, backgroundColor: BELA }}>
       <View style={[sadrzaj(okvir, kartica), { paddingTop: 8 * s }]}>
         <Pojava kasni={300}>
           <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Znak u stvarima</Text>
@@ -427,11 +438,12 @@ function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
         <View style={{ marginTop: 10 * s }}>
           <Reci tekst="Kamen, boja, biljka i hrana" kasni={420} className={DISP} style={T.naslov(30 * s)} />
         </View>
-        {/* Fotografije sa sajta su na belom — zato bele plocice, ne providnost ni mesanje boja (video ih ne bi snimio). */}
+        {/* Fotografije sa sajta su na belom, pa je i slajd beo: granica slike se ne vidi. Ne providnost ni
+            mesanje boja — video ih ne bi snimio. */}
         <View style={{ marginTop: 16 * s, flexDirection: 'row', flexWrap: 'wrap', gap: 10 * s }}>
           {stvari.map(([src, ozn, vr], i) => (
             <Pojava key={ozn} kasni={800 + i * 180} trajanje={600} ublazavanje={ISKOK} zum pomak={0}
-              className="items-center rounded-lg bg-card" style={{ width: plocica, padding: 8 * s, paddingBottom: 10 * s }}>
+              className="items-center" style={{ width: plocica, padding: 8 * s, paddingBottom: 10 * s }}>
               <View style={{ height: foto, width: plocica - 16 * s, alignItems: 'center', justifyContent: 'center' }}>
                 <Image source={src.src} style={staje(src, plocica - 16 * s, foto)} resizeMode="contain" accessibilityIgnoresInvertColors />
               </View>
@@ -473,10 +485,11 @@ function Planeta({ planetKey, velicina }: { planetKey: string; velicina: number 
   );
 }
 
-function SlikaVladar({ p, okvir, kartica, onPodeli, onProcitaj }: SlikaZnakaProps) {
+function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZnakaProps) {
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
-  const dno = kartica ? okvir.dno : okvir.donjiUmetak + 16 + DUGMAD_ZNAKA + 12;
+  // U uvodu dugmad crta plejer ("Nastavi") i vec je uracunao u `okvir.dno`.
+  const dno = kartica || uvod ? okvir.dno : okvir.donjiUmetak + 16 + DUGMAD_ZNAKA + 12;
   const strana = kartica ? 22 : 24;
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
@@ -494,14 +507,15 @@ function SlikaVladar({ p, okvir, kartica, onPodeli, onProcitaj }: SlikaZnakaProp
           <View style={{ marginTop: 10 * s }}>
             <Reci tekst={p.vladarNaslov} kasni={650} className={DISP} style={T.naslov(40 * s)} />
           </View>
-          {!kartica && (
+          {/* "U tvojoj natalnoj karti Mars je u Biku." — samo u prici: na slici za deljenje bi uz ime znaka odala jos podataka o rodjenju. */}
+          {!kartica && !!p.vladarRecenica && (
             <Pojava kasni={1200} style={{ marginTop: 12 * s }}>
-              <Text className={tezina('reading')} style={[T.tekst, { color: MUTNO }]}>{`Gde je ${p.vladar.ime} u tvojoj karti, vidiš na tabu „Ti“.`}</Text>
+              <Text className={tezina('reading')} style={[T.tekst, { color: MUTNO }]}>{p.vladarRecenica}</Text>
             </Pojava>
           )}
         </View>
       </View>
-      {!kartica && (
+      {!kartica && !uvod && (
         <Pojava kasni={1600} style={{ position: 'absolute', left: 24, right: 24, bottom: okvir.donjiUmetak + 16, gap: 6 }}>
           <Button onPress={onPodeli} accessibilityLabel="Podeli svoj znak">
             <View className="flex-row items-center gap-2">

@@ -6,7 +6,7 @@ import {
 import { router, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Animated, {
-  Easing, ReduceMotion, useAnimatedStyle, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue,
+  Easing, FadeInDown, ReduceMotion, useAnimatedStyle, useDerivedValue, useFrameCallback, useReducedMotion, useSharedValue,
   withTiming, type SharedValue,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -17,10 +17,14 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { File, Paths } from 'expo-file-system';
 import { Share, X } from 'lucide-react-native';
 
+import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { SatKojiTece } from '@/components/prica/sat';
+import { usePonudiVideo } from '@/components/prica/ponudi-video';
+import { KrugNapretka, procenat } from '@/components/prica/video-traka';
 import type { OkvirSlike } from '@/components/prica/slajdovi';
 import { cn } from '@/lib/utils';
+import type { PosaoVidea } from '@/store/video-price';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 
@@ -34,12 +38,16 @@ import { neutral } from '@/theme/tokens';
  *    pokrete" bi ovaj skocio na kraj. Uz "Smanji pokrete" i VoiceOver prica NE ide sama dalje.
  *  - Stoji u pozadini aplikacije, dok je otvoren meni za deljenje i dok je preko nje drugi ekran.
  *  - Svaka slika ima svoj SAT SLIKE (`sat.tsx`) od trenutka kad se pojavi; drzanje ga zaustavi.
- *  - "Podeli" snimi KARTICU tekuce slike (360 × 640, skrivena ispod price), svede je na
- *    1080 × 1920 i preda sistemskom meniju. Video cele price ovde jos nema (`video-radionica.tsx`
- *    za sada zna samo dnevnu pricu).
+ *  - "Podeli" nudi OVU SLIKU ili CELU PRICU KAO VIDEO (`ponudi-video.tsx`, isto kao dnevna; bez
+ *    `video` u opisu samo slika). Slika: KARTICA tekuce slike (360 × 640, skrivena ispod price),
+ *    svedena na 1080 × 1920, u sistemski meni. Video: `video-radionica.tsx`, van ekrana.
  *
  * Dodir ide kroz RN "responder", ne Gesture Handler: dugmad u slikama dobiju dodir pre roditelja.
  * Dnevna prica jos ima svoj plejer (`app/prica.tsx`); kad se prebaci na ovaj, dupliranja nema.
+ *
+ * UVOD (`uvod`, Ivan 1.10.2026: u onboardingu prica o znaku umesto dnevne, ista pravila): bez
+ * zaglavlja (logo, natpis, X), bez "Podeli" i bez zatvaranja povlacenjem — prica se mora odgledati.
+ * Na poslednjoj slici jedno dugme "Nastavi" (`onDalje`) i red ispod njega; sadrzaj slike ide iznad.
  */
 export type OpisPrice = {
   /** Trajanje svake slike (ms); broj slika = duzina niza. */
@@ -59,10 +67,14 @@ export type OpisPrice = {
   naslovDeljenja: string;
   /** Stigao do poslednje slike = prica pogledana. */
   onPoslednja?: () => void;
+  /** Video cele price (`poslovi-videa.tsx`); bez njega "Podeli" deli samo sliku. */
+  video?: PosaoVidea;
 };
 
 const LOGO_KRUG = require('../../../assets/images/logo-krug.png');
 const LOGO_KRUG_NEGATIV = require('../../../assets/images/logo-krug-negativ.png');
+/** Uvod: visina "Nastavi" (50) + razmak + red ispod dugmeta — isto kao dnevna (`app/prica.tsx`). */
+const UVOD_DUGME = 50 + 8 + 20;
 
 /** Zatvaranje: nazad; bez prethodnog ekrana (otvoreno linkom) na kapiju, pravilo 11. */
 function zatvori() {
@@ -70,7 +82,7 @@ function zatvori() {
   else router.replace('/');
 }
 
-export function PlejerPrice({ opis }: { opis: OpisPrice }) {
+export function PlejerPrice({ opis, uvod = false, onDalje }: { opis: OpisPrice; uvod?: boolean; onDalje?: () => void }) {
   const insets = useSafeAreaInsets();
   const { width: W, height: H } = useWindowDimensions();
   const n = opis.trajanja.length;
@@ -182,7 +194,7 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
       if (!s) return;
       const dy = e.nativeEvent.pageY - s.y;
       const dx = e.nativeEvent.pageX - s.x;
-      if (!s.vuce && dy > 14 && dy > Math.abs(dx)) {
+      if (!uvod && !s.vuce && dy > 14 && dy > Math.abs(dx)) {
         s.vuce = true;
         if (s.t) clearTimeout(s.t);
         drzi.set(0);
@@ -226,6 +238,10 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
     setDeli(idx);
   }, [mozeDeljenje, deli, pauzaJs]);
   const { imeFajla, naslovDeljenja } = opis;
+  // Slika ili video (`ponudi-video.tsx`); meni zaustavi pricu dok je otvoren.
+  const pauza = React.useCallback((stoji: boolean) => pauzaJs.set(stoji ? 1 : 0), [pauzaJs]);
+  const { ponudi: ponudiVideo, video } = usePonudiVideo({ posao: opis.video ?? null, pauza, naslov: naslovDeljenja });
+  const ponudi = React.useCallback((idx: number) => ponudiVideo(() => podeli(idx)), [ponudiVideo, podeli]);
   React.useEffect(() => {
     if (deli === null) return;
     let otkazano = false;
@@ -263,6 +279,8 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
     visina: H,
     donjiUmetak: insets.bottom,
   };
+  // U uvodu poslednja slika ima dole "Nastavi" i red ispod njega — sadrzaj ide iznad.
+  const okvirZa = (idx: number): OkvirSlike => (uvod && idx === n - 1 ? { ...okvir, dno: insets.bottom + 16 + UVOD_DUGME + 12 } : okvir);
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, { overflow: 'hidden', backgroundColor: neutral.grouped }, korenStil]}>
@@ -284,7 +302,7 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
             onGotovo={() => setSlojevi((sv) => sv.slice(Math.max(0, sv.findIndex((sl) => sl.id === s.id))))}
             zIndex={j}>
             <SatKojiTece tece={tece} pokret={!bezPokreta}>
-              {opis.slika(s.idx, { okvir, onPodeli: () => podeli(s.idx) })}
+              {opis.slika(s.idx, { okvir: okvirZa(s.idx), onPodeli: () => ponudi(s.idx) })}
             </SatKojiTece>
           </Otkrivanje>
         ))}
@@ -297,6 +315,7 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
             <Traka key={j} j={j} indeks={indeks} napredak={napredak} tamno={tamno} samaIde={samaIde} />
           ))}
         </View>
+        {!uvod && (
         <View style={{ position: 'absolute', top: insets.top + 18, left: 14, right: 6, height: 42, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Image source={tamno ? LOGO_KRUG_NEGATIV : LOGO_KRUG} style={{ width: 26, height: 26 }} accessibilityIgnoresInvertColors />
           <Text className={cn('text-[14px] leading-[18px]', tezina('row'))} style={{ color: boja }}>Astro Shop</Text>
@@ -310,22 +329,40 @@ export function PlejerPrice({ opis }: { opis: OpisPrice }) {
             <X size={22} color={boja} strokeWidth={2.2} />
           </Pressable>
         </View>
+        )}
       </Animated.View>
 
-      {/* "Podeli" dole desno — slike sa velikim dugmetom ga nemaju. */}
-      {mozeDeljenje && !opis.bezMalogPodeli?.(i) && (
+      {/* "Podeli" dole desno — slike sa velikim dugmetom ga nemaju, a ni uvod. */}
+      {mozeDeljenje && !uvod && !opis.bezMalogPodeli?.(i) && (
         <Animated.View style={[{ position: 'absolute', right: 16, bottom: insets.bottom + 16 }, hromStil]}>
           <Pressable
-            onPress={() => podeli(i)}
+            onPress={() => ponudi(i)}
             accessibilityRole="button"
-            accessibilityLabel="Podeli"
+            accessibilityLabel={video?.stanje === 'pravi' ? `Podeli. Video se pravi, ${procenat(video.napredak)}` : 'Podeli'}
             className="flex-row items-center gap-1.5 rounded-pill px-3.5 py-2.5 active:opacity-80"
             style={{ backgroundColor: tamno ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)', borderWidth: 1, borderColor: tamno ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.95)' }}>
             {deli !== null
               ? <ActivityIndicator size="small" color={boja} />
-              : <Share size={17} color={boja} strokeWidth={2} />}
+              : video?.stanje === 'pravi'
+                ? <KrugNapretka napredak={video.napredak} velicina={18} boja={boja} podloga={tamno ? 'rgba(255,255,255,0.28)' : 'rgba(21,21,21,0.16)'} />
+                : <Share size={17} color={boja} strokeWidth={2} />}
             <Text className={cn('text-[14px] leading-[18px]', tezina('dugme'))} style={{ color: boja }}>Podeli</Text>
           </Pressable>
+        </Animated.View>
+      )}
+
+      {/* Uvod: na poslednjoj slici "Nastavi" vodi dalje (obavestenja, pa paywall) — kao dnevna.
+          NE "Počinjemo": iza dugmeta su jos dva koraka. */}
+      {uvod && i === n - 1 && (
+        <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16 }, hromStil]}>
+          <Animated.View entering={FadeInDown.delay(bezPokreta ? 0 : 700).duration(500)} style={{ gap: 8 }}>
+            <Button variant={tamno ? 'soft' : 'default'} onPress={onDalje}>
+              <Text>Nastavi</Text>
+            </Button>
+            <Text className="text-center text-[13px] leading-[20px]" style={{ color: tamno ? 'rgba(255,255,255,0.8)' : neutral.inkMuted }}>
+              Nova priča stiže svakog dana, na početnoj.
+            </Text>
+          </Animated.View>
         </Animated.View>
       )}
 

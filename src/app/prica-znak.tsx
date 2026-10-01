@@ -4,8 +4,9 @@ import { router } from 'expo-router';
 
 import { PlejerPrice, type OpisPrice } from '@/components/prica/plejer';
 import { KarticaZnaka } from '@/components/prica-znaka/kartica';
+import { posaoPriceZnaka } from '@/components/prica/poslovi-videa';
 import { SLIKE_PRICE_ZNAKA } from '@/components/prica-znaka/slike';
-import { imeSlikeZnaka, pricaZnaka, SLIKE_ZNAKA, tamnaSlikaZnaka } from '@/lib/prica-znaka';
+import { imeSlikeZnaka, pricaZaKartu, SLIKE_ZNAKA, tamnaSlikaZnaka } from '@/lib/prica-znaka';
 import { useAuthStore } from '@/store/auth';
 import { usePricaZnakaLog } from '@/store/prica-znaka-log';
 import { useResolvedProfile } from '@/store/profile';
@@ -16,25 +17,29 @@ import { neutral } from '@/theme/tokens';
  * ekrana, sa ulaza na tabu "Ti" (prsten oko Sunca u velikoj trojci). Isti plejer i isti okvir kao
  * dnevna prica; tekst je sa astroshop.rs, element/kvalitet/doba se racunaju (`lib/prica-znaka.ts`).
  * Stepen Sunca stoji samo uz tacno vreme rodjenja (bez njega je Sunce ±0,5°).
+ *
+ * UVOD (`uvod`, Ivan 1.10.2026): ova prica je u onboardingu UMESTO dnevne (`(onboarding)/prva-prica.tsx`),
+ * po istim pravilima — bez zaglavlja, X, deljenja i povlacenja; na kraju "Nastavi" vodi na obavestenja.
  */
-export default function PricaZnakaEkran() {
+export default function Prica() {
+  return <PricaZnakaEkran />;
+}
+
+export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
   const resolved = useResolvedProfile();
   const userId = useAuthStore((s) => s.user?.id ?? null);
   const oznaci = usePricaZnakaLog((s) => s.oznaci);
 
-  const p = React.useMemo(() => {
-    if (!resolved || resolved.zoneUnreliable) return null;
-    const sunce = resolved.chart.planets.find((x) => x.key === 'sun');
-    if (!sunce) return null;
-    return pricaZnaka(sunce.position.sign.key, resolved.timeUnknown ? null : sunce.position.deg);
-  }, [resolved]);
+  // Znak, stepen Sunca i znak vladara iz karte (`pricaZaKartu`); bez pouzdane zone `null`.
+  const p = React.useMemo(() => (resolved ? pricaZaKartu(resolved) : null), [resolved]);
 
-  // Bez karte nema price (npr. nepouzdana zona, pravilo 4): ne ostaje se na krugu koji se vrti.
+  // Bez karte nema price (npr. nepouzdana zona, pravilo 4): ne ostaje se na krugu koji se vrti —
+  // uvod ide dalje (obavestenja), a sa taba "Ti" se prica zatvara.
   React.useEffect(() => {
     if (p) return;
-    const t = setTimeout(zatvori, 1500);
+    const t = setTimeout(uvod ? dalje : zatvori, uvod ? 2500 : 1500);
     return () => clearTimeout(t);
-  }, [p]);
+  }, [p, uvod]);
 
   const opis = React.useMemo<OpisPrice | null>(() => {
     if (!p) return null;
@@ -44,7 +49,7 @@ export default function PricaZnakaEkran() {
       tamna: (i) => tamnaSlikaZnaka(SLIKE_ZNAKA[i]),
       slika: (i, { okvir, onPodeli }) => {
         const Slika = SLIKE_PRICE_ZNAKA[SLIKE_ZNAKA[i]];
-        return <Slika p={p} okvir={okvir} onPodeli={onPodeli} onProcitaj={procitaj} />;
+        return <Slika p={p} okvir={okvir} uvod={uvod} onPodeli={onPodeli} onProcitaj={procitaj} />;
       },
       kartica: (i) => <KarticaZnaka p={p} k={SLIKE_ZNAKA[i]} />,
       // Poslednja slika ima veliko "Podeli svoj znak".
@@ -52,8 +57,11 @@ export default function PricaZnakaEkran() {
       imeFajla: imeSlikeZnaka(p.znak),
       naslovDeljenja: 'Podeli svoj znak',
       onPoslednja: () => { if (userId) oznaci(userId, p.znak.key); },
+      // Video cele price (1.10.2026) — iste kartice kao slika za deljenje, `poslovi-videa.tsx`.
+      // U uvodu deljenja nema.
+      video: uvod ? undefined : posaoPriceZnaka(p),
     };
-  }, [p, userId, oznaci]);
+  }, [p, uvod, userId, oznaci]);
 
   if (!opis) {
     return (
@@ -62,7 +70,7 @@ export default function PricaZnakaEkran() {
       </View>
     );
   }
-  return <PlejerPrice opis={opis} />;
+  return <PlejerPrice opis={opis} uvod={uvod} onDalje={dalje} />;
 }
 
 /** "Pročitaj: Sunce u Ovnu" — tumacenje Sunca u znaku (list preko price, prica za to vreme stoji). */
@@ -73,4 +81,12 @@ function procitaj() {
 function zatvori() {
   if (router.canGoBack()) router.back();
   else router.replace('/');
+}
+
+/**
+ * Posle price u onboardingu: obavestenja (`push.tsx`), pa paywall — isto kao posle dnevne
+ * (`app/prica.tsx`, `useDaljeIzUvoda`). Prica se zavrsava sa "Nova priča stiže svakog dana".
+ */
+function dalje() {
+  router.replace('/push');
 }

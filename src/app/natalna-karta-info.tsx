@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Image, useWindowDimensions, View } from 'react-native';
 
+import { Crown } from 'lucide-react-native';
+
 import { SheetScroll } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
@@ -11,6 +13,7 @@ import { ZnakIkona } from '@/components/znak-ikona';
 import { AspektiOdeljak, IKONA, Odeljak, Stavka } from '@/components/info-list';
 import { ASPECTS, BODIES } from '@/lib/astro';
 import { SIGNS, type Element } from '@/lib/zodiac';
+import { neutral } from '@/theme/tokens';
 
 /**
  * "Šta je natalna karta" — list odozdo sa ikonice "i" pored tocka na tabu "Ti"
@@ -67,14 +70,23 @@ export default function NatalnaKartaInfo() {
         <Stavka ime="Aspekti — kako se slažu" ikona={<AspektIkona aspekt={primer.aspekt} size={18} potez={PLANETA_POTEZ * IKONA} />}>
           Uglovi između planeta pokazuju da li im se energije dopunjuju ili sudaraju.
         </Stavka>
+        {/* Krunica na planetama tranzita nigde nije bila objasnjena (UX recenzija 1.10.2026). */}
+        <Stavka ime="Krunica — tvoj vladar" ikona={<Crown size={20} color={neutral.ink} strokeWidth={2} />}>
+          Planeta sa krunicom vlada znakom tvog podznaka. Tranzit u kom ona učestvuje ima veću težinu.
+        </Stavka>
       </Odeljak>
 
       <Odeljak naslov="Krug">
         <Text variant="reading">
           Spoljni prsten je 12 znakova, a boja kruga oko znaka je njegov element. Brojevi od 1 do 12
           su kuće, simboli su planete. Levo je Ascendent, odnosno podznak: znak koji se dizao na
-          istoku kad si se rodio. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u
+          istoku u trenutku tvog rođenja. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u
           sredini su aspekti.
+        </Text>
+        {/* Isto kao u listu "Šta je trenutno nebo" — karta ima R, a ovde nije bilo objasnjeno. */}
+        <Text variant="reading" className="mt-3">
+          R pored planete znači da je retrogradna: gledano sa Zemlje, prividno ide unazad kroz
+          zodijak.
         </Text>
       </Odeljak>
 

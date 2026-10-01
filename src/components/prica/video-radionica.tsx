@@ -1,23 +1,25 @@
 import * as React from 'react';
 import { AppState, Platform, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, type SharedValue } from 'react-native-reanimated';
-import { router } from 'expo-router';
+import Animated, { makeMutable, useAnimatedStyle, useSharedValue, type SharedValue } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import * as Notifications from 'expo-notifications';
 
-import { KARTICA, KarticaKraj, KarticaZaDeljenje } from '@/components/prica/kartica';
+import { KARTICA, KarticaKraj } from '@/components/prica/kartica';
 import { ZAVESA } from '@/components/prica/crtezi';
 import { PlatnoVidea, type PlatnoVideaRef } from '@/components/prica/platno-videa';
 import { SatSlike, VremeVidea } from '@/components/prica/sat';
+import { otvoriVideo } from '@/components/prica/video-traka';
 import { kadarVidea, poluprecnikKruga, rasporedVidea, VIDEO } from '@/lib/prica';
-import type { PricaDana } from '@/lib/use-prica';
 import { poslednjiDodir } from '@/store/budnost';
-import { fajlVidea, folderVidea, useVideoPrice } from '@/store/video-price';
+import { fajlVidea, folderVidea, useVideoPrice, type PosaoVidea, type VrstaVidea } from '@/store/video-price';
 
 /**
  * RADIONICA VIDEA PRICE (Ivan, 30.9.2026): cela prica, SA svim pokretima, kao MP4 —
  * dok korisnik radi sta hoce u aplikaciji. Kad je gotov: obavestenje i traka iznad tabova
  * (`video-traka.tsx`), a video je na listu `/video-price`.
+ *
+ * ZA SVAKU PRICU (1.10.2026): radionica zna samo `PosaoVidea` — kartice po redu i koliko koja traje
+ * (`poslovi-videa.tsx`: dnevna, o znaku). Posle poslednje kartice ide zavrsni kadar sa logom.
  *
  * Kako: karta za deljenje (`kartica.tsx`, 360 × 640, prvo lice, datum i logo) crta se
  * VAN EKRANA u nativno platno (`modules/video-price`). Za svaki kadar se sat slike
@@ -74,41 +76,27 @@ async function dozvola(otkazano: () => boolean) {
 
 /** Korenska radionica — montira se u `_layout.tsx`, crta samo dok se video pravi. */
 export function VideoRadionica() {
-  const prica = useVideoPrice((s) => (s.stanje === 'pravi' ? s.prica : null));
-  if (!PlatnoVidea || !prica) return null;
-  return <Radionica p={prica} />;
+  const posao = useVideoPrice((s) => s.posao);
+  if (!PlatnoVidea || !posao) return null;
+  // Nov posao = nova radionica (kljuc), bez ostataka prethodnog.
+  return <Radionica key={`${posao.vrsta}-${posao.kljuc}`} posao={posao} />;
 }
 
-function Radionica({ p }: { p: PricaDana }) {
+function Radionica({ posao }: { posao: PosaoVidea }) {
   const Platno = PlatnoVidea!;
   const platno = React.useRef<PlatnoVideaRef>(null);
-  // Slike price, pa zavrsni kadar sa logom (indeks `p.slike.length`).
-  // Svaka slika u videu isto traje (`VIDEO.slika`, 4 s) — kraci od price, u kojoj se cita (Ivan, 30.9.2026).
-  const raspored = React.useMemo(() => rasporedVidea(p.slike.map(() => VIDEO.slika), VIDEO.zavrsni), [p]);
+  // Kartice price, pa zavrsni kadar sa logom (indeks `posao.trajanja.length`).
+  const raspored = React.useMemo(() => rasporedVidea(posao.trajanja, VIDEO.zavrsni), [posao]);
   // Posle prekida kartice se montiraju iznova (nov kljuc) — bez ostataka od pre izlaska.
   const [pokusaj, setPokusaj] = React.useState(0);
+  const slika = raspored.pocetak.length;
 
-  // Sat za svaku sliku (najvise sest, pa zavrsni kadar).
-  const s0 = useSharedValue(0);
-  const s1 = useSharedValue(0);
-  const s2 = useSharedValue(0);
-  const s3 = useSharedValue(0);
-  const s4 = useSharedValue(0);
-  const s5 = useSharedValue(0);
-  const s6 = useSharedValue(0);
-  const satovi = React.useMemo(() => [s0, s1, s2, s3, s4, s5, s6], [s0, s1, s2, s3, s4, s5, s6]);
-  // Poluprecnik kruga svake slike: 0 = skrivena, KR = cela. Svaka ima SVOJ, da se sloj nikad ne crta iznova.
-  const r0 = useSharedValue(KR);
-  const r1 = useSharedValue(0);
-  const r2 = useSharedValue(0);
-  const r3 = useSharedValue(0);
-  const r4 = useSharedValue(0);
-  const r5 = useSharedValue(0);
-  const r6 = useSharedValue(0);
-  const krugovi = React.useMemo(() => [r0, r1, r2, r3, r4, r5, r6], [r0, r1, r2, r3, r4, r5, r6]);
+  // Sat svake slike i poluprecnik njenog kruga: 0 = skrivena, KR = cela. Svaka ima SVOJ, da se sloj
+  // nikad ne crta iznova. Broj slika zavisi od price (dnevna 7, znak 10), pa `makeMutable`, ne hook po slici.
+  const satovi = React.useMemo(() => Array.from({ length: slika }, () => makeMutable(0)), [slika]);
+  const krugovi = React.useMemo(() => Array.from({ length: slika }, (_, j) => makeMutable(j === 0 ? KR : 0)), [slika]);
   // Vreme od prvog kadra — za krug loga, koji se vrti kroz ceo video (`logo-price.tsx`).
   const vreme = useSharedValue(0);
-  const slika = raspored.pocetak.length;
 
   React.useEffect(() => {
     let otkazano = false;
@@ -123,7 +111,7 @@ function Radionica({ p }: { p: PricaDana }) {
       prekinuto = AppState.currentState !== 'active';
       javiNapredak(0);
       folderVidea().create({ intermediates: true, idempotent: true });
-      const fajl = fajlVidea(p.dan);
+      const fajl = fajlVidea(posao.ime);
       // Pocetno stanje: prva slika cela, ostale skrivene, svi satovi na nuli. Slike su vec
       // montirane (i posle prekida — nov `pokusaj`, nove kartice); daj im vreme za raspored i slike.
       const krugSada = krugovi.map(() => -1);
@@ -171,7 +159,7 @@ function Radionica({ p }: { p: PricaDana }) {
           if (otkazano || !uri) return;
           gotovo(uri);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-          void obavesti(p);
+          void obavesti(posao);
           return;
         } catch (e) {
           // U log (Console.app na Mac-u, i u Release buildu), da se neuspeh na telefonu moze procitati.
@@ -193,7 +181,7 @@ function Radionica({ p }: { p: PricaDana }) {
       pratiApp.remove();
       platno.current?.otkazi().catch(() => {});
     };
-  }, [p, raspored, satovi, krugovi, vreme, slika]);
+  }, [posao, raspored, satovi, krugovi, vreme, slika]);
 
   const sve = React.useMemo(() => Array.from({ length: slika }, (_, i) => i), [slika]);
   return (
@@ -207,7 +195,7 @@ function Radionica({ p }: { p: PricaDana }) {
         <VremeVidea vreme={vreme}>
           {/* Redom: kasnija slika je iznad ranije, pa se nova uvek otkriva preko prethodne. */}
           {sve.map((i) => (
-            <Sloj key={`${pokusaj}-${i}`} p={p} i={i} sat={satovi[i]} r={krugovi[i]} />
+            <Sloj key={`${pokusaj}-${i}`} posao={posao} i={i} sat={satovi[i]} r={krugovi[i]} />
           ))}
         </VremeVidea>
       </Platno>
@@ -220,7 +208,7 @@ function Radionica({ p }: { p: PricaDana }) {
  * sloj posle montiranja nikad ne crta iznova — novo crtanje bi vratilo pokrete na pocetne vrednosti.
  * Skrivena (krug 0) je i providna: tada se ne crta nista, ni ako raspored jos kasni.
  */
-const Sloj = React.memo(function Sloj({ p, i, sat, r }: { p: PricaDana; i: number; sat: SharedValue<number>; r: SharedValue<number> }) {
+const Sloj = React.memo(function Sloj({ posao, i, sat, r }: { posao: PosaoVidea; i: number; sat: SharedValue<number>; r: SharedValue<number> }) {
   const spolja = useAnimatedStyle(() => {
     const rr = Math.max(0, r.get());
     return { left: KX - rr, top: KY - rr, width: 2 * rr, height: 2 * rr, borderRadius: rr, opacity: rr > 0 ? 1 : 0 };
@@ -230,7 +218,7 @@ const Sloj = React.memo(function Sloj({ p, i, sat, r }: { p: PricaDana; i: numbe
     <Animated.View style={[{ position: 'absolute', overflow: 'hidden' }, spolja]}>
       <Animated.View style={[{ position: 'absolute', width: KARTICA.w, height: KARTICA.h }, unutra]}>
         <SatSlike sat={sat}>
-          {i < p.slike.length ? <KarticaZaDeljenje p={p} k={p.slike[i]} /> : <KarticaKraj />}
+          {i < posao.trajanja.length ? posao.kartica(i) : <KarticaKraj />}
         </SatSlike>
       </Animated.View>
     </Animated.View>
@@ -245,7 +233,7 @@ const VRSTA = 'video-price';
 const KANAL = 'video-price';
 
 /** Lokalno obavestenje — i dok je aplikacija otvorena (`ObavestenjeVidea`). Bez dozvole nista; traka i dalje javlja. */
-async function obavesti(p: PricaDana) {
+async function obavesti(posao: PosaoVidea) {
   try {
     const d = await Notifications.getPermissionsAsync();
     const moze = d.granted || d.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL;
@@ -264,8 +252,8 @@ async function obavesti(p: PricaDana) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Tvoj video je spreman',
-        body: `Priča dana, ${p.datumTekst}. Dodirni da je podeliš.`,
-        data: { vrsta: VRSTA },
+        body: `${posao.opis} Dodirni da ga podeliš.`,
+        data: { vrsta: VRSTA, video: posao.vrsta },
       },
       trigger: Platform.OS === 'android' ? { channelId: KANAL } : null,
     });
@@ -297,8 +285,9 @@ export function ObavestenjeVidea() {
       },
     });
     const sub = Notifications.addNotificationResponseReceivedListener((r) => {
-      if ((r.notification.request.content.data as { vrsta?: string } | undefined)?.vrsta !== VRSTA) return;
-      try { router.push('/video-price'); } catch { /* navigacija jos nije montirana */ }
+      const podaci = r.notification.request.content.data as { vrsta?: string; video?: VrstaVidea } | undefined;
+      if (podaci?.vrsta !== VRSTA) return;
+      try { otvoriVideo(podaci.video === 'znak' ? 'znak' : 'dan'); } catch { /* navigacija jos nije montirana */ }
     });
     return () => sub.remove();
   }, []);

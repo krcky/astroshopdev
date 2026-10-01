@@ -9,6 +9,8 @@ import type { LunarArea } from '@/lib/moon';
  * Ivanove (`files/*-active.svg`, 28.9.2026) i stigle su u toj boji.
  */
 export const OBLAST_BOJA = '#B39DDB';
+/** Ista lila, tamnija, SAMO za tekst (UX recenzija 1.10.2026): `OBLAST_BOJA` je 2,4:1 na beloj, ovo 5,2:1. */
+export const OBLAST_TEKST = '#7E57C2';
 
 /**
  * Ikonice oblasti (Ivan, 28.9.2026, drugi krug): 3D slike u lila tonu iz

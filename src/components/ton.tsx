@@ -10,6 +10,13 @@ import { TONE_LABEL, type Tone } from '@/lib/tone';
 /* Boje "Ide ti" (plus) i "Koci te" (minus) su u `lib/tocak-stil.ts` — deli ih tocak. */
 import { MINUS_BOJA, PLUS_BOJA } from '@/lib/tocak-stil';
 export { MINUS_BOJA, PLUS_BOJA };
+/**
+ * Iste boje u tamnijem tonu, SAMO za TEKST (UX recenzija 1.10.2026): svetlo plava i roze
+ * na beloj imaju kontrast ~1,7:1, a sitan tekst trazi bar 4,5:1. Ikonice, trake i
+ * pozadine ostaju u `PLUS_BOJA` / `MINUS_BOJA`.
+ */
+export const PLUS_TEKST = '#1F6F8B'; // 5,7:1 na beloj
+export const MINUS_TEKST = '#C2416B'; // 4,9:1 na beloj
 
 /**
  * Ton bez obojene kapsule (Ivan, 28.9.2026): ikonica pa rec, u redu sa

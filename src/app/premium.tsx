@@ -148,7 +148,7 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
               </View>
             }
             naslov="Teme perioda"
-            tekst="Spori tranziti koji traju mesecima."
+            tekst="Tranziti koji traju nedeljama i mesecima."
           />
           {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
           <Stavka

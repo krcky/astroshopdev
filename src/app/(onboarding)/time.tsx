@@ -13,6 +13,8 @@ export default function BirthTime() {
     if (draft.time) { d.setHours(draft.time.hour); d.setMinutes(draft.time.minute); }
     return d;
   });
+  // Isto kao datum: podne je samo pocetni polozaj tockica, ne odgovor.
+  const [izabrano, setIzabrano] = React.useState(!!draft.time);
 
   const next = () => {
     draft.set({ time: { hour: value.getHours(), minute: value.getMinutes() }, timeSkipped: false });
@@ -31,9 +33,9 @@ export default function BirthTime() {
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={Clock}
       title="Vreme rođenja"
-      primary={{ label: 'Nastavi', onPress: next }}
+      primary={{ label: izabrano ? 'Nastavi' : 'Izaberi vreme', onPress: next, disabled: !izabrano }}
       secondary={{ label: 'Ne znam vreme', onPress: skip }}>
-      <WheelPicker mode="time" value={value} onChange={setValue} />
+      <WheelPicker mode="time" value={value} onChange={(d) => { setValue(d); setIzabrano(true); }} />
     </OnboardingStep>
   );
 }

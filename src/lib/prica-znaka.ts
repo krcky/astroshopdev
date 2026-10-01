@@ -8,6 +8,8 @@
  * a element, kvalitet, doba godine, polaritet i srodni znaci se RACUNAJU iz mesta znaka u krugu.
  */
 import { datum } from '@/lib/horoscope';
+import type { NatalChart } from '@/lib/natal';
+import { moonSignForUnknownTime } from '@/lib/natal-keys';
 import { TRAJANJE_STALNO, trajanjeSlike } from '@/lib/prica';
 import { ZNAK_OPIS, type ZnakOpis } from '@/lib/znak-opis-podaci';
 import { SIGN_CASES, SIGNS, type Element, type ZodiacSign } from '@/lib/zodiac';
@@ -39,6 +41,29 @@ export const INSTRUMENTAL: Record<string, string> = {
   aries: 'Ovnom', taurus: 'Bikom', gemini: 'Blizancima', cancer: 'Rakom', leo: 'Lavom', virgo: 'Devicom',
   libra: 'Vagom', scorpio: 'Škorpijom', sagittarius: 'Strelcem', capricorn: 'Jarcem', aquarius: 'Vodolijom', pisces: 'Ribama',
 };
+/**
+ * Latinsko ime SAZVEZDJA (IAU) — natpis uz crtez na slici "Sazvezdje", kao u zvezdanom atlasu (Ivan,
+ * 1.10.2026). Imena sazvezdja, ne znakova: Scorpius i Capricornus, ne Scorpio i Capricorn.
+ */
+export const LATINSKO_IME: Record<string, string> = {
+  aries: 'Aries', taurus: 'Taurus', gemini: 'Gemini', cancer: 'Cancer', leo: 'Leo', virgo: 'Virgo',
+  libra: 'Libra', scorpio: 'Scorpius', sagittarius: 'Sagittarius', capricorn: 'Capricornus', aquarius: 'Aquarius', pisces: 'Pisces',
+};
+
+/** Koliko sazvezdje zauzima od manje stranice prostora crteza (ostatak su pozadinske zvezde). */
+export const POPUNA_SAZVEZDJA = 0.8;
+/** Razmak natpisa ispod najnize zvezde i visina njegovog reda (pt, pre razmere slike). */
+export const NATPIS_SAZVEZDJA = { razmak: 8, red: 16 } as const;
+
+/**
+ * Vrh natpisa sazvezdja (pt od vrha prostora crteza): `razmak` ispod najnize zvezde. Isti racun kao
+ * `components/prica-znaka/sazvezdje.tsx`: sazvezdje je centrirano, veca stranica = 1, a zauzme
+ * `popuna` manje stranice prostora; `najnize` je najveci y zvezda (od -0,5 do 0,5, y nadole).
+ */
+export function vrhNatpisaSazvezdja(najnize: number, sirina: number, visina: number, popuna: number, razmak: number): number {
+  return visina / 2 + najnize * Math.min(sirina, visina) * popuna + razmak;
+}
+
 /** Znaci cije je ime u mnozini: "Blizanci vladaju", ne "vlada". */
 const MNOZINA = new Set(['gemini', 'pisces']);
 
@@ -55,6 +80,8 @@ export type PricaZnaka = {
   stepen: number | null;
   /** "Prvi znak zodijaka" */
   redni: string;
+  /** Latinsko ime sazvezdja ("Aries", "Scorpius") — natpis uz crtez na slici "Sazvezdje". */
+  latinsko: string;
   /** "21. mar – 19. apr" — iz `SIGNS[].dates` (aplikacija), ne sa sajta; bez "otprilike" (Ivan, 30.9.2026). */
   datumi: string;
   element: Element;
@@ -73,6 +100,12 @@ export type PricaZnaka = {
   /** "Ovnom vlada Mars" */
   vladarNaslov: string;
   vladar: { key: string; ime: string };
+  /**
+   * Recenica ispod naslova vladara (Ivan, 1.10.2026): "U tvojoj natalnoj karti Mars je u Biku." — iz
+   * karte; Lavom vlada Sunce, koje je uvek u Lavu, pa tu ide ime iz mita ("Grci su ga zvali Helios.").
+   * `null` kad znak vladara nije poznat.
+   */
+  vladarRecenica: string | null;
   /** Naslov poglavlja sa tackom na kraju: "Otvorenost i ishitrenost." */
   ukratko: string;
   /** Prve recenice poglavlja; `null` kad su preduge za sliku. */
@@ -109,7 +142,23 @@ export function srodniZnaci(z: ZodiacSign): ZodiacSign[] {
   return SIGNS.filter((s) => s.key !== z.key && s.element === z.element);
 }
 
-export function pricaZnaka(znakKey: string, stepen: number | null): PricaZnaka {
+/** Za Lava (vladar Sunce, uvek u Lavu) umesto znaka vladara: grcko ime Sunca (Ivan, 1.10.2026). */
+const VLADAR_MIT: Record<string, string> = { sun: 'Grci su ga zvali Helios.' };
+
+/**
+ * "U tvojoj natalnoj karti Mars je u Biku." Dva znaka (Mesec bez vremena rodjenja) -> "u Blizancima ili Raku",
+ * kao trojka na tabu "Ti" — radije priznati nego pogadjati (pravilo 4).
+ */
+export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null): string | null {
+  if (VLADAR_MIT[vladarKey]) return VLADAR_MIT[vladarKey];
+  if (!znaci?.length) return null;
+  return `U tvojoj natalnoj karti ${vladarIme} je u ${znaci.map((z) => SIGN_CASES[z].loc).join(' ili ')}.`;
+}
+
+/**
+ * @param vladarZnaci znak (ili dva, kad nije siguran) u kom je vladar znaka u natalnoj karti; `pricaZaKartu`.
+ */
+export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: readonly string[] | null = null): PricaZnaka {
   const i = SIGNS.findIndex((s) => s.key === znakKey);
   if (i < 0) throw new Error(`nepoznat znak ${znakKey}`);
   const znak = SIGNS[i];
@@ -125,6 +174,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null): PricaZnaka {
     opis,
     stepen,
     redni: `${REDNI[i]} znak zodijaka`,
+    latinsko: LATINSKO_IME[znak.key],
     datumi: datumiZnaka(znak),
     element: znak.element,
     elementIme: ELEMENT_IME[znak.element],
@@ -137,6 +187,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null): PricaZnaka {
     teloOznaka: `Deo tela kojim ${znak.name} ${MNOZINA.has(znak.key) ? 'vladaju' : 'vlada'}`,
     vladarNaslov,
     vladar: { key: znak.rulerKey, ime: znak.ruler },
+    vladarRecenica: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci),
     ukratko,
     ukratkoRecenica: recenica(opis.ukratkoRecenica),
     ljubavRecenica: recenica(opis.ljubavRecenica),
@@ -152,10 +203,31 @@ export function pricaZnaka(znakKey: string, stepen: number | null): PricaZnaka {
     osvojiti: opis.osvojiti,
     osnove: [osnove, p.elementIme, kvalitet, opis.pol, polaritet, opis.izgled, opis.telo].join(' '),
     stvari: ['Kamen, boja, biljka i hrana', opis.kamen, opis.boja, opis.biljka, opis.hrana, opis.zivotinja].join(' '),
-    vladar: `${vladarNaslov}. Gde je ${znak.ruler} u tvojoj karti, vidiš na tabu Ti.`,
+    vladar: [vladarNaslov, p.vladarRecenica ?? ''].join(' '),
   };
   const trajanja = SLIKE_ZNAKA.map((k) => (tekst[k] === null ? TRAJANJE_STALNO.naslovna : trajanjeSlike(tekst[k]!)));
   return { ...p, trajanja };
+}
+
+/**
+ * Prica o znaku za SVOJU kartu: Suncev znak, stepen Sunca (samo uz tacno vreme rodjenja — bez njega je
+ * ±0,5°) i znak vladara. Bez pouzdane zone nema price (pravilo 4). Mesec (vladar Raka) bez vremena
+ * rodjenja moze biti u dva znaka — `moonSignForUnknownTime`, isto kao trojka na tabu "Ti".
+ */
+export function pricaZaKartu(r: { chart: NatalChart; timeUnknown: boolean; zoneUnreliable: boolean; utc: Date }): PricaZnaka | null {
+  if (r.zoneUnreliable) return null;
+  const sunce = r.chart.planets.find((x) => x.key === 'sun');
+  if (!sunce) return null;
+  const znak = sunce.position.sign;
+  let vladarZnaci: string[] | null = null;
+  if (znak.rulerKey === 'moon' && r.timeUnknown) {
+    const m = moonSignForUnknownTime(r.utc);
+    vladarZnaci = m.certain ? [m.sign.key] : [m.from.key, m.to.key];
+  } else {
+    const v = r.chart.planets.find((x) => x.key === znak.rulerKey);
+    vladarZnaci = v ? [v.position.sign.key] : null;
+  }
+  return pricaZnaka(znak.key, r.timeUnknown ? null : sunce.position.deg, vladarZnaci);
 }
 
 /**

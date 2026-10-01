@@ -90,16 +90,18 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
         ))}
       </View>
 
-      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti po imenu, pod katancem — vidi se
-          da postoje, ne i sta pisu. */}
+      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti pod katancem — vidi se da postoje,
+          ne i sta pisu. Od 1.10.2026 (UX recenzija) sa naslovom tumacenja i tonom, kao
+          otvorene kartice: naslov je iz kratke verzije, koju besplatni ionako dobija
+          (pravilo 8 cuva ceo tekst, ne naslov). */}
       {zakljucani.length > 0 && (
         <>
           <ZakljucaniRedovi
             className="mt-3"
             redovi={zakljucani.map((t) => ({
               key: t.red.key,
-              naslov: tekstReda(t.red, '').veci,
-              ispod: trajanja.get(t.red.key),
+              naslov: tekstReda(t.red, naslov(t.red.key)).veci,
+              ispod: [TONE_LABEL[t.ton], trajanja.get(t.red.key)].filter(Boolean).join(' · '),
             }))}
           />
           <PremiumKartica
@@ -177,10 +179,12 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, ozn
         <Text variant="caption" className="mt-2" numberOfLines={2}>{opis}</Text>
       ) : ton ? (
         // Ton pa trajanje u ISTOM redu (Ivan, 28.9.2026).
-        <View className="mt-2 flex-row items-center gap-1.5">
+        // Kad ne stane u red, trajanje PRELAZI u sledeci (UX recenzija 1.10.2026): do tada
+        // `adjustsFontSizeToFit` ga je na uskoj kartici skupljao na ~5 pt.
+        <View className="mt-2 flex-row flex-wrap items-center gap-x-1.5">
           <TonOznaka tone={ton} />
           {!!trajanje && <Text variant="caption">·</Text>}
-          <Text variant="caption" className="flex-shrink" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{trajanje}</Text>
+          {!!trajanje && <Text variant="caption">{trajanje}</Text>}
         </View>
       ) : null}
       </View>

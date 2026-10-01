@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { Info } from 'lucide-react-native';
 
-import { OBLAST_BOJA } from '@/components/oblast-ikona';
+import { OBLAST_BOJA, OBLAST_TEKST } from '@/components/oblast-ikona';
 import { Planeta, skalaSlike } from '@/components/planete-par';
 import { Okret } from '@/components/okret';
 import { UlazUPricu } from '@/components/prica/ulaz';
@@ -21,13 +21,14 @@ import { dayKey } from '@/lib/transits';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useAuthStore } from '@/store/auth';
 import { tezina } from '@/theme/tipografija';
-import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
+import { MINUS_TEKST, PLUS_TEKST } from '@/components/ton';
 
 /**
  * Boja oznake stavke (Ivan, 29.9.2026): EFEKAT "svetlo plava" kao plus u "Ide ti",
  * PAZI "roze" kao minus u "Koči te" (`DESIGN.md`, 2); SAVET ostaje lila (`OBLAST_BOJA`).
  */
-const ODELJAK_BOJA: Record<string, string> = { Efekat: PLUS_BOJA, Pazi: MINUS_BOJA };
+// Tekst ide u tamnijem tonu istih boja (UX recenzija 1.10.2026, kontrast bar 4,5:1).
+const ODELJAK_BOJA: Record<string, string> = { Efekat: PLUS_TEKST, Pazi: MINUS_TEKST };
 /** Varijanta `oznaka` je 11/15; na ovoj kartici datum i oznake odeljaka idu 12/16 (Ivan, 28.9.2026). */
 export const OZNAKA_12 = 'text-[12px] leading-[16px]';
 
@@ -200,7 +201,7 @@ function Odeljci({ stavke }: { stavke: { oznaka: string; s: Stavka }[] }) {
         <View key={x.oznaka} className={cn('flex-row items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
           <View className="flex-1">
             {/* Oznaka u lila boji ikonica i strelica (Ivan, 29.9.2026: "da budu ljubicasti"). */}
-            <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.oznaka] ?? OBLAST_BOJA }}>{x.oznaka}</Text>
+            <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.oznaka] ?? OBLAST_TEKST }}>{x.oznaka}</Text>
             {/* Podebljani deo u SVOM redu, tekst ispod njega (Ivan, 28.9.2026). */}
             {!!x.s.naslov && <Text variant="default" className={cn('mt-1', tezina('naslovUTekstu'))}>{x.s.naslov}</Text>}
             <Text variant="default" className={x.s.naslov ? undefined : 'mt-1'}>{x.s.tekst}</Text>

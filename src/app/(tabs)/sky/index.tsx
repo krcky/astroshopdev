@@ -10,6 +10,7 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { IznadPreliva, Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
+import { GledasDrugo } from '@/components/gledas-drugo';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
 import { buildSky, danZaKalendar, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
@@ -114,7 +115,9 @@ export default function Sky() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen label="Trenutno na nebu" padded={false} tint="pink" right={<ProfileButton />}>
+    <Screen
+      // Pomereno vreme: naslov vise ne tvrdi "trenutno" (UX recenzija 1.10.2026).
+      label={izabran ? 'Nebo' : 'Trenutno na nebu'} padded={false} tint="pink" right={<ProfileButton />}>
       {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
           preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
       <IznadPreliva
@@ -170,6 +173,11 @@ export default function Sky() {
         <StakloDugme siroko strelica="desno" tekst="sat" onPress={() => pomeriSat(1)} accessibilityLabel="Sat napred" />
         <StakloDugme siroko strelica="desno" tekst="dan" onPress={() => pomeriDan(1)} accessibilityLabel="Dan napred" />
       </View>
+      {/* Ista traka kao na pocetnoj kad je izabran drugi dan (`gledas-drugo.tsx`). */}
+      {izabran && (
+        <GledasDrugo className="mx-5 mt-4" tekst="Ovo nije sadašnje nebo."
+          dugme="Vrati na sada" onPress={() => setIzabran(null)} />
+      )}
 
       {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
           Ascendent su prvi redovi liste. */}

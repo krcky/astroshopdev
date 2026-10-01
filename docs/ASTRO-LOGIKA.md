@@ -252,6 +252,15 @@ Nekoliko slika o današnjem danu, kao „story" na Instagramu, sa dugmetom za de
 
 Na slici za deljenje isti tekst ide u prvom licu („Moj dan", „Ide mi", „Koči me").
 
+### 4.8 Priča o znaku (30.9.2026; u onboardingu umesto priče dana od 1.10.2026)
+
+Devet slika o **Sunčevom znaku**, sa Sunca u velikoj trojci (tab „Ti"). Tekst je sa astroshop.rs/znak, a ovo se **računa**:
+
+- **Element, kvalitet, polaritet** po redu znaka (kardinalni / fiksni / promenljivi; vatra i vazduh pozitivni). **Doba godine** za severnu poluloptu: kardinalni znak otvara doba, fiksni je sredina, promenljivi kraj. ✅
+- **Stepen Sunca** samo uz tačno vreme rođenja (bez njega je Sunce ±0,5°). ✅
+- **Vladar znaka** su MODERNI vladari iz `SIGNS` (Škorpija Pluton, Vodolija Uran, Ribe Neptun) — za razliku od „Tvog dana", koji za vladara Ascendenta uzima TRADICIONALNE (4.0). ⏳ potvrda astrologa
+- **Rečenica ispod vladara** (1.10.2026): „U tvojoj natalnoj karti Mars je u Biku." — znak u kom je vladar u korisnikovoj karti. Mesec (vladar Raka) bez vremena rođenja ume da promeni znak tog dana — tada stoji „u Blizancima ili Raku", kao trojka na tabu „Ti". Lavom vlada Sunce, koje je uvek u Lavu, pa tu stoji „Grci su ga zvali Helios." ✅
+
 ---
 
 ## 5. Tab „Tranziti"

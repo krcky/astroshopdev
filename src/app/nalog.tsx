@@ -128,7 +128,7 @@ export default function NalogSheet() {
           </Group>
           {!t && (
             <Text variant="caption" className="mt-2 px-1">
-              Bez vremena rođenja podznak i kuće nisu pouzdani. Dodirni „Vreme rođenja" da ga dodaš.
+              Bez vremena rođenja podznak i kuće nisu pouzdani. Dodirni „Vreme rođenja“ da ga dodaš.
             </Text>
           )}
         </>

@@ -109,7 +109,7 @@ export default function SkyPlace() {
           )}
 
           <Text variant="muted" className="mt-8 text-xs">
-            Ovim se menja samo ekran „Trenutno na nebu". Tvoja natalna karta
+            Ovim se menja samo ekran „Trenutno na nebu“. Tvoja natalna karta
             ostaje računata za mesto rođenja — ono se menja u profilu.
           </Text>
     </SheetScroll>

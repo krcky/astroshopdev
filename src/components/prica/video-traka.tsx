@@ -12,7 +12,8 @@ import { dayKey } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import { useDanas } from '@/store/danas';
-import { useVideoDana, useVideoPrice } from '@/store/video-price';
+import { useVideo, useVideoPrice, type VideoStanje, type VrstaVidea } from '@/store/video-price';
+import { useResolvedProfile } from '@/store/profile';
 import { tezina } from '@/theme/tipografija';
 import { brand, neutral, shadow } from '@/theme/tokens';
 
@@ -32,24 +33,48 @@ export const TRAKA_VIDEA_VISINA = 56;
 /** Sistem crta traku sam (iOS 26); inace je nasa plutajuca kapsula. */
 export const SISTEMSKA_TRAKA = Platform.OS === 'ios' && !STARI_IOS;
 
-/** Video danas za ovaj nalog, ako traka treba da stoji. */
-export function useTrakaVidea() {
-  const uid = useAuthStore((s) => s.user?.id ?? null);
+/**
+ * Za koji sadrzaj video te vrste SADA vazi: dnevni — danasnji dan; znak — Suncev znak iz profila
+ * (kad se podaci o rodjenju promene i Sunce predje u drugi znak, stari video se vise ne vidi).
+ */
+export function useKljucVidea(vrsta: VrstaVidea): string | null {
   const dan = dayKey(useDanas());
-  const v = useVideoDana(uid, dan);
-  if (!IMA_VIDEO || !v) return null;
+  const resolved = useResolvedProfile();
+  if (vrsta === 'dan') return dan;
+  const sunce = resolved?.chart.planets.find((x) => x.key === 'sun');
+  return sunce ? sunce.position.sign.key : null;
+}
+
+/** Video te vrste za ovaj nalog i sadrzaj koji sada vazi. */
+export function useVideoZa(vrsta: VrstaVidea) {
+  const uid = useAuthStore((s) => s.user?.id ?? null);
+  return useVideo(uid, vrsta, useKljucVidea(vrsta));
+}
+
+/** Poslednji pokrenut video (dnevni ili znaka), ako traka treba da stoji. */
+export function useTrakaVidea() {
+  const poslednja = useVideoPrice((s) => s.poslednja);
+  const v = useVideoZa(poslednja ?? 'dan');
+  if (!IMA_VIDEO || !poslednja || !v) return null;
   if (v.stanje === 'pravi') return v;
   return v.sklonjen ? null : v;
 }
 
-/** Sistemski meni za deljenje; traka posle toga nestaje (video ostaje do kraja dana). */
-export async function podeliVideo(uri: string) {
+/** Sistemski meni za deljenje; traka posle toga nestaje (video ostaje — dnevni do kraja dana). */
+export async function podeliVideo(uri: string, vrsta: VrstaVidea) {
   try {
     if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(uri, { mimeType: 'video/mp4', UTI: 'public.mpeg-4', dialogTitle: 'Podeli svoj dan' });
+      await Sharing.shareAsync(uri, {
+        mimeType: 'video/mp4', UTI: 'public.mpeg-4', dialogTitle: vrsta === 'znak' ? 'Podeli svoj znak' : 'Podeli svoj dan',
+      });
     }
-    useVideoPrice.getState().skloni();
+    useVideoPrice.getState().skloni(vrsta);
   } catch { /* otkazano deljenje */ }
+}
+
+/** List sa videom te vrste. */
+export function otvoriVideo(vrsta: VrstaVidea) {
+  router.push({ pathname: '/video-price', params: { vrsta } });
 }
 
 /** Procenat kao u aplikaciji: "42 %". */
@@ -86,15 +111,15 @@ export function VideoTraka() {
 }
 
 /** Sadrzaj trake (sistem crta staklenu kapsulu oko njega). Izdvojen i za `/dev-video`. */
-export function VideoTrakaSadrzaj({ v }: { v: NonNullable<ReturnType<typeof useVideoDana>> }) {
+export function VideoTrakaSadrzaj({ v }: { v: VideoStanje }) {
   const pravi = v.stanje === 'pravi';
   const gotov = v.stanje === 'gotov';
   const naslov = pravi ? 'Pravimo tvoj video' : gotov ? 'Tvoj video je spreman' : 'Video nije uspeo';
-  const podnaslov = pravi ? `Priča dana · ${procenat(v.napredak)}` : gotov ? 'Priča dana' : 'Pokušaj ponovo iz priče.';
+  const podnaslov = pravi ? `${v.naslov} · ${procenat(v.napredak)}` : gotov ? v.naslov : 'Pokušaj ponovo iz priče.';
   return (
     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 14, paddingRight: 6 }}>
       <Pressable
-        onPress={() => router.push('/video-price')}
+        onPress={() => otvoriVideo(v.vrsta)}
         accessibilityRole="button"
         accessibilityLabel={`${naslov}. ${podnaslov}`}
         className="flex-1 flex-row items-center gap-3 active:opacity-60"
@@ -107,7 +132,7 @@ export function VideoTrakaSadrzaj({ v }: { v: NonNullable<ReturnType<typeof useV
       </Pressable>
       {gotov && v.uri && (
         <Pressable
-          onPress={() => podeliVideo(v.uri!)}
+          onPress={() => podeliVideo(v.uri!, v.vrsta)}
           accessibilityRole="button"
           accessibilityLabel="Podeli video"
           hitSlop={6}
@@ -117,7 +142,7 @@ export function VideoTrakaSadrzaj({ v }: { v: NonNullable<ReturnType<typeof useV
       )}
       {!pravi && (
         <Pressable
-          onPress={() => useVideoPrice.getState().skloni()}
+          onPress={() => useVideoPrice.getState().skloni(v.vrsta)}
           accessibilityRole="button"
           accessibilityLabel="Skloni traku"
           hitSlop={6}

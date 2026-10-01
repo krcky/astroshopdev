@@ -19,6 +19,7 @@ export default function NovaOsobaVreme() {
     if (nacrt.vreme) { d.setHours(nacrt.vreme.hour); d.setMinutes(nacrt.vreme.minute); }
     return d;
   });
+  const [izabrano, setIzabrano] = React.useState(!!nacrt.vreme);
 
   if (!nacrt.ime || !nacrt.datum) return <Redirect href="/nova-osoba" />;
 
@@ -34,9 +35,13 @@ export default function NovaOsobaVreme() {
       title="Vreme rođenja"
       subtitle="Bez vremena karta nema podznak ni kuće."
       note={NAPOMENA_PODACI}
-      primary={{ label: 'Nastavi', onPress: () => dalje({ hour: vreme.getHours(), minute: vreme.getMinutes() }) }}
+      primary={{
+        label: izabrano ? 'Nastavi' : 'Izaberi vreme',
+        onPress: () => dalje({ hour: vreme.getHours(), minute: vreme.getMinutes() }),
+        disabled: !izabrano,
+      }}
       secondary={{ label: 'Ne znam vreme', onPress: () => dalje(null) }}>
-      <WheelPicker mode="time" value={vreme} onChange={setVreme} />
+      <WheelPicker mode="time" value={vreme} onChange={(d) => { setVreme(d); setIzabrano(true); }} />
     </OnboardingStep>
   );
 }

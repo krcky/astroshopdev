@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { View, type StyleProp, type TextStyle } from 'react-native';
 import Animated, { Easing, useAnimatedProps } from 'react-native-reanimated';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
-import { ISKOK } from '@/components/prica/crtezi';
+import { Text } from '@/components/ui/text';
+import { ISKOK, Pojava } from '@/components/prica/crtezi';
 import { useNapredak, useSekunde } from '@/components/prica/sat';
+import { NATPIS_SAZVEZDJA, POPUNA_SAZVEZDJA, vrhNatpisaSazvezdja } from '@/lib/prica-znaka';
 import type { Sazvezdje as Podaci } from '@/lib/sazvezdja';
 
 const AG = Animated.createAnimatedComponent(G);
@@ -12,8 +15,6 @@ const ACircle = Animated.createAnimatedComponent(Circle);
 
 /** Crtanje linija — isto ublazavanje kao crtezi dnevne price. */
 const CRTANJE = Easing.bezierFn(0.5, 0, 0.2, 1);
-/** Koliko sazvezdje zauzima od manje stranice prostora (ostatak su pozadinske zvezde). */
-const POPUNA = 0.8;
 
 /** Poluprecnik zvezde po magnitudi, u jedinicama sazvezdja (veca stranica = 1). */
 const poluprecnik = (m: number) => Math.max(0.0035, (5.4 - m) * 0.0034);
@@ -22,21 +23,36 @@ const poluprecnik = (m: number) => Math.max(0.0035, (5.4 - m) * 0.0034);
  * SAZVEZDJE ZNAKA na pravim polozajima (`lib/sazvezdja.ts`): pozadinske zvezde se pojave i trepere,
  * zvezde sazvezdja iskoce jedna za drugom, linije se iscrtaju. Sve po SATU SLIKE (`sat.tsx`) — u
  * videu kadar po kadar, bez sata (slika za deljenje) sve je nacrtano.
+ * `natpis` (latinsko ime, Ivan 1.10.2026) stoji ispod najnize zvezde, kao u zvezdanom atlasu.
  */
-export function Sazvezdje({ podaci, sirina, visina, boja = '#FFFFFF' }: {
+export function Sazvezdje({ podaci, sirina, visina, boja = '#FFFFFF', natpis, natpisKlasa, natpisStil, razmera = 1 }: {
   podaci: Podaci; sirina: number; visina: number; boja?: string;
+  natpis?: string; natpisKlasa?: string; natpisStil?: StyleProp<TextStyle>; razmera?: number;
 }) {
   // Prostor u jedinicama sazvezdja, sa sredinom u (0, 0): sazvezdje zauzme POPUNA manje stranice.
-  const k = (Math.min(sirina, visina) * POPUNA);
+  const k = (Math.min(sirina, visina) * POPUNA_SAZVEZDJA);
   const vw = sirina / k;
   const vh = visina / k;
   const grupe = [0, 1, 2].map((g) => podaci.pozadina.filter((_, i) => i % 3 === g));
+  const najnize = Math.max(...podaci.zvezde.map((z) => z[1]));
   return (
-    <Svg width={sirina} height={visina} viewBox={`${-vw / 2} ${-vh / 2} ${vw} ${vh}`} accessible={false}>
-      {grupe.map((g, i) => <Pozadina key={i} zvezde={g} redni={i} boja={boja} />)}
-      {podaci.linije.map((l, i) => <Linija key={i} tacke={l} kasni={900 + i * 260} boja={boja} />)}
-      {podaci.zvezde.map(([x, y, m], i) => <Zvezda key={i} x={x} y={y} r={poluprecnik(m)} kasni={300 + i * 60} boja={boja} />)}
-    </Svg>
+    <View style={{ width: sirina, height: visina }}>
+      <Svg width={sirina} height={visina} viewBox={`${-vw / 2} ${-vh / 2} ${vw} ${vh}`} accessible={false}>
+        {grupe.map((g, i) => <Pozadina key={i} zvezde={g} redni={i} boja={boja} />)}
+        {podaci.linije.map((l, i) => <Linija key={i} tacke={l} kasni={900 + i * 260} boja={boja} />)}
+        {podaci.zvezde.map(([x, y, m], i) => <Zvezda key={i} x={x} y={y} r={poluprecnik(m)} kasni={300 + i * 60} boja={boja} />)}
+      </Svg>
+      {!!natpis && (
+        <Pojava
+          kasni={1300}
+          style={{
+            position: 'absolute', left: 0, right: 0, alignItems: 'center',
+            top: vrhNatpisaSazvezdja(najnize, sirina, visina, POPUNA_SAZVEZDJA, NATPIS_SAZVEZDJA.razmak * razmera),
+          }}>
+          <Text className={natpisKlasa} style={natpisStil}>{natpis}</Text>
+        </Pojava>
+      )}
+    </View>
   );
 }
 

@@ -165,7 +165,9 @@ export function usePricaDana(): PricaDana | null {
       faza,
       znak,
       naslov: naslovMeseca(faza.name, SIGN_CASES[znak.key].loc),
-      sledeca: `${faza.next.name} · ${datum(faza.next.at, { dan: true })}`,
+      // "Sledi:" (UX recenzija 1.10.2026): bez toga je "Mesec danas · Poslednja četvrt · Sub, 3. okt"
+      // u istom redu pisalo "danas" i drugi dan, pa se citalo kao greska.
+      sledeca: `Sledi: ${faza.next.name}, ${datum(faza.next.at, { dan: true })}`,
       zaTebe: hitTekst?.title
         ? { naslov: hitTekst.title, tekst: hitTekst.body ? prveRecenice(hitTekst.body, 1) : '' }
         : null,

@@ -10,13 +10,11 @@ import { Button } from '@/components/ui/button';
 import { dnoLista } from '@/components/sheet';
 import { Text } from '@/components/ui/text';
 import { MOZE_CUVANJE, sacuvajUFotografije } from '@/components/prica/platno-videa';
-import { KrugNapretka, podeliVideo, procenat } from '@/components/prica/video-traka';
-import { dayKey } from '@/lib/transits';
+import { KrugNapretka, podeliVideo, procenat, useKljucVidea } from '@/components/prica/video-traka';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
-import { useDanas } from '@/store/danas';
 import { PROBNI_BUILD } from '@/store/dev';
-import { useVideoDana } from '@/store/video-price';
+import { useVideo, type VrstaVidea } from '@/store/video-price';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 
@@ -29,12 +27,14 @@ import { neutral } from '@/theme/tokens';
  * pokrete" video ne krece sam.
  */
 export default function VideoPriceEkran() {
+  // `?vrsta=znak` — video price o znaku (1.10.2026); bez nje dnevni.
   // Probni build: `?proba=1` pokazuje video napravljen na `/dev-video` (bez naloga).
-  const { proba } = useLocalSearchParams<{ proba?: string }>();
+  const { proba, vrsta: v0 } = useLocalSearchParams<{ proba?: string; vrsta?: string }>();
+  const vrsta: VrstaVidea = v0 === 'znak' ? 'znak' : 'dan';
   const nalog = useAuthStore((s) => s.user?.id ?? null);
   const uid = PROBNI_BUILD && proba === '1' ? 'proba' : nalog;
-  const dan = dayKey(useDanas());
-  const v = useVideoDana(uid, dan);
+  const v = useVideo(uid, vrsta, useKljucVidea(vrsta));
+  const dnevni = vrsta === 'dan';
   const insets = useSafeAreaInsets();
   const { height: H } = useWindowDimensions();
   const visina = Math.min(460, H * 0.52);
@@ -43,10 +43,11 @@ export default function VideoPriceEkran() {
     // Dno kao svaki list visine sadrzaja (`dnoLista`): sistem vec ostavlja umetak ispod.
     <View style={[{ paddingTop: 28, paddingHorizontal: 20, alignItems: 'center' }, dnoLista(insets.bottom)]}>
       <Text className={cn('text-center text-[22px] leading-[28px]', tezina('naslovStrane'))}>Tvoj video</Text>
+      <Text className="mt-0.5 text-center text-[14px] leading-[19px] text-muted-foreground">{dnevni ? 'Priča dana' : 'Priča o tvom znaku'}</Text>
       {v?.stanje === 'gotov' && v.uri ? (
         <>
           <Pregled uri={v.uri} visina={visina} />
-          <Button onPress={() => podeliVideo(v.uri!)} className="mt-6 self-stretch" accessibilityLabel="Podeli video">
+          <Button onPress={() => podeliVideo(v.uri!, vrsta)} className="mt-6 self-stretch" accessibilityLabel="Podeli video">
             <View className="flex-row items-center gap-2">
               <Share size={19} color={neutral.white} strokeWidth={2} />
               <Text>Podeli video</Text>
@@ -54,7 +55,9 @@ export default function VideoPriceEkran() {
           </Button>
           {MOZE_CUVANJE && <Sacuvaj uri={v.uri} />}
           <Text className="mt-3 text-center text-[13px] leading-[18px] text-muted-foreground">
-            {MOZE_CUVANJE ? `U aplikaciji je do kraja dana, a u ${GALERIJA_U} ostaje.` : 'U aplikaciji je do kraja dana.'}
+            {dnevni
+              ? (MOZE_CUVANJE ? `U aplikaciji je do kraja dana, a u ${GALERIJA_U} ostaje.` : 'U aplikaciji je do kraja dana.')
+              : (MOZE_CUVANJE ? `U aplikaciji je dok ne napraviš nov, a u ${GALERIJA_U} ostaje.` : 'U aplikaciji je dok ne napraviš nov.')}
           </Text>
         </>
       ) : v?.stanje === 'pravi' ? (
@@ -69,8 +72,10 @@ export default function VideoPriceEkran() {
         <View style={{ paddingVertical: 36 }}>
           <Text className="px-4 text-center text-[15px] leading-[22px] text-muted-foreground">
             {v?.stanje === 'greska'
-              ? 'Video nije uspeo. Otvori priču dana i pokušaj ponovo: dugme „Podeli“, pa „Cela priča, video“.'
-              : 'Danas još nema videa. Napravićeš ga iz priče dana: dugme „Podeli“, pa „Cela priča, video“.'}
+              ? `Video nije uspeo. Otvori ${dnevni ? 'priču dana' : 'priču o znaku'} i pokušaj ponovo: dugme „Podeli“, pa „Cela priča, video“.`
+              : dnevni
+                ? 'Danas još nema videa. Napravićeš ga iz priče dana: dugme „Podeli“, pa „Cela priča, video“.'
+                : 'Video znaka još nije napravljen. Napravićeš ga iz priče o znaku (tab „Ti“): dugme „Podeli“, pa „Cela priča, video“.'}
           </Text>
         </View>
       )}

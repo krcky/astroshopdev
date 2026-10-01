@@ -217,7 +217,7 @@ export default function MoonScreen() {
         </View>
         <Text variant="title" className="mt-5 text-center">{naslovMeseca(moonPhase(date).name, SIGN_CASES[znak.key].loc)}</Text>
         <Text variant="muted" className="mt-1 text-center">
-          {formatIllumination(stanje.illumination)} · {stanje.lunarDay}. lunarni dan
+          {formatIllumination(stanje.illumination)} osvetljen · {stanje.lunarDay}. lunarni dan
         </Text>
         {prelazak && <Text variant="muted" className="text-center">{prelazak}</Text>}
       </View>

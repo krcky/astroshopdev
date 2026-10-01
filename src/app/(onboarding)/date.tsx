@@ -15,6 +15,9 @@ export default function BirthDate() {
       ? new Date(draft.date.year, draft.date.month - 1, draft.date.day, 12, 0, 0)
       : DEFAULT
   );
+  // Tockic pocinje na 1. 1. 2000 — "Nastavi" se pali tek kad ga korisnik pomeri, inace bi
+  // brz dodir dao kartu za izmisljen datum, bez ijedne poruke (UX recenzija 1.10.2026).
+  const [izabran, setIzabran] = React.useState(!!draft.date);
 
   const next = () => {
     draft.set({
@@ -28,8 +31,8 @@ export default function BirthDate() {
       exit={{ kind: 'cancel', onPress: () => router.replace('/welcome') }}
       icon={CalendarDays}
       title="Datum rođenja"
-      primary={{ label: 'Nastavi', onPress: next }}>
-      <WheelPicker mode="date" value={value} onChange={setValue} maximumDate={new Date()} />
+      primary={{ label: izabran ? 'Nastavi' : 'Izaberi datum', onPress: next, disabled: !izabran }}>
+      <WheelPicker mode="date" value={value} onChange={(d) => { setValue(d); setIzabran(true); }} maximumDate={new Date()} />
     </OnboardingStep>
   );
 }

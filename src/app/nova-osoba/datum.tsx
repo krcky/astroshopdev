@@ -13,6 +13,8 @@ export default function NovaOsobaDatum() {
   const [datum, setDatum] = React.useState(() =>
     nacrt.datum ? new Date(nacrt.datum.year, nacrt.datum.month - 1, nacrt.datum.day, 12) : new Date(2000, 0, 1, 12)
   );
+  // Kao u onboardingu: "Nastavi" tek kad se tockic pomeri (pocetni 1. 1. 2000 nije odgovor).
+  const [izabran, setIzabran] = React.useState(!!nacrt.datum);
 
   if (!nacrt.ime) return <Redirect href="/nova-osoba" />;
 
@@ -27,8 +29,8 @@ export default function NovaOsobaDatum() {
       icon={CalendarDays}
       title="Datum rođenja"
       note={NAPOMENA_PODACI}
-      primary={{ label: 'Nastavi', onPress: dalje }}>
-      <WheelPicker mode="date" value={datum} onChange={setDatum} maximumDate={new Date()} />
+      primary={{ label: izabran ? 'Nastavi' : 'Izaberi datum', onPress: dalje, disabled: !izabran }}>
+      <WheelPicker mode="date" value={datum} onChange={(d) => { setDatum(d); setIzabran(true); }} maximumDate={new Date()} />
     </OnboardingStep>
   );
 }

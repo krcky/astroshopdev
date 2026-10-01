@@ -116,6 +116,9 @@ function PitajCoveka() {
  */
 function RedPitanja({ p }: { p: Pitanje }) {
   const novo = neprocitan(p);
+  // Nacrt (nije placeno, astrolog ga ne vidi) se izdvaja od poslatih (UX recenzija
+  // 1.10.2026): do tada je "Nije poslato" izgledalo isto kao "Odgovoreno", bez akcije.
+  const nacrt = p.status === 'draft';
   // Pitanje o drugoj osobi: "Ana" ili "Ja i Ana" ispred stanja (29.9.2026).
   const o = oKome(p);
   return (
@@ -130,11 +133,12 @@ function RedPitanja({ p }: { p: Pitanje }) {
         <Text variant="row" numberOfLines={2}>{p.tekst}</Text>
         <View className="mt-1 flex-row items-center gap-1.5">
           {novo && <View className="h-2 w-2 rounded-full" style={{ backgroundColor: brand.indigo }} />}
-          <Text variant="caption" className={cn(novo && cn('text-foreground', tezina('izabranRed')))}>
+          <Text variant="caption" className={cn((novo || nacrt) && cn('text-foreground', tezina('izabranRed')))}>
             {o ? `${o} · ` : ''}{natpisStatusa(p)} · {datumPitanja(p)}
           </Text>
         </View>
       </View>
+      {nacrt && <Text variant="muted" className="text-foreground">Završi</Text>}
       <ChevronRight size={18} color={neutral.inkSubtle} />
     </Pressable>
   );
