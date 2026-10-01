@@ -812,7 +812,8 @@ ENGLESKI (1.10.2026): `src/i18n/en/` je CEO recnik (tip `Recnik` — TS pada cim
 profilu, sekcija "Test", SAMO u probnom buildu: tekstovi astrologa (tranziti, natal, lunarni, prica o znaku,
 simbolika) su jos samo na srpskom. Jezik se pamti na telefonu (`store/jezik.ts`); jezik telefona ga NE bira —
 bez izbora je srpski. Promena jezika sklapa navigaciju iznova (`key` na `Stack` u `_layout.tsx`). Naslov iz
-korpusa se poredi sa SRPSKIM imenima (`tekstReda`). Pojmovnik i glas: `docs/PREVOD.md`.
+korpusa se poredi sa SRPSKIM imenima (`tekstReda`). ODGOVOR ASTROLOGA JE NA SRPSKOM (Ivan, 1.10.2026): en, sl i mk to
+kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. Pojmovnik i glas: `docs/PREVOD.md`.
 VAN RECNIKA, namerno: korpus i tekst sa sajta (`simbolika.ts`, `znak-opis-podaci.ts`, `traits.ts` — drugi
 korak), dev ekrani, panel astrologa, mejl sa kodom (Supabase sablon), nativni tekst (`app.json`, Swift/Kotlin).
 SNIMAK KARTE ZA ASTROLOGA (`pitanja.ts`) uzima imena iz SRPSKOG recnika po kljucu, ne iz tekuceg — panel je

@@ -204,7 +204,6 @@ export const onboarding = {
     primerDanNaslov: 'Tvoj dan',
     primerDanTekst: 'Horoskop za danas je spreman.',
     primerOdgovorTekst: 'Odgovorio je na tvoje pitanje.',
-    primerAspektTekst: 'Venera je u trigonu sa tvojim Suncem.',
     sada: 'sada',
     preSat: '1 h',
     juce: 'juče',

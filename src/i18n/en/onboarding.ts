@@ -195,7 +195,6 @@ export const onboarding: Recnik['onboarding'] = {
     primerDanNaslov: 'Your day',
     primerDanTekst: "Today's horoscope is ready.",
     primerOdgovorTekst: 'Answered your question.',
-    primerAspektTekst: 'Venus is trine your Sun.',
     sada: 'now',
     preSat: '1h ago',
     juce: 'yesterday',

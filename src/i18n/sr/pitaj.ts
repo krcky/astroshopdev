@@ -43,7 +43,8 @@ export const pitaj = {
   greske: {
     prazno: 'Pitanje je prazno. Napiši šta te zanima.',
     predugo: (max: number) => `Pitanje je duže od ${max} znakova. Skrati ga pa pošalji.`,
-    nemaKredita: 'Plaćeno pitanje je već iskorišćeno. Osveži stranu pa probaj ponovo.',
+    /** Aplikacija je mislila da ima placeno pitanje (kredit), a server kaze da je vec iskorisceno (npr. sa drugog telefona). */
+    nemaKredita: 'Plaćeno pitanje je već iskorišćeno, na primer sa drugog telefona. Ovo pitanje možeš da platiš.',
     nemaNacrta: 'Ovo pitanje je već poslato.',
     nemaOsobe: 'Ova osoba više nije na tvojoj listi. Izaberi o kome je pitanje pa pošalji.',
     nemaNaloga: 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.',

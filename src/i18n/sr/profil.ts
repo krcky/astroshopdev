@@ -46,7 +46,7 @@ export const profil = {
     josNijeMoguceNaslov: 'Još nije moguće',
     josNijeMoguceTekst: 'Kupovina u aplikaciji još nije uključena.',
     nemaPretplateNaslov: 'Nema pretplate',
-    nemaPretplateTekst: 'Na ovom nalogu prodavnice nema pretplate za Astroshop.',
+    nemaPretplateTekst: 'Na ovom nalogu prodavnice nema pretplate za Astro Shop.',
     proveraNijeUspelaNaslov: 'Provera nije uspela',
     proveraNijeUspelaTekst: 'Pokušaj ponovo za koji trenutak.',
     /** Test prekidac — samo u probnom buildu. */
@@ -90,7 +90,7 @@ export const profil = {
     nijeUkljucena: 'Kupovina u aplikaciji još nije uključena.',
     kupovinaNijeUspela: 'Kupovina nije uspela. Pokušaj ponovo za koji trenutak.',
     kupovinaCeka: 'Kupovina čeka odobrenje. Premium se uključuje čim stigne.',
-    nemaPretplate: 'Na ovom nalogu prodavnice nema pretplate za Astroshop.',
+    nemaPretplate: 'Na ovom nalogu prodavnice nema pretplate za Astro Shop.',
     proveraNijeUspela: 'Provera nije uspela. Pokušaj ponovo za koji trenutak.',
     probaj: (dana: number) => `Probaj ${gramatika.dana(dana)} besplatno`,
     pretplatiSe: 'Pretplati se',

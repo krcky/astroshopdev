@@ -158,6 +158,9 @@ export default function PitanjeNovo() {
       osvezi();
     } catch (e) {
       setPoruka(porukaGreske((e as Error)?.message));
+      // Npr. `nema_kredita`: broj placenih pitanja na telefonu je bio zastareo — posle osvezavanja
+      // dugme sam postane "Nastavi na plaćanje".
+      osvezi();
     }
     setSaljem(false);
   };

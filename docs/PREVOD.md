@@ -110,3 +110,9 @@ when it matters, US ("color", "favorite").
 
 Planet, sign and aspect names come from `t.nebo` — never re-type them. `nebo.uZnaku(k)` = "in Leo",
 `nebo.uZnak(k)` = "into Leo".
+
+### "Pitaj astrologa" na drugim jezicima (Ivan, 1.10.2026)
+
+Astrolog odgovara glasom NA SRPSKOM. U engleskom, slovenačkom i makedonskom rečniku to se kaže otvoreno, u
+postojećim rečenicama (`pitaj.uvod.glasovno`, `pitaj.pitanje.ceka`, `danas.tumacenje.pitajOpis`): "…glasovnom
+porukom, na srpskom…". Hrvatski i bosanski to ne trebaju — srpski razumeju. Tab se ne sakriva.

@@ -38,7 +38,7 @@ export const pitaj: Recnik['pitaj'] = {
   greske: {
     prazno: 'Your question is empty. Write what you want to know.',
     predugo: (max) => `Your question is longer than ${max} characters. Shorten it, then send.`,
-    nemaKredita: 'This paid question has already been used. Refresh the page and try again.',
+    nemaKredita: 'Your prepaid question has already been used, for example on another phone. You can pay for this one.',
     nemaNacrta: 'This question has already been sent.',
     nemaOsobe: 'This person is no longer on your list. Choose who the question is about, then send.',
     nemaNaloga: 'Your sign-in has expired. Close the app and open it again.',
