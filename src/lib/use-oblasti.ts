@@ -10,6 +10,7 @@ import * as React from 'react';
 import type { NatalChart } from '@/lib/natal';
 import { aktivniTranziti, LISTA_ORB, lunacijaDana, rasporedi, type OblastiDana } from '@/lib/oblasti';
 import { fetchTransitTones } from '@/lib/transit-texts';
+import { useJezik } from '@/i18n/use-t';
 
 type Profil = { chart: NatalChart; timeUnknown: boolean } | null | undefined;
 
@@ -43,8 +44,12 @@ export function useOblastiDana(profil: Profil, date: Date): OblastiDana | null {
     return () => { otkazano = true; };
   }, [potpis]);
 
+  // Jezik u zavisnostima: `rasporedi` sklapa natpise (ocene, trajanje) — posle promene jezika
+  // racuna se iznova, jer se navigacija NE sklapa iznova (`_layout.tsx`).
+  const jezik = useJezik();
   return React.useMemo(
     () => (osnova ? rasporedi(osnova.tranziti, osnova.lunacija, tonovi, undefined, undefined, timeUnknown, osnova.zaListu) : null),
-    [osnova, tonovi, timeUnknown]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [osnova, tonovi, timeUnknown, jezik]
   );
 }

@@ -88,6 +88,9 @@ export function pretplati(f: () => void): () => void {
 }
 
 /** Recnik tekuceg jezika. Van komponente; u komponenti `useT()`. */
+/** Recnik datog jezika (srpski ako ga nema). */
+export const recnikZa = (j: Jezik): Recnik => recnici[j] ?? sr;
+
 export function tr(): Recnik {
   return recnici[tekuci] ?? sr;
 }

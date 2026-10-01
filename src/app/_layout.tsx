@@ -2,7 +2,7 @@ import '@/global.css';
 
 import * as React from 'react';
 import { Platform } from 'react-native';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -99,7 +99,17 @@ export default function RootLayout() {
   const hydrated = useProfileStore((s) => s.hydrated);
   // Jezik sa diska (pravilo 26): prvi kadar posle uvoda mora biti na izabranom jeziku.
   const jezikHydrated = useJezikStore((s) => s.hydrated);
+  // PROMENA JEZIKA (Ivan, 2.10.2026): navigacija se sklapa iznova (`key` dole) — React Compiler
+  // pamti tekst koji sklapaju funkcije iz `lib/`, pa samo ponovno crtanje ne bi prevelo sve.
+  // Posle toga ide se na KAPIJU (`/`): sama obnova je otvarala "Unesi kod" bez nazad.
   const jezik = useJezik();
+  const prethodniJezik = React.useRef(jezik);
+  React.useEffect(() => {
+    if (prethodniJezik.current === jezik) return;
+    prethodniJezik.current = jezik;
+    const t = setTimeout(() => router.replace('/'), 0);
+    return () => clearTimeout(t);
+  }, [jezik]);
   const [uvod, setUvod] = React.useState(true);
   const krajUvoda = React.useCallback(() => setUvod(false), []);
   // Aplikacija se montira tek kad uvod krene — njeno prvo crtanje zauzme JS, pa
@@ -125,8 +135,7 @@ export default function RootLayout() {
             <ObavestenjeVidea />
             <Animated.View style={[{ flex: 1 }, zumStil]}>
               {pismo && aplikacija && (
-                // `key` = jezik: posle promene jezika cela navigacija se sklopi iznova (kapija
-                // vodi dalje), pa nijedan montiran ekran ni `useMemo` ne ostane na starom jeziku.
+                // `key` = jezik: posle promene jezika sve se sklopi iznova, pa kapija (efekat gore).
                 <Stack
                   key={jezik}
                   screenOptions={{
