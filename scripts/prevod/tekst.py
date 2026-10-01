@@ -1,6 +1,6 @@
 """
 Isto sto i Excel (`excel.py`), ali kao TEKST — Gemini Excel ne procita uvek, a CSV i tekst da.
-Za svaki jezik: `<jezik>.csv` (ceo list) i `<jezik>-deo-N.txt` (do 160 stavki, za lepljenje u razgovor).
+Za svaki jezik: `<jezik>.csv` (ceo list) i `<jezik>-deo-N.csv` / `.txt` (do 160 stavki, deo po deo).
 Vazne stavke idu prve.
 
     npx tsx scripts/prevod/izvoz.ts > /tmp/prevod.json
@@ -36,6 +36,11 @@ def main(ulaz: str, folder: str) -> None:
                     "",
                 ]
             open(os.path.join(folder, f"{kod}-deo-{n}.txt"), "w", encoding="utf-8").write("\n".join(linije))
+            with open(os.path.join(folder, f"{kod}-deo-{n}.csv"), "w", encoding="utf-8", newline="") as f:
+                w = csv.writer(f)
+                w.writerow(["kljuc", "gde se vidi", "srpski", "prevod", "vazno"])
+                for r in deo:
+                    w.writerow([r["kljuc"], r["kontekst"], r["sr"], r[kod], "DA" if r["vazno"] else ""])
         print(f"{ime}: {kod}.csv + {len(delovi)} delova")
 
 
