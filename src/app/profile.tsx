@@ -6,8 +6,9 @@ import * as WebBrowser from 'expo-web-browser';
 import { Camera, ChevronRight, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { dostupniJezici, IME_JEZIKA, tr, useJezik, useT } from '@/i18n';
+import { dostupniJezici, tr, useJezik, useT } from '@/i18n';
 import { useJezikStore } from '@/store/jezik';
+import { natpis as natpisJezika, SpisakJezika } from '@/components/izbor-jezika';
 import { VrednostReda } from '@/components/ui/vrednost-reda';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
 import { TvojiLjudi } from '@/components/tvoji-ljudi';
@@ -66,20 +67,19 @@ export default function ProfileSheet() {
   const t = useT();
   const tp = t.profil.profil;
   const jezik = useJezik();
+  const jezici = dostupniJezici();
   const izaberiJezikUStore = useJezikStore((s) => s.izaberi);
-  // Imena jezika su na SVOM jeziku ("English", "Srpski") i ne prevode se.
+  // Android: `Alert` prima najvise tri dugmeta, a jezika je sest — zato nas spisak.
+  const [spisakJezika, setSpisakJezika] = React.useState(false);
+  // Imena jezika su na SVOM jeziku ("English", "Srpski") i ne prevode se; uz njih zastava.
   const izaberiJezik = () => {
-    const jezici = dostupniJezici();
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: [...jezici.map((j) => IME_JEZIKA[j]), t.opste.otkazi], cancelButtonIndex: jezici.length },
+        { title: tp.jezik, options: [...jezici.map(natpisJezika), t.opste.otkazi], cancelButtonIndex: jezici.length },
         (i) => { if (i < jezici.length) izaberiJezikUStore(jezici[i]); },
       );
     } else {
-      Alert.alert(tp.jezik, undefined, [
-        ...jezici.map((j) => ({ text: IME_JEZIKA[j], onPress: () => izaberiJezikUStore(j) })),
-        { text: t.opste.otkazi, style: 'cancel' as const },
-      ]);
+      setSpisakJezika(true);
     }
   };
   const hydrated = useProfileStore((s) => s.hydrated);
@@ -258,13 +258,6 @@ export default function ProfileSheet() {
             {premiumRucno !== null && (
               <ListRow title={tp.vratiNaServer} chevron={false} onPress={() => setPremiumRucno(null)} />
             )}
-            {/* Jezik (pravilo 26): samo u probnom buildu dok korpus nije preveden. */}
-            <ListRow
-              title={tp.jezik}
-              subtitle={tp.jezikIspod}
-              trailing={<VrednostReda>{IME_JEZIKA[jezik]}</VrednostReda>}
-              onPress={izaberiJezik}
-            />
           </Group>
         </>
       )}
@@ -272,6 +265,14 @@ export default function ProfileSheet() {
       {/* Nalog: email i odjava. Brisanje je na listu "Nalog". */}
       <GroupHeader variant="oznaka" className={NASLOV}>{tp.nalog}</GroupHeader>
       <Group className={GRUPA}>
+        {/* Jezik (pravilo 26) — za sve, kao i na prvom ekranu (Ivan, 2.10.2026). Napomena o
+            tekstovima astrologa samo kad jezik nije srpski: korpus je za sada samo srpski. */}
+        <ListRow
+          title={tp.jezik}
+          subtitle={jezik === 'sr' ? undefined : tp.jezikIspod}
+          trailing={<VrednostReda>{natpisJezika(jezik)}</VrednostReda>}
+          onPress={izaberiJezik}
+        />
         <ListRow title={tp.nalog} subtitle={tp.nalogIspod} onPress={() => router.push('/nalog')} />
         <ListRow
           title={tp.odjaviSe}
@@ -281,6 +282,13 @@ export default function ProfileSheet() {
           trailing={odjava ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
         />
       </Group>
+      <SpisakJezika
+        otvoren={spisakJezika}
+        jezik={jezik}
+        jezici={jezici}
+        onIzbor={izaberiJezikUStore}
+        onClose={() => setSpisakJezika(false)}
+      />
 
       {/* Pomoc (B10 iz UX recenzije, Ivan 1.10.2026): mejl podrsci, sa verzijom aplikacije i
           telefona u telu poruke. Adresa je ista kao na sajtu (`web/podrska.html`). Obavestenja

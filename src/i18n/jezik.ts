@@ -41,6 +41,14 @@ export const IME_JEZIKA: Record<Jezik, string> = {
   sr: 'Srpski', hr: 'Hrvatski', bs: 'Bosanski', sl: 'Slovenščina', mk: 'Македонски', en: 'English',
 };
 
+/**
+ * Zastava uz ime jezika u izboru (emoji, crta ih sistem). Engleski nosi britansku — evropsko
+ * trziste; pravopis je americki (`docs/PREVOD.md`), ali zastava nije izjava o pravopisu.
+ */
+export const ZASTAVA: Record<Jezik, string> = {
+  sr: '🇷🇸', hr: '🇭🇷', bs: '🇧🇦', sl: '🇸🇮', mk: '🇲🇰', en: '🇬🇧',
+};
+
 /** Jezici za koje recnik postoji, redom za izbor. */
 export const dostupniJezici = (): Jezik[] => JEZICI.filter((j) => recnici[j] !== undefined);
 

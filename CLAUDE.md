@@ -808,9 +808,12 @@ podatak sa imenom ima getter (`SIGNS`, `BODIES`, `ASPECTS`, `POINTS`, `ODNOSI`, 
 `sign.name` cita recnik). Cela recenica sa promenljivom je JEDNA funkcija u recniku (drugi jezik ima drugi
 red reci); mnozina `t.gramatika`, znak u padezu `t.nebo.uZnaku(key)` / `uZnak(key)`, datum samo kroz
 `lib/horoscope.ts`. Srpski je OSNOVA: drugi jezik je dopuna (`registrujJezik`), sto fali uzima se iz srpskog.
-ENGLESKI (1.10.2026): `src/i18n/en/` je CEO recnik (tip `Recnik` — TS pada cim kljuc fali). Izbor jezika je u
-profilu, sekcija "Test", SAMO u probnom buildu: tekstovi astrologa (tranziti, natal, lunarni, prica o znaku,
-simbolika) su jos samo na srpskom. Jezik se pamti na telefonu (`store/jezik.ts`); jezik telefona ga NE bira —
+ENGLESKI (1.10.2026): `src/i18n/en/` je CEO recnik (tip `Recnik` — TS pada cim kljuc fali). IZBOR JEZIKA (Ivan, 2.10.2026) je za SVE: na
+prvom ekranu (`welcome.tsx`) na DNU, centrirano — `components/izbor-jezika` (iOS 26: SwiftUI `Menu` u sistemskom
+staklu + `Picker`, kvacicu crta sistem; Android/iOS < 26: kapsula + nas spisak, jer Android `Alert` prima
+najvise 3 dugmeta) — i u profilu, sekcija "Nalog". Uz ime jezika zastava (`ZASTAVA` u `i18n/jezik.ts`).
+Tekstovi astrologa (tranziti, natal, lunarni, prica o znaku, simbolika) su jos samo na srpskom — profil to
+kaze ispod reda kad jezik nije srpski. Jezik se pamti na telefonu (`store/jezik.ts`); jezik telefona ga NE bira —
 bez izbora je srpski. Promena jezika sklapa navigaciju iznova (`key` na `Stack` u `_layout.tsx`). Naslov iz
 korpusa se poredi sa SRPSKIM imenima (`tekstReda`). ODGOVOR ASTROLOGA JE NA SRPSKOM (Ivan, 1.10.2026): en, sl i mk to
 kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. HRVATSKI I BOSANSKI (1.10.2026): `src/i18n/hr/`, `src/i18n/bs/`, isto CELI

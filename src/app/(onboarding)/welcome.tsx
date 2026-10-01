@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/text';
 import { ScreenBackdrop } from '@/components/screen';
 import { useDraft } from '@/store/draft';
 import { useT } from '@/i18n';
+import { IzborJezika } from '@/components/izbor-jezika';
 
 /**
  * Prvi ekran bez naloga (Ivan, 29.9.2026): krug loga koji se vrti, ime,
@@ -49,6 +50,11 @@ export default function Welcome() {
               </Text>
             </Pressable>
           </View>
+        </View>
+        {/* Jezik na DNU ekrana, centrirano (Ivan, 2.10.2026): zastava + ime, meni sa svih sest
+            jezika. Bez izbora je srpski. */}
+        <View className="items-center pb-4">
+          <IzborJezika />
         </View>
       </SafeAreaView>
       <ScreenBackdrop />
