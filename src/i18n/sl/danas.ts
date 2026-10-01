@@ -19,6 +19,12 @@ const rodImena = (ime: string): Rod => {
 /** "natalni Mars", "natalna Luna", "natalno Sonce". */
 const natalni = (rod: Rod) => ({ m: 'natalni', z: 'natalna', s: 'natalno' })[rod];
 
+/** "v Levu" iz imena znamenja (dobi samo ime); "v znamenju Lev" bi zahteval rodilnik. */
+const vZnamenju = (ime: string) => {
+  const z = Object.values(nebo.znaci).find((x) => x.ime === ime);
+  return z ? `v ${z.lokativ}` : `v znamenju ${ime}`;
+};
+
 export const danas: Recnik['danas'] = {
   tabovi: {
     danas: 'Danes',
@@ -180,7 +186,7 @@ export const danas: Recnik['danas'] = {
 
   horoskop: {
     nebo: (znak, faza, retrogradni) =>
-      `Luna v znamenju ${znak} · ${faza}` + (retrogradni.length ? ` · retrogradni: ${retrogradni.join(', ')}` : ''),
+      `Luna ${vZnamenju(znak)} · ${faza}` + (retrogradni.length ? ` · retrogradni: ${retrogradni.join(', ')}` : ''),
   },
 
   ui: {

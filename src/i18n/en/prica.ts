@@ -2,7 +2,7 @@ import type { Recnik } from '../sr';
 import { nebo } from './nebo';
 
 /**
- * STORIES (rules 23 and 25): story of the day, your sign's story, share cards, video.
+ * STORIES (rules 23 and 25): story of the day, your sign’s story, share cards, video.
  *
  * TWO VOICES, ON PURPOSE: a slide in the story speaks to the user ("Your day", "Going your way", "For you");
  * the SHARE CARD and the VIDEO are FIRST PERSON ("My day", "Going my way", "For me") — the user posts them.
@@ -19,6 +19,8 @@ const ELEMENT_PRIDEV = { vatra: 'fire', zemlja: 'earth', vazduh: 'air', voda: 'w
 const KVALITET_PRIDEV = { kardinalan: 'Cardinal', fiksni: 'Fixed', promenljiv: 'Mutable' } as const;
 /** Seasons (Northern Hemisphere), from spring. */
 const DOBA = ['spring', 'summer', 'fall', 'winter'];
+/** Aspect between two planets, as astrologers write it: "Mars conjunct Sun", "Moon opposite Venus". */
+const IZMEDJU: Record<string, string> = { conjunction: 'conjunct', opposition: 'opposite' };
 
 export const prica: Recnik['prica'] = {
   /** Domain — not translated. */
@@ -64,7 +66,7 @@ export const prica: Recnik['prica'] = {
     zaTebe: 'For you',
     /** Caption under the advice: "From the reading for Mars square Sun." */
     izTumacenja: (tranzit) => `From the reading for ${tranzit}.`,
-    savetDana: "Today's advice",
+    savetDana: "Today’s advice",
     /** Button on the last slide, and the share sheet title. */
     podeliSvojDan: 'Share your day',
     procitajCeo: 'Read the full text',
@@ -93,12 +95,12 @@ export const prica: Recnik['prica'] = {
       zavrsava: 'last day',
     },
     /** Transit name: "Mars square Sun" (transiting planet, aspect, natal point). */
-    imeTranzita: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} ${natalna}`,
+    imeTranzita: (tranzitna, aspekt, natalna) => `${tranzitna} ${IZMEDJU[aspekt] ?? aspekt} ${natalna}`,
     /** Next main Moon phase: "Next: Last quarter, Sat, Oct 3". */
     sledi: (faza, datum) => `Next: ${faza}, ${datum}`,
   },
 
-  /** YOUR SIGN'S STORY. */
+  /** YOUR SIGN’S STORY. */
   znak: {
     /** After "Astro Shop" in the story header, and the video title on the bar. */
     podnaslov: 'Your sign',
@@ -116,7 +118,7 @@ export const prica: Recnik['prica'] = {
     /** Season: `doba` 0 spring … 3 winter, `deo` 0 opens, 1 middle, 2 end. */
     doba: (doba, deo) => {
       const d = DOBA[doba];
-      return [`opens ${d}`, `mid-${d}`, `end of ${d}`][deo];
+      return [`start of ${d}`, `mid-${d}`, `end of ${d}`][deo];
     },
     /** Related signs of the same element: "like Leo and Sagittarius". */
     srodni: (imena) => `like ${imena.join(' and ')}`,
@@ -124,10 +126,10 @@ export const prica: Recnik['prica'] = {
     teloOznaka: (_znakKljuc, ime) => `Body part ruled by ${ime}`,
     /** "Aries is ruled by Mars" (Gemini and Pisces too: "Gemini is ruled by Mercury"). */
     vladarNaslov: (znakKljuc, vladar) => `${nebo.znaci[znakKljuc as ZnakKljuc]?.ime ?? ''} is ruled by ${vladar}`.trim(),
-    /** Instead of the ruler's sign, when the ruler is always in the same sign (Sun in Leo). */
+    /** Instead of the ruler’s sign, when the ruler is always in the same sign (Sun in Leo). */
     vladarMit: { sun: 'The Greeks called it Helios.' },
     /** "In your birth chart Mars is in Taurus." — two signs when birth time is unknown ("in Gemini or Cancer"). */
-    vladarRecenica: (vladar, lokativi, lice = 'ti') => `In ${lice === 'ja' ? 'my' : 'your'} birth chart ${vladar} is in ${lokativi.join(' or ')}.`,
+    vladarRecenica: (vladar, lokativi, lice = 'ti') => `In ${lice === 'ja' ? 'my' : 'your'} birth chart, ${vladar} is in ${lokativi.join(' or ')}.`,
     /** Reading topic for the button: "Sun in Aries" (`uZnaku` = "in Aries"). */
     sunceU: (uZnaku) => `Sun ${uZnaku}`,
     /** Button on the last slide: "Read: Sun in Aries". */
@@ -173,8 +175,8 @@ export const prica: Recnik['prica'] = {
     naslovDana: 'Story of the day',
     /** Notification text: "Story of the day, Wed, Oct 1, 2026." */
     opisDana: (datum) => `Story of the day, ${datum}.`,
-    /** "Your sign's story, Aries." */
-    opisZnaka: (znak) => `Your sign's story, ${znak}.`,
+    /** "Your sign’s story, Aries." */
+    opisZnaka: (znak) => `Your sign’s story, ${znak}.`,
     /** Local notification when the video is done. */
     obavestenjeNaslov: 'Your video is ready',
     obavestenjeTekst: (opis) => `${opis} Tap to share it.`,
@@ -184,10 +186,10 @@ export const prica: Recnik['prica'] = {
 
   /** "Share" in the story: image or video. */
   ponudi: {
-    upravoPravimo: (drugi) => `We're making a video right now: ${drugi}. You can make this one as soon as that one is done.`,
-    sePravi: (procenat) => `Making the video · ${procenat}. We'll let you know when it's done.`,
+    upravoPravimo: (drugi) => `We’re making a video right now: ${drugi}. You can make this one as soon as that one is done.`,
+    sePravi: (procenat) => `Making the video · ${procenat}. We’ll let you know when it’s done.`,
     spreman: 'The video of the whole story is ready.',
-    pravimoOkoMinut: "The video takes about a minute. Keep using the app meanwhile — we'll let you know when it's done.",
+    pravimoOkoMinut: "The video takes about a minute. Keep using the app meanwhile — we’ll let you know when it’s done.",
     ovaSlika: 'This image',
     pogledajVideo: 'Watch video',
     celaPrica: 'Whole story, video',
@@ -200,7 +202,7 @@ export const prica: Recnik['prica'] = {
   traka: {
     pravimo: 'Making your video',
     spreman: 'Your video is ready',
-    nijeUspeo: "The video didn't work",
+    nijeUspeo: "The video didn’t work",
     pokusajIzPrice: 'Try again from the story.',
     /** "Story of the day · 42%" */
     uToku: (naslov, procenat) => `${naslov} · ${procenat}`,
@@ -214,7 +216,7 @@ export const prica: Recnik['prica'] = {
   video: {
     naslov: 'Your video',
     pricaDana: 'Story of the day',
-    pricaOZnaku: "Your sign's story",
+    pricaOZnaku: "Your sign’s story",
     podeliVideo: 'Share video',
     doKrajaDana: 'It stays in the app until the end of the day.',
     doKrajaDanaGalerija: (ios) => `It stays in the app until the end of the day, and in ${ios ? 'Photos' : 'Gallery'} for good.`,
@@ -224,14 +226,14 @@ export const prica: Recnik['prica'] = {
     pravimo: (procenat) => `Making your video · ${procenat}`,
     zaToVreme: 'Keep using the app meanwhile. If you leave it, the video starts over when you come back.',
     nijeUspeo: (dnevni) =>
-      `The video didn't work. Open ${dnevni ? 'the story of the day' : "your sign's story"} and try again: “Share”, then “Whole story, video”.`,
+      `The video didn’t work. Open ${dnevni ? 'the story of the day' : "your sign’s story"} and try again: “Share”, then “Whole story, video”.`,
     nemaDanas: 'No video yet today. Make one from the story of the day: “Share”, then “Whole story, video”.',
-    nemaZnaka: "Your sign's video hasn't been made yet. Make it from your sign's story (the “You” tab): “Share”, then “Whole story, video”.",
-    bezDozvole: (ios) => `Astro Shop isn't allowed to add to ${ios ? 'Photos' : 'Gallery'}.`,
+    nemaZnaka: "Your sign’s video hasn’t been made yet. Make it from your sign’s story (the “You” tab): “Share”, then “Whole story, video”.",
+    bezDozvole: (ios) => `Astro Shop isn’t allowed to add to ${ios ? 'Photos' : 'Gallery'}.`,
     otvoriPodesavanja: 'Open Settings',
     sacuvano: (ios) => `Saved to ${ios ? 'Photos' : 'Gallery'}`,
     sacuvaj: (ios) => `Save to ${ios ? 'Photos' : 'Gallery'}`,
-    nijeSacuvan: "The video wasn't saved. Try again.",
+    nijeSacuvan: "The video wasn’t saved. Try again.",
     /** VoiceOver for the video preview (same for both stories). */
     a11yPregled: 'Story video',
   },

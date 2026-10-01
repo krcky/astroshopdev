@@ -9,6 +9,12 @@ import { nebo } from './nebo';
 /** "2,3°" — decimalna vejica, ena decimalka. */
 const stepenDecimalno = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
 
+/** "v Levu" iz imena znamenja (dobi samo ime); "v znamenju Lev" bi zahteval rodilnik. */
+const vZnamenju = (ime: string) => {
+  const z = Object.values(nebo.znaci).find((x) => x.ime === ime);
+  return z ? `v ${z.lokativ}` : `v znamenju ${ime}`;
+};
+
 const MESECI_PUNO = [
   'januar', 'februar', 'marec', 'april', 'maj', 'junij',
   'julij', 'avgust', 'september', 'oktober', 'november', 'december',
@@ -53,7 +59,7 @@ export const karta: Recnik['karta'] = {
 
   lista: {
     tackaA11y: (ime, deg, min, znak, retro, kuca) =>
-      `${ime}, ${deg}° ${min}' v znamenju ${znak}${retro ? ', retrogradno' : ''}${kuca ? `, ${kuca}. hiša` : ''}`,
+      `${ime}, ${deg}° ${min}' ${vZnamenju(znak)}${retro ? ', retrogradno' : ''}${kuca ? `, ${kuca}. hiša` : ''}`,
     nepoznat: 'Neznano',
     trojkaA11y: (oznaka, tekst, prica, tumacenje) =>
       `${oznaka}: ${tekst}${prica ? `. ${prica}` : tumacenje ? '. Razlaga' : ''}`,
@@ -65,7 +71,7 @@ export const karta: Recnik['karta'] = {
   nebo: {
     naslov: 'Trenutno na nebu',
     infoA11y: 'Kaj je trenutno nebo?',
-    datumA11y: (datum) => `Datum: ${datum} Dotakni se, da izbereš dan.`,
+    datumA11y: (datum) => `Datum: ${datum}. Dotakni se, da izbereš dan.`,
     mestoA11y: (grad) => `Kraj opazovanja: ${grad}. Dotakni se, da ga spremeniš.`,
     dan: 'dan',
     sat: 'ura',
@@ -105,11 +111,11 @@ export const karta: Recnik['karta'] = {
     polozajUZnaku: (z) => `Položaj ${nebo.uZnaku(z)}`,
     stepenOd30: (deg, min) => `${deg}° ${min}' od 30°`,
     mesecPresao: (od, u) =>
-      `Na dan tvojega rojstva je bila Luna ${nebo.uZnaku(od)}, nato pa je prešla ${nebo.uZnak(u)}. Brez časa rojstva ne vemo, v katerem znamenju je bila v trenutku tvojega rojstva, zato razlage ne prikažemo.`,
+      `Na dan tvojega rojstva je bila Luna ${nebo.uZnaku(od)}, nato pa je prešla ${nebo.uZnak(u)}. Brez ure rojstva ne vemo, v katerem znamenju je bila v trenutku tvojega rojstva, zato razlage ne prikažemo.`,
     mesecPresaoOsoba: (od, u) =>
-      `Na dan rojstva je bila Luna ${nebo.uZnaku(od)}, nato pa je prešla ${nebo.uZnak(u)}. Brez časa rojstva ne vemo, v katerem znamenju je bila v trenutku rojstva, zato razlage ne prikažemo.`,
+      `Na dan rojstva je bila Luna ${nebo.uZnaku(od)}, nato pa je prešla ${nebo.uZnak(u)}. Brez ure rojstva ne vemo, v katerem znamenju je bila v trenutku rojstva, zato razlage ne prikažemo.`,
     dodajVreme: 'Dodaj uro rojstva',
-    kucaBezVremena: 'V kateri hiši je planet, je odvisno od natančnega časa rojstva. Ko ga vneseš, bo tu tudi razlaga hiše.',
+    kucaBezVremena: 'V kateri hiši je planet, je odvisno od natančne ure rojstva. Ko jo vneseš, bo tu tudi razlaga hiše.',
     premiumNaslov: 'Tvoja celotna karta',
     premiumNaslovOsoba: 'Celotna karta te osebe',
     premiumOpis: 'Sonce, Luna in ascendent so že odklenjeni. Ostali planeti v znamenjih in hišah ter vsi aspekti so na voljo s Premiumom.',
@@ -154,7 +160,7 @@ export const karta: Recnik['karta'] = {
   neboInfo: {
     naslov: 'Kaj je trenutno nebo?',
     uvod: 'Nebo v tem trenutku, gledano z izbranega kraja: v katerem znamenju so zdaj Sonce, Luna in planeti ter kako stojijo drug proti drugemu. Položaj planetov je enak za vse, kjer koli si. Od kraja so odvisne hiše, 12 delov kroga, ki se premikajo iz minute v minuto.',
-    strelice: 'S puščicami premikaš uro in dan, z dotikom datuma pa izbereš katerikoli dan.',
+    strelice: 'S puščicami premikaš uro in dan, z dotikom datuma pa izbereš kateri koli dan.',
     krug: 'Zunanji obroč je 12 znamenj. Številke od 1 do 12 so hiše, simboli so planeti. Levo je ascendent: znamenje, ki prav zdaj vzhaja na vzhodu. Zgoraj je MC, najvišja točka neba v tem trenutku. Barvne črte v sredini so aspekti, sivi simboli pa so točke.',
     tacke: 'Točke',
     tackeUvod: 'Vozlišče, Lilit in Točka sreče niso nebesna telesa, ampak točke, ki se izračunajo. Črte aspektov se zanje ne rišejo.',

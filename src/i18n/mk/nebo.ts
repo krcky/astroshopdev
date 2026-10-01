@@ -20,6 +20,13 @@ const znaci: Recnik['nebo']['znaci'] = {
   sagittarius: znak('Стрелец'), capricorn: znak('Јарец'), aquarius: znak('Водолија'), pisces: znak('Риби'),
 };
 
+/**
+ * Ime tela kao SUBJEKAT recenice: Сонце i Месечина kao nebeska tela nose clan ("Сонцето влегува
+ * во Вага", "Месечината е во Рак"); planete su imena i ostaju bez clana ("Марс е во Бик").
+ */
+export const subjekat = (ime: string): string =>
+  ime === TELA.sun ? 'Сонцето' : ime === TELA.moon ? 'Месечината' : ime;
+
 export const nebo: Recnik['nebo'] = {
   tela: TELA,
   tacke: { northNode: 'Северен јазол', lilith: 'Лилит', fortune: 'Точка на среќата' },

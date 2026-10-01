@@ -6,6 +6,13 @@ import { nebo } from './nebo';
 /** Rod planete za "retrogradna / retrogradni" — iz `nebo.padeziTela`. */
 const zenska = (kljuc: string) => (nebo.padeziTela as Record<string, { rod: string }>)[kljuc]?.rod === 'z';
 
+/** "natalni Jupiter", "natalna Venera", "natalno Sunce" — rod po imenu tijela (ime stize vec prevedeno). */
+const natalni = (ime: string) => {
+  const kljuc = Object.entries(nebo.tela).find(([, v]) => v === ime)?.[0];
+  const rod = kljuc ? (nebo.padeziTela as Record<string, { rod: string }>)[kljuc]?.rod : 'm';
+  return rod === 'z' ? 'natalna' : rod === 's' ? 'natalno' : 'natalni';
+};
+
 export const danas: Recnik['danas'] = {
   tabovi: {
     danas: 'Danas',
@@ -44,7 +51,7 @@ export const danas: Recnik['danas'] = {
 
   tranzit: {
     ime: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} ${natalna}`,
-    imeNatalni: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} natalni ${natalna}`,
+    imeNatalni: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} ${natalni(natalna)} ${natalna}`,
     ascendent: 'Ascendent',
     mc: 'MC',
     samoDanas: 'Samo danas',

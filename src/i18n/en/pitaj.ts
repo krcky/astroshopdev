@@ -9,7 +9,6 @@ import { mnozina } from './gramatika';
  */
 
 /** Rough timeframe — text only, no deadline and no promise (there is NO deadline, rule 21). */
-const ROK = 'usually within 2–3 business days';
 const ROK_KRATKO = '2–3 business days';
 
 export const pitaj: Recnik['pitaj'] = {
@@ -54,12 +53,12 @@ export const pitaj: Recnik['pitaj'] = {
     uskoro: 'soon',
     /** Paid questions not yet written (credits). */
     krediti: (n) => (n === 1
-      ? 'You have one paid question.'
-      : `You have ${n} ${mnozina(n, 'paid question', 'paid questions')}.`),
+      ? 'You have one prepaid question.'
+      : `You have ${n} ${mnozina(n, 'prepaid question', 'prepaid questions')}.`),
     pitaj: 'Ask',
-    /** Iznad "Postavi pitanje" kad vec ima pitanja (Ivan, 1.10.2026). */
+    /** Above "Ask a question" once there are questions. */
     josJednoNaslov: 'Have a new question?',
-    josJedno: (ime: string) => `Questions are answered by astrologer ${ime}.`,
+    josJedno: (ime: string) => `Astrologer ${ime} answers by voice message, in Serbian.`,
     postavi: 'Ask a question',
     mojaPitanja: 'My questions',
     /** Draft in the list — right side, next to the arrow. */
@@ -89,8 +88,8 @@ export const pitaj: Recnik['pitaj'] = {
       greska: 'Payment didn’t go through. Your question is saved — try again.',
       nedostupno: 'In-app payment isn’t turned on yet. Your question is saved and waiting here.',
     },
-    poslatoNaslov: 'Your question is sent.',
-    poslatoOpis: (ime) => `${ime} answers ${ROK}. The answer will show up in “My questions”.`,
+    poslatoNaslov: 'Your question has been sent.',
+    poslatoOpis: (ime) => `${ime} usually answers within ${ROK_KRATKO}. The answer will show up in “My questions”.`,
     napisi: 'Write a question',
     bezInterneta: 'You need an internet connection to send a question.',
     vecPlaceno: 'This question is already paid for. Once sent, it can’t be changed.',
@@ -125,9 +124,9 @@ export const pitaj: Recnik['pitaj'] = {
     odgovor: 'Answer',
     glasovnaPoruka: 'Voice message',
     /** Must say the answer is in Serbian. */
-    ceka: (ime) => `${ime} answers ${ROK}. The answer will show up here as a voice message, in Serbian.`,
+    ceka: (ime) => `${ime} usually answers within ${ROK_KRATKO}. The answer will show up here as a voice message, in Serbian.`,
     nijePoslato: 'This question hasn’t been sent yet.',
-    vraceno: (ime) => `This question was refunded, so ${ime} won’t receive it.`,
+    vraceno: (ime) => `Your payment for this question was refunded, so ${ime} won’t receive it.`,
   },
 
   /** Voice answer player. */

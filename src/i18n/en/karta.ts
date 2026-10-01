@@ -44,8 +44,8 @@ export const karta: Recnik['karta'] = {
   uKuci: (n) => `in the ${redni(n)} house`,
   /** "Sun in Leo", "Ascendant in Pisces" */
   uZnaku: (ime, z) => `${ime} ${nebo.uZnaku(z)}`,
-  /** "Sun square Mars" — two bodies and the aspect name. */
-  aspekt: (a, aspekt, b) => `${a} ${aspekt} ${b}`,
+  /** "Sun square Mars", "Sun conjunct Moon", "Sun opposite Saturn" — two bodies and the aspect. */
+  aspekt: (a, aspekt, b) => `${a} ${({ conjunction: 'conjunct', opposition: 'opposite' } as Record<string, string>)[aspekt] ?? aspekt} ${b}`,
   /** Aspects card title, uppercase comes from the style: "Aspects  ·  12". */
   aspektiNaslov: (n) => `Aspects  ·  ${n}`,
   /** Sign elements (Moon screen, "What is a birth chart?" sheet). */
@@ -56,7 +56,7 @@ export const karta: Recnik['karta'] = {
     naslov: 'Birth chart',
   },
 
-  /** `components/natalna-karta-prikaz.tsx` — whole birth chart ("You" and a person's page). */
+  /** `components/natalna-karta-prikaz.tsx` — whole birth chart ("You" and a person’s page). */
   prikaz: {
     infoA11y: 'What is a birth chart?',
     nemozeNaslov: 'The chart can’t be calculated',
@@ -65,7 +65,7 @@ export const karta: Recnik['karta'] = {
     javiNam: (zona) => `Let us know — time zone: ${zona}`,
     /** "Jul 10, 1990 at 14:05 · Belgrade"; without a birth time, no " at …". */
     rodjenje: (datum, vreme, grad) => `${datum}${vreme ? ` at ${vreme}` : ''} · ${grad}`,
-    /** Bubble around the Sun in the Big Three — opens "Your sign's story". */
+    /** Bubble around the Sun in the Big Three — opens "Your sign’s story". */
     tvojZnak: 'Your sign',
     /** Moon without a birth time: "Gemini or Cancer". */
     znakIli: (a, b) => `${a} or ${b}`,
@@ -88,7 +88,7 @@ export const karta: Recnik['karta'] = {
     /** Screen reader, a point row on Sky. */
     tackaA11y: (ime, deg, min, znak, retro, kuca) =>
       `${ime}, ${deg}° ${min}' in ${znak}${retro ? ', retrograde' : ''}${kuca ? `, ${redni(kuca)} house` : ''}`,
-    /** Sign that isn't known (Big Three). */
+    /** Sign that isn’t known (Big Three). */
     nepoznat: 'Unknown',
     /** Screen reader, Big Three tile: "Sun: Leo. Your sign" / "Moon: Cancer. Reading". */
     trojkaA11y: (oznaka, tekst, prica, tumacenje) =>
@@ -104,7 +104,7 @@ export const karta: Recnik['karta'] = {
   nebo: {
     naslov: 'The sky right now',
     infoA11y: 'What is the sky right now?',
-    datumA11y: (datum) => `Date: ${datum} Tap to choose a day.`,
+    datumA11y: (datum) => `Date: ${datum}. Tap to choose a day.`,
     mestoA11y: (grad) => `Viewing location: ${grad}. Tap to change.`,
     /** Labels on the arrow buttons (lowercase). */
     dan: 'day',
@@ -153,7 +153,7 @@ export const karta: Recnik['karta'] = {
     /** Moon without a birth time moved from one sign to another — own chart. */
     mesecPresao: (od, u) =>
       `On the day you were born, the Moon was ${nebo.uZnaku(od)}, then moved ${nebo.uZnak(u)}. Without a birth time we don’t know which sign it was in at the moment you were born, so we don’t show the reading.`,
-    /** Same, another person's chart. */
+    /** Same, another person’s chart. */
     mesecPresaoOsoba: (od, u) =>
       `On the day of birth, the Moon was ${nebo.uZnaku(od)}, then moved ${nebo.uZnak(u)}. Without a birth time we don’t know which sign it was in at the moment of birth, so we don’t show the reading.`,
     dodajVreme: 'Add birth time',
@@ -163,7 +163,7 @@ export const karta: Recnik['karta'] = {
     premiumOpis: 'The Sun, Moon and rising sign are already open. The other planets in signs and houses, and all aspects, come with Premium.',
     premiumDugme: 'Unlock the whole chart',
     nijeUcitano: 'The reading can’t load right now. Check your internet connection.',
-    /** "Conjunction – Struggle", as in the astrologer's text. */
+    /** "Conjunction – Struggle", as in the astrologer’s text. */
     simbolikaAspekta: (aspekt, tema) => `${gramatika.veliko(aspekt)} – ${tema}`,
   },
 

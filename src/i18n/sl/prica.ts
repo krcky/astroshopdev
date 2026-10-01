@@ -161,7 +161,7 @@ export const prica: Recnik['prica'] = {
   },
 
   ponudi: {
-    upravoPravimo: (drugi) => `Pravkar ustvarjamo video: ${drugi}. Tega dobiš, ko bo tisti končan.`,
+    upravoPravimo: (drugi) => `Pravkar ustvarjamo video: ${drugi}. Tega lahko narediš, ko bo tisti končan.`,
     sePravi: (procenat) => `Video se ustvarja · ${procenat}. Sporočili ti bomo, ko bo končan.`,
     spreman: 'Video cele zgodbe je pripravljen.',
     pravimoOkoMinut: 'Video ustvarjamo približno minuto. Medtem uporabljaj aplikacijo — sporočili ti bomo, ko bo končan.',

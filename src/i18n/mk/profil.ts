@@ -158,7 +158,7 @@ export const profil: Recnik['profil'] = {
     tranzitiNeMoguTekst: (grad) =>
       `За местото ${grad} на тој датум не знаеме сигурно колку часот било според UTC, па ни картата ни транзитите на неа не би биле точни.`,
     izmeniOpis: 'Уреди ги податоците за раѓање',
-    pitajAstrologa: 'Прашај го астрологот',
+    pitajAstrologa: 'Прашај астролог',
     pitajTekst: (astrolog) => `${astrolog} ја гледа оваа карта, па можеш да прашаш за оваа особа или за вас двајцата.`,
     postaviPitanje: 'Постави прашање',
   },
@@ -172,14 +172,14 @@ export const profil: Recnik['profil'] = {
     nijeIzabrano: 'Не е избрано',
     neZnaSe: 'Не се знае',
     napomena: (astrolog, bezVremena) =>
-      (bezVremena ? 'Без време на раѓање картата нема асцендент ни куќи. ' : '') + vidisSamoTi(astrolog),
+      (bezVremena ? 'Без време на раѓање картата нема подзнак ни куќи. ' : '') + vidisSamoTi(astrolog),
     obrisiOsobu: 'Избриши ја особата',
   },
 
   rodjenjePolje: {
     trebaInternet: 'За измена потребен е интернет.',
     tvojeIme: 'Твоето име',
-    vremeNijeUneto: 'Времето не е внесено — картата нема асцендент ни куќи.',
+    vremeNijeUneto: 'Времето не е внесено — картата нема подзнак ни куќи.',
     znamVreme: 'Го знам времето, сакам да го внесам',
   },
 
@@ -189,7 +189,7 @@ export const profil: Recnik['profil'] = {
     imePodnaslov: 'Име или прекар — го гледаш само ти.',
     izaberiDatum: 'Избери датум',
     izaberiVreme: 'Избери време',
-    vremePodnaslov: 'Без време картата нема асцендент ни куќи.',
+    vremePodnaslov: 'Без време картата нема подзнак ни куќи.',
     neMozemoKartu: 'Не можеме да ја пресметаме картата',
     neMozemoKartuTekst: (grad, zona) =>
       `Не знаеме сигурно колку часот било според UTC во местото ${grad} на тој датум. Пробај друго место на раѓање или јави ни — зона: ${zona}`,
@@ -203,7 +203,7 @@ export const profil: Recnik['profil'] = {
     mesec: 'Месечина',
     podznak: 'Подзнак',
     ulogaZnak: (uloga, znak) => `${uloga}: ${znak ?? 'непознат'}`,
-    bezVremena: 'Без време на раѓање асцендентот и куќите не можат да се пресметаат. Времето можеш да го додадеш подоцна.',
+    bezVremena: 'Без време на раѓање подзнакот и куќите не можат да се пресметаат. Времето можеш да го додадеш подоцна.',
     pristanak: 'Особата знае дека ги внесувам нејзините податоци за раѓање. Ако е дете, јас сум родител или старател.',
   },
 };

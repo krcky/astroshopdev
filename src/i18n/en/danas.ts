@@ -30,7 +30,7 @@ export const danas: Recnik['danas'] = {
     danas: 'Today',
     tranziti: 'Transits',
     pitaj: 'Ask',
-    /** The user's birth chart. */
+    /** The user’s birth chart. */
     ti: 'You',
     nebo: 'Sky',
   },
@@ -157,7 +157,7 @@ export const danas: Recnik['danas'] = {
     uvod: 'The text is written for the transit that matters most in your birth chart today.',
     tranzitDana: 'Transit of the day',
     /** Aspect angle in degrees. */
-    objasnjenje: (ugao: number) => `A planet in today's sky and the ${ugao}° angle it makes with a point in your birth chart.`,
+    objasnjenje: (ugao: number) => `A planet in today’s sky and the ${ugao}° angle it makes with a point in your birth chart.`,
     tranzitVladara: 'Transit of your ruler',
     nijeDeoKarte: 'This transit is not part of your chart.',
     /** The ruler is the natal point. `uZnaku` = "in Pisces". */
@@ -185,7 +185,7 @@ export const danas: Recnik['danas'] = {
     viseOTranzitu: 'More about this transit',
     pitajNaslov: 'Ask an astrologer about this transit',
     pitajOpis: (astrolog, oOsobi) =>
-      `${astrolog} sees ${oOsobi ? "this person's chart" : 'your chart'} and answers with a voice message, in Serbian, usually within 2–3 business days.`,
+      `${astrolog} sees ${oOsobi ? "this person’s chart" : 'your chart'} and answers with a voice message, in Serbian, usually within 2–3 business days.`,
     postaviPitanje: 'Ask a question',
     kratkaVerzija: 'This is the short version. The full one covers the areas of life the transit touches, its long-term effects and practical tips.',
     otkljucajCeo: 'Unlock the full text',

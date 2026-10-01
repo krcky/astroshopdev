@@ -65,7 +65,7 @@ export const profil: Recnik['profil'] = {
     naslov: 'Otvori sva tumačenja',
     podnaslov: 'Svi tvoji tranziti, teme razdoblja i pogled na sutra i prekosutra.',
     natalnaNaslov: 'Natalna karta',
-    natalnaTekst: 'Tumačenje svake planete po znaku i kući i svih aspekata.',
+    natalnaTekst: 'Tumačenje svakog planeta po znaku i kući i svih aspekata.',
     tranzitiNaslov: 'Tranziti',
     tranzitiTekst: 'Svi tranziti dana s cijelim tumačenjem — i za sutra i prekosutra.',
     ljudiNaslov: 'Tvoji ljudi',
@@ -138,7 +138,7 @@ export const profil: Recnik['profil'] = {
     mesto: 'Mjesto rođenja',
     neZnamVreme: 'Ne znam vrijeme',
     imeIliNadimak: 'Ime ili nadimak',
-    nemaVise: 'Ova osoba više nije na tvojem popisu.',
+    nemaVise: 'Ova osoba više nije na tvom popisu.',
   },
 
   osoba: {
@@ -163,7 +163,7 @@ export const profil: Recnik['profil'] = {
     naslov: 'Uređivanje',
     obrisatiNaslov: 'Izbrisati osobu?',
     obrisatiTekst: (ime) =>
-      `${ime} nestaje s tvojeg popisa, na svim uređajima. Već postavljena pitanja o ovoj osobi ostaju.`,
+      `${ime} nestaje s tvog popisa, na svim uređajima. Već postavljena pitanja o ovoj osobi ostaju.`,
     odustani: 'Odustani',
     nijeIzabrano: 'Nije odabrano',
     neZnaSe: 'Ne zna se',

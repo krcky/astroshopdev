@@ -138,7 +138,7 @@ je napisano; delovi aplikacije se prevode iz srpskog. Množina i padeži su isti
 
 - **Ijekavica** kao u hrvatskom, ali rječnik bliži srpskom: sedmica (ne tjedan, ne nedelja), hiljada,
   tačka, račun, šifra/lozinka, postavke, sačuvaj, obriši, nazad, ponovo, obavještenje, e-mail, kupovina,
-  posljednji, sljedeći, ko/šta, historija, kahva (ako zatreba), voz. Mjeseci: januar, februar… (kao srpski).
+  posljednji, sljedeći, ko/šta, historija, kahva (ako zatreba), voz. Mjeseci: januar, februar, mart, april, maj, juni, juli, august, septembar…
 - **"da + prezent" i infinitiv su oba u redu;** biraj ono što zvuči prirodnije u Sarajevu.
 - Glas isti.
 

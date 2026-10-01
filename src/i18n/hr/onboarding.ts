@@ -46,7 +46,7 @@ export const onboarding: Recnik['onboarding'] = {
     greskaCuvanja: 'Karta nije spremljena — nismo uspjeli doći do servera. Provjeri internet pa ponovno pritisni Nastavi.',
     izvorPozicija: 'Položaje računamo iz podataka o kretanju planeta, za tvoj točan trenutak i mjesto rođenja.',
     /** Opis slike planeta za citac zaslona. */
-    vladajucaPlaneta: (planeta) => `Vladajuća planeta: ${planeta}`,
+    vladajucaPlaneta: (planeta) => `Vladajući planet: ${planeta}`,
     vladarZnaka: (planeta) => `Vladar tvog znaka: ${planeta}`,
     vladarKarte: (planeta) => `Vladar tvoje karte: ${planeta}`,
     sunce: 'Sunce',
@@ -160,7 +160,7 @@ export const onboarding: Recnik['onboarding'] = {
     neZnam: 'Ne znam',
     mestoRodjenja: 'Mjesto rođenja',
     /** Spominje natpis reda `vremeRodjenja`, pod navodnicima. */
-    bezVremena: 'Dok vrijeme rođenja nije uneseno, podznak i kuće nisu pouzdani. Dodirni „Vrijeme rođenja” da ga dodaš.',
+    bezVremena: 'Dok vrijeme rođenja nije uneseno, podznak i kuće nisu pouzdani. Dodirni „Vrijeme rođenja“ da ga dodaš.',
     odjavaSvuda: 'Odjavi se sa svih uređaja',
     odjavaNaslov: 'Odjaviti se sa svih uređaja?',
     odjavaTekst: 'Bit ćeš odjavljen i na ovom mobitelu i na svakom drugom uređaju na kojem si prijavljen.',

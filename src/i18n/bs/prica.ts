@@ -55,9 +55,9 @@ export const prica: Recnik['prica'] = {
     nemaAspekata: 'Danas nijedna planeta ne pravi aspekt sa tvojom kartom.',
     najvaznijeDanas: (momenat) => `Najvažnije danas · ${momenat}`,
     najboljeTiIde: 'Najbolje ti ide',
-    boljeNegoJuce: '↑ bolje nego juče',
+    boljeNegoJuce: '↑ bolje nego jučer',
     ocenaA11y: (oblast, ocena, oznaka, bolje) =>
-      `${oblast}, ${ocena} od 5, ${oznaka}${bolje ? ', bolje nego juče' : ''}`,
+      `${oblast}, ${ocena} od 5, ${oznaka}${bolje ? ', bolje nego jučer' : ''}`,
     ideTi: 'Ide ti',
     kociTe: 'Koči te',
     mesecDanas: (sledeca) => `Mjesec danas · ${sledeca}`,

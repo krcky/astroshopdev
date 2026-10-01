@@ -15,8 +15,9 @@ export function mnozina(n: number, [ednina, dvojina, tri, pet]: Oblici): string 
 }
 
 export const gramatika: Recnik['gramatika'] = {
-  dana: (n) => `${n} ${mnozina(n, ['dan', 'dneva', 'dnevi', 'dni'])}`,
-  meseci: (n) => `${n} ${mnozina(n, ['mesec', 'meseca', 'meseci', 'mesecev'])}`,
+  // Trajanje je u TOZILNIKU (traja še 3 dni, preizkusi 3 dni), zato za 3—4: dni, mesece.
+  dana: (n) => `${n} ${mnozina(n, ['dan', 'dneva', 'dni', 'dni'])}`,
+  meseci: (n) => `${n} ${mnozina(n, ['mesec', 'meseca', 'mesece', 'mesecev'])}`,
   tranzita: (n) => mnozina(n, ['tranzit', 'tranzita', 'tranziti', 'tranzitov']),
   veliko: (x) => x.charAt(0).toLocaleUpperCase('sl') + x.slice(1),
   locale: 'sl-SI',

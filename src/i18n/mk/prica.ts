@@ -1,5 +1,6 @@
 import type { Recnik } from '../sr';
 import { mnozina } from './gramatika';
+import { nebo, subjekat } from './nebo';
 
 /**
  * PRICE (pravila 23 i 25), makedonski — prevod `sr/prica.ts`. Ceo tekst cirilicom; latinicom samo
@@ -10,7 +11,7 @@ import { mnozina } from './gramatika';
  * Vladar: "Со Овен владее Марс" (isto za svih 12, bez padeza); Близнаци i Риби su mnozina ("владеат").
  */
 /** Redni broj znaka u zodijaku, od Ovna. */
-const REDNI = ['Прв', 'Втор', 'Трет', 'Четврт', 'Петти', 'Шести', 'Седми', 'Осми', 'Деветти', 'Десетти', 'Единаесетти', 'Дванаесетти'];
+const REDNI = ['Прв', 'Втор', 'Трет', 'Четврти', 'Петти', 'Шести', 'Седми', 'Осми', 'Деветти', 'Десетти', 'Единаесетти', 'Дванаесетти'];
 const ELEMENT_PRIDEV = { vatra: 'огнен', zemlja: 'земјен', vazduh: 'воздушен', voda: 'воден' } as const;
 const KVALITET_PRIDEV = { kardinalan: 'кардинален', fiksni: 'фиксен', promenljiv: 'променлив' } as const;
 /** Godisnje doba (severna polulopta), od proleca, sa clanom: "почеток на пролетта". */
@@ -103,16 +104,11 @@ export const prica: Recnik['prica'] = {
     /** "Дел од телото со кој владее Овен" / "… владеат Близнаци". */
     teloOznaka: (znakKljuc, ime) => `Дел од телото со кој ${MNOZINA_ZNAKA.has(znakKljuc) ? 'владеат' : 'владее'} ${ime}`,
     /** "Со Овен владее Марс". */
-    vladarNaslov: (znakKljuc, vladar) => {
-      const imena: Record<string, string> = {
-        aries: 'Овен', taurus: 'Бик', gemini: 'Близнаци', cancer: 'Рак', leo: 'Лав', virgo: 'Девица',
-        libra: 'Вага', scorpio: 'Скорпија', sagittarius: 'Стрелец', capricorn: 'Јарец', aquarius: 'Водолија', pisces: 'Риби',
-      };
-      return `Со ${imena[znakKljuc]} владее ${vladar}`;
-    },
+    vladarNaslov: (znakKljuc, vladar) =>
+      `Со ${nebo.znaci[znakKljuc as keyof typeof nebo.znaci]?.ime ?? znakKljuc} владее ${vladar}`,
     vladarMit: { sun: 'Грците го нарекувале Хелиос.' },
     vladarRecenica: (vladar, lokativi, lice = 'ti') =>
-      `Во ${lice === 'ja' ? 'мојата' : 'твојата'} натална карта ${vladar} е во ${lokativi.join(' или ')}.`,
+      `Во ${lice === 'ja' ? 'мојата' : 'твојата'} натална карта ${subjekat(vladar)} е во ${lokativi.join(' или ')}.`,
     sunceU: (uZnaku) => `Сонце ${uZnaku}`,
     procitaj: (tema) => `Прочитај: ${tema}`,
     sunceNa: (stepen) => `Сонце на ${stepen}°`,

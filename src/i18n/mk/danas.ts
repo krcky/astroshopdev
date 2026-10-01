@@ -1,6 +1,6 @@
 import type { Recnik } from '../sr';
 import { mnozina } from './gramatika';
-import { nebo } from './nebo';
+import { nebo, subjekat } from './nebo';
 
 /** Prevod `sr/danas.ts` (makedonski). */
 
@@ -135,10 +135,10 @@ export const danas: Recnik['danas'] = {
     tranzitVladara: 'Транзит на твојот владетел',
     nijeDeoKarte: 'Овој транзит не е дел од твојата карта.',
     vladarNatalni: (planeta, uZnaku) =>
-      `${planeta} е владетел на твојот Асцендент ${uZnaku}. Кога транзит ќе го допре, денот се чувствува полично и посилно, затоа овој транзит денес има предност.`,
+      `${subjekat(planeta)} е владетел на твојот Асцендент ${uZnaku}. Кога транзит ќе го допре, денот се чувствува полично и посилно, затоа овој транзит денес има предност.`,
     /** "влијае на" — без клитика, па родот на `koga` не мора да се слага. */
     vladarTranzitni: (planeta, uZnaku, koga) =>
-      `${planeta} е владетел на твојот Асцендент ${uZnaku}, а денес влијае на ${koga}. Затоа овој транзит денес има предност.`,
+      `${subjekat(planeta)} е владетел на твојот Асцендент ${uZnaku}, а денес влијае на ${koga}. Затоа овој транзит денес има предност.`,
     tvojAkuzativ: {
       sun: 'твоето Сонце', moon: 'твојата Месечина', mercury: 'твојот Меркур', venus: 'твојата Венера',
       mars: 'твојот Марс', jupiter: 'твојот Јупитер', saturn: 'твојот Сатурн', uranus: 'твојот Уран',
@@ -182,7 +182,7 @@ export const danas: Recnik['danas'] = {
 
   promena: {
     /** "Марс влегува во Лав". */
-    ulazi: (planeta, uZnak) => `${planeta} влегува ${uZnak}`,
+    ulazi: (planeta, uZnak) => `${subjekat(planeta)} влегува ${uZnak}`,
     retrogradna: (kljuc, planeta, uZnaku) =>
       `${{ m: 'Ретрограден', z: 'Ретроградна', s: 'Ретроградно' }[rodKljuca(kljuc)]} ${planeta} ${uZnaku}`,
     direktna: (kljuc, planeta, uZnaku) =>

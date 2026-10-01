@@ -1,5 +1,5 @@
 import type { Recnik } from '../sr';
-import { nebo } from './nebo';
+import { nebo, subjekat } from './nebo';
 
 /** Koraci onboardinga, prijava i racun (makedonski) — vidi `sr/onboarding.ts`. Jedan objekat po ekranu, redom kao u toku. */
 export const onboarding: Recnik['onboarding'] = {
@@ -178,7 +178,7 @@ export const onboarding: Recnik['onboarding'] = {
     primerAspektTekst: (tranzitna, aspekt, natalna) => {
       const n = nebo.padeziTela[natalna];
       const clan = n.rod === 'z' ? 'твојата' : n.rod === 's' ? 'твоето' : 'твојот';
-      return `${nebo.tela[tranzitna]} е во ${nebo.padeziAspekta[aspekt].lokativ} со ${clan} ${n.instrumental}.`;
+      return `${subjekat(nebo.tela[tranzitna])} е во ${nebo.padeziAspekta[aspekt].lokativ} со ${clan} ${n.instrumental}.`;
     },
     primerOdgovorTekst: 'Одговори на твоето прашање.',
     sada: 'сега',

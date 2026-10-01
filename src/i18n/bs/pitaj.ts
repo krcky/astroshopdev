@@ -39,7 +39,7 @@ export const pitaj: Recnik['pitaj'] = {
     nemaOsobe: 'Ova osoba više nije na tvojoj listi. Izaberi o kome je pitanje pa pošalji.',
     nemaNaloga: 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.',
     mreza: 'Nema veze sa serverom. Pitanje je sačuvano na telefonu — probaj kad se internet vrati.',
-    nepoznato: 'Pitanje nije sačuvano. Probaj ponovo za minutu.',
+    nepoznato: 'Pitanje nije sačuvano. Probaj ponovo za minut.',
   },
 
   tab: {

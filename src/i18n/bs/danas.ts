@@ -44,7 +44,9 @@ export const danas: Recnik['danas'] = {
 
   tranzit: {
     ime: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} ${natalna}`,
-    imeNatalni: (tranzitna, aspekt, natalna) => `${tranzitna} ${aspekt} natalni ${natalna}`,
+    /** Pridjev se slaže sa rodom natalne tačke: "natalna Venera", "natalno Sunce", "natalni Mars". */
+    imeNatalni: (tranzitna, aspekt, natalna) =>
+      `${tranzitna} ${aspekt} ${natalna === nebo.tela.venus ? 'natalna' : natalna === nebo.tela.sun ? 'natalno' : 'natalni'} ${natalna}`,
     ascendent: 'Ascendent',
     mc: 'MC',
     samoDanas: 'Samo danas',
@@ -131,7 +133,7 @@ export const danas: Recnik['danas'] = {
     pitajOpis: (astrolog, oOsobi) =>
       `${astrolog} vidi ${oOsobi ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, obično za 2–3 radna dana.`,
     postaviPitanje: 'Postavi pitanje',
-    kratkaVerzija: 'Ovo je kratka verzija. U cijeloj su oblasti života na koja tranzit djeluje, dugoročni efekti i konkretni savjeti.',
+    kratkaVerzija: 'Ovo je kratka verzija. U cijeloj su oblasti života na koje tranzit djeluje, dugoročni efekti i konkretni savjeti.',
     otkljucajCeo: 'Otključaj cijeli tekst',
   },
 

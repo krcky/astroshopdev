@@ -69,7 +69,7 @@ export const profil: Recnik['profil'] = {
 
   /** `app/premium.tsx` — paywall. */
   premium: {
-    naslov: 'Open every reading',
+    naslov: 'Unlock every reading',
     podnaslov: 'All your transits, themes of the period and a look at the next two days.',
     natalnaNaslov: 'Birth chart',
     natalnaTekst: 'A reading of every planet by sign and house, and of every aspect.',
@@ -104,7 +104,7 @@ export const profil: Recnik['profil'] = {
      */
     obnavljanje: (proba, ios) =>
       (proba ? `After the trial, ${proba.cena} ${proba.godisnje ? 'per year' : 'per month'}. ` : '')
-      + `The subscription renews automatically until you cancel it in ${ios ? 'App Store' : 'Google Play'} settings.`,
+      + `The subscription renews automatically until you cancel it in your ${ios ? 'App Store' : 'Google Play'} settings.`,
     pitanjaPosebno: 'Questions to the astrologer are paid separately.',
     uslovi: 'Terms',
     vratiKupovine: 'Restore purchases',
@@ -147,7 +147,7 @@ export const profil: Recnik['profil'] = {
   greske: {
     granica: 'Adding more people requires Premium.',
     prijavaIstekla: 'Your sign-in has expired. Close the app and open it again.',
-    mreza: 'Can\'t reach the server. Nothing was saved — try again when you\'re back online.',
+    mreza: 'Can’t reach the server. Nothing was saved — try again when you’re back online.',
     opsta: 'Not saved. Try again in a minute.',
   },
 
@@ -160,12 +160,12 @@ export const profil: Recnik['profil'] = {
     datum: 'Date of birth',
     vreme: 'Time of birth',
     mesto: 'Place of birth',
-    neZnamVreme: 'I don\'t know the time',
+    neZnamVreme: 'I don’t know the time',
     imeIliNadimak: 'Name or nickname',
     nemaVise: 'This person is no longer on your list.',
   },
 
-  /** `app/osoba.tsx` — another person's page. */
+  /** `app/osoba.tsx` — another person’s page. */
   osoba: {
     naslov: 'Person',
     tabKarta: 'Birth chart',
@@ -175,22 +175,22 @@ export const profil: Recnik['profil'] = {
     uzPremiumOpis: (n) =>
       `Without Premium, only the first person on your list is open. With it, you get charts and transits for up to ${ljudi(n)}.`,
     otkljucajSve: 'Unlock everyone',
-    tranzitiNeMogu: 'Transits can\'t be calculated',
+    tranzitiNeMogu: 'Transits can’t be calculated',
     tranzitiNeMoguTekst: (grad) =>
-      `For ${grad} on that date, we don't reliably know what time it was in UTC, so neither the chart nor its transits would be accurate.`,
+      `For ${grad} on that date, we don’t reliably know what time it was in UTC, so neither the chart nor its transits would be accurate.`,
     izmeniOpis: 'Edit birth details',
     pitajAstrologa: 'Ask an astrologer',
-    /** `astrolog` = astrologer's short name. */
+    /** `astrolog` = astrologer’s short name. */
     pitajTekst: (astrolog) => `${astrolog} sees this chart, so you can ask about this person or about the two of you.`,
     postaviPitanje: 'Ask a question',
   },
 
-  /** `app/osoba-uredi.tsx` — table of another person's details. */
+  /** `app/osoba-uredi.tsx` — table of another person’s details. */
   osobaUredi: {
     naslov: 'Edit',
     obrisatiNaslov: 'Delete this person?',
     obrisatiTekst: (ime) =>
-      `${ime} will be removed from your list on all devices. Questions you've already asked about this person stay.`,
+      `${ime} will be removed from your list on all devices. Questions you’ve already asked about this person stay.`,
     odustani: 'Cancel',
     nijeIzabrano: 'Not selected',
     neZnaSe: 'Unknown',
@@ -210,15 +210,15 @@ export const profil: Recnik['profil'] = {
 
   /** `app/nova-osoba/*` — new person, step by step. */
   novaOsoba: {
-    napomena: 'Only you can see these birth details. We don\'t share or sell them.',
-    imeNaslov: 'What\'s their name?',
+    napomena: 'Only you can see these birth details. We don’t share or sell them.',
+    imeNaslov: 'What’s their name?',
     imePodnaslov: 'A name or nickname — only you can see it.',
     izaberiDatum: 'Choose a date',
     izaberiVreme: 'Choose a time',
     vremePodnaslov: 'Without a time, the chart has no rising sign or houses.',
-    neMozemoKartu: 'We can\'t calculate the chart',
+    neMozemoKartu: 'We can’t calculate the chart',
     neMozemoKartuTekst: (grad, zona) =>
-      `We don't reliably know what time it was in UTC in ${grad} on that date. Try a different place of birth, or let us know — time zone: ${zona}`,
+      `We don’t reliably know what time it was in UTC in ${grad} on that date. Try a different place of birth, or let us know — time zone: ${zona}`,
     nazadNaMesto: 'Back to place of birth',
     /** Date and time of birth, e.g. "Sat, May 12, 1990 at 14:30". */
     datumUVreme: (datum, vreme) => `${datum} at ${vreme}`,
@@ -231,7 +231,7 @@ export const profil: Recnik['profil'] = {
     podznak: 'Rising',
     /** Screen reader: "Sun: Leo". */
     ulogaZnak: (uloga, znak) => `${uloga}: ${znak ?? 'unknown'}`,
-    bezVremena: 'Without a time of birth, the rising sign and houses can\'t be calculated. You can add the time later.',
-    pristanak: 'This person knows I\'m entering their birth details. If it\'s a child, I\'m their parent or guardian.',
+    bezVremena: 'Without a time of birth, the rising sign and houses can’t be calculated. You can add the time later.',
+    pristanak: 'This person knows I’m entering their birth details. If it’s a child, I’m their parent or guardian.',
   },
 };

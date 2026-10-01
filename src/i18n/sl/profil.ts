@@ -163,7 +163,7 @@ export const profil: Recnik['profil'] = {
 
   osobaUredi: {
     naslov: 'Urejanje',
-    obrisatiNaslov: 'Izbrišem osebo?',
+    obrisatiNaslov: 'Izbrišeš osebo?',
     obrisatiTekst: (ime) =>
       `${ime} izgine s tvojega seznama na vseh napravah. Že postavljena vprašanja o tej osebi ostanejo.`,
     odustani: 'Prekliči',
