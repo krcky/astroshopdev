@@ -30,6 +30,8 @@ export const profil: Recnik['profil'] = {
     pravila: 'Legal',
     pomoc: 'Help',
     pisiteNam: 'Write to us',
+    obavestenja: 'Notifications',
+    obavestenjaUskoro: 'Coming soon',
     nemaMejlAplikacije: (adresa) => `There is no email app on this phone. The address is ${adresa}.`,
     premium: 'Premium',
     ukljucenTestom: 'On via test switch',

@@ -813,7 +813,10 @@ profilu, sekcija "Test", SAMO u probnom buildu: tekstovi astrologa (tranziti, na
 simbolika) su jos samo na srpskom. Jezik se pamti na telefonu (`store/jezik.ts`); jezik telefona ga NE bira —
 bez izbora je srpski. Promena jezika sklapa navigaciju iznova (`key` na `Stack` u `_layout.tsx`). Naslov iz
 korpusa se poredi sa SRPSKIM imenima (`tekstReda`). ODGOVOR ASTROLOGA JE NA SRPSKOM (Ivan, 1.10.2026): en, sl i mk to
-kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. Pojmovnik i glas: `docs/PREVOD.md`.
+kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. HRVATSKI I BOSANSKI (1.10.2026): `src/i18n/hr/`, `src/i18n/bs/`, isto CELI
+recnici, isti izbor u profilu (Test). Ijekavica — `check:prevod` pada na cestu ekavsku rec; datum sa tackom
+posle godine ("29. ruj 2026."). Hr: Škorpion, Vodenjak, račun, mobitel, infinitiv; bs: Škorpija, Vodolija,
+sedmica, telefon. Pojmovnik i glas: `docs/PREVOD.md`.
 VAN RECNIKA, namerno: korpus i tekst sa sajta (`simbolika.ts`, `znak-opis-podaci.ts`, `traits.ts` — drugi
 korak), dev ekrani, panel astrologa, mejl sa kodom (Supabase sablon), nativni tekst (`app.json`, Swift/Kotlin).
 SNIMAK KARTE ZA ASTROLOGA (`pitanja.ts`) uzima imena iz SRPSKOG recnika po kljucu, ne iz tekuceg — panel je
@@ -940,7 +943,8 @@ npm run panel:build       panel za objavu -> panel/dist
       podatke o pravnom licu, napraviti aliase, dati pravniku. Vidi `web/README.md`.
       ODLUCENO 23.9.2026: bez `.well-known` fajlova — sajt radi nezavisno od
       aplikacije i link ka `astroshop.rs` NE SME da otvara app.
-- [ ] Push notifikacije
+- [ ] Push notifikacije — u profilu (sekcija "Pomoć") vec stoji red "Obaveštenja · Uskoro" BEZ funkcije
+      (Ivan, 1.10.2026, B10 iz UX recenzije): kad stignu push i RevenueCat, red dobija prekidac/podesavanja.
 - [ ] Dnevna prica (pravilo 23) — URADJENO 30.9.2026: sve slike, prsten i balon na pocetnoj, deljenje.
       Provereno u simulatoru (bez naloga, probni profil): slike 1, 2, 3 i 5, dodiri, drzanje, zatvaranje,
       deljenje 1080x1920. FALI: provera na telefonu SA NALOGOM (prsten i balon, slike Ide ti / Koči te i

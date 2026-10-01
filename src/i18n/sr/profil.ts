@@ -32,6 +32,8 @@ export const profil = {
     /** Pomoc: mejl podrsci. */
     pomoc: 'Pomoć',
     pisiteNam: 'Pišite nam',
+    obavestenja: 'Obaveštenja',
+    obavestenjaUskoro: 'Uskoro',
     nemaMejlAplikacije: (adresa: string) => `Na telefonu nema aplikacije za mejl. Adresa je ${adresa}.`,
     premium: 'Premium',
     ukljucenTestom: 'Uključen test prekidačem',

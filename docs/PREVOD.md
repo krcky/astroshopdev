@@ -116,3 +116,51 @@ Planet, sign and aspect names come from `t.nebo` — never re-type them. `nebo.u
 Astrolog odgovara glasom NA SRPSKOM. U engleskom, slovenačkom i makedonskom rečniku to se kaže otvoreno, u
 postojećim rečenicama (`pitaj.uvod.glasovno`, `pitaj.pitanje.ceka`, `danas.tumacenje.pitajOpis`): "…glasovnom
 porukom, na srpskom…". Hrvatski i bosanski to ne trebaju — srpski razumeju. Tab se ne sakriva.
+
+## Hrvatski i bosanski (korak 3, 1.10.2026)
+
+Oba su CEO rečnik (`src/i18n/hr/`, `src/i18n/bs/`, tip `Recnik`). Zajedničko (opste, gramatika, datum, nebo)
+je napisano; delovi aplikacije se prevode iz srpskog. Množina i padeži su isti kao u srpskom (`mnozina` iz
+`./gramatika`). Datum ima tačku posle godine: hr "Uto, 29. ruj 2026.", bs "Uto, 29. sep 2026.".
+`check:prevod` pada na čestu ekavsku reč ("vreme", "posle", "mesto"…) u hr/bs rečniku.
+
+### Hrvatski — pravila
+
+- **Ijekavica** (vrijeme, mjesto, mjesec, dijete, lijepo, uvijek, gdje, poslije/nakon, primjer, cijena, dio).
+- **Infinitiv, ne "da + prezent":** "možeš platiti", "želiš li promijeniti", ne "možeš da platiš".
+- **Hrvatske riječi:** tjedan, tisuća, točka, račun (nalog), lozinka, postavke, spremi, izbriši, uredi,
+  odustani, natrag, ponovno, obavijest, e-mail (ne "mejl"), pretplata, kupnja, zadnji, sljedeći, kroz,
+  tko/što (ne ko/šta), mjesec (ne "mesec"), vlak, glazba, sveučilište, organizirati (-irati, ne -ovati).
+- **Upitne rečenice:** "Želiš li…?", ne "Da li želiš…?".
+- Glas isti kao srpski (`copywriter-sr`): "ti", tumači a ne proriče, bez uzvičnika i laskanja.
+
+### Bosanski — pravila
+
+- **Ijekavica** kao u hrvatskom, ali rječnik bliži srpskom: sedmica (ne tjedan, ne nedelja), hiljada,
+  tačka, račun, šifra/lozinka, postavke, sačuvaj, obriši, nazad, ponovo, obavještenje, e-mail, kupovina,
+  posljednji, sljedeći, ko/šta, historija, kahva (ako zatreba), voz. Mjeseci: januar, februar… (kao srpski).
+- **"da + prezent" i infinitiv su oba u redu;** biraj ono što zvuči prirodnije u Sarajevu.
+- Glas isti.
+
+### Pojmovnik (hr / bs)
+
+| Srpski | Hrvatski | Bosanski |
+|---|---|---|
+| Mesec (planeta) | Mjesec | Mjesec |
+| Severni čvor, Tačka sreće | Sjeverni čvor, Točka sreće | Sjeverni čvor, Tačka sreće |
+| Devica, Škorpija, Strelac, Vodolija | Djevica, Škorpion, Strijelac, Vodenjak | Djevica, Škorpija, Strijelac, Vodolija |
+| natalna karta, tumačenje | natalna karta, tumačenje | natalna karta, tumačenje |
+| Ascendent / podznak | Ascendent / podznak | Ascendent / podznak |
+| kuća (5. kuća) | kuća (5. kuća) | kuća (5. kuća) |
+| Tvoj dan, Danas ukratko | Tvoj dan, Danas ukratko | Tvoj dan, Danas ukratko |
+| Ide ti / Koči te | Ide ti / Koči te | Ide ti / Koči te |
+| Priča dana / Priča o znaku | Priča dana / Priča o znaku | Priča dana / Priča o znaku |
+| Tvoji ljudi | Tvoji ljudi | Tvoji ljudi |
+| nalog, prijava, odjava | račun, prijava, odjava | račun, prijava, odjava |
+| obaveštenja | obavijesti | obavještenja |
+| podešavanja | postavke | postavke |
+| Vrati kupovine | Vrati kupnje | Vrati kupovine |
+| mejl / kod sa mejla | e-mail / kod iz e-maila | e-mail / kod sa e-maila |
+| nedelja (7 dana) | tjedan | sedmica |
+| Poslednja četvrt | Zadnja četvrt | Posljednja četvrt |
+| "Pitaj astrologa" | odgovor je na srpskom — NE pisati posebnu napomenu (hr i bs razumiju srpski) | isto |

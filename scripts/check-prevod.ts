@@ -89,18 +89,26 @@ if (nalazi.length) {
 }
 
 /*
- * ENGLESKI (`src/i18n/en/`): ceo recnik, bez praznog dela (`{} as Recnik[...]`) i bez srpskih slova —
- * srpsko slovo u engleskom recniku je skoro uvek zaboravljen prevod. Vlastita imena su izuzetak.
+ * DRUGI JEZICI (`src/i18n/<jezik>/`): ceo recnik, bez praznog dela (`{} as Recnik[...]`).
+ * Engleski: bez srpskih slova — srpsko slovo je skoro uvek zaboravljen prevod (vlastita imena su izuzetak).
+ * Hrvatski i bosanski: bez EKAVICE — cesta ekavska rec ("vreme", "posle") znaci da je tekst prepisan iz srpskog.
  */
 const VLASTITA = /Vujović|Boban Vujović/g;
-const EN = path.join(KOREN, 'i18n', 'en');
-for (const f of fs.readdirSync(EN)) {
-  const izvor = fs.readFileSync(path.join(EN, f), 'utf8');
-  if (/\{\}\s*as\s+Recnik/.test(izvor)) { console.error(`✗ en/${f}: deo jos nije preveden ({} as Recnik)`); greske++; }
-  izvor.split('\n').forEach((red, i) => {
-    const bez = red.replace(/\/\/.*$|\/?\*.*$/, '').replace(VLASTITA, '');
-    if (SRPSKO.test(bez)) { console.error(`✗ en/${f}:${i + 1}  srpsko slovo: ${red.trim().slice(0, 70)}`); greske++; }
-  });
+const EKAVICA = /\b(vreme|mesto|mesta|mestu|mesec|meseca|mesecu|meseci|dete|deca|deteta|reč|reči|lepo|lepa|svet|sveta|uvek|gde|posle|primer|cena|cenu|deo|delu|delova|menja|menjaš|promeni|promena|promene|videti|ceo|cela|celu|celi|celog|nedelja|nedelju|sneg|verovatno|beleška|razumeš)\b/i;
+for (const j of ['en', 'hr', 'bs']) {
+  const dir = path.join(KOREN, 'i18n', j);
+  for (const f of fs.readdirSync(dir)) {
+    const izvor = fs.readFileSync(path.join(dir, f), 'utf8');
+    if (/\{\}\s*as\s+Recnik/.test(izvor)) { console.error(`✗ ${j}/${f}: deo jos nije preveden ({} as Recnik)`); greske++; }
+    izvor.split('\n').forEach((red, i) => {
+      const bez = red.replace(/\/\/.*$|\/?\*.*$/, '').replace(VLASTITA, '');
+      // samo tekst u navodnicima, ne kljucevi ni imena promenljivih
+      const tekst = (bez.match(/(['"`])(?:\\.|(?!\1).)*\1/g) ?? []).join(' ').replace(/\$\{[^}]*\}/g, ' ');
+      if (j === 'en' && SRPSKO.test(tekst)) { console.error(`✗ en/${f}:${i + 1}  srpsko slovo: ${red.trim().slice(0, 70)}`); greske++; }
+      const e = j !== 'en' && tekst.match(EKAVICA);
+      if (e) { console.error(`✗ ${j}/${f}:${i + 1}  ekavica "${e[0]}": ${red.trim().slice(0, 70)}`); greske++; }
+    });
+  }
 }
 
 /* Racun koji sklapa tekst mora da prati jezik (getteri, datum, mnozina). */
@@ -113,6 +121,8 @@ async function proveraJezika() {
   const dan = new Date(2026, 8, 29, 12);
   const ocekivano: [string, () => string, string, string][] = [
     ['datum', () => datum(dan, { dan: true, godina: true }), 'Uto, 29. sep 2026', 'Tue, Sep 29, 2026'],
+    ['datum hr/bs', () => { postaviJezik('hr'); const h = datum(dan, { dan: true, godina: true }); postaviJezik('bs'); return `${h} / ${datum(dan, { dan: true, godina: true })}`; }, 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.', 'Uto, 29. ruj 2026. / Uto, 29. sep 2026.'],
+    ['znak hr/bs', () => { postaviJezik('hr'); const h = SIGNS[10].name; postaviJezik('bs'); return `${h} / ${SIGNS[10].name}`; }, 'Vodenjak / Vodolija', 'Vodenjak / Vodolija'],
     ['trajanje', () => josTraje(3), 'Traje još 3 dana', '3 days left'],
     ['znak', () => signFromLongitude(42.5).formatted, "12° 30' Bik", "12° 30' Taurus"],
     ['vladar', () => SIGNS[7].ruler, 'Pluton', 'Pluto'],
@@ -133,5 +143,5 @@ async function proveraJezika() {
 
 proveraJezika().then(() => {
   if (greske) process.exit(1);
-  console.log('Prevod: engleski recnik je ceo, racun prati jezik.');
+  console.log('Prevod: engleski, hrvatski i bosanski recnik su celi, racun prati jezik.');
 });
