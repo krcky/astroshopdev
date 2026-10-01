@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { Text } from '@/components/ui/text';
 import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 /**
  * Veb varijanta loga: staticni krug umesto Lottie animacije.
@@ -52,10 +53,12 @@ export function LogoKrug({ size, onSpreman }: {
 
 /** `title` — ime strane; `full` — pun logo iz brend PNG-a (staticno na vebu). */
 /** `color` — preboja kruga (PNG je indigo na providnom, pa `tintColor` radi). */
-export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
+export function Logo({ title: naslov, full = false, color }: { title?: string; full?: boolean; color?: string }) {
+  const t = useT();
+  const title = naslov ?? t.opste.imeAplikacije;
   if (full) {
     return (
-      <View className="flex-1 items-center" style={{ transform: [{ translateX: -((338 - 621 / 2) / 168) * 58 }, { translateY: 4 }] }} accessibilityRole="header" accessibilityLabel="Astro Shop">
+      <View className="flex-1 items-center" style={{ transform: [{ translateX: -((338 - 621 / 2) / 168) * 58 }, { translateY: 4 }] }} accessibilityRole="header" accessibilityLabel={t.opste.imeAplikacije}>
         <Image
           source={require('@/assets/images/logo-full.png')}
           style={{ width: 58 * FULL_ASPECT, height: 58 }}

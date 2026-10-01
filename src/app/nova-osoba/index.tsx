@@ -4,6 +4,7 @@ import { UserRound } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Input } from '@/components/ui/input';
+import { useT } from '@/i18n';
 import { useNovaOsoba } from '@/store/nova-osoba';
 
 /**
@@ -12,6 +13,7 @@ import { useNovaOsoba } from '@/store/nova-osoba';
  * X zatvara ceo tok.
  */
 export default function NovaOsobaIme() {
+  const t = useT();
   const nacrt = useNovaOsoba();
   const [ime, setIme] = React.useState(nacrt.ime);
   const valid = ime.trim().length > 0 && ime.trim().length <= 60;
@@ -26,16 +28,16 @@ export default function NovaOsobaIme() {
     <OnboardingStep
       exit={{ kind: 'cancel', onPress: () => router.back() }}
       icon={UserRound}
-      title="Kako se zove?"
-      subtitle="Ime ili nadimak — vidiš ga samo ti."
+      title={t.profil.novaOsoba.imeNaslov}
+      subtitle={t.profil.novaOsoba.imePodnaslov}
       center={false}
       note={null}
-      primary={{ label: 'Nastavi', onPress: dalje, disabled: !valid }}>
+      primary={{ label: t.opste.nastavi, onPress: dalje, disabled: !valid }}>
       <Input
         povrsina="siva"
         value={ime}
         onChangeText={setIme}
-        placeholder="Ime ili nadimak"
+        placeholder={t.profil.rodjenje.imeIliNadimak}
         autoCapitalize="words"
         autoCorrect={false}
         returnKeyType="next"

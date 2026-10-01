@@ -61,6 +61,9 @@ src/
     video-price.tsx  "Tvoj video" — LIST odozdo (traka iznad tabova, obavestenje, "Podeli" u prici): pregled, "Podeli", "Sačuvaj u Fotografije"
     (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
+  i18n/              JEZIK (pravilo 26): `useT()` u komponenti, `tr()` van nje; `jezik.ts` = tekuci jezik
+    sr/              SRPSKI RECNIK = osnova i tip svih jezika; deo po delu aplikacije (onboarding,
+                     profil, pitaj, prica, danas, karta) + zajednicko (opste, gramatika, datum, nebo)
   theme/
     tokens.ts        IZVOR ISTINE za boje, pismo i mere (vidi DESIGN.md)
   components/
@@ -787,6 +790,23 @@ U ONBOARDINGU (Ivan, 1.10.2026): ova prica, UMESTO dnevne, po pravilima iz pravi
 zaglavlja, X, deljenja i povlacenja; na slici "vladar" umesto "Podeli svoj znak" / "Pročitaj" jedno "Nastavi" (plejer)
 i red "Nova priča stiže svakog dana, na početnoj." -> obavestenja. Bez karte posle 2,5 s dalje.
 
+**26. Tekst za korisnika ide ISKLJUCIVO kroz recnik (Ivan, 1.10.2026 — prvi korak prevoda).**
+Planirani jezici: hrvatski, bosanski, slovenacki, makedonski, engleski. Sav tekst koji korisnik vidi je u
+`src/i18n/sr/`; ekran ga cita kroz `useT()` (`t.profil.naslov`), `lib/` i store kroz `tr()` U TRENUTKU
+poziva. NIKAD preveden tekst u konstanti na nivou modula — modul se izvrsi pre nego sto se jezik postavi;
+podatak sa imenom ima getter (`SIGNS`, `BODIES`, `ASPECTS`, `POINTS`, `ODNOSI`, `OBLASTI`, `ASTROLOG`:
+`sign.name` cita recnik). Cela recenica sa promenljivom je JEDNA funkcija u recniku (drugi jezik ima drugi
+red reci); mnozina `t.gramatika`, znak u padezu `t.nebo.uZnaku(key)` / `uZnak(key)`, datum samo kroz
+`lib/horoscope.ts`. Srpski je OSNOVA: drugi jezik je dopuna (`registrujJezik`), sto fali uzima se iz srpskog.
+Drugi jezik jos NE POSTOJI i nema izbora jezika — aplikacija je i dalje samo na srpskom.
+VAN RECNIKA, namerno: korpus i tekst sa sajta (`simbolika.ts`, `znak-opis-podaci.ts`, `traits.ts` — drugi
+korak), dev ekrani, panel astrologa, mejl sa kodom (Supabase sablon), nativni tekst (`app.json`, Swift/Kotlin).
+SNIMAK KARTE ZA ASTROLOGA (`pitanja.ts`) uzima imena iz SRPSKOG recnika po kljucu, ne iz tekuceg — panel je
+srpski. Font skripta cita `glyph: '...'` iz `astro.ts`/`zodiac.ts`/`points.ts` — taj oblik mora da ostane.
+`scripts/korpus/odgovor.py` cita faze i teme kuca iz `src/i18n/sr/karta.ts` (`luna`). Provera:
+`npm run check:prevod` (skener: JSX tekst i string sa srpskim slovom van recnika; `--svi` za rucni pregled).
+Pravila i spisak: `docs/PREVOD.md`.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -819,6 +839,7 @@ npm run check:prica       dnevna prica: koje slike, trajanje, mnozina u legendi,
 npm run slike             slike u assets/ bez gubitka (oxipng) + upis u spisak  <- posle SVAKE nove slike
 npm run check:slike       svaka slika u assets/ je prosla `npm run slike` (pravilo 24)
 npm run check:prica-znaka prica o znaku: tekst i slike za 12 znakova, element/kvalitet/doba, padezi, trajanje
+npm run check:prevod      sav tekst za korisnika je u recniku src/i18n/sr/ (pravilo 26)
 npm run panel             panel za astrologa na http://localhost:5180 (#/proba bez prijave)
 npm run panel:build       panel za objavu -> panel/dist
 ```

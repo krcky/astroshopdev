@@ -12,6 +12,7 @@ import { searchCities as searchLocal, type City } from '@/lib/cities';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { ZONE_STANDARD_OFFSET } from '@/lib/zone-offsets';
 import type { TimeZoneInfo } from '@/lib/timezone';
+import { tr } from '@/i18n/jezik';
 
 /** Isto presavijanje koje je primenjeno na `search_name` u bazi. */
 function fold(s: string): string {
@@ -30,10 +31,10 @@ function zoneFor(name: string): TimeZoneInfo {
   };
 }
 
-/** Ime zemlje na srpskom ako runtime ume; inace kod zemlje. */
+/** Ime zemlje na jeziku aplikacije ako runtime ume; inace kod zemlje. */
 function countryName(code: string): string {
   try {
-    return new Intl.DisplayNames(['sr-Latn'], { type: 'region' }).of(code) ?? code;
+    return new Intl.DisplayNames([tr().gramatika.locale], { type: 'region' }).of(code) ?? code;
   } catch {
     return code;
   }

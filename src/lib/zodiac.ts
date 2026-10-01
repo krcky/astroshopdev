@@ -1,15 +1,17 @@
 /** Tropski zodijak — 12 znakova po 30 stepeni, pocev od 0 Ovna (prolecna ravnodnevica). */
+import { tr, type Recnik } from '@/i18n/jezik';
 
 export type Element = 'vatra' | 'zemlja' | 'vazduh' | 'voda';
 
 export type ZodiacSign = {
   /** Stabilan kljuc — koristi se kao deo kljuca u bazi tekstova. Nikad ne menjati. */
   key: string;
-  name: string;
+  /** Ime na jeziku aplikacije (getter, iz recnika). */
+  readonly name: string;
   glyph: string;
   element: Element;
   /** Vladar znaka (tradicionalni/moderni), za prikaz. */
-  ruler: string;
+  readonly ruler: string;
   /**
    * Isti vladar kao kljuc planete iz `astro.ts` (`PlanetKey`). Tip je string da
    * `zodiac.ts` ne uvozi `astro.ts` (koji uvozi ovaj fajl). Koristi ga izbor
@@ -20,40 +22,47 @@ export type ZodiacSign = {
   dates: string;
 };
 
+type ZnakKljuc = keyof Recnik['nebo']['znaci'];
+type TeloKljuc = keyof Recnik['nebo']['tela'];
+
+/** Ime i vladar se citaju iz recnika U TRENUTKU citanja (getter), da prate jezik. */
+function znak(d: { key: ZnakKljuc; glyph: string; element: Element; rulerKey: TeloKljuc; dates: string }): ZodiacSign {
+  return {
+    ...d,
+    get name() { return tr().nebo.znaci[d.key].ime; },
+    get ruler() { return tr().nebo.tela[d.rulerKey]; },
+  };
+}
+
 export const SIGNS: ZodiacSign[] = [
-  { key: 'aries',       name: 'Ovan',      glyph: '♈\uFE0E', element: 'vatra',  ruler: 'Mars',    rulerKey: 'mars',     dates: '21.3 — 19.4' },
-  { key: 'taurus',      name: 'Bik',       glyph: '♉\uFE0E', element: 'zemlja', ruler: 'Venera',  rulerKey: 'venus',    dates: '20.4 — 20.5' },
-  { key: 'gemini',      name: 'Blizanci',  glyph: '♊\uFE0E', element: 'vazduh', ruler: 'Merkur',  rulerKey: 'mercury',  dates: '21.5 — 20.6' },
-  { key: 'cancer',      name: 'Rak',       glyph: '♋\uFE0E', element: 'voda',   ruler: 'Mesec',   rulerKey: 'moon',     dates: '21.6 — 22.7' },
-  { key: 'leo',         name: 'Lav',       glyph: '♌\uFE0E', element: 'vatra',  ruler: 'Sunce',   rulerKey: 'sun',      dates: '23.7 — 22.8' },
-  { key: 'virgo',       name: 'Devica',    glyph: '♍\uFE0E', element: 'zemlja', ruler: 'Merkur',  rulerKey: 'mercury',  dates: '23.8 — 22.9' },
-  { key: 'libra',       name: 'Vaga',      glyph: '♎\uFE0E', element: 'vazduh', ruler: 'Venera',  rulerKey: 'venus',    dates: '23.9 — 22.10' },
-  { key: 'scorpio',     name: 'Škorpija',  glyph: '♏\uFE0E', element: 'voda',   ruler: 'Pluton',  rulerKey: 'pluto',    dates: '23.10 — 21.11' },
-  { key: 'sagittarius', name: 'Strelac',   glyph: '♐\uFE0E', element: 'vatra',  ruler: 'Jupiter', rulerKey: 'jupiter',  dates: '22.11 — 21.12' },
-  { key: 'capricorn',   name: 'Jarac',     glyph: '♑\uFE0E', element: 'zemlja', ruler: 'Saturn',  rulerKey: 'saturn',   dates: '22.12 — 19.1' },
-  { key: 'aquarius',    name: 'Vodolija',  glyph: '♒\uFE0E', element: 'vazduh', ruler: 'Uran',    rulerKey: 'uranus',   dates: '20.1 — 18.2' },
-  { key: 'pisces',      name: 'Ribe',      glyph: '♓\uFE0E', element: 'voda',   ruler: 'Neptun',  rulerKey: 'neptune',  dates: '19.2 — 20.3' },
+  znak({ key: 'aries', glyph: '♈\uFE0E', element: 'vatra', rulerKey: 'mars', dates: '21.3 — 19.4' }),
+  znak({ key: 'taurus', glyph: '♉\uFE0E', element: 'zemlja', rulerKey: 'venus', dates: '20.4 — 20.5' }),
+  znak({ key: 'gemini', glyph: '♊\uFE0E', element: 'vazduh', rulerKey: 'mercury', dates: '21.5 — 20.6' }),
+  znak({ key: 'cancer', glyph: '♋\uFE0E', element: 'voda', rulerKey: 'moon', dates: '21.6 — 22.7' }),
+  znak({ key: 'leo', glyph: '♌\uFE0E', element: 'vatra', rulerKey: 'sun', dates: '23.7 — 22.8' }),
+  znak({ key: 'virgo', glyph: '♍\uFE0E', element: 'zemlja', rulerKey: 'mercury', dates: '23.8 — 22.9' }),
+  znak({ key: 'libra', glyph: '♎\uFE0E', element: 'vazduh', rulerKey: 'venus', dates: '23.9 — 22.10' }),
+  znak({ key: 'scorpio', glyph: '♏\uFE0E', element: 'voda', rulerKey: 'pluto', dates: '23.10 — 21.11' }),
+  znak({ key: 'sagittarius', glyph: '♐\uFE0E', element: 'vatra', rulerKey: 'jupiter', dates: '22.11 — 21.12' }),
+  znak({ key: 'capricorn', glyph: '♑\uFE0E', element: 'zemlja', rulerKey: 'saturn', dates: '22.12 — 19.1' }),
+  znak({ key: 'aquarius', glyph: '♒\uFE0E', element: 'vazduh', rulerKey: 'uranus', dates: '20.1 — 18.2' }),
+  znak({ key: 'pisces', glyph: '♓\uFE0E', element: 'voda', rulerKey: 'neptune', dates: '19.2 — 20.3' }),
 ];
 
 /**
  * Padezi imena znakova, za recenice: "Mars ulazi u Lava" (akuzativ),
  * "Retrogradna Venera u Skorpiji" (lokativ). Kljuc je `ZodiacSign.key`.
- * Odvojeno od `SIGNS` da se nominativ nigde ne pomesa sa padezom.
+ * Odvojeno od `SIGNS` da se nominativ nigde ne pomesa sa padezom. Iz recnika (`nebo.znaci`).
  */
-export const SIGN_CASES: Record<string, { acc: string; loc: string }> = {
-  aries:       { acc: 'Ovna',      loc: 'Ovnu' },
-  taurus:      { acc: 'Bika',      loc: 'Biku' },
-  gemini:      { acc: 'Blizance',  loc: 'Blizancima' },
-  cancer:      { acc: 'Raka',      loc: 'Raku' },
-  leo:         { acc: 'Lava',      loc: 'Lavu' },
-  virgo:       { acc: 'Devicu',    loc: 'Devici' },
-  libra:       { acc: 'Vagu',      loc: 'Vagi' },
-  scorpio:     { acc: 'Škorpiju',  loc: 'Škorpiji' },
-  sagittarius: { acc: 'Strelca',   loc: 'Strelcu' },
-  capricorn:   { acc: 'Jarca',     loc: 'Jarcu' },
-  aquarius:    { acc: 'Vodoliju',  loc: 'Vodoliji' },
-  pisces:      { acc: 'Ribe',      loc: 'Ribama' },
-};
+export const SIGN_CASES: Record<string, { acc: string; loc: string }> = new Proxy({} as Record<string, { acc: string; loc: string }>, {
+  get(_, key) {
+    const z = tr().nebo.znaci[key as ZnakKljuc];
+    return z ? { acc: z.akuzativ, loc: z.lokativ } : undefined;
+  },
+  has: (_, key) => key in tr().nebo.znaci,
+  ownKeys: () => Object.keys(tr().nebo.znaci),
+  getOwnPropertyDescriptor: (_, key) => (key in tr().nebo.znaci ? { enumerable: true, configurable: true } : undefined),
+});
 
 /** Normalizuje ugao u [0, 360). */
 export function norm360(deg: number): number {

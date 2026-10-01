@@ -7,6 +7,7 @@ import Animated, {
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /**
  * Koliko cifara ima kod sa mejla. SPREGNUTO sa Supabase-om (pravilo 15): `Email
@@ -30,6 +31,7 @@ const LENGTH = DUZINA_KODA;
  * vec unetih, a na ekranu bi stajale redom.
  */
 export function PoljeZaKod({ value, onChange }: { value: string; onChange: (kod: string) => void }) {
+  const t = useT();
   const [fokus, setFokus] = React.useState(false);
 
   return (
@@ -61,7 +63,7 @@ export function PoljeZaKod({ value, onChange }: { value: string; onChange: (kod:
 
       <TextInput
         value={value}
-        onChangeText={(t) => onChange(t.replace(/\D/g, '').slice(0, LENGTH))}
+        onChangeText={(v) => onChange(v.replace(/\D/g, '').slice(0, LENGTH))}
         onFocus={() => setFokus(true)}
         onBlur={() => setFokus(false)}
         selection={{ start: value.length, end: value.length }}
@@ -72,7 +74,7 @@ export function PoljeZaKod({ value, onChange }: { value: string; onChange: (kod:
         maxLength={LENGTH}
         caretHidden
         selectionColor="transparent"
-        accessibilityLabel="Šestocifreni kod"
+        accessibilityLabel={t.onboarding.poljeZaKod}
         style={styles.skrivenoPolje}
       />
     </View>

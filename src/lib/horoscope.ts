@@ -9,6 +9,7 @@
  * pravog sadrzaja. Izbacen je: stajao je na vrhu ekrana i ostavljao utisak
  * da je glas astrologa.
  */
+import { tr } from '@/i18n/jezik';
 import { findAspects, planetPositions, moonPhase, type Aspect } from '@/lib/astro';
 import {
   findTransits, findHouseTransits, pickHero, pickBrief, splitBySpeed, transitEnd, moonDay,
@@ -23,31 +24,28 @@ import type { ResolvedProfile } from '@/store/profile';
  * Mesta se razlikuju samo po tome sta nose (dan u nedelji, godina), ne po
  * obliku. Verzali ("TVOJ DAN · UTO, 29. SEP 2026") dolaze iz stila `oznaka`,
  * ne iz teksta. Datum se NE sklapa u ekranu — samo kroz funkcije ispod.
+ * Imena i oblik su u recniku (`i18n/sr/datum.ts`), po jeziku.
  */
 
-/** Skracena imena dana (nedelja je 0, kao `getDay()`). */
-const DANI_KRATKO = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
-/** Skracena imena meseci: "okt". */
-export const MESECI_KRATKO = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
-
-const veliko = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+/** Skracena imena meseci: "okt" — iz recnika, po jeziku. */
+export const mesecKratko = (m: number): string => tr().datum.mesecKratko[m];
 
 /**
  * Jedini sklapac datuma. "29. sep", uz `dan` "Uto, 29. sep", uz `godina`
  * "29. sep 2026". `utc` cita UTC polja (vidi `formatDate`).
  */
 export function datum(date: Date, { dan = false, godina = false, utc = false }: { dan?: boolean; godina?: boolean; utc?: boolean } = {}): string {
-  const d = utc ? date.getUTCDay() : date.getDay();
-  const broj = utc ? date.getUTCDate() : date.getDate();
-  const m = utc ? date.getUTCMonth() : date.getMonth();
-  const g = utc ? date.getUTCFullYear() : date.getFullYear();
-  const s = `${broj}. ${MESECI_KRATKO[m]}${godina ? ` ${g}` : ''}`;
-  return dan ? `${veliko(DANI_KRATKO[d])}, ${s}` : s;
+  return tr().datum.oblik({
+    dan: dan ? (utc ? date.getUTCDay() : date.getDay()) : null,
+    broj: utc ? date.getUTCDate() : date.getDate(),
+    mesec: utc ? date.getUTCMonth() : date.getMonth(),
+    godina: godina ? (utc ? date.getUTCFullYear() : date.getFullYear()) : null,
+  });
 }
 
 /** Datum rodjenja iz profila (mesec 1—12): "10. jul 1990". */
 export function datumRodjenja(b: { year: number; month: number; day: number }): string {
-  return `${b.day}. ${MESECI_KRATKO[b.month - 1]} ${b.year}`;
+  return tr().datum.oblik({ dan: null, broj: b.day, mesec: b.month - 1, godina: b.year });
 }
 
 /**
@@ -55,8 +53,8 @@ export function datumRodjenja(b: { year: number; month: number; day: number }): 
  * traje. `null` (iza horizonta od ~3 godine) daje "još godinama".
  */
 export function formatUntil(end: Date | null, today: Date = new Date()): string {
-  if (!end) return 'još godinama';
-  return `do ${formatDay(end, today)}`;
+  if (!end) return tr().datum.josGodinama;
+  return tr().datum.doDana(formatDay(end, today));
 }
 
 /** "14. nov", a druge godine "3. mar 2027" — za "od" i "do". */
@@ -70,7 +68,7 @@ export function formatDay(day: Date, today: Date = new Date()): string {
  * (Ivan, 28.9.2026). Verzale daje stil `oznaka` na mestu prikaza.
  */
 export function opsegDatuma(start: Date, end: Date): string {
-  return `${datum(start)} – ${datum(end, { godina: end.getFullYear() !== start.getFullYear() })}`;
+  return tr().datum.opseg(datum(start), datum(end, { godina: end.getFullYear() !== start.getFullYear() }));
 }
 
 /** "14:05" po lokalnom vremenu uredjaja. */
@@ -195,9 +193,7 @@ export function buildPersonalDaily(
     moonDay: moonDay(resolved.chart, date, resolved.timeUnknown),
     skyEvents: upcomingSkyEvents(resolved.chart, date, resolved.timeUnknown),
     moon: { phase: moonPhase(date).name, sign: moon.position.sign.name, glyph: moon.position.sign.glyph },
-    skyline:
-      `Mesec u znaku ${moon.position.sign.name} · ${moonPhase(date).name}` +
-      (retro.length ? ` · retrogradni: ${retro.map((r) => r.name).join(', ')}` : ''),
+    skyline: tr().danas.horoskop.nebo(moon.position.sign.name, moonPhase(date).name, retro.map((r) => r.name)),
     entries,
     houseHighlights,
   };

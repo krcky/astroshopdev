@@ -157,6 +157,18 @@ def _ts_blok(fajl: str, ime: str) -> str:
     return m.group(1)
 
 
+def _recnik_grana(deo: str, *put: str) -> str:
+    """Telo grane `a: { b: { ... } }` iz srpskog recnika (`src/i18n/sr/<deo>.ts`), po putanji kljuceva."""
+    fajl = f'src/i18n/sr/{deo}.ts'
+    s = (KOREN / fajl).read_text(encoding='utf-8')
+    for ime in put:
+        m = re.search(rf'\n([ \t]*){ime}: {{(.*?)\n\1}}', s, re.S)
+        if not m:
+            sys.exit(f'{fajl}: nema {".".join(put)} — promenjen oblik, popravi _recnik_grana')
+        s = '\n' + m.group(2)
+    return s
+
+
 def _osobine():
     blok = _ts_blok('src/lib/traits.ts', 'SUN_TRAITS')
     rr = re.findall(r"(\w+):\s*\['([^']*)',\s*'([^']*)',\s*'([^']*)'\]", blok)
@@ -165,15 +177,15 @@ def _osobine():
 
 
 def _faze():
-    ime = dict(re.findall(r"(\w+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'PHASE_NAME')))
-    rec = dict(re.findall(r"(\w+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'PHASE_SUMMARY_PRIVREMENO')))
+    ime = dict(re.findall(r"(\w+): '([^']*)'", _recnik_grana('karta', 'luna', 'faze')))
+    rec = dict(re.findall(r"(\w+): '([^']*)'", _recnik_grana('karta', 'luna', 'fazaPrivremeno')))
     red = ['new', 'waxing', 'first', 'full', 'waning', 'last']  # redom kroz ciklus
-    assert set(red) == set(rec) == set(ime), 'faze u moon.ts su se promenile'
+    assert set(red) == set(rec) == set(ime), 'faze u recniku (karta.luna) su se promenile'
     return [[ime[k], rec[k], None, f'phase.{k}'] for k in red]
 
 
 def _kuce():
-    teme = dict(re.findall(r"(\d+): '([^']*)'", _ts_blok('src/lib/moon.ts', 'HOUSE_THEMES')))
+    teme = dict(re.findall(r"(\d+): '([^']*)'", _recnik_grana('karta', 'luna', 'temeKuca')))
     assert sorted(map(int, teme)) == list(range(1, 13)), 'HOUSE_THEMES: ocekivano 12 kuca'
     return [[f'{n}. kuća', teme[str(n)], None, None, None, f'house.{n}'] for n in range(1, 13)]
 

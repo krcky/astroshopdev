@@ -39,6 +39,7 @@ import { useBackdropStore, type ScreenBackground } from '@/store/backdrop';
 import { STARI_IOS } from '@/lib/platform';
 import { TRAKA_VIDEA_VISINA, useTrakaVidea } from '@/components/prica/video-traka';
 import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
+import { useT } from '@/i18n';
 
 /**
  * Zajednicki okvir ekrana — preliv na vrhu, zamucena traka, sadrzaj koji klizi
@@ -480,11 +481,12 @@ export function IznadPreliva({ podignuto, className, children }: {
  * `-ml-3` vraca samu strelicu na marginu ekrana, da ne odskoci od sadrzaja.
  */
 function BackButton() {
+  const t = useT();
   return (
     <Pressable
       onPress={() => router.back()}
       accessibilityRole="button"
-      accessibilityLabel="Nazad"
+      accessibilityLabel={t.opste.nazad}
       className="-ml-3 h-11 w-11 items-center justify-center active:opacity-60">
       <ChevronLeft size={26} color={neutral.ink} />
     </Pressable>

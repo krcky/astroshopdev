@@ -11,7 +11,7 @@ import { KucaBroj } from '@/components/kuca-broj';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { formatDatum, formatUntil } from '@/lib/horoscope';
-import { SIGN_CASES } from '@/lib/zodiac';
+import { useT } from '@/i18n';
 import type { SkyEvent } from '@/lib/sky-events';
 
 /**
@@ -43,16 +43,17 @@ const ZNAK = 26;
 const PRSTEN = 3;
 
 export function PromenaNaNebu({ e, today }: { e: SkyEvent; today: Date }) {
-  // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad).
-  const zenski = e.planet.key === 'venus';
-  const znak = SIGN_CASES[e.sign.key];
+  const t = useT();
+  const p = t.danas.promena;
+  const z = e.sign.key as keyof typeof t.nebo.znaci;
+  // Venera je jedina planeta zenskog roda koja menja smer (Sunce nikad) — rod bira recnik po kljucu.
   const naslov =
-    e.kind === 'ingress' ? `${e.planet.name} ulazi u ${znak.acc}`
-    : e.kind === 'retrograde' ? `${zenski ? 'Retrogradna' : 'Retrogradni'} ${e.planet.name} u ${znak.loc}`
-    : `${e.planet.name} ponovo ${zenski ? 'direktna' : 'direktan'} u ${znak.loc}`;
-  const kuca = e.house === null ? null : `U tvojoj ${e.house}. kući`;
+    e.kind === 'ingress' ? p.ulazi(e.planet.name, t.nebo.uZnak(z))
+    : e.kind === 'retrograde' ? p.retrogradna(e.planet.key, e.planet.name, t.nebo.uZnaku(z))
+    : p.direktna(e.planet.key, e.planet.name, t.nebo.uZnaku(z));
+  const kuca = e.house === null ? null : t.danas.tranzit.uTvojojKuci(e.house);
   // Direktno kretanje nema kraj — tu stoji samo kuca.
-  const trajanje = e.kind === 'direct' ? null : `Traje ${formatUntil(e.until, today)}`;
+  const trajanje = e.kind === 'direct' ? null : p.traje(formatUntil(e.until, today));
   const datum = formatDatum(e.at);
 
   return (

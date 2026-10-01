@@ -7,6 +7,7 @@ import { OnboardingStep } from '@/components/onboarding-step';
 import { DUZINA_KODA, PoljeZaKod } from '@/components/polje-za-kod';
 import { useTurnstile } from '@/components/turnstile';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { pullProfile } from '@/lib/sync';
 import { datumRodjenja } from '@/lib/horoscope';
@@ -23,6 +24,8 @@ const POKUSAJA = 3;
 const PAUZA_MS = 800;
 
 export default function Code() {
+  const t = useT();
+  const tk = t.onboarding.kod;
   // `nov` = dolazi se iz "Napravi nalog" (reveal -> account), vidi `lib/signup.ts`.
   const { email, nov } = useLocalSearchParams<{ email: string; nov?: string }>();
   const [code, setCode] = React.useState('');
@@ -57,7 +60,7 @@ export default function Code() {
         // samo sto je stigao"). Najcesce je upisan kod iz STARIJEG mejla: svaki nov kod
         // ponistava prethodni.
         if (__DEV__) console.log('[kod] provera odbijena:', error?.code, error?.message);
-        setError('Kod nije tačan ili više ne važi. Upiši kod iz najnovijeg mejla ili pošalji novi.');
+        setError(tk.netacan);
         return;
       }
       id = data.session.user.id;
@@ -88,7 +91,7 @@ export default function Code() {
     }
     setBusy(false);
     if (ishod === null) {
-      setError('Kod je potvrđen, ali nalog nije učitan. Proveri internet pa pritisni Potvrdi ponovo.');
+      setError(tk.nalogNijeUcitan);
       return;
     }
     if (ishod !== 'zauzet') router.replace(routeAfterSignup(ishod));
@@ -116,14 +119,14 @@ export default function Code() {
       try {
         captchaToken = await captcha.getToken();
       } catch {
-        setError('Nismo uspeli da potvrdimo da nisi robot. Probaj ponovo.');
+        setError(tk.robot);
         return;
       }
       const { error } = await supabase.auth.signInWithOtp({
         email: String(email),
         options: { captchaToken },
       });
-      if (error) setError('Sačekaj minut pre nego što tražiš novi kod.');
+      if (error) setError(tk.sacekaj);
       else setResentAt(Date.now());
     } finally {
       setSaljemNovi(false);
@@ -131,20 +134,20 @@ export default function Code() {
   };
 
   if (zauzet) {
+    const podnaslov = tk.zauzetPodnaslov(datumRodjenja(zauzet.birth), zauzet.cityName);
     return (
       <OnboardingStep
         exit={{ kind: 'back', onPress: drugiEmail }}
         icon={UserRoundCheck}
-        title="Ovaj email već ima nalog"
+        title={tk.zauzetNaslov}
         subtitle={
           <>
-            Na nalogu <Text className={tezina('naslovUTekstu')}>{email}</Text> je karta za{' '}
-            {datumRodjenja(zauzet.birth)}, {zauzet.cityName}. Za nov nalog unesi drugi email.
+            {podnaslov.pre}<Text className={tezina('naslovUTekstu')}>{email}</Text>{podnaslov.posle}
           </>
         }
-        note="Ako uđeš u postojeći nalog, podaci iz prethodnih koraka se ne čuvaju."
-        primary={{ label: 'Unesi drugi email', onPress: drugiEmail }}
-        secondary={{ label: 'Uđi u taj nalog', onPress: udjiUPostojeci }}
+        note={tk.zauzetNapomena}
+        primary={{ label: tk.unesiDrugi, onPress: drugiEmail }}
+        secondary={{ label: tk.udjiUTaj, onPress: udjiUPostojeci }}
       />
     );
   }
@@ -153,17 +156,17 @@ export default function Code() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={MessageSquareMore}
-      title="Unesi kod"
+      title={tk.naslov}
       subtitle={
         <>
-          Poslali smo šestocifreni kod na{'\n'}
-          <Text className={tezina('naslovUTekstu')}>{email}</Text>.
+          {tk.poslatPre}
+          <Text className={tezina('naslovUTekstu')}>{email}</Text>{tk.poslatPosle}
         </>
       }
       center={false}
       note={null}
       primary={{
-        label: 'Potvrdi',
+        label: tk.potvrdi,
         onPress: verify,
         disabled: code.length !== LENGTH,
         ucitava: busy,
@@ -172,12 +175,12 @@ export default function Code() {
       <View className="items-center">
         <PoljeZaKod
           value={code}
-          onChange={(t) => { setCode(t); setError(null); }}
+          onChange={(v) => { setCode(v); setError(null); }}
         />
 
         {error && <Text className="mt-4 px-2 text-center text-sm text-destructive">{error}</Text>}
         {resentAt && !error && (
-          <Text variant="muted" className="mt-4 text-center text-sm">Novi kod je poslat.</Text>
+          <Text variant="muted" className="mt-4 text-center text-sm">{tk.noviPoslat}</Text>
         )}
 
         {/* Ispod polja, a ne ispod dugmeta: sa otvorenom tastaturom dno je samo
@@ -186,13 +189,13 @@ export default function Code() {
           onPress={resend}
           disabled={saljemNovi}
           accessibilityRole="button"
-          accessibilityLabel="Pošalji novi kod"
+          accessibilityLabel={tk.posaljiNovi}
           accessibilityState={{ disabled: saljemNovi, busy: saljemNovi }}
           hitSlop={8}
           className="mt-6 py-2 active:opacity-60">
           {saljemNovi
             ? <ActivityIndicator color={neutral.ink} />
-            : <Text variant="label" className="text-foreground underline">Pošalji novi kod</Text>}
+            : <Text variant="label" className="text-foreground underline">{tk.posaljiNovi}</Text>}
         </Pressable>
       </View>
 

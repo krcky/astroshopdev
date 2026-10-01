@@ -13,9 +13,10 @@ import { AstrologSlika } from '@/components/astrolog-slika';
 import { BezInterneta } from '@/components/bez-interneta';
 import { PitajUvod } from '@/components/pitaj-uvod';
 import { KapsuleRed } from '@/components/ui/kapsule';
+import { useT } from '@/i18n';
 import { Kvacica } from '@/components/ui/kvacica';
 import {
-  ASTROLOG, OKVIRNI_ROK, PITANJE_MAX, pitanjeSpremno, porukaGreske, snimakKarte, snimakODrugoj,
+  ASTROLOG, PITANJE_MAX, pitanjeSpremno, porukaGreske, snimakKarte, snimakODrugoj,
 } from '@/lib/pitanja';
 import { useKarta, useOsobe, useOtvoreneOsobe } from '@/lib/osobe-api';
 import { posaljiKreditom, sacuvajNacrt, useKrediti, useMojaPitanja, useOsveziPitanja } from '@/lib/pitanja-api';
@@ -31,12 +32,10 @@ import { neutral } from '@/theme/tokens';
 const JA = 'ja';
 
 /** Poruka posle kupovine koja nije zavrsena. Pitanje je u svakom slucaju sacuvano. */
-const POSLE_KUPOVINE: Record<Exclude<IshodKupovine, 'placeno'>, string> = {
-  odustao: 'Pitanje je sačuvano. Možeš da ga pošalješ kasnije.',
-  ceka: `Plaćanje čeka odobrenje. Pitanje stiže ${ASTROLOG.dativ} čim se potvrdi.`,
-  greska: 'Plaćanje nije završeno. Pitanje je sačuvano — pokušaj ponovo.',
-  nedostupno: 'Plaćanje u aplikaciji još nije uključeno. Pitanje je sačuvano i čeka ovde.',
-};
+function posleKupovine(ishod: Exclude<IshodKupovine, 'placeno'>, t: ReturnType<typeof useT>): string {
+  const p = t.pitaj.novo.posleKupovine;
+  return ishod === 'ceka' ? p.ceka(ASTROLOG.dativ) : p[ishod];
+}
 
 /**
  * Pisanje pitanja astrologu — list odozdo preko celog ekrana (`presentation:
@@ -57,6 +56,8 @@ const POSLE_KUPOVINE: Record<Exclude<IshodKupovine, 'placeno'>, string> = {
  * otvara odmah polje.
  */
 export default function PitanjeNovo() {
+  const t = useT();
+  const tn = t.pitaj.novo;
   // `osoba`: otvoreno sa strane osobe (29.9.2026) — pitanje je o njoj.
   const { korak: pocetniKorak, osoba: pocetnaOsoba } = useLocalSearchParams<{ korak?: string; osoba?: string }>();
   const [korak, setKorak] = React.useState<'uvod' | 'pisanje'>(pocetniKorak === 'uvod' ? 'uvod' : 'pisanje');
@@ -113,8 +114,8 @@ export default function PitanjeNovo() {
   // Cuvanje na telefonu dok se kuca — pola sekunde posle poslednjeg slova.
   React.useEffect(() => {
     if (!ucitano || !uid || poslato) return;
-    const t = setTimeout(() => upisiLokalno(uid, tekst), 500);
-    return () => clearTimeout(t);
+    const tajmer = setTimeout(() => upisiLokalno(uid, tekst), 500);
+    return () => clearTimeout(tajmer);
   }, [tekst, ucitano, uid, poslato]);
 
   // Dugme i napomena stoje iznad tastature. Bez tastature: iznad home indikatora.
@@ -151,7 +152,7 @@ export default function PitanjeNovo() {
       }
       const ishod = await kupiPitanje(id, premium);
       if (ishod === 'placeno') { await zavrsi(); return; }
-      setPoruka(POSLE_KUPOVINE[ishod]);
+      setPoruka(posleKupovine(ishod, t));
       osvezi();
     } catch (e) {
       setPoruka(porukaGreske((e as Error)?.message));
@@ -163,12 +164,12 @@ export default function PitanjeNovo() {
     return (
       <View className="flex-1 items-center justify-center bg-background px-8" style={{ paddingBottom: dno }}>
         <AstrologSlika velicina={88} />
-        <Text variant="h1" className="mt-6 text-center">Pitanje je poslato.</Text>
+        <Text variant="h1" className="mt-6 text-center">{tn.poslatoNaslov}</Text>
         <Text variant="body" className="mt-2 text-center">
-          {ASTROLOG.kratko} odgovara {OKVIRNI_ROK}. Odgovor će se pojaviti u „Mojim pitanjima“.
+          {tn.poslatoOpis(ASTROLOG.kratko)}
         </Text>
         <Button className="mt-8 self-stretch" onPress={() => router.back()}>
-          <Text>Zatvori</Text>
+          <Text>{t.opste.zatvori}</Text>
         </Button>
       </View>
     );
@@ -183,7 +184,7 @@ export default function PitanjeNovo() {
         </ScrollView>
         <View className="px-6 pt-3" style={{ paddingBottom: dno }}>
           <Button istaknuto onPress={() => setKorak('pisanje')}>
-            <Text>Napiši pitanje</Text>
+            <Text>{tn.napisi}</Text>
           </Button>
         </View>
       </View>
@@ -191,10 +192,10 @@ export default function PitanjeNovo() {
   }
 
   const napomena = !naMrezi
-    ? 'Za slanje pitanja potreban je internet.'
+    ? tn.bezInterneta
     : kreditom
-      ? 'Ovo pitanje je već plaćeno. Posle slanja ne može da se menja.'
-      : `${cena ? `${cena} · jednokratno plaćanje. ` : ''}Posle plaćanja pitanje ne može da se menja.`;
+      ? tn.vecPlaceno
+      : tn.placanje(cena ?? null);
 
   return (
     <View className="flex-1 bg-background">
@@ -203,13 +204,13 @@ export default function PitanjeNovo() {
       <View className="flex-row items-center gap-3 px-6 pt-5">
         <AstrologSlika velicina={44} />
         <View className="flex-1">
-          <Text variant="h3">Pitanje za {ASTROLOG.genitiv}</Text>
+          <Text variant="h3">{tn.naslov(ASTROLOG.genitiv)}</Text>
           <Text variant="caption">
             {!osoba
-              ? `${ASTROLOG.kratko} vidi tvoju kartu, pa ne moraš da pišeš datum ni mesto rođenja.`
+              ? tn.vidiTvoju(ASTROLOG.kratko)
               : oOdnosu
-                ? `${ASTROLOG.kratko} vidi obe karte, pa ne moraš da pišeš podatke o rođenju.`
-                : `${ASTROLOG.kratko} vidi kartu osobe o kojoj pitaš, pa ne moraš da pišeš podatke te osobe.`}
+                ? tn.vidiObe(ASTROLOG.kratko)
+                : tn.vidiOsobe(ASTROLOG.kratko)}
           </Text>
         </View>
       </View>
@@ -217,15 +218,15 @@ export default function PitanjeNovo() {
       {/* O kome je pitanje — samo kad korisnik ima druge osobe ("Tvoji ljudi" na tabu "Ti"). */}
       {izbor.length > 0 && (
         <View className="mt-5 px-6">
-          <Text variant="label" className="mb-2">O kome je pitanje</Text>
+          <Text variant="label" className="mb-2">{tn.oKome}</Text>
           <KapsuleRed
-            stavke={[{ key: JA, label: 'Ja', icon: null }, ...izbor.map((o) => ({ key: o.id, label: o.name, icon: null }))]}
+            stavke={[{ key: JA, label: tn.ja, icon: null }, ...izbor.map((o) => ({ key: o.id, label: o.name, icon: null }))]}
             izabrana={osobaId ?? JA}
             onIzbor={(k) => { setOsobaId(k === JA ? null : k); if (k === JA) setOOdnosu(false); }}
           />
           {osoba && (
             <Kvacica ukljuceno={oOdnosu} onPromena={setOOdnosu} className="mt-3">
-              Pitanje je o nama dvoma — pošalji i moju kartu
+              {tn.oNamaDvoma}
             </Kvacica>
           )}
         </View>
@@ -242,12 +243,12 @@ export default function PitanjeNovo() {
         maxLength={PITANJE_MAX}
         textAlignVertical="top"
         placeholder={!osoba
-          ? 'Npr. Razmišljam da promenim posao ove jeseni. Šta moja karta kaže o tom periodu?'
+          ? tn.primerJa
           : oOdnosu
-            ? 'Npr. Kako da se bolje razumemo kad se ne slažemo?'
-            : 'Npr. Na šta da obratim pažnju ove jeseni? Šta kaže karta ove osobe?'}
+            ? tn.primerOdnos
+            : tn.primerOsoba}
         placeholderTextColor={neutral.inkSubtle}
-        accessibilityLabel="Tvoje pitanje"
+        accessibilityLabel={tn.poljeOpis}
         // Bez okvira i bez sive podloge — polje je papir, kursor je jedini znak.
         className="mt-5 flex-1 px-6 font-sans text-row leading-[26px] text-foreground"
         style={Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : undefined}
@@ -259,7 +260,7 @@ export default function PitanjeNovo() {
         <View className="gap-3 px-6 pt-3">
           {/* Crveno kad je tekst duzi od granice (npr. nacrt iz vremena kad je bila 1000). */}
           <Text variant="caption" className={cn('text-right', tekst.length > PITANJE_MAX && 'text-destructive')}>
-            {tekst.length} / {PITANJE_MAX}
+            {tn.brojac(tekst.length, PITANJE_MAX)}
           </Text>
           {poruka ? (
             <Text variant="note" className="text-foreground">{poruka}</Text>
@@ -268,7 +269,7 @@ export default function PitanjeNovo() {
           )}
           {/* Ugaseno SIVO: belo dugme na belom listu je izgledalo kao sam natpis (Ivan). */}
           <Button istaknuto onPress={posalji} disabled={!spremno} ucitava={saljem}>
-            <Text>{kreditom ? 'Pošalji pitanje' : 'Nastavi na plaćanje'}</Text>
+            <Text>{kreditom ? tn.posalji : tn.naPlacanje}</Text>
           </Button>
         </View>
       </Animated.View>
@@ -284,11 +285,12 @@ export default function PitanjeNovo() {
  * preko celog ekrana); sistemsko "nazad" i dalje radi.
  */
 function Vrh() {
+  const t = useT();
   const insets = useSafeAreaInsets();
   if (Platform.OS !== 'android') return <Rucica />;
   return (
     <View className="flex-row justify-end px-5" style={{ paddingTop: insets.top + VRH_ANDROID }}>
-      <GlassIconButton onPress={() => router.back()} accessibilityLabel="Zatvori">
+      <GlassIconButton onPress={() => router.back()} accessibilityLabel={t.opste.zatvori}>
         <X size={20} color={neutral.ink} />
       </GlassIconButton>
     </View>

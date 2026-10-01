@@ -7,12 +7,13 @@
  * osnove znaka, kamen/boja/biljka/hrana, vladar. Tekst je sa sajta (`znak-opis-podaci.ts`),
  * a element, kvalitet, doba godine, polaritet i srodni znaci se RACUNAJU iz mesta znaka u krugu.
  */
+import { tr } from '@/i18n/jezik';
 import { datum } from '@/lib/horoscope';
 import type { NatalChart } from '@/lib/natal';
 import { moonSignForUnknownTime } from '@/lib/natal-keys';
 import { TRAJANJE_STALNO, trajanjeSlike } from '@/lib/prica';
 import { ZNAK_OPIS, type ZnakOpis } from '@/lib/znak-opis-podaci';
-import { SIGN_CASES, SIGNS, type Element, type ZodiacSign } from '@/lib/zodiac';
+import { SIGNS, type Element, type ZodiacSign } from '@/lib/zodiac';
 
 export type SlikaZnaka =
   | 'sazvezdje' | 'naslovna' | 'ukratko' | 'ljubav' | 'posao' | 'osvojiti' | 'osnove' | 'stvari' | 'vladar';
@@ -26,21 +27,11 @@ export function tamnaSlikaZnaka(k: SlikaZnaka): boolean {
   return k === 'sazvezdje' || k === 'osvojiti';
 }
 
-const REDNI = ['Prvi', 'Drugi', 'Treći', 'Četvrti', 'Peti', 'Šesti', 'Sedmi', 'Osmi', 'Deveti', 'Deseti', 'Jedanaesti', 'Dvanaesti'];
-export const ELEMENT_IME: Record<Element, string> = { vatra: 'Vatra', zemlja: 'Zemlja', vazduh: 'Vazduh', voda: 'Voda' };
-const ELEMENT_PRIDEV: Record<Element, string> = { vatra: 'vatreni', zemlja: 'zemljani', vazduh: 'vazdušni', voda: 'vodeni' };
+/** Kvalitet znaka — kljuc; ime je u recniku (`prica.znak.kvalitet`). */
+export type KvalitetKljuc = 'kardinalan' | 'fiksni' | 'promenljiv';
+const KVALITETI: readonly KvalitetKljuc[] = ['kardinalan', 'fiksni', 'promenljiv'];
+export type PolaritetKljuc = 'pozitivan' | 'negativan';
 
-export type Kvalitet = 'Kardinalan' | 'Fiksni' | 'Promenljiv';
-const KVALITETI: readonly Kvalitet[] = ['Kardinalan', 'Fiksni', 'Promenljiv'];
-const KVALITET_PRIDEV: Record<Kvalitet, string> = { Kardinalan: 'kardinalni', Fiksni: 'fiksni', Promenljiv: 'promenljivi' };
-/** Doba godine: [akuzativ, genitiv] — "otvara proleće", "sredina proleća". Severna polulopta. */
-const DOBA: readonly (readonly [string, string])[] = [['proleće', 'proleća'], ['leto', 'leta'], ['jesen', 'jeseni'], ['zimu', 'zime']];
-
-/** Instrumental imena znaka: "Ovnom vlada Mars". (Nominativ, akuzativ i lokativ su u `zodiac.ts`.) */
-export const INSTRUMENTAL: Record<string, string> = {
-  aries: 'Ovnom', taurus: 'Bikom', gemini: 'Blizancima', cancer: 'Rakom', leo: 'Lavom', virgo: 'Devicom',
-  libra: 'Vagom', scorpio: 'Škorpijom', sagittarius: 'Strelcem', capricorn: 'Jarcem', aquarius: 'Vodolijom', pisces: 'Ribama',
-};
 /**
  * Latinsko ime SAZVEZDJA (IAU) — natpis uz crtez na slici "Sazvezdje", kao u zvezdanom atlasu (Ivan,
  * 1.10.2026). Imena sazvezdja, ne znakova: Scorpius i Capricornus, ne Scorpio i Capricorn.
@@ -64,9 +55,6 @@ export function vrhNatpisaSazvezdja(najnize: number, sirina: number, visina: num
   return visina / 2 + najnize * Math.min(sirina, visina) * popuna + razmak;
 }
 
-/** Znaci cije je ime u mnozini: "Blizanci vladaju", ne "vlada". */
-const MNOZINA = new Set(['gemini', 'pisces']);
-
 /** Recenica sa sajta ide na sliku samo ako nije duza od ovoga — duza bi potisnula naslov. */
 export const NAJDUZA_RECENICA = 34;
 
@@ -86,10 +74,14 @@ export type PricaZnaka = {
   datumi: string;
   element: Element;
   elementIme: string;
-  kvalitet: Kvalitet;
+  kvalitetKljuc: KvalitetKljuc;
+  /** Ime kvaliteta: "Kardinalan" (recnik). */
+  kvalitet: string;
   /** "otvara proleće", "sredina leta", "kraj zime" */
   doba: string;
-  polaritet: 'Pozitivan' | 'Negativan';
+  polaritetKljuc: PolaritetKljuc;
+  /** "Pozitivan" / "Negativan" (recnik). */
+  polaritet: string;
   polaritetOpis: string;
   /** "kao Lav i Strelac" */
   srodni: string;
@@ -124,17 +116,16 @@ function recenica(t: string): string | null {
 export function datumiZnaka(z: ZodiacSign): string {
   const [od, doo] = z.dates.split('—').map((d) => d.trim().split('.').map(Number));
   const dan = ([d, m]: number[]) => datum(new Date(Date.UTC(2001, m - 1, d)), { utc: true });
-  return `${dan(od)} – ${dan(doo)}`;
+  return tr().datum.opseg(dan(od), dan(doo));
 }
 
-export function kvalitetZnaka(i: number): Kvalitet {
+export function kvalitetZnaka(i: number): KvalitetKljuc {
   return KVALITETI[i % 3];
 }
 
 /** Doba godine koje znak otvara, sredina ili kraj — kardinalni znaci otvaraju doba (severna polulopta). */
 export function dobaZnaka(i: number): string {
-  const [akuzativ, genitiv] = DOBA[Math.floor(i / 3)];
-  return [`otvara ${akuzativ}`, `sredina ${genitiv}`, `kraj ${genitiv}`][i % 3];
+  return tr().prica.znak.doba(Math.floor(i / 3), i % 3);
 }
 
 /** Ostala dva znaka istog elementa, redom u krugu. */
@@ -142,17 +133,17 @@ export function srodniZnaci(z: ZodiacSign): ZodiacSign[] {
   return SIGNS.filter((s) => s.key !== z.key && s.element === z.element);
 }
 
-/** Za Lava (vladar Sunce, uvek u Lavu) umesto znaka vladara: grcko ime Sunca (Ivan, 1.10.2026). */
-const VLADAR_MIT: Record<string, string> = { sun: 'Grci su ga zvali Helios.' };
-
 /**
  * "U tvojoj natalnoj karti Mars je u Biku." Dva znaka (Mesec bez vremena rodjenja) -> "u Blizancima ili Raku",
  * kao trojka na tabu "Ti" — radije priznati nego pogadjati (pravilo 4).
  */
 export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null): string | null {
-  if (VLADAR_MIT[vladarKey]) return VLADAR_MIT[vladarKey];
+  const t = tr();
+  // Za Lava (vladar Sunce, uvek u Lavu) umesto znaka vladara: grcko ime Sunca (Ivan, 1.10.2026).
+  const mit = t.prica.znak.vladarMit[vladarKey];
+  if (mit) return mit;
   if (!znaci?.length) return null;
-  return `U tvojoj natalnoj karti ${vladarIme} je u ${znaci.map((z) => SIGN_CASES[z].loc).join(' ili ')}.`;
+  return t.prica.znak.vladarRecenica(vladarIme, znaci.map((z) => t.nebo.znaci[z as keyof typeof t.nebo.znaci].lokativ));
 }
 
 /**
@@ -163,28 +154,32 @@ export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: 
   if (i < 0) throw new Error(`nepoznat znak ${znakKey}`);
   const znak = SIGNS[i];
   const opis = ZNAK_OPIS[znak.key];
-  const kvalitet = kvalitetZnaka(i);
-  const pridev = ELEMENT_PRIDEV[znak.element];
-  const osnove = `${pridev[0].toUpperCase()}${pridev.slice(1)}, ${KVALITET_PRIDEV[kvalitet]} znak`;
-  const polaritet = i % 2 === 0 ? 'Pozitivan' : 'Negativan';
-  const vladarNaslov = `${INSTRUMENTAL[znak.key]} vlada ${znak.ruler}`;
+  const t = tr().prica.znak;
+  const kvalitetKljuc = kvalitetZnaka(i);
+  const kvalitet = t.kvalitet[kvalitetKljuc];
+  const osnove = t.osnove(znak.element, kvalitetKljuc);
+  const polaritetKljuc: PolaritetKljuc = i % 2 === 0 ? 'pozitivan' : 'negativan';
+  const polaritet = t.polaritet[polaritetKljuc];
+  const vladarNaslov = t.vladarNaslov(znak.key, znak.ruler);
   const ukratko = `${uz(opis.ukratko)}.`;
   const p: Omit<PricaZnaka, 'trajanja'> = {
     znak,
     opis,
     stepen,
-    redni: `${REDNI[i]} znak zodijaka`,
+    redni: t.redni(i),
     latinsko: LATINSKO_IME[znak.key],
     datumi: datumiZnaka(znak),
     element: znak.element,
-    elementIme: ELEMENT_IME[znak.element],
+    elementIme: t.element[znak.element],
+    kvalitetKljuc,
     kvalitet,
     doba: dobaZnaka(i),
+    polaritetKljuc,
     polaritet,
-    polaritetOpis: polaritet === 'Pozitivan' ? 'kao svi vatreni i vazdušni znaci' : 'kao svi zemljani i vodeni znaci',
-    srodni: `kao ${srodniZnaci(znak).map((s) => s.name).join(' i ')}`,
+    polaritetOpis: t.polaritetOpis[polaritetKljuc],
+    srodni: t.srodni(srodniZnaci(znak).map((s) => s.name)),
     osnove,
-    teloOznaka: `Deo tela kojim ${znak.name} ${MNOZINA.has(znak.key) ? 'vladaju' : 'vlada'}`,
+    teloOznaka: t.teloOznaka(znak.key, znak.name),
     vladarNaslov,
     vladar: { key: znak.rulerKey, ime: znak.ruler },
     vladarRecenica: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci),
@@ -202,7 +197,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: 
     posao: [opis.posao, p.posaoRecenica ?? ''].join(' '),
     osvojiti: opis.osvojiti,
     osnove: [osnove, p.elementIme, kvalitet, opis.pol, polaritet, opis.izgled, opis.telo].join(' '),
-    stvari: ['Kamen, boja, biljka i hrana', opis.kamen, opis.boja, opis.biljka, opis.hrana, opis.zivotinja].join(' '),
+    stvari: [t.stvariNaslov, opis.kamen, opis.boja, opis.biljka, opis.hrana, opis.zivotinja].join(' '),
     vladar: [vladarNaslov, p.vladarRecenica ?? ''].join(' '),
   };
   const trajanja = SLIKE_ZNAKA.map((k) => (tekst[k] === null ? TRAJANJE_STALNO.naslovna : trajanjeSlike(tekst[k]!)));
@@ -232,22 +227,23 @@ export function pricaZaKartu(r: { chart: NatalChart; timeUnknown: boolean; zoneU
 
 /**
  * Natpisi koji zavise od toga ko gleda: u prici "ti", na slici za deljenje prvo lice — sliku
- * objavljuje korisnik (kao "Moj dan" u dnevnoj prici).
+ * objavljuje korisnik (kao "Moj dan" u dnevnoj prici). Iz recnika, u trenutku citanja.
  */
 export const NATPISI = {
-  sazvezdjeOznaka: { ti: 'Tvoje sazvežđe', ja: 'Moje sazvežđe' },
-  sazvezdjeNaslov: { ti: 'Po ovim zvezdama je tvoj znak dobio ime.', ja: 'Po ovim zvezdama je moj znak dobio ime.' },
-  osvojitiOznaka: { ti: 'Kako te osvojiti', ja: 'Kako da me osvojiš' },
-} as const;
+  get sazvezdjeOznaka() { return tr().prica.znak.sazvezdjeOznaka; },
+  get sazvezdjeNaslov() { return tr().prica.znak.sazvezdjeNaslov; },
+  get osvojitiOznaka() { return tr().prica.znak.osvojitiOznaka; },
+};
 
 /** Ime fajla slike za deljenje: "Astro Shop Ovan" (bez nastavka). */
 export function imeSlikeZnaka(z: ZodiacSign): string {
-  return `Astro Shop ${z.name}`;
+  return tr().prica.imeFajla(z.name);
 }
 
-/** Lokativ imena znaka za dugme "Pročitaj: Sunce u Ovnu". */
+/** Tema za dugme "Pročitaj: Sunce u Ovnu". */
 export function sunceU(z: ZodiacSign): string {
-  return `Sunce u ${SIGN_CASES[z.key].loc}`;
+  const t = tr();
+  return t.prica.znak.sunceU(t.nebo.uZnaku(z.key as keyof typeof t.nebo.znaci));
 }
 
 /**

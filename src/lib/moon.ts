@@ -5,8 +5,21 @@
  * crtez, lunarni dan, sledeci mlad i pun Mesec, element i deo biljke.
  */
 import * as Astronomy from 'astronomy-engine';
+import { tr } from '@/i18n/jezik';
 import type { Element, ZodiacSign } from '@/lib/zodiac';
 import { houseOf, type NatalChart } from '@/lib/natal';
+
+/**
+ * Natpisi su u recniku (`i18n/sr/karta.ts`, `luna`) i citaju se U TRENUTKU citanja:
+ * objekat ima getter za svaki kljuc, pa pozivaoci i dalje pisu `PLANT_PART[e]`.
+ */
+function izRecnika<K extends string | number>(kljucevi: readonly K[], tekst: (k: K) => string): Record<K, string> {
+  const o = {} as Record<K, string>;
+  for (const k of kljucevi) Object.defineProperty(o, k, { get: () => tekst(k), enumerable: true });
+  return o;
+}
+
+const ELEMENTI: readonly Element[] = ['vatra', 'zemlja', 'vazduh', 'voda'];
 
 export type MoonState = {
   /** Ugao faze 0—360: 0 mlad, 90 prva cetvrt, 180 pun, 270 poslednja cetvrt. */
@@ -54,13 +67,9 @@ export function formatIllumination(f: number): string {
  * (Maria Thun): vatra plod, zemlja koren, vazduh cvet, voda list.
  * PRAVILO CEKA POTVRDU ASTROLOGA (27.9.2026).
  */
-export const PLANT_PART: Record<Element, string> = {
-  vatra: 'Plod', zemlja: 'Koren', vazduh: 'Cvet', voda: 'List',
-};
+export const PLANT_PART: Record<Element, string> = izRecnika(ELEMENTI, (e) => tr().karta.luna.biljka[e]);
 
-export const ELEMENT_NAME: Record<Element, string> = {
-  vatra: 'Vatra', zemlja: 'Zemlja', vazduh: 'Vazduh', voda: 'Voda',
-};
+export const ELEMENT_NAME: Record<Element, string> = izRecnika(ELEMENTI, (e) => tr().karta.elementi[e]);
 
 export function moonElement(sign: ZodiacSign) {
   return { element: ELEMENT_NAME[sign.element], plant: PLANT_PART[sign.element] };
@@ -125,13 +134,16 @@ export function moonSignAt(
  * Oblasti lunarnog kalendara — iste kao u tekstovima astrologa (faza x znak x
  * oblast, `lib/lunar-texts.ts`). Tekstovi su u bazi (pravilo 7), ne u kodu.
  */
+const oblast = <K extends 'ljubav' | 'zdravlje' | 'karijera' | 'kuca' | 'basta'>(key: K) =>
+  ({ key, get name() { return tr().karta.luna.oblasti[key]; } });
+
 export const LUNAR_AREAS = [
-  // Ikonice su u `components/oblast-ikona.tsx` (Ivanove, 28.9.2026).
-  { key: 'ljubav', name: 'Ljubav' },
-  { key: 'zdravlje', name: 'Zdravlje' },
-  { key: 'karijera', name: 'Karijera' },
-  { key: 'kuca', name: 'Kuća' },
-  { key: 'basta', name: 'Bašta' },
+  // Ikonice su u `components/oblast-ikona.tsx` (Ivanove, 28.9.2026). Kljuc ide u bazu, ime iz recnika.
+  oblast('ljubav'),
+  oblast('zdravlje'),
+  oblast('karijera'),
+  oblast('kuca'),
+  oblast('basta'),
 ] as const;
 
 export type LunarArea = (typeof LUNAR_AREAS)[number]['key'];
@@ -152,44 +164,36 @@ export type LunarArea = (typeof LUNAR_AREAS)[number]['key'];
  * od (1 − cos D)/2 odstupa manje od 1%).
  * ------------------------------------------------------------------------- */
 
+const glavna = <K extends 'new' | 'first' | 'full' | 'last'>(angle: number, key: K) =>
+  ({ angle, key, get name() { return tr().karta.luna.faze[key]; } });
+
 export const MAIN_PHASES = [
-  { angle: 0, name: 'Mlad Mesec', key: 'new' },
-  { angle: 90, name: 'Prva četvrt', key: 'first' },
-  { angle: 180, name: 'Pun Mesec', key: 'full' },
-  { angle: 270, name: 'Poslednja četvrt', key: 'last' },
+  glavna(0, 'new'),
+  glavna(90, 'first'),
+  glavna(180, 'full'),
+  glavna(270, 'last'),
 ] as const;
 
 export type PhaseKey = (typeof MAIN_PHASES)[number]['key'] | 'waxing' | 'waning';
 
-export const PHASE_NAME: Record<PhaseKey, string> = {
-  new: 'Mlad Mesec', first: 'Prva četvrt', full: 'Pun Mesec', last: 'Poslednja četvrt',
-  waxing: 'Rastući Mesec', waning: 'Opadajući Mesec',
-};
+const FAZE: readonly PhaseKey[] = ['new', 'first', 'full', 'last', 'waxing', 'waning'];
+
+export const PHASE_NAME: Record<PhaseKey, string> = izRecnika(FAZE, (k) => tr().karta.luna.faze[k]);
 
 /**
  * PRIVREMENO (Ivan, 27.9.2026: "cekam tekstove, stavi nesto privremeno").
  * Jedna recenica po fazi dok astrolog ne posalje prave. NIJE astrologov tekst —
  * zameniti cim stignu.
  */
-export const PHASE_SUMMARY_PRIVREMENO: Record<PhaseKey, string> = {
-  new: 'Početak novog lunarnog ciklusa, dobar trenutak da postaviš nameru.',
-  first: 'Prva prepreka na putu onoga što si započeo traži odluku i akciju.',
-  full: 'Vrhunac ciklusa: osećanja su jača, a stvari izlaze na videlo.',
-  last: 'Vreme da završiš, pospremiš i otpustiš ono što ti više ne treba.',
-  waxing: 'Energija raste, pa se lakše gradi i započinje.',
-  waning: 'Energija opada, pa je vreme za završavanje i odmor.',
-};
+export const PHASE_SUMMARY_PRIVREMENO: Record<PhaseKey, string> = izRecnika(FAZE, (k) => tr().karta.luna.fazaPrivremeno[k]);
 
 /**
  * Teme kuca za red "Za tebe" (Mlad i Pun Mesec u natalnoj kuci).
  * POCETNE VREDNOSTI IZ BRIEFA — ceka potvrdu astrologa.
  */
-export const HOUSE_THEMES: Record<number, string> = {
-  1: 'ti i tvoje telo', 2: 'novac i vrednosti', 3: 'komunikacija i okolina',
-  4: 'dom i porodica', 5: 'ljubav, kreativnost i deca', 6: 'posao i zdravlje',
-  7: 'partnerstva', 8: 'zajednički novac i promene', 9: 'putovanja i učenje',
-  10: 'karijera i ugled', 11: 'prijatelji i planovi', 12: 'odmor i unutrašnji svet',
-};
+export const HOUSE_THEMES: Record<number, string> = izRecnika(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], (k) => tr().karta.luna.temeKuca[k],
+);
 
 /**
  * Kljuc faze u lunarnom kalendaru astrologa (`lunar.<faza>.<znak>.<oblast>`),
@@ -291,6 +295,5 @@ export function lunationHouse(
  * `moonPhase()` (`lib/astro.ts`), `uZnaku` lokativ znaka ("Biku").
  */
 export function naslovMeseca(faza: string, uZnaku: string): string {
-  const saMesecom = faza.includes('Mesec') ? faza : `${faza} Meseca`;
-  return `${saMesecom} u ${uZnaku}`;
+  return tr().karta.luna.naslov(faza, uZnaku);
 }

@@ -5,6 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /**
  * Prijava preko Apple ili Google naloga (Ivan, 29.9.2026) — za sada SAMO IZGLED:
@@ -18,27 +19,23 @@ import { neutral } from '@/theme/tokens';
  */
 type Vrsta = 'apple' | 'google';
 
-const NATPIS: Record<Vrsta, string> = {
-  apple: 'Nastavi uz Apple',
-  google: 'Nastavi uz Google',
-};
-
 export function PrijavaDugme({ vrsta, onPress, className }: {
   vrsta: Vrsta;
   onPress: () => void;
   className?: string;
 }) {
+  const natpis = useT().onboarding.prijavaDugme[vrsta];
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={NATPIS[vrsta]}
+      accessibilityLabel={natpis}
       className={cn(
         'h-field flex-row items-center justify-center gap-2.5 rounded-pill border border-fill-strong bg-card active:opacity-80',
         className
       )}>
       {vrsta === 'apple' ? <AppleLogo /> : <GoogleLogo />}
-      <Text variant="row" className="text-foreground">{NATPIS[vrsta]}</Text>
+      <Text variant="row" className="text-foreground">{natpis}</Text>
     </Pressable>
   );
 }

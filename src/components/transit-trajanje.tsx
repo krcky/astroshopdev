@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { formatDay, opsegDatuma } from '@/lib/horoscope';
 import { daysBetween, dayKey } from '@/lib/transits';
 import { trajanjeTekst, type Trajanje } from '@/lib/oblasti';
+import { useT } from '@/i18n';
 
 /**
  * Trajanje tranzita: pocetak, "Jos N dana" i traka napretka. Pocetak i kraj su
@@ -23,13 +24,14 @@ export function TransitTrajanje({ trajanje, date, className, boja, opseg = false
   /** Levo opseg "13. sep – 26. sep" umesto "Od 13. sep" (list tranzita i "Zašto baš ovaj tekst"). */
   opseg?: boolean;
 }) {
+  const t = useT();
   const { start, end, mesec } = trajanje;
   if (mesec) {
     return <Text variant="muted" className={cn('mt-4', className)}>{trajanjeTekst(trajanje)}</Text>;
   }
   const desno = trajanjeTekst(trajanje);
   const levo = opseg && start && end ? opsegDatuma(start, end)
-    : start ? `Od ${formatDay(start, date)}` : 'Traje duže od tri godine';
+    : start ? t.danas.trajanje.od(formatDay(start, date)) : t.danas.trajanje.duzeOdTriGodine;
   const ukupno = start && end ? daysBetween(dayKey(start), end) + 1 : null;
   const proslo = start ? daysBetween(dayKey(start), date) + 1 : null;
   const udeo = ukupno && proslo ? Math.min(1, proslo / ukupno) : null;

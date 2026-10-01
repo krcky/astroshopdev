@@ -15,13 +15,16 @@
  * Mesec ide po istom pravilu; njegova kratkotrajnost je u bodovanju, ne u tonu.
  */
 
+import { tr } from '@/i18n/jezik';
+
 export type Tone = 'povoljno' | 'izazovno' | 'mesovito';
 export type ToneSource = 'manual' | 'rule';
 
+/** Natpis tona iz recnika (`danas.ton`) — getter, da prati jezik. */
 export const TONE_LABEL: Record<Tone, string> = {
-  povoljno: 'Povoljno',
-  izazovno: 'Izazovno',
-  mesovito: 'Mešovito',
+  get povoljno() { return tr().danas.ton.povoljno; },
+  get izazovno() { return tr().danas.ton.izazovno; },
+  get mesovito() { return tr().danas.ton.mesovito; },
 };
 
 type Nature = 'blaga' | 'neutralna' | 'dinamicna' | 'teska';
@@ -60,7 +63,7 @@ export function toneByRule(transitingKey: string, aspect: string, natalKey: stri
 /** Rucna oznaka iz baze -> ton. Prihvata "Povoljno", "mešovito", "mesovito"… */
 export function parseTone(raw: string | null | undefined): Tone | null {
   if (!raw) return null;
-  const s = raw.trim().toLowerCase().replace('š', 's');
+  const s = raw.trim().toLowerCase().replace(/š/, 's');
   return s === 'povoljno' || s === 'izazovno' || s === 'mesovito' ? s : null;
 }
 

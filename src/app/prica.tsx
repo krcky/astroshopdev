@@ -19,6 +19,8 @@ import { Share, X } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
+import { tr } from '@/i18n/jezik';
 import { KarticaZaDeljenje } from '@/components/prica/kartica';
 import { SLIKE, tamnaSlika, type OkvirSlike } from '@/components/prica/slajdovi';
 import { SatKojiTece } from '@/components/prica/sat';
@@ -116,6 +118,7 @@ function useDaljeIzUvoda() {
 }
 
 function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: () => void }) {
+  const t = useT();
   const insets = useSafeAreaInsets();
   const { width: W, height: H } = useWindowDimensions();
   const slike = p.slike;
@@ -287,11 +290,11 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
         const slika = await ImageManipulator.manipulate(uri).resize({ width: 1080, height: 1920 }).renderAsync();
         const gotova = await slika.saveAsync({ format: SaveFormat.PNG });
         // Citljivo ime umesto nasumicnog — vidi se u meniju za deljenje, u Fajlovima i preko AirDrop-a.
-        const fajl = new File(Paths.cache, `Astro Shop ${p.dan}.png`);
+        const fajl = new File(Paths.cache, `${tr().prica.imeFajla(p.dan)}.png`);
         await new File(gotova.uri).move(fajl, { overwrite: true });
         if (otkazano) return;
         if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(fajl.uri, { mimeType: 'image/png', UTI: 'public.png', dialogTitle: 'Podeli svoj dan' });
+          await Sharing.shareAsync(fajl.uri, { mimeType: 'image/png', UTI: 'public.png', dialogTitle: tr().prica.dnevna.podeliSvojDan });
         }
       } catch {
         // Otkazano deljenje ili pad snimka: prica samo nastavlja.
@@ -306,7 +309,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
   // isto kao prica o znaku). Video se pravi van ekrana dok korisnik radi sta hoce; prica ide dalje.
   const posao = React.useMemo(() => posaoDnevnePrice(p), [p]);
   const pauza = React.useCallback((stoji: boolean) => pauzaJs.set(stoji ? 1 : 0), [pauzaJs]);
-  const { ponudi: ponudiVideo, video } = usePonudiVideo({ posao, pauza, naslov: 'Podeli svoj dan' });
+  const { ponudi: ponudiVideo, video } = usePonudiVideo({ posao, pauza, naslov: t.prica.dnevna.podeliSvojDan });
   const ponudi = React.useCallback((k: SlikaKljuc) => ponudiVideo(() => podeli(k)), [ponudiVideo, podeli]);
 
   const k = slike[i];
@@ -372,12 +375,12 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
         {!uvod && (
         <View style={{ position: 'absolute', top: insets.top + 18, left: 14, right: 6, height: 42, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Image source={tamno ? LOGO_KRUG_NEGATIV : LOGO_KRUG} style={{ width: 26, height: 26 }} accessibilityIgnoresInvertColors />
-          <Text className={cn('text-[14px] leading-[18px]', tezina('row'))} style={{ color: boja }}>Astro Shop</Text>
+          <Text className={cn('text-[14px] leading-[18px]', tezina('row'))} style={{ color: boja }}>{t.opste.imeAplikacije}</Text>
           <Text className="flex-1 text-[14px] leading-[18px]" style={{ color: boja, opacity: 0.65 }}>{p.datumTekst}</Text>
           <Pressable
             onPress={zatvoriAnimirano}
             accessibilityRole="button"
-            accessibilityLabel="Zatvori priču"
+            accessibilityLabel={t.prica.plejer.zatvori}
             hitSlop={8}
             className="h-11 w-11 items-center justify-center active:opacity-60">
             <X size={22} color={boja} strokeWidth={2.2} />
@@ -392,7 +395,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
           <Pressable
             onPress={() => ponudi(k)}
             accessibilityRole="button"
-            accessibilityLabel={video?.stanje === 'pravi' ? `Podeli. Video se pravi, ${procenat(video.napredak)}` : 'Podeli'}
+            accessibilityLabel={video?.stanje === 'pravi' ? t.prica.plejer.podeliVideoSePravi(procenat(video.napredak)) : t.opste.podeli}
             className="flex-row items-center gap-1.5 rounded-pill px-3.5 py-2.5 active:opacity-80"
             style={{ backgroundColor: tamno ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.78)', borderWidth: 1, borderColor: tamno ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.95)' }}>
             {deli
@@ -400,7 +403,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
               : video?.stanje === 'pravi'
                 ? <KrugNapretka napredak={video.napredak} velicina={18} boja={boja} podloga={tamno ? 'rgba(255,255,255,0.28)' : 'rgba(21,21,21,0.16)'} />
                 : <Share size={17} color={boja} strokeWidth={2} />}
-            <Text className={cn('text-[14px] leading-[18px]', tezina('dugme'))} style={{ color: boja }}>Podeli</Text>
+            <Text className={cn('text-[14px] leading-[18px]', tezina('dugme'))} style={{ color: boja }}>{t.opste.podeli}</Text>
           </Pressable>
         </Animated.View>
       )}
@@ -411,10 +414,10 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
         <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16 }, hromStil]}>
           <Animated.View entering={FadeInDown.delay(bezPokreta ? 0 : 700).duration(500)} style={{ gap: 8 }}>
             <Button variant={tamno ? 'soft' : 'default'} onPress={onDalje}>
-              <Text>Nastavi</Text>
+              <Text>{t.opste.nastavi}</Text>
             </Button>
             <Text className="text-center text-[13px] leading-[20px]" style={{ color: tamno ? 'rgba(255,255,255,0.8)' : neutral.inkMuted }}>
-              Nova priča stiže svakog dana, na početnoj.
+              {t.prica.plejer.novaPricaStize}
             </Text>
           </Animated.View>
         </Animated.View>
@@ -423,8 +426,8 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
       {/* Uz VoiceOver: sledeca/prethodna kao dugmad (prica tada ne ide sama). */}
       {citac && (
         <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 70, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Prethodna slika" onPress={() => idi(tekuca.current - 1)} className="h-11 w-11" />
-          <Pressable accessibilityRole="button" accessibilityLabel={`Sledeća slika, ${i + 1} od ${n}`} onPress={() => idi(tekuca.current + 1)} className="h-11 w-11" />
+          <Pressable accessibilityRole="button" accessibilityLabel={t.prica.plejer.prethodnaSlika} onPress={() => idi(tekuca.current - 1)} className="h-11 w-11" />
+          <Pressable accessibilityRole="button" accessibilityLabel={t.prica.plejer.sledecaSlika(i + 1, n)} onPress={() => idi(tekuca.current + 1)} className="h-11 w-11" />
         </View>
       )}
     </Animated.View>

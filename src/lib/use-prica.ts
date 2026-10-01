@@ -4,12 +4,13 @@
  */
 import * as React from 'react';
 
+import { useT } from '@/i18n';
 import { bodyLongitude, type AspectDef } from '@/lib/astro';
 import { buildPersonalDaily, datum } from '@/lib/horoscope';
 import { phaseDay, naslovMeseca, type PhaseDay } from '@/lib/moon';
 import { oceneOblasti, trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
 import {
-  brojTonova, legendaTonova, MOMENAT_NATPIS, najbolja, slikeDana, trajanjeSlike, TRAJANJE_STALNO,
+  brojTonova, legendaTonova, momenatNatpis, najbolja, slikeDana, trajanjeSlike, TRAJANJE_STALNO,
   type BrojTonova, type SlikaKljuc,
 } from '@/lib/prica';
 import type { Tone } from '@/lib/tone';
@@ -78,6 +79,8 @@ export function usePricaDana(): PricaDana | null {
   const resolved = useResolvedProfile();
   const danas = useDanas();
   const userId = useAuthStore((s) => s.user?.id ?? null);
+  // Recnik u zavisnostima: prica se sklopi iznova kad se jezik promeni.
+  const recnik = useT();
   const tvojDanLog = useTvojDanLog(tvojDanShownFor(userId));
 
   const juce = React.useMemo(() => new Date(danas.getFullYear(), danas.getMonth(), danas.getDate() - 1, 12), [danas]);
@@ -115,6 +118,7 @@ export function usePricaDana(): PricaDana | null {
   return React.useMemo(() => {
     if (!resolved || !oblasti) return null;
     const { chart, timeUnknown } = resolved;
+    const t = recnik.prica.racun;
 
     // --- naslovna: lista dana, najvazniji prvi (kao tab "Tranziti")
     const lista = oblasti.poVaznosti;
@@ -133,9 +137,9 @@ export function usePricaDana(): PricaDana | null {
       tranzitna: pick.transiting,
       natalna: pick.natal,
       aspekt: pick.aspect,
-      ime: `${pick.transiting.name} ${pick.aspect.name} ${pick.natal.name}`,
-      momenat: MOMENAT_NATPIS[pick.moment] ?? trajanjeTekst(trajanjeTranzita(pick, danas)).toLowerCase(),
-      naslov: tdTekst?.title || `${pick.transiting.name} ${pick.aspect.name} ${pick.natal.name}`,
+      ime: t.imeTranzita(pick.transiting.name, pick.aspect.name, pick.natal.name),
+      momenat: momenatNatpis(pick.moment) ?? trajanjeTekst(trajanjeTranzita(pick, danas)).toLowerCase(),
+      naslov: tdTekst?.title || t.imeTranzita(pick.transiting.name, pick.aspect.name, pick.natal.name),
       sazetak: tdTekst?.body ? prveRecenice(tdTekst.body) : '',
     } : null;
 
@@ -147,9 +151,9 @@ export function usePricaDana(): PricaDana | null {
 
     // --- Ide ti / Koči te: prva recenica koja IMA tekst, kao "Danas ukratko"
     const sa = (kandidati: Transit[], polje: 'positive' | 'challenge') => {
-      for (const t of kandidati) {
-        const r = texts.get(t.contentKey)?.[polje];
-        if (r) return { tekst: r, ime: `${t.transiting.name} ${t.aspect.name} ${t.natal.name}` };
+      for (const k of kandidati) {
+        const r = texts.get(k.contentKey)?.[polje];
+        if (r) return { tekst: r, ime: t.imeTranzita(k.transiting.name, k.aspect.name, k.natal.name) };
       }
       return null;
     };
@@ -167,7 +171,7 @@ export function usePricaDana(): PricaDana | null {
       naslov: naslovMeseca(faza.name, SIGN_CASES[znak.key].loc),
       // "Sledi:" (UX recenzija 1.10.2026): bez toga je "Mesec danas · Poslednja četvrt · Sub, 3. okt"
       // u istom redu pisalo "danas" i drugi dan, pa se citalo kao greska.
-      sledeca: `Sledi: ${faza.next.name}, ${datum(faza.next.at, { dan: true })}`,
+      sledeca: t.sledi(faza.next.name, datum(faza.next.at, { dan: true })),
       zaTebe: hitTekst?.title
         ? { naslov: hitTekst.title, tekst: hitTekst.body ? prveRecenice(hitTekst.body, 1) : '' }
         : null,
@@ -213,5 +217,5 @@ export function usePricaDana(): PricaDana | null {
       savet,
       ucitava: loading,
     };
-  }, [resolved, oblasti, oblastiJuce, pick, brief, mesecHit, texts, loading, danas]);
+  }, [resolved, oblasti, oblastiJuce, pick, brief, mesecHit, texts, loading, danas, recnik]);
 }

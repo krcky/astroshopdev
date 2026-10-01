@@ -14,6 +14,7 @@ import { AspektiOdeljak, IKONA, Odeljak, Stavka } from '@/components/info-list';
 import { ASPECTS, BODIES } from '@/lib/astro';
 import { SIGNS, type Element } from '@/lib/zodiac';
 import { neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /**
  * "Šta je natalna karta" — list odozdo sa ikonice "i" pored tocka na tabu "Ti"
@@ -26,6 +27,8 @@ import { neutral } from '@/theme/tokens';
  * elementa od astrologa nema, pa ga nema ni ovde.
  */
 export default function NatalnaKartaInfo() {
+  const t = useT();
+  const ti = t.karta.natalnaInfo;
   // Sirina teksta na listu: ekran minus bokovi `SheetScroll`-a (24 + 24).
   const sirina = useWindowDimensions().width - 48;
   // Po jedan nasumican primer uz svaku kategoriju (Ivan, 28.9.2026); bira se
@@ -39,12 +42,8 @@ export default function NatalnaKartaInfo() {
   return (
     <SheetScroll>
       {/* Naslov lista `naslovLista`, podnaslovi sekcija `h2` (Ivan, 28.9.2026). */}
-      <Text variant="naslovLista">Šta je natalna karta?</Text>
-      <Text variant="reading" className="mt-3">
-        Natalna karta je slika neba u trenutku tvog rođenja: gde su bili Sunce, Mesec i
-        planete, u kojim znacima i u kojim kućama. Zato je svačija karta drugačija, kao
-        nebeska lična karta.
-      </Text>
+      <Text variant="naslovLista">{ti.naslov}</Text>
+      <Text variant="reading" className="mt-3">{ti.uvod}</Text>
 
       {/* Ilustracija (Ivan, 28.9.2026; izvor `files/natalna-karta-ilustracija-objasnjenje@2x`),
           sirine teksta, pre "Kako se čita". Pozadina je vec providna. */}
@@ -57,52 +56,44 @@ export default function NatalnaKartaInfo() {
         accessible={false}
       />
 
-      <Odeljak naslov="Kako se čita">
-        <Stavka ime="Planete — šta" ikona={<IkonaTacke tacka={primer.planeta} size={IKONA} />}>
-          Svaka planeta je jedna vrsta energije koja te pokreće.
+      <Odeljak naslov={ti.kakoSeCita}>
+        <Stavka ime={ti.planete} ikona={<IkonaTacke tacka={primer.planeta} size={IKONA} />}>
+          {ti.planeteOpis}
         </Stavka>
-        <Stavka ime="Znakovi — kako" ikona={<ZnakIkona znak={primer.znak.key} element={primer.znak.element} size={IKONA} />}>
-          Znak pokazuje kako se ta energija izražava. Ista planeta u svakom od 12 znakova deluje drugačije.
+        <Stavka ime={ti.znakovi} ikona={<ZnakIkona znak={primer.znak.key} element={primer.znak.element} size={IKONA} />}>
+          {ti.znakoviOpis}
         </Stavka>
-        <Stavka ime="Kuće — gde" ikona={<KucaBroj kuca={primer.kuca} size={IKONA} />}>
-          Krug je podeljen na 12 kuća, a svaka je jedna oblast života. Kuća pokazuje gde planeta deluje.
+        <Stavka ime={ti.kuce} ikona={<KucaBroj kuca={primer.kuca} size={IKONA} />}>
+          {ti.kuceOpis}
         </Stavka>
-        <Stavka ime="Aspekti — kako se slažu" ikona={<AspektIkona aspekt={primer.aspekt} size={18} potez={PLANETA_POTEZ * IKONA} />}>
-          Uglovi između planeta pokazuju da li im se energije dopunjuju ili sudaraju.
+        <Stavka ime={ti.aspekti} ikona={<AspektIkona aspekt={primer.aspekt} size={18} potez={PLANETA_POTEZ * IKONA} />}>
+          {ti.aspektiOpis}
         </Stavka>
         {/* Krunica na planetama tranzita nigde nije bila objasnjena (UX recenzija 1.10.2026). */}
-        <Stavka ime="Krunica — tvoj vladar" ikona={<Crown size={20} color={neutral.ink} strokeWidth={2} />}>
-          Planeta sa krunicom vlada znakom tvog podznaka. Tranzit u kom ona učestvuje ima veću težinu.
+        <Stavka ime={ti.krunica} ikona={<Crown size={20} color={neutral.ink} strokeWidth={2} />}>
+          {ti.krunicaOpis}
         </Stavka>
       </Odeljak>
 
-      <Odeljak naslov="Krug">
-        <Text variant="reading">
-          Spoljni prsten je 12 znakova, a boja kruga oko znaka je njegov element. Brojevi od 1 do 12
-          su kuće, simboli su planete. Levo je Ascendent, odnosno podznak: znak koji se dizao na
-          istoku u trenutku tvog rođenja. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u
-          sredini su aspekti.
-        </Text>
+      <Odeljak naslov={t.karta.info.krug}>
+        <Text variant="reading">{ti.krug}</Text>
         {/* Isto kao u listu "Šta je trenutno nebo" — karta ima R, a ovde nije bilo objasnjeno. */}
-        <Text variant="reading" className="mt-3">
-          R pored planete znači da je retrogradna: gledano sa Zemlje, prividno ide unazad kroz
-          zodijak.
-        </Text>
+        <Text variant="reading" className="mt-3">{t.karta.info.retro}</Text>
       </Odeljak>
 
       <AspektiOdeljak />
 
-      <Odeljak naslov="Elementi">
-        <Text variant="reading">Svaki znak pripada jednom od četiri elementa.</Text>
+      <Odeljak naslov={ti.elementi}>
+        <Text variant="reading">{ti.elementiUvod}</Text>
         <View className="mt-4 gap-4">
           {ELEMENTI.map((e) => {
-            const znaci = SIGNS.filter((s) => s.element === e.key);
+            const znaci = SIGNS.filter((s) => s.element === e);
             return (
-              <View key={e.key} className="flex-row items-center gap-3" accessible
-                accessibilityLabel={`${e.ime}: ${znaci.map((s) => s.name).join(', ')}`}>
-                <ElementIkona element={e.key} size={36} />
+              <View key={e} className="flex-row items-center gap-3" accessible
+                accessibilityLabel={ti.elementA11y(t.karta.elementi[e], znaci.map((s) => s.name))}>
+                <ElementIkona element={e} size={36} />
                 <View className="flex-1">
-                  <Text variant="row">{e.ime}</Text>
+                  <Text variant="row">{t.karta.elementi[e]}</Text>
                   <View className="mt-1 flex-row flex-wrap items-center gap-x-3 gap-y-1">
                     {znaci.map((s) => (
                       <View key={s.key} className="flex-row items-center gap-1">
@@ -118,23 +109,15 @@ export default function NatalnaKartaInfo() {
         </View>
       </Odeljak>
 
-      <Odeljak naslov="Vreme rođenja">
-        <Text variant="reading">
-          Podznak i kuće zavise od tačnog vremena rođenja. Za sat vremena Zemlja se okrene toliko da
-          se podznak pomeri za pola znaka. Kad vreme rođenja nije uneto, krug nema kuća, Ascendenta
-          ni MC-a, a levo je Ovan, prvi znak zodijaka.
-        </Text>
+      <Odeljak naslov={ti.vremeRodjenja}>
+        <Text variant="reading">{ti.vremeRodjenjaOpis}</Text>
       </Odeljak>
     </SheetScroll>
   );
 }
 
-const ELEMENTI: { key: Element; ime: string }[] = [
-  { key: 'vatra', ime: 'Vatra' },
-  { key: 'zemlja', ime: 'Zemlja' },
-  { key: 'vazduh', ime: 'Vazduh' },
-  { key: 'voda', ime: 'Voda' },
-];
+/** Redosled elemenata; imena su u recniku (`karta.elementi`). */
+const ELEMENTI: Element[] = ['vatra', 'zemlja', 'vazduh', 'voda'];
 
 /** Sirina / visina ilustracije (1774 x 1520). */
 const ILUSTRACIJA_ODNOS = 1774 / 1520;

@@ -21,16 +21,19 @@ import { cn } from '@/lib/utils';
 import { moonPhase } from '@/lib/astro';
 import { dayKey, moonDay } from '@/lib/transits';
 import {
-  DANI_U_NEDELJI, MESECI_PUNO, glavneFazeMeseca, istiDan, mrezaMeseca, naDan, nedeljaDana, pomeriDan, ugaoDana,
+  daniUNedelji, naslovKalendara, glavneFazeMeseca, istiDan, mrezaMeseca, naDan, nedeljaDana, pomeriDan, ugaoDana,
 } from '@/lib/lunarni-kalendar';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { useDanas } from '@/store/danas';
 import { tezina } from '@/theme/tipografija';
 import { formatDatumKratko, formatDay, formatTime } from '@/lib/horoscope';
 import {
-  moonState, moonSignAt, moonElement, formatIllumination, phaseDay, LUNAR_AREAS, MAIN_PHASES, naslovMeseca, type LunarArea,
+  moonState, moonSignAt, moonElement, formatIllumination, phaseDay, LUNAR_AREAS, MAIN_PHASES, type LunarArea,
 } from '@/lib/moon';
-import { SIGN_CASES, signFromLongitude } from '@/lib/zodiac';
+import { signFromLongitude } from '@/lib/zodiac';
+import { useT, type Recnik } from '@/i18n';
+
+type ZnakKljuc = keyof Recnik['nebo']['znaci'];
 import { useLunarTexts } from '@/lib/lunar-texts';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
@@ -80,6 +83,8 @@ const CELIJA_MESEC = 26;
  * odnosi ("Pun mesec u Biku"). Bez teksta tab to kaze, ne izmislja.
  */
 export default function MoonScreen() {
+  const t = useT();
+  const tm = t.karta.mesec;
   const naMrezi = useNaMrezi();
   const { day, area } = useLocalSearchParams<{ day?: string; area?: string }>();
   const resolved = useResolvedProfile();
@@ -143,8 +148,8 @@ export default function MoonScreen() {
   // Znak u naslovu je onaj u izabranom trenutku; posle prelaska red kaze od kad.
   const prelazak = !dan.ingress ? null
     : date >= dan.ingress.at
-      ? `Od ${formatTime(dan.ingress.at)}, pre toga u ${SIGN_CASES[dan.sign.key].loc}`
-      : `Do ${formatTime(dan.ingress.at)}, zatim u ${SIGN_CASES[dan.ingress.sign.key].loc}`;
+      ? tm.odSata(formatTime(dan.ingress.at), dan.sign.key as ZnakKljuc)
+      : tm.doSata(formatTime(dan.ingress.at), dan.ingress.sign.key as ZnakKljuc);
   const savet = lunarni.get(oblast);
 
   // Oba prikaza su ISTI `SheetScroll` (isti koren), pa skrol zivi; sadrzaj se pretopi.
@@ -156,9 +161,9 @@ export default function MoonScreen() {
         {/* Samo kalendar: strelica nazad gore levo vraca na dan (Ivan, 29.9.2026). */}
         {/* Naslov na sredini lista, `h2` (Ivan, 29.9.2026); strelica ostaje levo, preko reda. */}
         <View className="h-11 justify-center">
-          <Text variant="h2" className="text-center" accessibilityRole="header">Lunarni kalendar</Text>
+          <Text variant="h2" className="text-center" accessibilityRole="header">{tm.lunarniKalendar}</Text>
           <View className="absolute left-0">
-            <DanDugme smer={-1} onPress={() => setSamoKalendar(false)} label="Nazad" />
+            <DanDugme smer={-1} onPress={() => setSamoKalendar(false)} label={t.opste.nazad} />
           </View>
         </View>
         <Animated.View entering={FadeIn.duration(220)}>
@@ -185,17 +190,17 @@ export default function MoonScreen() {
           <Pressable
             onPress={otvoriKalendar}
             accessibilityRole="button"
-            accessibilityLabel={`${formatDatumKratko(date)}. Otvori kalendar`}
+            accessibilityLabel={tm.otvoriKalendarA11y(formatDatumKratko(date))}
             hitSlop={8}
             className="flex-row items-center gap-1 active:opacity-60">
             <Text variant="oznaka" className={OZNAKA_12}>{formatDatumKratko(date)}</Text>
             <ChevronDown size={14} color={neutral.inkMuted} strokeWidth={2.2} />
           </Pressable>
           {jeDanas ? (
-            <Text variant="caption" className="mt-0.5">Danas</Text>
+            <Text variant="caption" className="mt-0.5">{tm.danas}</Text>
           ) : (
             <Pressable onPress={() => setDate(naDan(danas, new Date()))} accessibilityRole="button" hitSlop={8} className="active:opacity-60">
-              <Text variant="caption" className="mt-0.5 text-foreground underline">Nazad na danas</Text>
+              <Text variant="caption" className="mt-0.5 text-foreground underline">{tm.nazadNaDanas}</Text>
             </Pressable>
           )}
         </View>
@@ -215,9 +220,9 @@ export default function MoonScreen() {
             <ZnakIkona znak={znak.key} element={znak.element} size={ZNACKA} />
           </View>
         </View>
-        <Text variant="title" className="mt-5 text-center">{naslovMeseca(moonPhase(date).name, SIGN_CASES[znak.key].loc)}</Text>
+        <Text variant="title" className="mt-5 text-center">{t.karta.luna.naslov(moonPhase(date).name, t.nebo.znaci[znak.key as ZnakKljuc].lokativ)}</Text>
         <Text variant="muted" className="mt-1 text-center">
-          {formatIllumination(stanje.illumination)} osvetljen · {stanje.lunarDay}. lunarni dan
+          {tm.osvetljen(formatIllumination(stanje.illumination), stanje.lunarDay)}
         </Text>
         {prelazak && <Text variant="muted" className="text-center">{prelazak}</Text>}
       </View>
@@ -225,10 +230,10 @@ export default function MoonScreen() {
       {/* Biljka i element — tiho, bez kartice, male ikonice ispod naslova (Ivan, 29.9.2026:
           "ne treba da su ovoliko istaknuti"). */}
       <View className="mt-3 flex-row items-center justify-center gap-5">
-        <Podatak oznaka="Biljka" vrednost={plant}>
+        <Podatak oznaka={tm.biljka} vrednost={plant}>
           <BiljkaIkona element={znak.element} size={PODATAK_IKONA} />
         </Podatak>
-        <Podatak oznaka="Element" vrednost={element}>
+        <Podatak oznaka={tm.element} vrednost={element}>
           <ElementIkona element={znak.element} size={PODATAK_IKONA} />
         </Podatak>
       </View>
@@ -270,7 +275,7 @@ export default function MoonScreen() {
           ) : lunarniLoading ? (
             <TextPlaceholder lines={4} />
           ) : (
-            <Text variant="muted">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
+            <Text variant="muted">{naMrezi ? tm.saveti : tm.savetiBezVeze}</Text>
           )}
         </Animated.View>
       </Animated.View>
@@ -280,7 +285,7 @@ export default function MoonScreen() {
       {dan.hits.length > 0 && (
         <Animated.View entering={ulaz(5)} layout={KLIZANJE} className="mt-9">
           <Text variant="label" className="mb-3 text-foreground" accessibilityRole="header">
-            {jeDanas ? 'Za tebe danas' : `Za tebe · ${formatDay(date, danas)}`}
+            {jeDanas ? tm.zaTebeDanas : tm.zaTebeDan(formatDay(date, danas))}
           </Text>
           <View className="gap-3">
             {dan.hits.map((h) => (
@@ -295,7 +300,7 @@ export default function MoonScreen() {
                 }}
                 naslov={texts.get(h.contentKey)?.title ?? ''}
                 loading={tekstoviLoading}
-                opis={`Tačan u ${formatTime(h.exactAt)}`}
+                opis={tm.tacanU(formatTime(h.exactAt))}
               />
             ))}
           </View>
@@ -317,9 +322,10 @@ function Podatak({ oznaka, vrednost, children }: { oznaka: string; vrednost: str
 
 /** Stakleno okruglo dugme (Ivan, 29.9.2026) — isto kao nazad u onboardingu (`GlassIconButton`). */
 function DanDugme({ smer, onPress, label }: { smer: 1 | -1; onPress: () => void; label?: string }) {
+  const tm = useT().karta.mesec;
   const Ikona = smer < 0 ? ChevronLeft : ChevronRight;
   return (
-    <GlassIconButton onPress={onPress} accessibilityLabel={label ?? (smer < 0 ? 'Dan ranije' : 'Dan kasnije')}>
+    <GlassIconButton onPress={onPress} accessibilityLabel={label ?? (smer < 0 ? tm.danRanije : tm.danKasnije)}>
       <Ikona size={22} color={neutral.ink} strokeWidth={2} />
     </GlassIconButton>
   );
@@ -337,6 +343,7 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
   /** "Ceo mesec" ispod nedelje — samo u sklopljenom. */
   onCeoMesec?: () => void;
 }) {
+  const tm = useT().karta.mesec;
   const [prikaz, setPrikaz] = React.useState(() => ({ g: izabran.getFullYear(), m: izabran.getMonth() }));
   // Dan pomeren strelicama gore u drugi mesec — kalendar ga prati (podesavanje
   // stanja tokom crtanja, React-ov nacin za "stanje izvedeno iz propa").
@@ -370,7 +377,7 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
     return { g: d.getFullYear(), m: d.getMonth() };
   });
   const mesec = otvoren ? prikaz : { g: izabran.getFullYear(), m: izabran.getMonth() };
-  const naslov = MESECI_PUNO[mesec.m].charAt(0).toUpperCase() + MESECI_PUNO[mesec.m].slice(1);
+  const naslov = naslovKalendara(mesec.m, mesec.g);
   const redFaza = otvoren ? [...faze.values()].sort((a, b) => a.at.getTime() - b.at.getTime()) : [];
 
   return (
@@ -379,18 +386,18 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
           (Ivan, 29.9.2026) — datum je vec gore. */}
       {otvoren && (
         <View className="h-11 flex-row items-center justify-between pb-2">
-          <Pressable onPress={() => listaj(-1)} accessibilityRole="button" accessibilityLabel="Prethodni mesec" hitSlop={8} className="h-11 w-11 items-center justify-center active:opacity-60">
+          <Pressable onPress={() => listaj(-1)} accessibilityRole="button" accessibilityLabel={tm.prethodniMesec} hitSlop={8} className="h-11 w-11 items-center justify-center active:opacity-60">
             <ChevronLeft size={20} color={neutral.ink} strokeWidth={2} />
           </Pressable>
-          <Text variant="h3" accessibilityRole="header">{naslov} {mesec.g}</Text>
-          <Pressable onPress={() => listaj(1)} accessibilityRole="button" accessibilityLabel="Sledeći mesec" hitSlop={8} className="h-11 w-11 items-center justify-center active:opacity-60">
+          <Text variant="h3" accessibilityRole="header">{naslov}</Text>
+          <Pressable onPress={() => listaj(1)} accessibilityRole="button" accessibilityLabel={tm.sledeciMesec} hitSlop={8} className="h-11 w-11 items-center justify-center active:opacity-60">
             <ChevronRight size={20} color={neutral.ink} strokeWidth={2} />
           </Pressable>
         </View>
       )}
 
       <View className="flex-row">
-        {DANI_U_NEDELJI.map((d, i) => (
+        {daniUNedelji().map((d, i) => (
           <Text key={i} variant="oznaka" className="flex-1 text-center">{d}</Text>
         ))}
       </View>
@@ -409,7 +416,7 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
                 onPress={() => onIzbor(d)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: izabranDan }}
-                accessibilityLabel={`${formatDatumKratko(d)}${faza ? `, ${MAIN_PHASES.find((p) => p.key === faza.key)!.name}` : ''}`}
+                accessibilityLabel={tm.celijaA11y(formatDatumKratko(d), faza ? MAIN_PHASES.find((p) => p.key === faza.key)!.name : null)}
                 // Izabran dan: cela celija svetlo lila, kao izabrana kapsula (Ivan, 29.9.2026).
                 style={izabranDan ? { backgroundColor: LILA_SVETLA } : undefined}
                 className="mx-0.5 flex-1 items-center rounded-xl py-1.5 active:opacity-60">
@@ -439,7 +446,7 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
           {redFaza.map((f) => (
             <View key={f.at.toISOString()} className="flex-row items-center justify-between py-1">
               <Text variant="default">{MAIN_PHASES.find((p) => p.key === f.key)!.name}</Text>
-              <Text variant="muted">{formatDay(f.at, danas)} u {formatTime(f.at)}</Text>
+              <Text variant="muted">{tm.fazaU(formatDay(f.at, danas), formatTime(f.at))}</Text>
             </View>
           ))}
         </View>
@@ -451,7 +458,7 @@ function Kalendar({ izabran, danas, onIzbor, otvoren, onCeoMesec }: {
           onPress={onCeoMesec}
           accessibilityRole="button"
           className="mt-1 flex-row items-center justify-center gap-1 py-2 active:opacity-60">
-          <Text variant="caption" className="text-foreground">Ceo mesec</Text>
+          <Text variant="caption" className="text-foreground">{tm.ceoMesec}</Text>
           <ChevronDown size={16} color={neutral.ink} strokeWidth={2} />
         </Pressable>
       )}

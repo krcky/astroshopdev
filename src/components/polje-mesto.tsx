@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 /**
  * Mesto rodjenja: polje za pretragu i predlozi ispod (ugradjena lista pa baza).
@@ -24,6 +25,7 @@ export function PoljeMesto({ grad, onGrad, povrsina, autoFocus, linija = 'border
   linija?: 'border-border' | 'border-fill-strong';
   broj?: number;
 }) {
+  const t = useT().onboarding.pretragaGrada;
   const [upit, setUpit] = React.useState('');
   const { results, loading } = useCitySearch(grad ? '' : upit, broj);
   return (
@@ -31,8 +33,8 @@ export function PoljeMesto({ grad, onGrad, povrsina, autoFocus, linija = 'border
       <Input
         povrsina={povrsina}
         value={grad ? (grad.country ? `${grad.name}, ${grad.country}` : grad.name) : upit}
-        onChangeText={(t) => { setUpit(t); onGrad(null); }}
-        placeholder="Grad"
+        onChangeText={(v) => { setUpit(v); onGrad(null); }}
+        placeholder={t.placeholder}
         autoFocus={autoFocus}
         autoCorrect={false}
       />
@@ -49,7 +51,7 @@ export function PoljeMesto({ grad, onGrad, povrsina, autoFocus, linija = 'border
             </Pressable>
           ))}
           {loading && (
-            <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
+            <Text variant="muted" className="py-3 text-center text-sm">{t.trazimDalje}</Text>
           )}
         </View>
       )}

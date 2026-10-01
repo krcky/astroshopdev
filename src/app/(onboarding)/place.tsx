@@ -3,14 +3,16 @@ import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { MapPin } from 'lucide-react-native';
 
-import { OnboardingStep, PRIVACY_NOTE } from '@/components/onboarding-step';
+import { OnboardingStep } from '@/components/onboarding-step';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
 import { useCitySearch } from '@/lib/city-search';
 import { useDraft } from '@/store/draft';
+import { useT } from '@/i18n';
 
 export default function BirthPlace() {
+  const t = useT();
   const draft = useDraft();
   const [query, setQuery] = React.useState('');
   const [city, setCity] = React.useState<City | null>(null);
@@ -27,20 +29,20 @@ export default function BirthPlace() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={MapPin}
-      title="Mesto rođenja"
+      title={t.onboarding.mesto.naslov}
       center={false}
       // Dok se bira, lista treba svaki red iznad tastature — objasnjenje o
       // privatnosti se vrati kad je grad izabran i liste vise nema (Ivan,
       // 29.9.2026: treci grad je bio odsecen). Red koji ide ispod ivice se pretapa.
-      note={city ? PRIVACY_NOTE : null}
+      note={city ? t.onboarding.korak.privatnost : null}
       pretapanje
-      primary={{ label: 'Nastavi', onPress: next, disabled: !city }}>
+      primary={{ label: t.opste.nastavi, onPress: next, disabled: !city }}>
 
       <Input
         povrsina="siva"
         value={city ? `${city.name}, ${city.country}` : query}
-        onChangeText={(t) => { setQuery(t); setCity(null); }}
-        placeholder="Grad"
+        onChangeText={(v) => { setQuery(v); setCity(null); }}
+        placeholder={t.onboarding.pretragaGrada.placeholder}
         autoFocus
         autoCorrect={false}
       />
@@ -56,7 +58,7 @@ export default function BirthPlace() {
           </Pressable>
         ))}
         {loading && (
-          <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
+          <Text variant="muted" className="py-3 text-center text-sm">{t.onboarding.pretragaGrada.trazimDalje}</Text>
         )}
       </View>
     </OnboardingStep>

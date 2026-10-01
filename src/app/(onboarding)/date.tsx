@@ -5,10 +5,12 @@ import { CalendarDays } from 'lucide-react-native';
 import { OnboardingStep } from '@/components/onboarding-step';
 import { WheelPicker } from '@/components/ui/wheel-picker';
 import { useDraft } from '@/store/draft';
+import { useT } from '@/i18n';
 
 const DEFAULT = new Date(2000, 0, 1, 12, 0, 0);
 
 export default function BirthDate() {
+  const t = useT();
   const draft = useDraft();
   const [value, setValue] = React.useState(() =>
     draft.date
@@ -30,8 +32,8 @@ export default function BirthDate() {
     <OnboardingStep
       exit={{ kind: 'cancel', onPress: () => router.replace('/welcome') }}
       icon={CalendarDays}
-      title="Datum rođenja"
-      primary={{ label: izabran ? 'Nastavi' : 'Izaberi datum', onPress: next, disabled: !izabran }}>
+      title={t.onboarding.datum.naslov}
+      primary={{ label: izabran ? t.opste.nastavi : t.onboarding.datum.izaberi, onPress: next, disabled: !izabran }}>
       <WheelPicker mode="date" value={value} onChange={(d) => { setValue(d); setIzabran(true); }} maximumDate={new Date()} />
     </OnboardingStep>
   );

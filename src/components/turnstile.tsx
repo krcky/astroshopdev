@@ -35,6 +35,7 @@ import { View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 
 const SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
@@ -82,6 +83,7 @@ function page(): string {
 }
 
 export function useTurnstile() {
+  const natpis = useT().onboarding.captcha;
   const [run, setRun] = React.useState<number | null>(null);
   const [visible, setVisible] = React.useState(false);
   const pending = React.useRef<{
@@ -150,7 +152,7 @@ export function useTurnstile() {
       <View className="items-center rounded-2xl border border-border bg-background px-6 py-5 shadow-lg">
         {visible && (
           <Text variant="muted" className="mb-4 text-center text-sm">
-            Samo da potvrdimo da nisi robot.
+            {natpis}
           </Text>
         )}
         <WebView

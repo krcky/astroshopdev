@@ -4,7 +4,7 @@ import { Clock } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { WheelPicker } from '@/components/ui/wheel-picker';
-import { NAPOMENA_PODACI } from '@/lib/osobe';
+import { useT } from '@/i18n';
 import { useNovaOsoba } from '@/store/nova-osoba';
 
 /**
@@ -13,6 +13,7 @@ import { useNovaOsoba } from '@/store/nova-osoba';
  * podznaka i kuca (pravilo 5), i to se kaze.
  */
 export default function NovaOsobaVreme() {
+  const t = useT();
   const nacrt = useNovaOsoba();
   const [vreme, setVreme] = React.useState(() => {
     const d = new Date(2000, 0, 1, 12, 0);
@@ -32,15 +33,15 @@ export default function NovaOsobaVreme() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={Clock}
-      title="Vreme rođenja"
-      subtitle="Bez vremena karta nema podznak ni kuće."
-      note={NAPOMENA_PODACI}
+      title={t.profil.rodjenje.vreme}
+      subtitle={t.profil.novaOsoba.vremePodnaslov}
+      note={t.profil.novaOsoba.napomena}
       primary={{
-        label: izabrano ? 'Nastavi' : 'Izaberi vreme',
+        label: izabrano ? t.opste.nastavi : t.profil.novaOsoba.izaberiVreme,
         onPress: () => dalje({ hour: vreme.getHours(), minute: vreme.getMinutes() }),
         disabled: !izabrano,
       }}
-      secondary={{ label: 'Ne znam vreme', onPress: () => dalje(null) }}>
+      secondary={{ label: t.profil.rodjenje.neZnamVreme, onPress: () => dalje(null) }}>
       <WheelPicker mode="time" value={vreme} onChange={(d) => { setVreme(d); setIzabrano(true); }} />
     </OnboardingStep>
   );

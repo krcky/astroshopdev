@@ -5,6 +5,7 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { formatDatum } from '@/lib/horoscope';
+import { useT } from '@/i18n';
 
 /**
  * Native tockic za datum/vreme.
@@ -84,6 +85,7 @@ function AndroidField({ mode, value, onChange, maximumDate, minimumDate }: Props
 
 /** Web nema native tockic — tri odnosno dva polja u istom centriranom stilu. */
 function WebFallback({ mode, value, onChange }: Pick<Props, 'mode' | 'value' | 'onChange'>) {
+  const { ui } = useT().danas;
   const set = (part: 'd' | 'm' | 'y' | 'h' | 'min', raw: string) => {
     const n = parseInt(raw, 10);
     if (Number.isNaN(n)) return;
@@ -98,11 +100,11 @@ function WebFallback({ mode, value, onChange }: Pick<Props, 'mode' | 'value' | '
 
   const fields: [string, string, (v: string) => void, number][] =
     mode === 'date'
-      ? [['dan', String(value.getDate()), (v) => set('d', v), 2],
-         ['mesec', String(value.getMonth() + 1), (v) => set('m', v), 2],
-         ['godina', String(value.getFullYear()), (v) => set('y', v), 4]]
-      : [['sat', pad(value.getHours()), (v) => set('h', v), 2],
-         ['minut', pad(value.getMinutes()), (v) => set('min', v), 2]];
+      ? [[ui.poljeDan, String(value.getDate()), (v) => set('d', v), 2],
+         [ui.poljeMesec, String(value.getMonth() + 1), (v) => set('m', v), 2],
+         [ui.poljeGodina, String(value.getFullYear()), (v) => set('y', v), 4]]
+      : [[ui.poljeSat, pad(value.getHours()), (v) => set('h', v), 2],
+         [ui.poljeMinut, pad(value.getMinutes()), (v) => set('min', v), 2]];
 
   return (
     <View className="flex-row items-end justify-center gap-4">

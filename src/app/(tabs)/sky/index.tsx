@@ -19,6 +19,7 @@ import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
 import { useSkyTimeStore } from '@/store/sky-time';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 import { neutral } from '@/theme/tokens';
 
 /**
@@ -37,6 +38,8 @@ import { neutral } from '@/theme/tokens';
  * tranzita na licnu kartu su i dalje u tabu "Tranziti", jer se tamo placaju.
  */
 export default function Sky() {
+  const t = useT();
+  const tn = t.karta.nebo;
   const hydrated = useProfileStore((s) => s.hydrated);
   const resolved = useResolvedProfile();
   const { width } = useWindowDimensions();
@@ -117,7 +120,7 @@ export default function Sky() {
   return (
     <Screen
       // Pomereno vreme: naslov vise ne tvrdi "trenutno" (UX recenzija 1.10.2026).
-      label={izabran ? 'Nebo' : 'Trenutno na nebu'} padded={false} tint="pink" right={<ProfileButton />}>
+      label={izabran ? tn.naslovPomereno : tn.naslov} padded={false} tint="pink" right={<ProfileButton />}>
       {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
           preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
       <IznadPreliva
@@ -126,7 +129,7 @@ export default function Sky() {
         {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
             linija, pa je legenda ispod liste uklonjena. */}
         <TockInfo velicina={wheelSize} onPress={() => router.push('/nebo-info')}
-          accessibilityLabel="Šta je trenutno nebo?" />
+          accessibilityLabel={tn.infoA11y} />
       </IznadPreliva>
 
       {/* Sat ISPOD tocka, centrirano — na mestu imena na natalnoj karti.
@@ -145,14 +148,14 @@ export default function Sky() {
           ikona={<CalendarDays size={IKONA} color={neutral.ink} strokeWidth={2} />}
           tekst={datum}
           onPress={otvoriKalendar}
-          accessibilityLabel={`Datum: ${datum} Dodirni da izabereš dan.`}
+          accessibilityLabel={tn.datumA11y(datum)}
         />
         <StakloDugme
           sfIkona="mappin.and.ellipse"
           ikona={<MapPin size={IKONA} color={neutral.ink} strokeWidth={2} />}
           tekst={grad.name}
           onPress={() => router.push('/sky-place')}
-          accessibilityLabel={`Mesto posmatranja: ${grad.name}. Dodirni da promeniš.`}
+          accessibilityLabel={tn.mestoA11y(grad.name)}
         />
       </View>
 
@@ -161,33 +164,29 @@ export default function Sky() {
           pogadjao isti sat; sat je prostih 60 minuta stvarnog vremena — vidi
           komentar u `lib/sky.ts`. Mesec i godinu pokriva kalendar. */}
       <View className="mx-5 mt-3 flex-row gap-2">
-        <StakloDugme siroko strelica="levo" tekst="dan" onPress={() => pomeriDan(-1)} accessibilityLabel="Dan nazad" />
-        <StakloDugme siroko strelica="levo" tekst="sat" onPress={() => pomeriSat(-1)} accessibilityLabel="Sat nazad" />
+        <StakloDugme siroko strelica="levo" tekst={tn.dan} onPress={() => pomeriDan(-1)} accessibilityLabel={tn.danNazad} />
+        <StakloDugme siroko strelica="levo" tekst={tn.sat} onPress={() => pomeriSat(-1)} accessibilityLabel={tn.satNazad} />
         {/* Ivice nema, pa neaktivno "Trenutno" (vec gledas sadasnjost) razlikuje samo siv natpis. */}
         <StakloDugme
-          tekst="Trenutno"
+          tekst={tn.trenutno}
           onPress={() => setIzabran(null)}
           disabled={!izabran}
-          accessibilityLabel="Vrati se na sadašnji trenutak"
+          accessibilityLabel={tn.trenutnoA11y}
         />
-        <StakloDugme siroko strelica="desno" tekst="sat" onPress={() => pomeriSat(1)} accessibilityLabel="Sat napred" />
-        <StakloDugme siroko strelica="desno" tekst="dan" onPress={() => pomeriDan(1)} accessibilityLabel="Dan napred" />
+        <StakloDugme siroko strelica="desno" tekst={tn.sat} onPress={() => pomeriSat(1)} accessibilityLabel={tn.satNapred} />
+        <StakloDugme siroko strelica="desno" tekst={tn.dan} onPress={() => pomeriDan(1)} accessibilityLabel={tn.danNapred} />
       </View>
       {/* Ista traka kao na pocetnoj kad je izabran drugi dan (`gledas-drugo.tsx`). */}
       {izabran && (
-        <GledasDrugo className="mx-5 mt-4" tekst="Ovo nije sadašnje nebo."
-          dugme="Vrati na sada" onPress={() => setIzabran(null)} />
+        <GledasDrugo className="mx-5 mt-4" tekst={tn.nijeSadasnje}
+          dugme={tn.vratiNaSada} onPress={() => setIzabran(null)} />
       )}
 
       {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
           Ascendent su prvi redovi liste. */}
       {chart.houses.fellBack && (
         <View className={cn(CARD_SURFACE, 'mx-5 mt-4 p-4')}>
-          <Text variant="muted">
-            Na geografskoj širini mesta {grad.name} Placidus kuće ne postoje — tačke
-            ekliptike koje ih određuju nikad ne izlaze nad horizont. Prikazane
-            su Whole Sign kuće.
-          </Text>
+          <Text variant="muted">{tn.bezPlacidusa(grad.name)}</Text>
         </View>
       )}
 
@@ -195,7 +194,7 @@ export default function Sky() {
           Sunce, Mesec, ostale planete, cvor, Lilit, Tacka srece, MC — MC ostaje
           poslednji, kao na natalnoj karti. Iste kolone, bez rasklapanja i strelica. */}
       <View className={cn(CARD_SURFACE, 'mx-5 mt-4 overflow-hidden')}>
-        <TackaRed tacka="ascendant" glyph="ASC" ime="Ascendent" pos={chart.ascendantSign} />
+        <TackaRed tacka="ascendant" glyph="ASC" ime={t.karta.ascendent} pos={chart.ascendantSign} />
         {redosledPlaneta(chart.planets).map((p) => (
           <TackaRed
             key={p.key}
@@ -218,7 +217,7 @@ export default function Sky() {
             kuca={t.house}
           />
         ))}
-        <TackaRed tacka="midheaven" glyph="MC" ime="MC" pos={chart.midheavenSign} last />
+        <TackaRed tacka="midheaven" glyph="MC" ime={t.karta.mc} pos={chart.midheavenSign} last />
       </View>
 
       {/* Aspekti — bez tumacenja, pa bez strelice; ime nije sivo jer ovde
@@ -228,7 +227,7 @@ export default function Sky() {
             Ivan, 29.9.2026), ne `RowHead`. */}
         <View className="border-b border-border px-4 py-3">
           <Text variant="oznaka" className={OZNAKA_12} accessibilityRole="header">
-            Aspekti{'\u00A0\u00A0·\u00A0\u00A0'}{aspects.length}
+            {t.karta.aspektiNaslov(aspects.length)}
           </Text>
         </View>
         {aspects.map((a, i) => (

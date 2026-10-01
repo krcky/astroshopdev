@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { ScreenBackdrop } from '@/components/screen';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -17,7 +18,6 @@ import {
   cenaBezPopusta, cenaPoMesecu, kupiPremium, usePaketiPremium, ustedaGodisnje, vratiKupovine, type PaketPremium,
 } from '@/lib/kupovina';
 import { PRIVATNOST, USLOVI } from '@/lib/pravila';
-import { dana } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { PREMIUM, PREMIUM_IZABRAN } from '@/components/zakljucano';
@@ -61,6 +61,8 @@ export default function Premium() {
  * kapiju (pravilo 11), ne nazad.
  */
 export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean }) {
+  const t = useT();
+  const tp = t.profil.premium;
   const insets = useSafeAreaInsets();
   // Otvoren preko drugog ekrana = iOS list; utvrdjuje se jednom, pri otvaranju.
   const [kaoList] = React.useState(() => !uOnboardingu && Platform.OS === 'ios' && router.canGoBack());
@@ -81,18 +83,18 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
     setPoruka(null);
     const ishod = await kupiPremium(paket.id);
     setRadi(false);
-    if (ishod === 'nedostupno') setPoruka('Kupovina u aplikaciji još nije uključena.');
-    else if (ishod === 'greska') setPoruka('Kupovina nije uspela. Pokušaj ponovo za koji trenutak.');
-    else if (ishod === 'ceka') setPoruka('Kupovina čeka odobrenje. Premium se uključuje čim stigne.');
+    if (ishod === 'nedostupno') setPoruka(tp.nijeUkljucena);
+    else if (ishod === 'greska') setPoruka(tp.kupovinaNijeUspela);
+    else if (ishod === 'ceka') setPoruka(tp.kupovinaCeka);
     else if (ishod === 'placeno') zatvori();
   };
 
   const vrati = async () => {
     setPoruka(null);
     const ishod = await vratiKupovine();
-    if (ishod === 'nedostupno') setPoruka('Kupovina u aplikaciji još nije uključena.');
-    else if (ishod === 'nema') setPoruka('Na ovom nalogu prodavnice nema pretplate za Astroshop.');
-    else if (ishod === 'greska') setPoruka('Provera nije uspela. Pokušaj ponovo za koji trenutak.');
+    if (ishod === 'nedostupno') setPoruka(tp.nijeUkljucena);
+    else if (ishod === 'nema') setPoruka(tp.nemaPretplate);
+    else if (ishod === 'greska') setPoruka(tp.proveraNijeUspela);
     else zatvori();
   };
 
@@ -104,11 +106,11 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
       <View className="px-5">
 
         <Text variant="naslovLista" className="text-center" accessibilityRole="header">
-          Otvori sva tumačenja
+          {tp.naslov}
         </Text>
         {/* Uze od ekrana, da se prelomi u dva ujednacena reda — ne jedna rec sama u drugom (Ivan, 29.9.2026). */}
         <Text variant="muted" className="mt-3 self-center text-center" style={{ maxWidth: 280 }}>
-          Svi tvoji tranziti, teme perioda i pogled na sutra i prekosutra.
+          {tp.podnaslov}
         </Text>
 
         <View className={uOnboardingu ? 'mt-10 gap-7' : 'mt-7 gap-5'}>
@@ -121,8 +123,8 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
                 accessible={false}
               />
             }
-            naslov="Natalna karta"
-            tekst="Tumačenje svake planete po znaku i kući i svih aspekata."
+            naslov={tp.natalnaNaslov}
+            tekst={tp.natalnaTekst}
           />
           <Stavka
             slika={
@@ -133,9 +135,9 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
                 width={ILUSTRACIJA - 12}
               />
             }
-            naslov="Tranziti"
+            naslov={tp.tranzitiNaslov}
             // "Sledeća dva dana" vise nije stavka (Ivan, 29.9.2026) — samo deo ovog teksta.
-            tekst="Svi tranziti dana sa celim tumačenjem — i za sutra i prekosutra."
+            tekst={tp.tranzitiTekst}
           />
           {/* Spori tranziti (Jupiter—Pluton), slajd "Tema perioda"; besplatni vidi prvi. */}
           <Stavka
@@ -147,8 +149,8 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
                 </View>
               </View>
             }
-            naslov="Teme perioda"
-            tekst="Tranziti koji traju nedeljama i mesecima."
+            naslov={tp.temeNaslov}
+            tekst={tp.temeTekst}
           />
           {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
           <Stavka
@@ -163,8 +165,8 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
                 </View>
               </View>
             }
-            naslov="Tvoji ljudi"
-            tekst={`Karte i tranziti do ${PREMIUM_GRANICE.osobe} bliskih osoba.`}
+            naslov={tp.ljudiNaslov}
+            tekst={tp.ljudiTekst(PREMIUM_GRANICE.osobe)}
           />
         </View>
 
@@ -180,25 +182,25 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
           <View className="flex-row gap-3" accessibilityRole="radiogroup">
             <PaketKartica
               paket={godisnji}
-              naslov="Godišnje"
-              period="godišnje"
-              ispod={`${cenaPoMesecu(godisnji.iznos, godisnji.valuta)} mesečno`}
+              naslov={tp.godisnjeNaslov}
+              period={tp.godisnje}
+              ispod={tp.poMesecu(cenaPoMesecu(godisnji.iznos, godisnji.valuta))}
               precrtano={cenaBezPopusta(godisnji.iznos, mesecni.iznos, godisnji.valuta)}
-              oznaka={usteda ? `Uštedi ${usteda}%` : undefined}
+              oznaka={usteda ? tp.ustedi(usteda) : undefined}
               izabran={izabran === 'godisnje'}
               onPress={() => setIzabran('godisnje')}
             />
             <PaketKartica
               paket={mesecni}
-              naslov="Mesečno"
-              period="mesečno"
+              naslov={tp.mesecnoNaslov}
+              period={tp.mesecno}
               izabran={izabran === 'mesecno'}
               onPress={() => setIzabran('mesecno')}
             />
           </View>
         ) : (
           <Text variant="muted" className="text-center">
-            Kupovina u aplikaciji još nije uključena.
+            {tp.nijeUkljucena}
           </Text>
         )}
       </View>
@@ -207,22 +209,22 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
       <View className={uOnboardingu ? 'px-5 pt-6' : 'px-5 pt-5'}>
         {!!poruka && <Text variant="muted" className="mb-3 text-center" accessibilityLiveRegion="polite">{poruka}</Text>}
         <Button disabled={!paket} ucitava={radi} onPress={kupi}>
-          <Text>{paket?.probaDana ? `Probaj ${dana(paket.probaDana)} besplatno` : 'Pretplati se'}</Text>
+          <Text>{paket?.probaDana ? tp.probaj(paket.probaDana) : tp.pretplatiSe}</Text>
         </Button>
         {!!paket && (
           <Text variant="caption" className="mt-3 text-center">
-            {paket.probaDana
-              ? `Posle probe ${paket.cena} ${paket.id === 'godisnje' ? 'godišnje' : 'mesečno'}. `
-              : ''}
-            Pretplata se obnavlja sama dok je ne otkažeš u podešavanjima {Platform.OS === 'ios' ? 'App Store-a' : 'Google Play-a'}.
+            {tp.obnavljanje(
+              paket.probaDana ? { cena: paket.cena, godisnje: paket.id === 'godisnje' } : null,
+              Platform.OS === 'ios',
+            )}
           </Text>
         )}
         <View className="mt-2 flex-row items-center justify-center">
-          <Veza onPress={() => WebBrowser.openBrowserAsync(USLOVI)}>Uslovi</Veza>
+          <Veza onPress={() => WebBrowser.openBrowserAsync(USLOVI)}>{tp.uslovi}</Veza>
           <Crta />
-          <Veza onPress={vrati}>Vrati kupovine</Veza>
+          <Veza onPress={vrati}>{tp.vratiKupovine}</Veza>
           <Crta />
-          <Veza onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)}>Privatnost</Veza>
+          <Veza onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)}>{tp.privatnost}</Veza>
         </View>
       </View>
     </>
@@ -233,7 +235,7 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
       <Pressable
         onPress={zatvori}
         accessibilityRole="button"
-        accessibilityLabel="Zatvori"
+        accessibilityLabel={t.opste.zatvori}
         hitSlop={10}
         className="absolute right-4 h-[30px] w-[30px] items-center justify-center rounded-pill bg-fill active:opacity-60"
         style={{ top: (kaoList ? 0 : insets.top) + 14 }}>
@@ -319,12 +321,13 @@ function PaketKartica({ paket, naslov, period, ispod, precrtano, oznaka, izabran
   izabran: boolean;
   onPress: () => void;
 }) {
+  const tp = useT().profil.premium;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ selected: izabran }}
-      accessibilityLabel={[naslov, paket.probaDana ? `${dana(paket.probaDana)} besplatno` : null, `${paket.cena} ${period}`, precrtano ? `umesto ${precrtano}` : null, ispod, oznaka].filter(Boolean).join(', ')}
+      accessibilityLabel={[naslov, paket.probaDana ? tp.besplatno(paket.probaDana) : null, tp.cenaPeriod(paket.cena, period), precrtano ? tp.umesto(precrtano) : null, ispod, oznaka].filter(Boolean).join(', ')}
       className={cn(CARD_SURFACE, 'flex-1 border-2 p-4 active:opacity-80', !izabran && 'border-transparent')}
       style={izabran ? { borderColor: PREMIUM, backgroundColor: PREMIUM_IZABRAN } : undefined}>
       {!!oznaka && (
@@ -339,7 +342,7 @@ function PaketKartica({ paket, naslov, period, ispod, precrtano, oznaka, izabran
         <Text variant="h3">{naslov}</Text>
       </View>
       <View className="mt-3">
-        {!!paket.probaDana && <Text variant="default">{dana(paket.probaDana)} besplatno</Text>}
+        {!!paket.probaDana && <Text variant="default">{tp.besplatno(paket.probaDana)}</Text>}
         {/* Cena podebljana (Ivan, 29.9.2026). Uz precrtanu punu cenu (Ivan, 30.9.2026): prvo
             prava, pa precrtana, u istom redu — BEZ reci "godišnje", da red uvek stane (naslov
             kartice to vec kaze, a recenica o obnavljanju ispod dugmeta nosi i period). */}

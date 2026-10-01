@@ -6,30 +6,33 @@
  * ROKA NEMA (Ivan, 29.9.2026): "obicno za 2—3 radna dana" je okviran tekst,
  * bez racuna, statusa "kasni" i bez obecanja.
  */
+import { tr } from '@/i18n/jezik';
+import { sr } from '@/i18n/sr';
 import { natalAspects } from '@/lib/natal-keys';
 import { formatDay } from '@/lib/horoscope';
 import { signFromLongitude, type SignPosition } from '@/lib/zodiac';
-import { nazivOdnosa, type OdnosKljuc } from '@/lib/osobe';
+import type { OdnosKljuc } from '@/lib/osobe';
 import type { SnimakKarte } from '@/lib/pitanja-snimak';
 import type { ResolvedProfile } from '@/store/profile';
 
 /** Najvise znakova u pitanju (Ivan, 29.9.2026: 500, ranije 1000). Isto ogranicenje drzi i baza. */
 export const PITANJE_MAX = 500;
 
-/** Astrolog koji odgovara — jedno mesto za sve ekrane, sa padezima koje tekst trazi. */
+/**
+ * Astrolog koji odgovara — jedno mesto za sve ekrane. Ime, padezi koje trazi recenica i
+ * zvanje su u recniku (`t.pitaj.astrolog`; ime se ne prevodi), pa su getteri.
+ * Okviran rok je u recenicama recnika (`i18n/sr/pitaj.ts`).
+ */
 export const ASTROLOG = {
-  ime: 'Boban Vujović',
-  kratko: 'Boban',
+  get ime() { return tr().pitaj.astrolog.ime; },
+  get kratko() { return tr().pitaj.astrolog.kratko; },
   /** "Pitanje za Bobana" */
-  genitiv: 'Bobana',
+  get genitiv() { return tr().pitaj.astrolog.genitiv; },
   /** "stiže Bobanu" */
-  dativ: 'Bobanu',
-} as const;
-
-/** Okviran rok — samo tekst (vidi gore). */
-export const OKVIRNI_ROK = 'obično za 2–3 radna dana';
-/** Isti rok, bez "obično za" — u recenici tabele uvoda (`pitaj-uvod.tsx`). */
-export const ROK_KRATKO = '2–3 radna dana';
+  get dativ() { return tr().pitaj.astrolog.dativ; },
+  /** "Astrolog" — ispod imena u uvodu. */
+  get zvanje() { return tr().pitaj.astrolog.zvanje; },
+};
 
 export type PitanjeStatus = 'draft' | 'paid' | 'answered' | 'refunded';
 
@@ -61,7 +64,7 @@ export type Pitanje = {
  */
 export function oKome(p: Pick<Pitanje, 'karta_pita' | 'karta_ime' | 'karta_par'>): string | null {
   if (!p.karta_pita || !p.karta_ime) return null;
-  return p.karta_par ? `Ja i ${p.karta_ime}` : p.karta_ime;
+  return p.karta_par ? tr().pitaj.jaI(p.karta_ime) : p.karta_ime;
 }
 
 /** Pitanje moze da se posalje: posle obrezivanja ima 1—`PITANJE_MAX` znakova. */
@@ -82,13 +85,14 @@ export function brojNeprocitanih(pitanja: readonly Pick<Pitanje, 'audio_putanja'
 
 /** Natpis stanja u listi "Moja pitanja". */
 export function natpisStatusa(p: Pick<Pitanje, 'status' | 'audio_putanja' | 'procitano_at'>): string {
-  if (neprocitan(p)) return 'Novi odgovor';
+  const s = tr().pitaj.status;
+  if (neprocitan(p)) return s.noviOdgovor;
   switch (p.status) {
-    case 'draft': return 'Nije poslato';
-    case 'paid': return 'Čeka odgovor';
-    case 'answered': return 'Odgovoreno';
+    case 'draft': return s.nijePoslato;
+    case 'paid': return s.cekaOdgovor;
+    case 'answered': return s.odgovoreno;
     // Povracaj posle odgovora: odgovor ostaje, pa je i dalje "odgovoreno".
-    case 'refunded': return p.audio_putanja ? 'Odgovoreno' : 'Novac je vraćen';
+    case 'refunded': return p.audio_putanja ? s.odgovoreno : s.novacVracen;
   }
 }
 
@@ -117,15 +121,31 @@ export function trajanjeZvuka(sekundi: number): string {
  */
 export function porukaGreske(poruka: string | undefined | null): string {
   const m = poruka ?? '';
-  if (/prazno_pitanje/.test(m)) return 'Pitanje je prazno. Napiši šta te zanima.';
-  if (/predugo_pitanje/.test(m)) return `Pitanje je duže od ${PITANJE_MAX} znakova. Skrati ga pa pošalji.`;
-  if (/nema_kredita/.test(m)) return 'Plaćeno pitanje je već iskorišćeno. Osveži stranu pa probaj ponovo.';
-  if (/nema_nacrta/.test(m)) return 'Ovo pitanje je već poslato.';
-  if (/nema_osobe/.test(m)) return 'Ova osoba više nije na tvojoj listi. Izaberi o kome je pitanje pa pošalji.';
-  if (/nema_naloga|JWT/i.test(m)) return 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.';
-  if (/fetch|network|timed? ?out/i.test(m)) return 'Nema veze sa serverom. Pitanje je sačuvano na telefonu — probaj kad se internet vrati.';
-  return 'Pitanje nije sačuvano. Probaj ponovo za minut.';
+  const g = tr().pitaj.greske;
+  if (/prazno_pitanje/.test(m)) return g.prazno;
+  if (/predugo_pitanje/.test(m)) return g.predugo(PITANJE_MAX);
+  if (/nema_kredita/.test(m)) return g.nemaKredita;
+  if (/nema_nacrta/.test(m)) return g.nemaNacrta;
+  if (/nema_osobe/.test(m)) return g.nemaOsobe;
+  if (/nema_naloga|JWT/i.test(m)) return g.nemaNaloga;
+  if (/fetch|network|timed? ?out/i.test(m)) return g.mreza;
+  return g.nepoznato;
 }
+
+/*
+ * SNIMAK JE NA SRPSKOM, UVEK: ide u bazu (`pitanja.karta`) i u panel astrologa, koji
+ * ostaje srpski. Imena se zato NE citaju iz tekuceg recnika (`p.name`, `sign.name`,
+ * `formatted` prate jezik aplikacije) nego iz srpskog (`sr`), po kljucu. Na srpskom je
+ * ishod isti znak po znak (`check:pitanja`, deo 5).
+ */
+const SNIMAK_UGLOVI: Record<string, string> = { ascendant: 'Ascendent' };
+const imeTelaSr = (key: string, rezerva: string): string =>
+  sr.nebo.tela[key as keyof typeof sr.nebo.tela] ?? SNIMAK_UGLOVI[key] ?? rezerva;
+const imeZnakaSr = (p: SignPosition): string => sr.nebo.znaci[p.sign.key as keyof typeof sr.nebo.znaci]?.ime ?? p.sign.name;
+/** "12° 34' Bik" — isti oblik kao `formatted` u `zodiac.ts`, sa srpskim imenom znaka. */
+const stepenSr = (p: SignPosition): string => `${p.deg}° ${String(p.min).padStart(2, '0')}' ${imeZnakaSr(p)}`;
+/** Odnos za astrologa, srpski naziv iz `profil.odnosi`; "Neko drugi" i neodabran se ne pisu (kao `nazivOdnosa`). */
+const odnosSr = (k: OdnosKljuc | null): string | null => (!k || k === 'drugo' ? null : sr.profil.odnosi[k] ?? null);
 
 /**
  * Snimak karte za astrologa, u trenutku slanja. Isti racun koji korisnik vidi u
@@ -154,7 +174,7 @@ export function snimakKarte(r: ResolvedProfile): SnimakKarte {
       sistemKuca: null, planete: [], ascendent: null, mc: null, kuce: null, aspekti: [],
     };
   }
-  const polozaj = (p: SignPosition) => ({ znak: p.sign.name, stepen: p.formatted });
+  const polozaj = (p: SignPosition) => ({ znak: imeZnakaSr(p), stepen: stepenSr(p) });
   return {
     verzija: 1,
     ime: profile.name,
@@ -164,9 +184,9 @@ export function snimakKarte(r: ResolvedProfile): SnimakKarte {
     sistemKuca: timeUnknown ? null : chart.houses.system,
     planete: chart.planets.map((p) => ({
       kljuc: p.key,
-      ime: p.name,
-      znak: p.position.sign.name,
-      stepen: p.position.formatted,
+      ime: imeTelaSr(p.key, p.name),
+      znak: imeZnakaSr(p.position),
+      stepen: stepenSr(p.position),
       kuca: timeUnknown ? null : p.house,
       retro: p.retrograde,
     })),
@@ -176,7 +196,12 @@ export function snimakKarte(r: ResolvedProfile): SnimakKarte {
     // Isti spisak kao u tabu "Ti"; Mesecevi aspekti bez vremena rodjenja se ne salju.
     aspekti: natalAspects(chart, timeUnknown)
       .filter((a) => a.interpreted)
-      .map((a) => ({ a: a.a.name, aspekt: a.aspect.name, b: a.b.name, orbis: `${a.orb.toFixed(1).replace('.', ',')}°` })),
+      .map((a) => ({
+        a: imeTelaSr(a.a.key, a.a.name),
+        aspekt: sr.nebo.aspekti[a.aspect.key as keyof typeof sr.nebo.aspekti] ?? a.aspect.name,
+        b: imeTelaSr(a.b.key, a.b.name),
+        orbis: `${a.orb.toFixed(1).replace('.', ',')}°`,
+      })),
   };
 }
 
@@ -195,7 +220,7 @@ export function snimakODrugoj(
     ...snimakKarte(osoba),
     verzija: 2,
     drugaOsoba: {
-      odnos: nazivOdnosa(odnos),
+      odnos: odnosSr(odnos),
       pita: ja.profile.name,
       mojaKarta: oOdnosu ? snimakKarte(ja) : null,
     },

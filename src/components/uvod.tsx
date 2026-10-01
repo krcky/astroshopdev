@@ -22,6 +22,7 @@ import {
   krajRupe, KRUG_NESTAJE, PRELIV_GASENJE, rupaPoluprecnik, UVOD_KRUG, UVOD_MS, ZALET, ZUM_SADRZAJA,
 } from '@/lib/uvod';
 import { backdrop, neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /*
  * UVOD PRI POKRETANJU (Ivan, 28.9.2026) — varijanta "Krug se otvori", po uzoru
@@ -88,6 +89,7 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
   /** Uvod je gotov i moze da se ukloni. */
   onKraj: () => void;
 }) {
+  const imeAplikacije = useT().opste.imeAplikacije;
   const [vel, setVel] = React.useState<{ w: number; h: number } | null>(null);
   /** Lottie je ucitan (ili je prosla rezerva) — splash se sklanja, krug krece. */
   const [krenuo, setKrenuo] = React.useState(false);
@@ -181,7 +183,7 @@ export function Uvod({ spremno, zum, onPocetak, onKraj }: {
       // Aplikacija ispod je vec montirana; VoiceOver je ne cita dok je uvod preko nje.
       accessibilityViewIsModal
       accessible
-      accessibilityLabel="Astro Shop"
+      accessibilityLabel={imeAplikacije}
       accessibilityState={{ busy: !smiren }}>
       {!vel ? (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: neutral.grouped }]} />

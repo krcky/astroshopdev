@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { KARTICA } from '@/components/prica/kartica';
 import { LogoPrice } from '@/components/prica/logo-price';
 import type { OkvirSlike } from '@/components/prica/slajdovi';
@@ -27,6 +28,7 @@ const LOGO_VRH = 532;
  *   završnom kadru, a ime znaka na naslovnoj. Slika za deljenje (PNG) ga zadržava.
  */
 export function KarticaZnaka({ p, k, bezZaglavlja = false }: { p: PricaZnaka; k: SlikaZnaka; bezZaglavlja?: boolean }) {
+  const t = useT();
   const Slika = SLIKE_PRICE_ZNAKA[k];
   const tamno = tamnaSlikaZnaka(k);
   return (
@@ -36,7 +38,7 @@ export function KarticaZnaka({ p, k, bezZaglavlja = false }: { p: PricaZnaka; k:
       <Text
         className={cn('uppercase', tezina('statOznaka'))}
         style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: tamno ? 'rgba(255,255,255,0.75)' : neutral.inkMuted }}>
-        {`${p.znak.name} · astroshop.rs`}
+        {t.prica.uzSajt(p.znak.name)}
       </Text>
       )}
       <LogoPrice sirina={LOGO_W} negativ={tamno} style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />

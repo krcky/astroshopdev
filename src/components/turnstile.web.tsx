@@ -22,6 +22,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 
 const SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
@@ -76,6 +77,7 @@ function loadScript(): Promise<TurnstileApi> {
 }
 
 export function useTurnstile() {
+  const natpis = useT().onboarding.captcha;
   const [run, setRun] = React.useState<number | null>(null);
   const [visible, setVisible] = React.useState(false);
   const host = React.useRef<HTMLDivElement | null>(null);
@@ -177,7 +179,7 @@ export function useTurnstile() {
       <View className={visible ? 'items-center rounded-2xl border border-border bg-background px-6 py-5 shadow-lg' : ''}>
         {visible && (
           <Text variant="muted" className="mb-4 text-center text-sm">
-            Samo da potvrdimo da nisi robot.
+            {natpis}
           </Text>
         )}
         {/* Cloudflare trazi pravi DOM cvor — zato raw div, a ne View. */}

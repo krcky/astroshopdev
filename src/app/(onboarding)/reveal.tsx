@@ -4,6 +4,7 @@ import { Redirect, router } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { useAuthStore } from '@/store/auth';
 import { useDraft } from '@/store/draft';
@@ -25,6 +26,8 @@ const PLANETA: Record<string, ImageSourcePropType> = {
 };
 
 export default function Reveal() {
+  const t = useT();
+  const rv = t.onboarding.reveal;
   const draft = useDraft();
   const user = useAuthStore((s) => s.user);
   const [cuva, setCuva] = React.useState(false);
@@ -77,9 +80,9 @@ export default function Reveal() {
     return (
       <OnboardingStep
         exit={{ kind: 'back', onPress: () => router.back() }}
-        question="Ne možemo da izračunamo kartu"
-        note={`Ne znamo pouzdano koliko je sati bilo po UTC-u u mestu ${resolved.city.name} na taj datum. Probaj drugo mesto rođenja, ili nam javi — zona: ${resolved.city.tz.name}`}
-        primary={{ label: 'Nazad na mesto rođenja', onPress: () => router.back() }}
+        question={rv.neMozemo}
+        note={rv.zonaNepouzdana(resolved.city.name, resolved.city.tz.name)}
+        primary={{ label: rv.nazadNaMesto, onPress: () => router.back() }}
       />
     );
   }
@@ -98,33 +101,33 @@ export default function Reveal() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       note={greska
-        ? 'Karta nije sačuvana — nismo uspeli da stignemo do servera. Proveri internet pa pritisni Nastavi ponovo.'
-        : 'Pozicije računamo iz podataka o kretanju planeta, za tvoj tačan trenutak i mesto rođenja.'}
-      primary={{ label: 'Nastavi', onPress: nastavi, ucitava: cuva, disabled: cuva }}>
+        ? rv.greskaCuvanja
+        : rv.izvorPozicija}
+      primary={{ label: t.opste.nastavi, onPress: nastavi, ucitava: cuva, disabled: cuva }}>
 
       <View className="items-center">
         <Image source={PLANETA[vladar.key]} style={{ width: 200, height: 200 }}
-          resizeMode="contain" accessibilityLabel={`Vladajuća planeta: ${vladar.name}`} />
+          resizeMode="contain" accessibilityLabel={rv.vladajucaPlaneta(vladar.name)} />
         <Text variant="muted" className="mt-3 text-center">
-          {resolved.timeUnknown ? 'Vladar tvog znaka' : 'Vladar tvoje karte'}: {vladar.name}
+          {resolved.timeUnknown ? rv.vladarZnaka(vladar.name) : rv.vladarKarte(vladar.name)}
         </Text>
 
         {/* Velika trojka kroz nase ikonice znakova (Ivan, 29.9.2026; ranije ☉ ☽ ↑). */}
         <View className="mt-8 w-full flex-row justify-center gap-8">
-          <Placement uloga="Sunce" znak={sun.position.sign} />
-          <Placement uloga="Mesec" znak={moon.position.sign} />
-          <Placement uloga="Podznak" znak={resolved.timeUnknown ? null : asc} />
+          <Placement uloga={rv.sunce} znak={sun.position.sign} />
+          <Placement uloga={rv.mesec} znak={moon.position.sign} />
+          <Placement uloga={rv.podznak} znak={resolved.timeUnknown ? null : asc} />
         </View>
 
         <View className="mt-10 items-center">
-          {traits.map((t) => (
-            <Text key={t} variant="display" className="py-1 text-center text-3xl">{t}</Text>
+          {traits.map((osobina) => (
+            <Text key={osobina} variant="display" className="py-1 text-center text-3xl">{osobina}</Text>
           ))}
         </View>
 
         {resolved.timeUnknown && (
           <Text variant="muted" className="mt-8 px-4 text-center text-xs">
-            Bez vremena rođenja ascendent se ne može izračunati. Dopunićeš ga kasnije u profilu.
+            {rv.bezVremena}
           </Text>
         )}
       </View>
@@ -134,8 +137,9 @@ export default function Reveal() {
 
 /** Znak (nasa ikonica), ime znaka, ispod sitno cije je (Sunce / Mesec / Podznak). */
 function Placement({ uloga, znak }: { uloga: string; znak: ZodiacSign | null }) {
+  const rv = useT().onboarding.reveal;
   return (
-    <View className="items-center" accessible accessibilityLabel={`${uloga}: ${znak ? znak.name : 'nepoznat'}`}>
+    <View className="items-center" accessible accessibilityLabel={rv.uloga(uloga, znak ? znak.name : rv.nepoznat)}>
       {znak ? (
         <ZnakIkona znak={znak.key} element={znak.element} size={40} />
       ) : (

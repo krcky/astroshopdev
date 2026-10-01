@@ -4,12 +4,13 @@ import { MapPin } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { PoljeMesto } from '@/components/polje-mesto';
+import { useT } from '@/i18n';
 import type { City } from '@/lib/cities';
-import { NAPOMENA_PODACI } from '@/lib/osobe';
 import { useNovaOsoba } from '@/store/nova-osoba';
 
 /** Nova osoba, korak 5: mesto rodjenja — ista pretraga kao onboarding. */
 export default function NovaOsobaMesto() {
+  const t = useT();
   const nacrt = useNovaOsoba();
   const [grad, setGrad] = React.useState<City | null>(nacrt.grad);
 
@@ -25,12 +26,12 @@ export default function NovaOsobaMesto() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={MapPin}
-      title="Mesto rođenja"
+      title={t.profil.rodjenje.mesto}
       center={false}
       // Kao u onboardingu: dok se bira, lista treba prostor iznad tastature.
-      note={grad ? NAPOMENA_PODACI : null}
+      note={grad ? t.profil.novaOsoba.napomena : null}
       pretapanje
-      primary={{ label: 'Nastavi', onPress: dalje, disabled: !grad }}>
+      primary={{ label: t.opste.nastavi, onPress: dalje, disabled: !grad }}>
       <PoljeMesto grad={grad} onGrad={setGrad} povrsina="siva" autoFocus linija="border-fill-strong" broj={8} />
     </OnboardingStep>
   );

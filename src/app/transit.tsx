@@ -24,6 +24,7 @@ import { OdeljakIkona } from '@/components/odeljak-ikona';
 import { vrstaSekcije, type VrstaSekcije } from '@/lib/tumacenje';
 import { neutral } from '@/theme/tokens';
 import { useNaMrezi } from '@/lib/mreza';
+import { useT } from '@/i18n';
 
 
 /**
@@ -49,6 +50,8 @@ const IKONA_SEKCIJE: Record<VrstaSekcije, SymbolViewProps['name']> = {
  * placen — i tada se prikazuje kratka verzija sa pozivom na otkljucavanje.
  */
 export default function TransitDetail() {
+  const t = useT();
+  const tx = t.danas.tumacenje;
   // `osoba`: tranzit na kartu druge osobe (strana osobe, 29.9.2026) — bez njega korisnikova karta.
   const { key, osoba } = useLocalSearchParams<{ key: string; osoba?: string }>();
   const resolved = useKarta(osoba);
@@ -70,7 +73,7 @@ export default function TransitDetail() {
 
   if (!resolved) {
     // Osoba je u medjuvremenu obrisana (ili je drugi nalog) — list to kaze, ne salje na kapiju.
-    if (osoba) return <SheetScroll><Text variant="muted">Ova osoba više nije na tvojoj listi.</Text></SheetScroll>;
+    if (osoba) return <SheetScroll><Text variant="muted">{tx.osobaViseNije}</Text></SheetScroll>;
     return <Redirect href="/" />;
   }
 
@@ -90,14 +93,14 @@ export default function TransitDetail() {
                 <Simbol tacka={tranzit.natal} />
               </View>
               <Text variant="oznaka" className="flex-1 text-right text-foreground">
-                {tranzit.transiting.name} {tranzit.aspect.name} {tranzit.natal.name}
+                {t.danas.tranzit.ime(tranzit.transiting.name, tranzit.aspect.name, tranzit.natal.name)}
               </Text>
             </View>
           )}
           <View className="mt-7 flex-row items-end gap-5">
             {/* Cele reci: duga rec u uskoj koloni smanji naslov umesto da se prelomi (32 -> najmanje 22). */}
             <NaslovCeleReci size={32} lineHeight={38} min={22} className="flex-1">
-              {puna?.title || sazeta?.title || 'Tranzit'}
+              {puna?.title || sazeta?.title || tx.tranzit}
             </NaslovCeleReci>
             {tranzit && imaAspekt(tranzit.aspect.key) && (
               <AspektIlustracija
@@ -148,7 +151,7 @@ export default function TransitDetail() {
                   nema — tada se to i kaze (Ivan, 29.9.2026). */}
               {entitlement?.active ? (
                 <Text variant="muted" className="mt-6 text-xs">
-                  {naMrezi ? 'Tumačenje za ovaj tranzit još nije napisano.' : 'Ceo tekst će se pojaviti kad se veza vrati.'}
+                  {naMrezi ? tx.nijeNapisano : tx.stizeKadVeza}
                 </Text>
               ) : (
                 <PremiumKartica
@@ -156,9 +159,9 @@ export default function TransitDetail() {
                   ilustracija
                   className="mt-12"
                   // Tekst: verzija 2 od tri (Ivan, 30.9.2026) — iskreno kaze da je gore kratka verzija.
-                  naslov="Pročitaj do kraja"
-                  opis="Ovo je kratka verzija. U celoj su oblasti života na koje tranzit deluje, dugoročni efekti i konkretni saveti."
-                  dugme="Otključaj ceo tekst"
+                  naslov={tx.procitajDoKraja}
+                  opis={tx.kratkaVerzija}
+                  dugme={tx.otkljucajCeo}
                 />
               )}
             </>

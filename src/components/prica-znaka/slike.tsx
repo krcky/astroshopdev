@@ -5,6 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Share } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { ElementIkona } from '@/components/element-ikona';
@@ -113,6 +114,7 @@ function SlikaSazvezdje({ p, okvir, kartica }: SlikaZnakaProps) {
   const T = tipovi(s);
   const [m, onLayout] = useMera();
   const naslov = kartica ? NATPISI.sazvezdjeNaslov.ja : NATPISI.sazvezdjeNaslov.ti;
+  useT(); // NATPISI cita recnik; crta se iznova kad se jezik promeni
   return (
     <View style={{ flex: 1, backgroundColor: INDIGO }}>
       <Pozadina nijansa="noc" okvir={okvir} kartica={kartica} />
@@ -181,6 +183,7 @@ function Cip({ ikona, tekst, s }: { ikona?: React.ReactNode; tekst: string; s: n
 }
 
 function SlikaNaslovna({ p, okvir, kartica }: SlikaZnakaProps) {
+  const t = useT();
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
   const [m, onLayout] = useMera();
@@ -209,7 +212,7 @@ function SlikaNaslovna({ p, okvir, kartica }: SlikaZnakaProps) {
             <Cip s={s} ikona={<ElementIkona element={p.element} size={ikona} />} tekst={p.elementIme} />
             <Cip s={s} ikona={planeta ? <Image source={planeta} style={{ width: ikona, height: ikona }} resizeMode="contain" /> : undefined} tekst={p.vladar.ime} />
             {/* Stepen samo u prici, i samo uz tacno vreme rodjenja (bez njega Sunce je ±0,5°). */}
-            {!kartica && p.stepen !== null && <Cip s={s} tekst={`Sunce na ${p.stepen}°`} />}
+            {!kartica && p.stepen !== null && <Cip s={s} tekst={t.prica.znak.sunceNa(p.stepen)} />}
           </Pojava>
         </View>
       </View>
@@ -236,6 +239,7 @@ function Crta({ boja, kasni, s }: { boja: string; kasni: number; s: number }) {
 }
 
 function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
+  const t = useT();
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
   const sirina = okvir.sirina - 2 * (kartica ? 22 : 24);
@@ -248,7 +252,7 @@ function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
       {/* Sadrzaj na sredini visine (Ivan, 1.10.2026) — i na kartici, pa je isti raspored. */}
       <View style={[sadrzaj(okvir, kartica), { justifyContent: 'center' }]}>
         <Pojava kasni={300}>
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{`${p.znak.name} ukratko`}</Text>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{t.prica.znak.ukratko(p.znak.name)}</Text>
         </Pojava>
         <View style={{ marginTop: 10 * s }}>
           <Reci tekst={p.ukratko} kasni={450} korak={110} className={DISP} style={T.naslov(vel)} />
@@ -261,7 +265,7 @@ function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
         )}
         <Pojava kasni={2100} style={{ marginTop: 24 * s }}>
           <Linija />
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 16 * s }]}>Najveće vrednosti</Text>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 16 * s }]}>{t.prica.znak.najveceVrednosti}</Text>
         </Pojava>
         <View style={{ marginTop: 8 * s }}>
           {p.opis.vrednosti.map((v, i) => (
@@ -313,11 +317,13 @@ function SlikaTema({ okvir, kartica, nijansa, ikona, sirinaIkone, oznaka, naslov
 }
 
 function SlikaLjubav({ p, okvir, kartica }: SlikaZnakaProps) {
-  return <SlikaTema okvir={okvir} kartica={kartica} nijansa="roze" ikona={SRCE} sirinaIkone={112} oznaka="U ljubavi" naslov={p.opis.ljubav} recenica={p.ljubavRecenica} />;
+  const t = useT();
+  return <SlikaTema okvir={okvir} kartica={kartica} nijansa="roze" ikona={SRCE} sirinaIkone={112} oznaka={t.prica.znak.uLjubavi} naslov={p.opis.ljubav} recenica={p.ljubavRecenica} />;
 }
 
 function SlikaPosao({ p, okvir, kartica }: SlikaZnakaProps) {
-  return <SlikaTema okvir={okvir} kartica={kartica} nijansa="zlato" ikona={TORBA} sirinaIkone={106} oznaka="Na poslu" naslov={p.opis.posao} recenica={p.posaoRecenica} />;
+  const t = useT();
+  return <SlikaTema okvir={okvir} kartica={kartica} nijansa="zlato" ikona={TORBA} sirinaIkone={106} oznaka={t.prica.znak.naPoslu} naslov={p.opis.posao} recenica={p.posaoRecenica} />;
 }
 
 /* ------------------------------------------------------------------------- *
@@ -325,6 +331,7 @@ function SlikaPosao({ p, okvir, kartica }: SlikaZnakaProps) {
  * ------------------------------------------------------------------------- */
 
 function SlikaOsvojiti({ p, okvir, kartica }: SlikaZnakaProps) {
+  useT(); // NATPISI cita recnik
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
   const sirina = okvir.sirina - 2 * (kartica ? 22 : 24);
@@ -389,26 +396,31 @@ function KarticaOsnove({ ikona, oznaka, vrednost, opis, dugo, kasni, s, T }: {
 }
 
 function SlikaOsnove({ p, okvir, kartica }: SlikaZnakaProps) {
+  const t = useT();
   // Sest kartica sa izgledom od 3—4 reda: na kartici za deljenje manja razmera, inace idu preko loga.
   const s = kartica ? 0.62 : razmera(okvir, kartica);
   const T = tipovi(s);
   const sirina = okvir.sirina - 2 * (kartica ? 22 : 24);
   const vel = velicinaNaslova(p.osnove, sirina, 34 * s, 26 * s, 2);
   const ik = 40 * s;
-  const kvalitet = { Kardinalan: 'kvalitet-kardinalni', Fiksni: 'kvalitet-fiksni', Promenljiv: 'kvalitet-promenljivi' }[p.kvalitet];
+  const kvalitet = { kardinalan: 'kvalitet-kardinalni', fiksni: 'kvalitet-fiksni', promenljiv: 'kvalitet-promenljivi' }[p.kvalitetKljuc];
+  const z = t.prica.znak;
+  // Pol sa sajta je uvek isti kao polaritet (muski = pozitivan; drzi `check:prica-znaka`, deo 2), pa
+  // ikonica pola ide po polaritetu — bez poredjenja sa tekstom sa sajta.
+  const muski = p.polaritetKljuc === 'pozitivan';
   const redovi = [
-    { ikona: <ElementIkona element={p.element} size={34 * s} />, oznaka: 'Element', vrednost: p.elementIme, opis: p.srodni },
-    { ikona: <IkonaOsnove ime={kvalitet} size={ik} />, oznaka: 'Kvalitet', vrednost: p.kvalitet, opis: p.doba },
-    { ikona: <IkonaOsnove ime={p.opis.pol === 'Muški' ? 'pol-muski' : 'pol-zenski'} size={ik} />, oznaka: 'Pol', vrednost: p.opis.pol },
-    { ikona: <IkonaOsnove ime={p.polaritet === 'Pozitivan' ? 'polaritet-pozitivni' : 'polaritet-zenski'} size={ik} />, oznaka: 'Polaritet', vrednost: p.polaritet, opis: p.polaritetOpis },
-    { ikona: <IkonaOsnove ime="izgled" size={ik} />, oznaka: 'Izgled', vrednost: p.opis.izgled, dugo: true },
+    { ikona: <ElementIkona element={p.element} size={34 * s} />, oznaka: z.oznakaElement, vrednost: p.elementIme, opis: p.srodni },
+    { ikona: <IkonaOsnove ime={kvalitet} size={ik} />, oznaka: z.oznakaKvalitet, vrednost: p.kvalitet, opis: p.doba },
+    { ikona: <IkonaOsnove ime={muski ? 'pol-muski' : 'pol-zenski'} size={ik} />, oznaka: z.oznakaPol, vrednost: p.opis.pol },
+    { ikona: <IkonaOsnove ime={muski ? 'polaritet-pozitivni' : 'polaritet-zenski'} size={ik} />, oznaka: z.oznakaPolaritet, vrednost: p.polaritet, opis: p.polaritetOpis },
+    { ikona: <IkonaOsnove ime="izgled" size={ik} />, oznaka: z.oznakaIzgled, vrednost: p.opis.izgled, dugo: true },
     { ikona: <IkonaOsnove ime="deo-tela" size={ik} />, oznaka: p.teloOznaka, vrednost: p.opis.telo, dugo: true },
   ];
   return (
     <View style={{ flex: 1, backgroundColor: SIVA }}>
       <View style={[sadrzaj(okvir, kartica), { paddingTop: 8 * s }]}>
         <Pojava kasni={300}>
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Osnove znaka</Text>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{z.osnoveZnaka}</Text>
         </Pojava>
         <View style={{ marginTop: 10 * s }}>
           <Reci tekst={p.osnove} kasni={450} className={DISP} style={T.naslov(vel)} />
@@ -426,14 +438,15 @@ function SlikaOsnove({ p, okvir, kartica }: SlikaZnakaProps) {
  * ------------------------------------------------------------------------- */
 
 function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
+  const t = useT();
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
   const sl = SLIKE_ZNAKA[p.znak.key];
   const stvari: [Slika, string, string][] = [
-    [sl.kamen, 'Dragi kamen', p.opis.kamen],
-    [sl.boja, 'Boja', p.opis.boja],
-    [sl.biljka, 'Biljka', p.opis.biljka],
-    [sl.hrana, 'Hrana', p.opis.hrana],
+    [sl.kamen, t.prica.znak.dragiKamen, p.opis.kamen],
+    [sl.boja, t.prica.znak.boja, p.opis.boja],
+    [sl.biljka, t.prica.znak.biljka, p.opis.biljka],
+    [sl.hrana, t.prica.znak.hrana, p.opis.hrana],
   ];
   const z = p.opis.zivotinja;
   const velZ = (z.length < 40 ? 22 : z.length < 90 ? 17 : 14.5) * s;
@@ -444,10 +457,10 @@ function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
     <View style={{ flex: 1, backgroundColor: BELA }}>
       <View style={[sadrzaj(okvir, kartica), { paddingTop: 8 * s }]}>
         <Pojava kasni={300}>
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Znak u stvarima</Text>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{t.prica.znak.znakUStvarima}</Text>
         </Pojava>
         <View style={{ marginTop: 10 * s }}>
-          <Reci tekst="Kamen, boja, biljka i hrana" kasni={420} className={DISP} style={T.naslov(30 * s)} />
+          <Reci tekst={t.prica.znak.stvariNaslov} kasni={420} className={DISP} style={T.naslov(30 * s)} />
         </View>
         {/* Fotografije sa sajta su na belom, pa je i slajd beo: granica slike se ne vidi. Ne providnost ni
             mesanje boja — video ih ne bi snimio. */}
@@ -465,7 +478,7 @@ function SlikaStvari({ p, okvir, kartica }: SlikaZnakaProps) {
         </View>
         <Pojava kasni={1700} style={{ marginTop: 16 * s }}>
           <Linija />
-          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 12 * s }]}>Životinja</Text>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO, marginTop: 12 * s }]}>{t.prica.znak.zivotinja}</Text>
           <Text className={tezina('naslovUTekstu')} style={{ fontSize: velZ, lineHeight: velZ * 1.25, marginTop: 4 * s }}>{z}</Text>
         </Pojava>
       </View>
@@ -498,6 +511,7 @@ function Planeta({ planetKey, velicina }: { planetKey: string; velicina: number 
 }
 
 function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZnakaProps) {
+  const t = useT();
   const s = razmera(okvir, kartica);
   const T = tipovi(s);
   // U uvodu dugmad crta plejer ("Nastavi") i vec je uracunao u `okvir.dno`.
@@ -514,7 +528,7 @@ function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZna
         </View>
         <View style={{ alignSelf: 'stretch', paddingHorizontal: strana, marginTop: 28 * s }}>
           <Pojava kasni={500}>
-            <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>Vladar znaka</Text>
+            <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{t.prica.znak.vladarZnaka}</Text>
           </Pojava>
           <View style={{ marginTop: 10 * s }}>
             <Reci tekst={p.vladarNaslov} kasni={650} className={DISP} style={T.naslov(40 * s)} />
@@ -529,14 +543,14 @@ function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZna
       </View>
       {!kartica && !uvod && (
         <Pojava kasni={1600} style={{ position: 'absolute', left: 24, right: 24, bottom: okvir.donjiUmetak + 16, gap: 6 }}>
-          <Button onPress={onPodeli} accessibilityLabel="Podeli svoj znak">
+          <Button onPress={onPodeli} accessibilityLabel={t.prica.znak.podeliSvojZnak}>
             <View className="flex-row items-center gap-2">
               <Share size={19} color={BELA} strokeWidth={2} />
-              <Text>Podeli svoj znak</Text>
+              <Text>{t.prica.znak.podeliSvojZnak}</Text>
             </View>
           </Button>
           <Pressable onPress={onProcitaj} accessibilityRole="button" className="h-11 items-center justify-center active:opacity-60">
-            <Text className={cn('text-[16px] leading-[20px]', tezina('dugme'))}>{`Pročitaj: ${sunceU(p.znak)}`}</Text>
+            <Text className={cn('text-[16px] leading-[20px]', tezina('dugme'))}>{t.prica.znak.procitaj(sunceU(p.znak))}</Text>
           </Pressable>
         </Pojava>
       )}

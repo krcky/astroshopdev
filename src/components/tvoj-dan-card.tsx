@@ -22,13 +22,16 @@ import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useAuthStore } from '@/store/auth';
 import { tezina } from '@/theme/tipografija';
 import { MINUS_TEKST, PLUS_TEKST } from '@/components/ton';
+import { useT } from '@/i18n';
+
+type OdeljakKljuc = 'efekat' | 'pazi' | 'savet';
 
 /**
  * Boja oznake stavke (Ivan, 29.9.2026): EFEKAT "svetlo plava" kao plus u "Ide ti",
  * PAZI "roze" kao minus u "Koči te" (`DESIGN.md`, 2); SAVET ostaje lila (`OBLAST_BOJA`).
  */
 // Tekst ide u tamnijem tonu istih boja (UX recenzija 1.10.2026, kontrast bar 4,5:1).
-const ODELJAK_BOJA: Record<string, string> = { Efekat: PLUS_TEKST, Pazi: MINUS_TEKST };
+const ODELJAK_BOJA: Partial<Record<OdeljakKljuc, string>> = { efekat: PLUS_TEKST, pazi: MINUS_TEKST };
 /** Varijanta `oznaka` je 11/15; na ovoj kartici datum i oznake odeljaka idu 12/16 (Ivan, 28.9.2026). */
 export const OZNAKA_12 = 'text-[12px] leading-[16px]';
 
@@ -69,6 +72,7 @@ export function TvojDanCard({ pick, date, isToday }: {
   /** Vise se ne koristi (objasnjenje vladara je u `/tvoj-dan-info`); ostaje da pozivi ne pucaju. */
   chart?: NatalChart;
 }) {
+  const t = useT();
   const key = pick.contentKey;
   const kljucevi = React.useMemo(() => [key], [key]);
   const { texts: kratke, loading: l1 } = useTransitTexts(kljucevi, 'short');
@@ -85,7 +89,7 @@ export function TvojDanCard({ pick, date, isToday }: {
   const kratka = kratke.get(key);
   const duga = duge.get(key);
 
-  const ime = `${pick.transiting.name} ${pick.aspect.name} ${pick.natal.name}`;
+  const ime = t.danas.tranzit.ime(pick.transiting.name, pick.aspect.name, pick.natal.name);
   // Naslov kartice je naslov TEKSTA ("Planovi koji donose uspeh"); ime tranzita je u
   // listu "Zašto baš ovaj tekst" (Ivan, 28.9.2026). Bez teksta ostaje racunato ime.
   const naslov = duga?.title || kratka?.title || ime;
@@ -94,10 +98,10 @@ export function TvojDanCard({ pick, date, isToday }: {
   // Tri stavke: iz duge verzije, sledeca pri svakom novom prikazu istog tranzita.
   // Bez duge verzije ostaju jedna recenica kratke (bez rotacije).
   const odeljci = duga ? triOdeljka(duga.sections) : null;
-  const stavke: { oznaka: string; s: Stavka | null }[] = [
-    { oznaka: 'Efekat', s: odeljci ? stavkaZaPrikaz(odeljci.efekat, pick.shownBefore) : kratka?.positive ? { tekst: kratka.positive } : null },
-    { oznaka: 'Pazi', s: odeljci ? stavkaZaPrikaz(odeljci.pazi, pick.shownBefore) : kratka?.challenge ? { tekst: kratka.challenge } : null },
-    { oznaka: 'Savet', s: odeljci ? stavkaZaPrikaz(odeljci.savet, pick.shownBefore) : kratka?.advice ? { tekst: kratka.advice } : null },
+  const stavke: { key: OdeljakKljuc; oznaka: string; s: Stavka | null }[] = [
+    { key: 'efekat', oznaka: t.danas.tvojDan.efekat, s: odeljci ? stavkaZaPrikaz(odeljci.efekat, pick.shownBefore) : kratka?.positive ? { tekst: kratka.positive } : null },
+    { key: 'pazi', oznaka: t.danas.tvojDan.pazi, s: odeljci ? stavkaZaPrikaz(odeljci.pazi, pick.shownBefore) : kratka?.challenge ? { tekst: kratka.challenge } : null },
+    { key: 'savet', oznaka: t.danas.tvojDan.savet, s: odeljci ? stavkaZaPrikaz(odeljci.savet, pick.shownBefore) : kratka?.advice ? { tekst: kratka.advice } : null },
   ];
 
   // Bez kartice (Ivan, 28.9.2026): stoji direktno na sivoj pozadini pocetne,
@@ -111,7 +115,7 @@ export function TvojDanCard({ pick, date, isToday }: {
           {/* 1. Datum izabranog dana (Ivan, 28.9.2026). */}
           {/* `oznaka`, ali 12pt — datum i Efekat/Pazi/Savet (Ivan, 28.9.2026). */}
           {/* "TVOJ DAN · UTO, 29. SEP 2026" — ista tacka i razmaci kao "Mesec danas · 91%" (Ivan, 29.9.2026). */}
-          <Text variant="oznaka" className={OZNAKA_12}>Tvoj dan{'\u00A0\u00A0·\u00A0\u00A0'}{formatDatumKratko(date)}</Text>
+          <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.oznaka}{'\u00A0\u00A0·\u00A0\u00A0'}{formatDatumKratko(date)}</Text>
 
           {/* 2. Naslov teksta — najveca klasa u sistemu (`display`, Ivan 28.9.2026).
               TON je sklonjen za sada (Ivan, 28.9.2026: "dodacemo ga posle"); racun je u
@@ -131,7 +135,7 @@ export function TvojDanCard({ pick, date, isToday }: {
                 // `day`: izabrani dan, da trajanje u listu bude za taj dan, ne za danas.
                 onPress={() => router.push({ pathname: '/tvoj-dan-info', params: { key, day: dayKey(date) } })}
                 accessibilityRole="button"
-                accessibilityLabel="Zašto baš ovaj tekst?"
+                accessibilityLabel={t.danas.tvojDan.zastoOvajTekst}
                 // Dodirna povrsina 44pt preko `hitSlop`; red ne raste.
                 hitSlop={14}
                 // Ugradjen element stoji na osnovnoj liniji teksta; podignut da bude u
@@ -174,14 +178,14 @@ export function TvojDanCard({ pick, date, isToday }: {
           istaknuto
           className="h-auto px-5 py-[10px]"
           onPress={() => router.push({ pathname: '/transit', params: { key } })}>
-          <Text className="text-[16px] leading-[20px]">Saznaj više</Text>
+          <Text className="text-[16px] leading-[20px]">{t.danas.tvojDan.saznajVise}</Text>
         </Button>
       </View>
 
       {/* Trajanje (traka) je samo u listu "Zašto baš ovaj tekst" — sa pocetne izbaceno (Ivan, 28.9.2026). */}
 
       {/* Efekat, Pazi, Savet kao lista u beloj kartici (Ivan, 29.9.2026). */}
-      <Odeljci stavke={stavke.filter((x): x is { oznaka: string; s: Stavka } => !!x.s)} />
+      <Odeljci stavke={stavke.filter((x): x is { key: OdeljakKljuc; oznaka: string; s: Stavka } => !!x.s)} />
     </View>
   );
 }
@@ -191,17 +195,17 @@ export function TvojDanCard({ pick, date, isToday }: {
  * (Ivan, 29.9.2026; ranije staklene kapsule koje biraju jednu stavku). Svaki red:
  * oznaka, podebljan naslov stavke, tekst. Bez ijedne stavke kartice nema.
  */
-function Odeljci({ stavke }: { stavke: { oznaka: string; s: Stavka }[] }) {
+function Odeljci({ stavke }: { stavke: { key: OdeljakKljuc; oznaka: string; s: Stavka }[] }) {
   if (stavke.length === 0) return null;
   return (
     // Linija od ivice do ivice kartice: kartica bez bocnog razmaka, red ga nosi sam.
     // Samo tekst, bez ikonica (Ivan, 29.9.2026).
     <View className={cn(CARD_SURFACE, 'mt-8 overflow-hidden py-1')}>
       {stavke.map((x, i) => (
-        <View key={x.oznaka} className={cn('flex-row items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+        <View key={x.key} className={cn('flex-row items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
           <View className="flex-1">
             {/* Oznaka u lila boji ikonica i strelica (Ivan, 29.9.2026: "da budu ljubicasti"). */}
-            <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.oznaka] ?? OBLAST_TEKST }}>{x.oznaka}</Text>
+            <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.key] ?? OBLAST_TEKST }}>{x.oznaka}</Text>
             {/* Podebljani deo u SVOM redu, tekst ispod njega (Ivan, 28.9.2026). */}
             {!!x.s.naslov && <Text variant="default" className={cn('mt-1', tezina('naslovUTekstu'))}>{x.s.naslov}</Text>}
             <Text variant="default" className={x.s.naslov ? undefined : 'mt-1'}>{x.s.tekst}</Text>

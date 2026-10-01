@@ -9,6 +9,7 @@ import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
 import { brand } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 /*
  * Logo u traci na vrhu ekrana: animirani krug + natpis "Astro Shop".
@@ -178,7 +179,9 @@ export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: s
  * Ivan 26.9.2026); bez nje krug je brend indigo (`KRUG_INDIGO`). Ide kroz Lottie
  * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
-export function Logo({ title = 'Astro Shop', full = false, color }: { title?: string; full?: boolean; color?: string }) {
+export function Logo({ title: naslov, full = false, color }: { title?: string; full?: boolean; color?: string }) {
+  const t = useT();
+  const title = naslov ?? t.opste.imeAplikacije;
   // Pun logo ima svoj Lottie; krug sam (`KrugLoga`) vodi svoje okretanje. Kuka je
   // ovde bezuslovna (pravilo kuka), a bez punog loga ref je prazan pa ne radi nista.
   const krug = React.useRef<LottieView>(null);
@@ -192,7 +195,7 @@ export function Logo({ title = 'Astro Shop', full = false, color }: { title?: st
         // koliko treba da krug bude na sredini strane.
         style={{ transform: [{ translateX: FULL_SHIFT_X }, { translateY: 4 }] }}
         accessibilityRole="header"
-        accessibilityLabel="Astro Shop">
+        accessibilityLabel={t.opste.imeAplikacije}>
         <LottieView
           ref={krug}
           source={require('@/assets/lottie/logo-full.json')}

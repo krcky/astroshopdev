@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { OCENA_MAX, type OblastKey } from '@/lib/oblasti-config';
 import { PREMIUM, otvoriPremium } from '@/components/zakljucano';
 import { oceneOblasti, type OblastiDana } from '@/lib/oblasti';
+import { useT } from '@/i18n';
 
 /**
  * Ocena oblasti 1—5 kao tackice (●●●○○), na slajdu "Danas ukratko". Crno i svetlosivo, bez boje: ocena je
@@ -42,6 +43,7 @@ export function OceneOblasti({ rez, bare = false, otkljucane }: {
    */
   otkljucane?: readonly OblastKey[];
 }) {
+  const t = useT();
   const ocene = oceneOblasti(rez);
   const otvorena = (k: OblastKey) => !otkljucane || otkljucane.includes(k);
   const imaZakljucanih = ocene.some((o) => !otvorena(o.key));
@@ -49,8 +51,8 @@ export function OceneOblasti({ rez, bare = false, otkljucane }: {
     <Pressable
       onPress={() => (imaZakljucanih ? otvoriPremium() : router.navigate('/daily'))}
       accessibilityRole="button"
-      accessibilityLabel={ocene.map((o) => (otvorena(o.key) ? `${o.name}, ocena ${o.ocena} od 5, ${o.oznaka}` : `${o.name}, uz Premium`)).join('. ') + '.'}
-      accessibilityHint={imaZakljucanih ? 'Otvara Premium' : 'Otvara tranzite'}
+      accessibilityLabel={ocene.map((o) => (otvorena(o.key) ? t.danas.ocene.otvorena(o.name, o.ocena, o.oznaka) : t.danas.ocene.zakljucana(o.name))).join('. ') + '.'}
+      accessibilityHint={imaZakljucanih ? t.danas.ocene.otvaraPremium : t.danas.ocene.otvaraTranzite}
       // Desno 22pt: poslednja tackica u liniji sa vrhom strelice u "Ide ti / Koči te"
       // (px-4 + chevron 18pt, vidljivi vrh ~6pt od ivice okvira ikone).
       className={cn(!bare && CARD_SURFACE, 'pl-4 pr-[22px] py-3.5 active:opacity-80')}>

@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 
 import { PlejerPrice, type OpisPrice } from '@/components/prica/plejer';
+import { useT } from '@/i18n';
 import { KarticaZnaka } from '@/components/prica-znaka/kartica';
 import { posaoPriceZnaka } from '@/components/prica/poslovi-videa';
 import { SLIKE_PRICE_ZNAKA } from '@/components/prica-znaka/slike';
@@ -26,6 +27,7 @@ export default function Prica() {
 }
 
 export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
+  const t = useT();
   const resolved = useResolvedProfile();
   const userId = useAuthStore((s) => s.user?.id ?? null);
   const oznaci = usePricaZnakaLog((s) => s.oznaci);
@@ -37,15 +39,15 @@ export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
   // uvod ide dalje (obavestenja), a sa taba "Ti" se prica zatvara.
   React.useEffect(() => {
     if (p) return;
-    const t = setTimeout(uvod ? dalje : zatvori, uvod ? 2500 : 1500);
-    return () => clearTimeout(t);
+    const tajmer = setTimeout(uvod ? dalje : zatvori, uvod ? 2500 : 1500);
+    return () => clearTimeout(tajmer);
   }, [p, uvod]);
 
   const opis = React.useMemo<OpisPrice | null>(() => {
     if (!p) return null;
     return {
       trajanja: p.trajanja,
-      podnaslov: 'Tvoj znak',
+      podnaslov: t.prica.znak.podnaslov,
       tamna: (i) => tamnaSlikaZnaka(SLIKE_ZNAKA[i]),
       slika: (i, { okvir, onPodeli }) => {
         const Slika = SLIKE_PRICE_ZNAKA[SLIKE_ZNAKA[i]];
@@ -55,13 +57,13 @@ export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
       // Poslednja slika ima veliko "Podeli svoj znak".
       bezMalogPodeli: (i) => SLIKE_ZNAKA[i] === 'vladar',
       imeFajla: imeSlikeZnaka(p.znak),
-      naslovDeljenja: 'Podeli svoj znak',
+      naslovDeljenja: t.prica.znak.podeliSvojZnak,
       onPoslednja: () => { if (userId) oznaci(userId, p.znak.key); },
       // Video cele price (1.10.2026) — iste kartice kao slika za deljenje, `poslovi-videa.tsx`.
       // U uvodu deljenja nema.
       video: uvod ? undefined : posaoPriceZnaka(p),
     };
-  }, [p, uvod, userId, oznaci]);
+  }, [p, uvod, userId, oznaci, t]);
 
   if (!opis) {
     return (

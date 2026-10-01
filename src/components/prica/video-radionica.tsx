@@ -4,6 +4,7 @@ import Animated, { makeMutable, useAnimatedStyle, useSharedValue, type SharedVal
 import * as Haptics from 'expo-haptics';
 import * as Notifications from 'expo-notifications';
 
+import { tr } from '@/i18n/jezik';
 import { KARTICA, KarticaKraj } from '@/components/prica/kartica';
 import { ZAVESA } from '@/components/prica/crtezi';
 import { PlatnoVidea, type PlatnoVideaRef } from '@/components/prica/platno-videa';
@@ -243,7 +244,7 @@ async function obavesti(posao: PosaoVidea) {
     // Vaznost kanala se posle prvog pravljenja ne moze menjati iz aplikacije — samo nov kanal.
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(KANAL, {
-        name: 'Video priče',
+        name: tr().prica.posao.kanal,
         importance: Notifications.AndroidImportance.HIGH,
         sound: null,
         enableVibrate: false,
@@ -251,8 +252,8 @@ async function obavesti(posao: PosaoVidea) {
     }
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Tvoj video je spreman',
-        body: `${posao.opis} Dodirni da ga podeliš.`,
+        title: tr().prica.posao.obavestenjeNaslov,
+        body: tr().prica.posao.obavestenjeTekst(posao.opis),
         data: { vrsta: VRSTA, video: posao.vrsta },
       },
       trigger: Platform.OS === 'android' ? { channelId: KANAL } : null,

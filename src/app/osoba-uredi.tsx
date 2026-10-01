@@ -4,11 +4,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { Screen } from '@/components/screen';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { BezInterneta } from '@/components/bez-interneta';
 import { Group, ListRow } from '@/components/ui/list';
 import { VrednostReda } from '@/components/ui/vrednost-reda';
 import { obrisiOsobu, useOsoba } from '@/lib/osobe-api';
-import { ODNOSI, porukaOsobe, type PoljeOsobe } from '@/lib/osobe';
+import { porukaOsobe, type PoljeOsobe } from '@/lib/osobe';
 import { datumRodjenja } from '@/lib/horoscope';
 import { ASTROLOG } from '@/lib/pitanja';
 import { useAuthStore } from '@/store/auth';
@@ -24,6 +25,9 @@ const dvo = (n: number) => String(n).padStart(2, '0');
  * Dole je brisanje. Pitanja o osobi ostaju — snimak karte je u pitanju.
  */
 export default function OsobaUredi() {
+  const tt = useT();
+  const tu = tt.profil.osobaUredi;
+  const tp = tt.profil.rodjenje;
   const { id } = useLocalSearchParams<{ id: string }>();
   const osoba = useOsoba(id);
   const uid = useAuthStore((s) => s.user?.id);
@@ -32,8 +36,8 @@ export default function OsobaUredi() {
 
   if (!osoba) {
     return (
-      <Screen label="Izmena" tabBarSpace={false} pushed>
-        <Text variant="muted" className="mt-6">Ova osoba više nije na tvojoj listi.</Text>
+      <Screen label={tu.naslov} tabBarSpace={false} pushed>
+        <Text variant="muted" className="mt-6">{tp.nemaVise}</Text>
       </Screen>
     );
   }
@@ -44,12 +48,12 @@ export default function OsobaUredi() {
   const obrisi = () => {
     if (!uid) return;
     Alert.alert(
-      'Obrisati osobu?',
-      `${osoba.name} nestaje sa tvoje liste, na svim uređajima. Već postavljena pitanja o ovoj osobi ostaju.`,
+      tu.obrisatiNaslov,
+      tu.obrisatiTekst(osoba.name),
       [
-        { text: 'Odustani', style: 'cancel' },
+        { text: tu.odustani, style: 'cancel' },
         {
-          text: 'Obriši',
+          text: tt.opste.obrisi,
           style: 'destructive',
           onPress: async () => {
             setBrisem(true);
@@ -73,31 +77,30 @@ export default function OsobaUredi() {
       <BezInterneta className="mx-screen mt-4" />
 
       <Group className="mt-6">
-        <ListRow title="Ime" trailing={<VrednostReda>{osoba.name}</VrednostReda>} onPress={() => otvori('ime')} />
+        <ListRow title={tp.ime} trailing={<VrednostReda>{osoba.name}</VrednostReda>} onPress={() => otvori('ime')} />
         <ListRow
-          title="Ko ti je"
-          trailing={<VrednostReda>{ODNOSI.find((o) => o.key === osoba.odnos)?.naziv ?? 'Nije izabrano'}</VrednostReda>}
+          title={tp.koTiJeNaslov}
+          trailing={<VrednostReda>{(osoba.odnos ? tt.profil.odnosi[osoba.odnos] : null) ?? tu.nijeIzabrano}</VrednostReda>}
           onPress={() => otvori('odnos')}
         />
-        <ListRow title="Datum rođenja" trailing={<VrednostReda>{datumRodjenja(osoba.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
+        <ListRow title={tp.datum} trailing={<VrednostReda>{datumRodjenja(osoba.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
         <ListRow
-          title="Vreme rođenja"
-          trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : 'Ne zna se'}</VrednostReda>}
+          title={tp.vreme}
+          trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : tu.neZnaSe}</VrednostReda>}
           onPress={() => otvori('vreme')}
         />
-        <ListRow title="Mesto rođenja" trailing={<VrednostReda>{osoba.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />
+        <ListRow title={tp.mesto} trailing={<VrednostReda>{osoba.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />
       </Group>
 
       <Text variant="muted" className="mx-screen mt-3">
-        {t ? '' : 'Bez vremena rođenja karta nema podznak ni kuće. '}
-        Ove podatke vidiš samo ti. Ako postaviš pitanje o ovoj osobi, vidi ih i {ASTROLOG.kratko}.
+        {tu.napomena(ASTROLOG.kratko, !t)}
       </Text>
 
       {!!poruka && <Text variant="note" className="mx-screen mt-6 text-foreground">{poruka}</Text>}
 
       <Group className="mt-8">
         <ListRow
-          title="Obriši osobu"
+          title={tu.obrisiOsobu}
           destructive
           chevron={false}
           onPress={brisem ? undefined : obrisi}

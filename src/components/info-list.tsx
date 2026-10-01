@@ -8,6 +8,7 @@ import { AspektIkona, imaAspekt } from '@/components/aspekt-ikona';
 import { ASPECT_STYLE } from '@/components/natal-wheel';
 import { ASPECTS } from '@/lib/astro';
 import { SIMBOLIKA_ASPEKTA } from '@/lib/simbolika';
+import { useT } from '@/i18n';
 
 /**
  * Delovi listova sa objasnjenjem tocka — "Šta je natalna karta" (tab "Ti") i
@@ -60,23 +61,23 @@ function LinijaAspekta({ boja, debljina, crta }: { boja: string; debljina: numbe
  * kao "Simbolika" na tumacenju (`lib/simbolika.ts`).
  */
 export function AspektiOdeljak() {
+  const ti = useT().karta.info;
   return (
-    <Odeljak naslov="Aspekti">
-      <Text variant="reading">Skladni su plavi, napeti roze, a konjunkcija je siva.</Text>
+    <Odeljak naslov={ti.aspekti}>
+      <Text variant="reading">{ti.aspektiUvod}</Text>
       <View className="mt-4 gap-5">
         {ASPECTS.map((a) => {
           const sim = SIMBOLIKA_ASPEKTA[a.key];
           const st = ASPECT_STYLE[a.key];
-          const ime = a.name.charAt(0).toUpperCase() + a.name.slice(1);
           return (
             <View key={a.key} className="flex-row gap-3" accessible
-              accessibilityLabel={`${a.angle} stepeni, ${ime}${sim ? ` – ${sim.tema}. ${sim.opis}` : ''}`}>
+              accessibilityLabel={ti.aspektA11y(a.angle, a.name, sim ?? null)}>
               <View className="items-center pt-1" style={{ width: LINIJA }}>
                 {imaAspekt(a.key) && <AspektIkona aspekt={a.key} size={16} />}
                 {st && <LinijaAspekta boja={st.color} debljina={st.width} crta={st.dash} />}
               </View>
               <View className="flex-1">
-                <Text variant="oznaka">{a.angle}° · {ime}{sim ? ` – ${sim.tema}` : ''}</Text>
+                <Text variant="oznaka">{ti.aspektOznaka(a.angle, a.name, sim ? sim.tema : null)}</Text>
                 {sim && <Text variant="muted" className="mt-1">{sim.opis}</Text>}
               </View>
             </View>

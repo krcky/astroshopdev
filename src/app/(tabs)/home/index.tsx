@@ -39,9 +39,12 @@ import { pickBrief, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
+import { useT, type Recnik } from '@/i18n';
 
 /** Pregled dana — izlog, ne sadrzaj. Pun tekst je u tabu "Tranziti". */
 export default function Home() {
+  const t = useT();
+  const p = t.danas.pocetna;
   const hydrated = useProfileStore((s) => s.hydrated);
   const authLoading = useAuthStore((s) => s.loading);
   const resolved = useResolvedProfile();
@@ -55,7 +58,7 @@ export default function Home() {
   const premium = usePremium();
   const smeDrugiDan = premium || BESPLATNO.danMeni;
   const zakljucan = (o: number) => !smeDrugiDan && o !== 0;
-  const menjaDan = smeDrugiDan ? 'Promeni dan' : 'Drugi dani uz Premium';
+  const menjaDan = smeDrugiDan ? p.promeniDan : p.drugiDaniUzPremium;
   const [izabranDan, setOffset] = React.useState(0);
   const offset = smeDrugiDan ? izabranDan : 0;
   // Nov dan: nazad na "danas" — jucerasnje "sutra" ne sme da postane prekosutra.
@@ -125,7 +128,7 @@ export default function Home() {
   const ukratko = briefGroups.ide.length > 0 || briefGroups.koci.length > 0 || oblasti ? (
     <Brief
       {...briefGroups}
-      naslov={offset === 0 ? 'Danas ukratko' : 'Ukratko'}
+      naslov={offset === 0 ? p.danasUkratko : p.ukratko}
       vrh={oblasti ? <OceneOblasti rez={oblasti} bare otkljucane={premium ? undefined : BESPLATNO.oblasti} /> : null}
     />
   ) : null;
@@ -139,24 +142,24 @@ export default function Home() {
         {tvojDan && <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} aktivan={tab === 'danas'} />}
         {ukratko && <View className={tvojDan ? 'mt-3' : undefined}>{ukratko}</View>}
       </View>
-    ) : <Prazno>Za ovaj dan nema izraženih tranzita.</Prazno>,
+    ) : <Prazno>{p.nemaTranzitaDana}</Prazno>,
     // Lunarni kalendar je besplatan za sve.
     mesec: <MesecDanasCard date={date} offset={offset} chart={resolved.chart} timeUnknown={resolved.timeUnknown} name={resolved.profile.name} excludeKey={tvojDan?.contentKey ?? null} />,
     // Sledece promene na nebu i kuca u koju ulaze.
     promene: (
-      <Odeljak nadnaslov="Šta te čeka u narednom periodu" naslov="Promene na nebu">
+      <Odeljak nadnaslov={p.promeneNadnaslov} naslov={p.promeneNaslov}>
         {daily.skyEvents.length > 0
           ? <SkyEvents daily={daily} today={date} />
-          : <Prazno>Nijedna planeta uskoro ne menja znak ni smer.</Prazno>}
+          : <Prazno>{p.nemaPromena}</Prazno>}
       </Odeljak>
     ),
     // Spori tranziti — tema perioda. Svi brzi tranziti su u tabu "Tranziti".
     // Naziv i opis isti kao na paywallu (UX recenzija 1.10.2026).
     teme: (
-      <Odeljak nadnaslov="Tranziti koji traju nedeljama i mesecima" naslov="Teme perioda">
+      <Odeljak nadnaslov={p.temeNadnaslov} naslov={p.temeNaslov}>
         {daily.bySpeed.slow.length > 0
           ? <TransitList list={daily.bySpeed.slow} texts={texts} today={date} chart={resolved.chart} timeUnknown={resolved.timeUnknown} besplatno={premium ? undefined : BESPLATNO.temaPerioda} />
-          : <Prazno>Ovih dana nijedna spora planeta nije u aspektu sa tvojom kartom.</Prazno>}
+          : <Prazno>{p.nemaTema}</Prazno>}
       </Odeljak>
     ),
   };
@@ -188,9 +191,9 @@ export default function Home() {
                 <NativeDayMenu
                   systemImage="calendar"
                   povrsina={size.headerButton}
-                  accessibilityLabel={`Izabran dan: ${RELATIVE[offset]}. ${menjaDan}`}
+                  accessibilityLabel={p.izabranDan(relativ(t, offset), menjaDan)}
                   color={neutral.ink}
-                  options={DAY_OFFSETS.map((o) => ({ value: o, title: RELATIVE[o], zakljucano: zakljucan(o) }))}
+                  options={DAY_OFFSETS.map((o) => ({ value: o, title: relativ(t, o), zakljucano: zakljucan(o) }))}
                   selected={offset}
                   onChange={setOffset}
                   onZakljucano={() => otvoriPremium()}
@@ -205,7 +208,7 @@ export default function Home() {
               <Pressable
                 onPress={() => router.push('/profile')}
                 accessibilityRole="button"
-                accessibilityLabel="Profil"
+                accessibilityLabel={p.profil}
                 hitSlop={4}
                 className="h-full w-full items-center justify-center active:opacity-60">
                 <UserRound size={20} color={neutral.ink} />
@@ -227,23 +230,23 @@ export default function Home() {
             unstable_headerRightItems: (): NativeStackHeaderItem[] => [
               {
                 type: 'menu',
-                label: dayLabel(today, offset),
+                label: dayLabel(t, today, offset),
                 icon: { type: 'sfSymbol', name: 'calendar' },
-                accessibilityLabel: `Izabran dan: ${RELATIVE[offset]}. ${menjaDan}`,
+                accessibilityLabel: p.izabranDan(relativ(t, offset), menjaDan),
                 sharesBackground: false,
                 menu: {
-                  title: 'Dan',
+                  title: p.dan,
                   items: DAY_OFFSETS.map((o) => zakljucan(o)
                     ? {
                       type: 'action' as const,
-                      label: RELATIVE[o],
+                      label: relativ(t, o),
                       description: formatDate(dayAt(today, o)),
                       icon: { type: 'sfSymbol' as const, name: 'lock' as const },
                       onPress: () => otvoriPremium(),
                     }
                     : {
                       type: 'action' as const,
-                      label: RELATIVE[o],
+                      label: relativ(t, o),
                       description: formatDate(dayAt(today, o)),
                       state: o === offset ? ('on' as const) : ('off' as const),
                       onPress: () => setOffset(o),
@@ -252,9 +255,9 @@ export default function Home() {
               },
               {
                 type: 'button',
-                label: 'Profil',
+                label: p.profil,
                 icon: { type: 'sfSymbol', name: 'person' },
-                accessibilityLabel: 'Profil',
+                accessibilityLabel: p.profil,
                 sharesBackground: false,
                 onPress: () => router.push('/profile'),
               },
@@ -271,11 +274,11 @@ export default function Home() {
           nijansom preliva (Ivan, 30.9.2026 — podignute iznad preliva, cisto bele, probane
           istog dana i vracene: "ipak da budu providni"). */}
       <View className="pt-4">
-        <KapsuleRed tabovi stavke={TABOVI} izabrana={tab} onIzbor={izaberiTab} />
+        <KapsuleRed tabovi stavke={tabovi(t)} izabrana={tab} onIzbor={izaberiTab} />
       </View>
       {offset !== 0 && (
-        <GledasDrugo className="mt-4" tekst={`${RELATIVE[offset]} · ${formatDate(date)}`}
-          dugme="Nazad na danas" onPress={() => setOffset(0)} />
+        <GledasDrugo className="mt-4" tekst={`${relativ(t, offset)} · ${formatDate(date)}`}
+          dugme={p.nazadNaDanas} onPress={() => setOffset(0)} />
       )}
       <Animated.View key={tab} entering={ODOZDO} className="pt-7">
         {sadrzaj[tab]}
@@ -286,11 +289,11 @@ export default function Home() {
 }
 
 type TabPocetne = 'danas' | 'mesec' | 'promene' | 'teme';
-const TABOVI: { key: TabPocetne; label: string }[] = [
-  { key: 'danas', label: 'Tvoj dan' },
-  { key: 'mesec', label: 'Mesec' },
-  { key: 'promene', label: 'Promene' },
-  { key: 'teme', label: 'Teme' },
+const tabovi = (t: Recnik): { key: TabPocetne; label: string }[] => [
+  { key: 'danas', label: t.danas.pocetna.tabTvojDan },
+  { key: 'mesec', label: t.danas.pocetna.tabMesec },
+  { key: 'promene', label: t.danas.pocetna.tabPromene },
+  { key: 'teme', label: t.danas.pocetna.tabTeme },
 ];
 
 /** Promena taba: sadrzaj ulazi sa strane, bez providnosti (staklo), kao listanje. */
@@ -321,15 +324,15 @@ type Texts = Map<string, TransitText>;
 
 /** Koliko dana unapred i unazad se moze gledati. */
 const DAY_RANGE = 2;
-const RELATIVE: Record<number, string> = { [-2]: 'Prekjuče', [-1]: 'Juče', 0: 'Danas', 1: 'Sutra', 2: 'Prekosutra' };
+/** "Juče", "Danas", "Sutra"… za pomeraj -2..2. */
+const relativ = (t: Recnik, o: number) => t.danas.pocetna.relativniDani[o + DAY_RANGE];
 
-/** Skracena imena dana, kao u iOS kalendaru. */
-const DANI_KRATKO = ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'];
 /** Ponudjeni dani: dva pre, danas, dva posle. */
 const DAY_OFFSETS = [-DAY_RANGE, -1, 0, 1, DAY_RANGE];
 const dayAt = (today: Date, o: number) => { const d = new Date(today); d.setDate(today.getDate() + o); return d; };
-/** Natpis na dugmetu: "Danas", ili skracenica dana kad je izabran drugi. */
-const dayLabel = (today: Date, offset: number) => (offset === 0 ? 'Danas' : DANI_KRATKO[dayAt(today, offset).getDay()]);
+/** Natpis na dugmetu: "Danas", ili skracenica dana kad je izabran drugi ("Pon", kao u iOS kalendaru). */
+const dayLabel = (t: Recnik, today: Date, offset: number) =>
+  (offset === 0 ? relativ(t, 0) : t.gramatika.veliko(t.datum.daniKratko[dayAt(today, offset).getDay()]));
 
 
 /**
@@ -349,6 +352,7 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
   /** Drugi deo natpisa za citac ekrana ("Promeni dan" / "Drugi dani uz Premium"). */
   opis: string;
 }) {
+  const t = useT();
   const [otvoren, setOtvoren] = React.useState(false);
   const insets = useSafeAreaInsets();
   const dan = (o: number) => dayAt(today, o);
@@ -360,7 +364,7 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
       <Pressable
         onPress={() => setOtvoren(true)}
         accessibilityRole="button"
-        accessibilityLabel={`Izabran dan: ${RELATIVE[offset]}. ${opis}`}
+        accessibilityLabel={t.danas.pocetna.izabranDan(relativ(t, offset), opis)}
         hitSlop={4}
         className="h-full w-full items-center justify-center active:opacity-60">
         <Calendar size={20} color={neutral.ink} />
@@ -368,7 +372,7 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
 
       <Modal visible={otvoren} transparent animationType="fade" onRequestClose={() => setOtvoren(false)}>
         {/* Providna pozadina: dodir bilo gde zatvara meni. */}
-        <Pressable className="flex-1" onPress={() => setOtvoren(false)} accessibilityLabel="Zatvori meni" />
+        <Pressable className="flex-1" onPress={() => setOtvoren(false)} accessibilityLabel={t.danas.pocetna.zatvoriMeni} />
         <View
           className="absolute overflow-hidden rounded-lg bg-background"
           style={{ top: insets.top + VRH_ANDROID + headerBar.height - 4, right: space.screen, width: 260, ...shadow.floating }}>
@@ -382,11 +386,11 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
                   else onChange(o);
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={zakljucan(o) ? `${RELATIVE[o]}. Uz Premium` : undefined}
+                accessibilityLabel={zakljucan(o) ? t.danas.pocetna.danUzPremium(relativ(t, o)) : undefined}
                 accessibilityState={o === offset ? { selected: true } : undefined}
                 className="min-h-row flex-row items-center gap-3 px-gutter py-3 active:bg-fill">
                 <View className="flex-1">
-                  <Text variant="row">{RELATIVE[o]}</Text>
+                  <Text variant="row">{relativ(t, o)}</Text>
                   <Text variant="caption">{formatDate(dan(o))}</Text>
                 </View>
                 {zakljucan(o)
@@ -422,6 +426,7 @@ function saTekstom(list: Transit[], texts: Texts, polje: 'positive' | 'challenge
 type Redovi = { t: Transit; recenica: string | null }[];
 
 function Brief({ ide, koci, vrh = null, naslov }: { ide: Redovi; koci: Redovi; vrh?: React.ReactNode; naslov?: string }) {
+  const t = useT();
   // Dve grupe jedna ispod druge, razdvojene linijom od ivice do ivice: "ide ti" sa
   // plusom, "koci te" sa minusom; samo recenice, bez imena tranzita (Ivan, 26.9.2026).
   // Boje ikona su Ivanove — jedino mesto boje na kartici, ikona je mala.
@@ -442,13 +447,13 @@ function Brief({ ide, koci, vrh = null, naslov }: { ide: Redovi; koci: Redovi; v
       {ide.length > 0 && (
         <View className={cn(CARD_SURFACE, !!vrh && 'mt-3')}>
           {!vrh && zaglavlje}
-          <Grupa naslov="Ide ti" ikona={<Plus size={16} color={PLUS} strokeWidth={3} />} redovi={ide} />
+          <Grupa naslov={t.danas.pocetna.ideTi} ikona={<Plus size={16} color={PLUS} strokeWidth={3} />} redovi={ide} />
         </View>
       )}
       {koci.length > 0 && (
         <View className={cn(CARD_SURFACE, (!!vrh || ide.length > 0) && 'mt-3')}>
           {!vrh && ide.length === 0 && zaglavlje}
-          <Grupa naslov="Koči te" ikona={<Minus size={16} color={MINUS} strokeWidth={3} />} redovi={koci} />
+          <Grupa naslov={t.danas.pocetna.kociTe} ikona={<Minus size={16} color={MINUS} strokeWidth={3} />} redovi={koci} />
         </View>
       )}
     </View>
@@ -461,6 +466,7 @@ const MINUS = MINUS_BOJA;
 
 // Zbijeno (Ivan, 28.9.2026): manji okvir i razmak medju redovima.
 function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: Redovi }) {
+  const { imeNatalni } = useT().danas.tranzit;
   return (
     <View className="px-4 py-4">
       <View className="mb-1 flex-row items-center gap-1.5">
@@ -472,13 +478,13 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
           key={t.contentKey}
           onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
           accessibilityRole="button"
-          accessibilityLabel={`${recenica ?? ''} ${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`.trim()}
+          accessibilityLabel={`${recenica ?? ''} ${imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}`.trim()}
           className="flex-row items-center gap-3 py-1.5 active:opacity-60">
           {recenica ? (
             <Text variant="default" className="flex-1">{recenica}</Text>
           ) : (
             // Bez teksta ostaje samo ime tranzita, sivo — jedino sto se o njemu zna.
-            <Text variant="muted" className="flex-1">{t.transiting.name} {t.aspect.name} natalni {t.natal.name}</Text>
+            <Text variant="muted" className="flex-1">{imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}</Text>
           )}
           <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} />
         </Pressable>
@@ -515,6 +521,7 @@ function TransitList({ list, texts, today, chart, timeUnknown, besplatno }: {
   /** Besplatni: koliko kartica je otvoreno (`BESPLATNO.temaPerioda`); ostale po imenu pod katancem. */
   besplatno?: number;
 }) {
+  const tx = useT();
   // Rucne oznake tona astrologa, jednim upitom — isto kao na tabu "Tranziti".
   const potpis = list.map((t) => t.contentKey).join('|');
   // Naslov kao na tabu "Tranziti": prvo iz DUGE verzije, pa iz kratke. Do 1.10.2026 je
@@ -562,13 +569,13 @@ function TransitList({ list, texts, today, chart, timeUnknown, besplatno }: {
       <ZakljucaniRedovi
         redovi={zakljucani.map((t) => ({
           key: t.contentKey,
-          naslov: `${t.transiting.name} ${t.aspect.name} natalni ${t.natal.name}`,
+          naslov: tx.danas.tranzit.imeNatalni(t.transiting.name, t.aspect.name, t.natal.name),
           ispod: trajanjeTekst(trajanjeTranzita(t, today)),
         }))}
       />
       {ostalo > 0 && besplatno === undefined && (
         <Pressable onPress={() => router.navigate('/daily')} accessibilityRole="link" className="py-1 active:opacity-60">
-          <Text variant="muted">Još {ostalo} u Tranzitima</Text>
+          <Text variant="muted">{tx.danas.pocetna.josUTranzitima(ostalo)}</Text>
         </Pressable>
       )}
     </View>

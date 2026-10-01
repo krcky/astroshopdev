@@ -6,6 +6,8 @@ import Svg, { Circle } from 'react-native-svg';
 import { Clapperboard, Share, X } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
+import { tr } from '@/i18n/jezik';
 import { IMA_VIDEO } from '@/components/prica/platno-videa';
 import { STARI_IOS } from '@/lib/platform';
 import { dayKey } from '@/lib/transits';
@@ -65,7 +67,7 @@ export async function podeliVideo(uri: string, vrsta: VrstaVidea) {
   try {
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(uri, {
-        mimeType: 'video/mp4', UTI: 'public.mpeg-4', dialogTitle: vrsta === 'znak' ? 'Podeli svoj znak' : 'Podeli svoj dan',
+        mimeType: 'video/mp4', UTI: 'public.mpeg-4', dialogTitle: vrsta === 'znak' ? tr().prica.znak.podeliSvojZnak : tr().prica.dnevna.podeliSvojDan,
       });
     }
     useVideoPrice.getState().skloni(vrsta);
@@ -78,7 +80,7 @@ export function otvoriVideo(vrsta: VrstaVidea) {
 }
 
 /** Procenat kao u aplikaciji: "42 %". */
-export const procenat = (x: number) => `${Math.round(Math.max(0, Math.min(1, x)) * 100)} %`;
+export const procenat = (x: number) => tr().prica.procenat(Math.round(Math.max(0, Math.min(1, x)) * 100));
 
 /** Krug napretka (kao traka price, samo okrugao). */
 export function KrugNapretka({ napredak, velicina = 30, boja = brand.indigo, podloga = neutral.fillStrong }: {
@@ -112,16 +114,17 @@ export function VideoTraka() {
 
 /** Sadrzaj trake (sistem crta staklenu kapsulu oko njega). Izdvojen i za `/dev-video`. */
 export function VideoTrakaSadrzaj({ v }: { v: VideoStanje }) {
+  const t = useT().prica.traka;
   const pravi = v.stanje === 'pravi';
   const gotov = v.stanje === 'gotov';
-  const naslov = pravi ? 'Pravimo tvoj video' : gotov ? 'Tvoj video je spreman' : 'Video nije uspeo';
-  const podnaslov = pravi ? `${v.naslov} · ${procenat(v.napredak)}` : gotov ? v.naslov : 'Pokušaj ponovo iz priče.';
+  const naslov = pravi ? t.pravimo : gotov ? t.spreman : t.nijeUspeo;
+  const podnaslov = pravi ? t.uToku(v.naslov, procenat(v.napredak)) : gotov ? v.naslov : t.pokusajIzPrice;
   return (
     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 14, paddingRight: 6 }}>
       <Pressable
         onPress={() => otvoriVideo(v.vrsta)}
         accessibilityRole="button"
-        accessibilityLabel={`${naslov}. ${podnaslov}`}
+        accessibilityLabel={t.a11y(naslov, podnaslov)}
         className="flex-1 flex-row items-center gap-3 active:opacity-60"
         style={{ minHeight: 44 }}>
         {pravi ? <KrugNapretka napredak={v.napredak} velicina={28} /> : <Clapperboard size={22} color={neutral.ink} strokeWidth={1.8} />}
@@ -134,7 +137,7 @@ export function VideoTrakaSadrzaj({ v }: { v: VideoStanje }) {
         <Pressable
           onPress={() => podeliVideo(v.uri!, v.vrsta)}
           accessibilityRole="button"
-          accessibilityLabel="Podeli video"
+          accessibilityLabel={t.podeliVideo}
           hitSlop={6}
           className="h-11 w-11 items-center justify-center active:opacity-60">
           <Share size={21} color={neutral.ink} strokeWidth={2} />
@@ -144,7 +147,7 @@ export function VideoTrakaSadrzaj({ v }: { v: VideoStanje }) {
         <Pressable
           onPress={() => useVideoPrice.getState().skloni(v.vrsta)}
           accessibilityRole="button"
-          accessibilityLabel="Skloni traku"
+          accessibilityLabel={t.skloni}
           hitSlop={6}
           className="h-11 w-11 items-center justify-center active:opacity-60">
           <X size={19} color={neutral.inkMuted} strokeWidth={2} />

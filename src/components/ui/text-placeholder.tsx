@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 /**
  * Mesto za tekst koji se jos ucitava — sive trake u obliku redova.
@@ -47,6 +48,7 @@ export function TextPlaceholder({ lines = 3, title, lineType = 'body', className
   title?: 'display' | 'hero';
   className?: string;
 }) {
+  const t = useT();
   const bezPokreta = useReducedMotion();
   const providnost = useSharedValue(1);
 
@@ -69,7 +71,7 @@ export function TextPlaceholder({ lines = 3, title, lineType = 'body', className
       style={puls}
       className={cn(className)}
       accessible
-      accessibilityLabel="Učitavam"
+      accessibilityLabel={t.danas.ui.ucitavam}
       accessibilityState={{ busy: true }}>
       {title && <View className="mb-2">{traka(title, '70%', 'naslov')}</View>}
       {Array.from({ length: lines }, (_, i) =>

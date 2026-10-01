@@ -14,7 +14,7 @@ import { chartRulers, rulerRole } from '@/lib/rulers';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { MoonDisc } from '@/components/moon-disc';
 import { cn } from '@/lib/utils';
-import { SIGN_CASES, signFromLongitude } from '@/lib/zodiac';
+import { signFromLongitude } from '@/lib/zodiac';
 import type { NatalChart } from '@/lib/natal';
 import {
   LUNAR_AREAS, PHASE_SUMMARY_PRIVREMENO, phaseDay, type LunarArea,
@@ -25,11 +25,9 @@ import { moonDay, strongestMoonHit } from '@/lib/transits';
 import { lunarneStavke, prveRecenice, type Stavka } from '@/lib/tumacenje';
 import { tezina } from '@/theme/tipografija';
 import { useNaMrezi } from '@/lib/mreza';
+import { useT } from '@/i18n';
 
-/** Nazivi tabova na kartici (brief). "Ljubav" je u tekstovima "Ljubav i odnosi". */
-const TAB: Record<LunarArea, string> = {
-  ljubav: 'Ljubav', zdravlje: 'Zdravlje i lepota', karijera: 'Karijera i finansije', kuca: 'Kuća', basta: 'Bašta',
-};
+/* Nazivi tabova na kartici su u recniku (`danas.mesecDanas.tabovi`). "Ljubav" je u tekstovima "Ljubav i odnosi". */
 
 /** Ilustracija Meseca desno od naslova i znak dole desno na njoj. */
 const MESEC = 96;
@@ -55,6 +53,8 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
   /** Tranzit vec prikazan u "Tvom danu" — ne ponavlja se ovde. */
   excludeKey?: string | null;
 }) {
+  const t = useT();
+  const m = t.danas.mesecDanas;
   const naMrezi = useNaMrezi();
   const faza = React.useMemo(() => phaseDay(date), [date]);
   const znak = signFromLongitude(faza.moonLongitude).sign;
@@ -63,8 +63,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
   // Jedna stavka po oblasti (Ivan, 28.9.2026); Basta i dalje Uradi / Izbegavaj.
   // Jedna stavka po oblasti, i za Baštu (Ivan, 28.9.2026) — bez Uradi / Izbegavaj.
   const s = body ? lunarneStavke(body, 1) : null;
-  const smer = faza.waxing ? 'raste' : 'opada';
-  const naslov = `${faza.name} u ${SIGN_CASES[znak.key].loc}`;
+  const naslov = m.naslov(faza.name, t.nebo.uZnaku(znak.key as keyof typeof t.nebo.znaci));
 
   // LICNI DEO (Ivan, 28.9.2026): kako Mesec danas utice na tebe — najjaci
   // Mesecev aspekt na natalnu kartu koji postaje tacan tog dana (`moonDay`),
@@ -87,7 +86,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
       <View className="flex-row items-start gap-4">
         <View className="flex-1">
           {/* Osvetljenost uz oznaku, ne ispod ilustracije; mala tacka, po dva razmaka (Ivan, 28.9.2026). */}
-          <Text variant="oznaka" className={OZNAKA_12}>Mesec danas{'\u00A0\u00A0·\u00A0\u00A0'}{faza.illuminationPct}% osvetljen</Text>
+          <Text variant="oznaka" className={OZNAKA_12}>{m.oznaka}{'\u00A0\u00A0·\u00A0\u00A0'}{m.osvetljen(faza.illuminationPct)}</Text>
           <Text variant="display" className="mt-3">{naslov}</Text>
           {/* PRIVREMENA recenica faze dok astrolog ne posalje prave (`PHASE_SUMMARY_PRIVREMENO`).
               U koloni naslova, pored ilustracije, blizu naslova (Ivan, 28.9.2026). Ista mera
@@ -101,7 +100,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
               istaknuto
               className="h-auto px-5 py-[10px]"
               onPress={() => router.push({ pathname: '/moon', params: { day: String(offset), area: oblast } })}>
-              <Text className="text-[16px] leading-[20px]">Saznaj više</Text>
+              <Text className="text-[16px] leading-[20px]">{m.saznajVise}</Text>
             </Button>
           </View>
         </View>
@@ -109,7 +108,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
         <View
           accessible
           accessibilityRole="image"
-          accessibilityLabel={`${naslov}, osvetljenost ${faza.illuminationPct} posto, ${smer}`}
+          accessibilityLabel={m.slika(naslov, faza.illuminationPct, faza.waxing)}
           // Spusteno u visinu naslova, ne uz oznaku (Ivan, 28.9.2026).
           className="mt-6 items-center">
           <View>
@@ -129,7 +128,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
           pravoStaklo
           stavke={LUNAR_AREAS.map((a) => ({
             key: a.key,
-            label: TAB[a.key],
+            label: m.tabovi[a.key],
             // Sve ikonice pune, i neizabrane (Ivan, 29.9.2026).
             icon: <OblastIkona oblast={a.key} size={20} />,
           }))}
@@ -143,7 +142,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
             <TextPlaceholder lines={2} />
           ) : (
             // Bez interneta se ne tvrdi da saveti nisu stigli — mozda samo nisu sacuvani.
-            <Text variant="muted">{naMrezi ? 'Saveti za ovu oblast još nisu stigli.' : 'Saveti će se pojaviti kad se veza vrati.'}</Text>
+            <Text variant="muted">{naMrezi ? m.nemaSaveta : m.saveteKadVeza}</Text>
           )}
         </View>
       </Kartica>
@@ -160,7 +159,7 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
               natal: hit.natal,
               ruler: rulerRole(hit.transiting.key, hit.natal.key, chartRulers(chart, timeUnknown)),
             }}
-            oznaka="Za tebe"
+            oznaka={m.zaTebe}
             naslov={hitTekst.title ?? ''}
             loading={false}
             opis={hitTekst.body ? prveRecenice(hitTekst.body) : undefined}

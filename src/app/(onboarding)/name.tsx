@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { useProfileStore } from '@/store/profile';
 import { useAuthStore } from '@/store/auth';
 import { pushProfile } from '@/lib/sync';
+import { useT } from '@/i18n';
 
 export default function Name() {
+  const t = useT();
   const profile = useProfileStore((s) => s.profile);
   const setProfile = useProfileStore((s) => s.setProfile);
   const user = useAuthStore((s) => s.user);
@@ -33,16 +35,16 @@ export default function Name() {
   return (
     <OnboardingStep
       icon={UserRound}
-      title="Kako da te zovemo?"
-      subtitle="Tako ti se horoskop obraća direktno, umesto kao oglasna tabla."
+      title={t.onboarding.ime.naslov}
+      subtitle={t.onboarding.ime.podnaslov}
       center={false}
       note={null}
-      primary={{ label: 'Nastavi', onPress: next, disabled: !valid, ucitava: busy }}>
+      primary={{ label: t.opste.nastavi, onPress: next, disabled: !valid, ucitava: busy }}>
       <Input
         povrsina="siva"
         value={name}
         onChangeText={setName}
-        placeholder="Tvoje ime"
+        placeholder={t.onboarding.ime.placeholder}
         autoCapitalize="words"
         autoCorrect={false}
         autoComplete="given-name"

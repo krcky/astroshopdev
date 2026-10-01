@@ -8,6 +8,7 @@ import { useTurnstile } from '@/components/turnstile';
 import { Input } from '@/components/ui/input';
 import { PrijavaDugme } from '@/components/prijava-dugme';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { AUTH_MODE } from '@/lib/auth-mode';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
@@ -15,6 +16,8 @@ import { pullProfile } from '@/lib/sync';
 import { signOut } from '@/store/auth';
 
 export default function Account() {
+  const t = useT();
+  const tx = t.onboarding.nalogEmail;
   // `nov` = dolazi se iz "Napravi nalog" (posle reveal-a); `zauzet` = email koji vec
   // ima kartu, vraca ga ekran sa kodom (`lib/signup.ts`).
   const { nov, zauzet } = useLocalSearchParams<{ nov?: string; zauzet?: string }>();
@@ -30,12 +33,12 @@ export default function Account() {
   const emailOk = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email.trim());
   const valid = AUTH_MODE === 'otp' ? emailOk : emailOk && password.length >= 6;
   const poruka = error ?? (zauzet && email.trim().toLowerCase() === zauzet
-    ? 'Ovaj email već ima nalog. Unesi drugi.'
+    ? tx.emailZauzet
     : null);
 
   const submit = async () => {
     if (!valid || busy) return;
-    if (!isSupabaseConfigured) { setError('Nalog još nije podešen.'); return; }
+    if (!isSupabaseConfigured) { setError(tx.nijePodesen); return; }
     setBusy(true);
     setError(null);
     const mail = email.trim().toLowerCase();
@@ -47,7 +50,7 @@ export default function Account() {
       try {
         captchaToken = await captcha.getToken();
       } catch {
-        setError('Nismo uspeli da potvrdimo da nisi robot. Proveri internet pa probaj ponovo.');
+        setError(tx.robot);
         return;
       }
 
@@ -58,8 +61,8 @@ export default function Account() {
         });
         if (error) {
           setError(/rate|limit|seconds/i.test(error.message)
-            ? 'Previše pokušaja. Sačekaj minut pa probaj ponovo.'
-            : 'Nismo uspeli da pošaljemo kod. Proveri email i internet.');
+            ? tx.previsePokusaja
+            : tx.kodNijePoslat);
           return;
         }
         router.push({ pathname: '/code', params: nov ? { email: mail, nov } : { email: mail } });
@@ -78,31 +81,31 @@ export default function Account() {
           email: mail, password, options: { captchaToken: retryToken },
         }));
         if (error) {
-          setError('Nalog sa ovim emailom postoji, ali lozinka nije tačna.');
+          setError(tx.lozinkaNetacna);
           return;
         }
       } else if (error) {
         setError(/password/i.test(error.message)
-          ? 'Lozinka mora imati bar 6 znakova.'
-          : 'Nismo uspeli da napravimo nalog. Proveri podatke i internet.');
+          ? tx.lozinkaKratka
+          : tx.nalogNijeNapravljen);
         return;
       }
 
       if (!data.session) {
         // Potvrda emaila je i dalje ukljucena u Supabase-u.
-        setError('Potvrda emaila je uključena u Supabase-u. Isključi je u Authentication → Sign In / Providers → Email.');
+        setError(tx.potvrdaUkljucena);
         return;
       }
 
       if (nov && (await pullProfile(data.session.user.id))) {
         await signOut('local');
-        setError('Ovaj email već ima nalog. Unesi drugi.');
+        setError(tx.emailZauzet);
         return;
       }
       const outcome = await completeSignup(data.session.user.id, mail);
       router.replace(routeAfterSignup(outcome));
     } catch {
-      setError('Nismo uspeli da učitamo nalog. Proveri internet pa probaj ponovo.');
+      setError(tx.nalogNijeUcitan);
     } finally {
       setBusy(false);
     }
@@ -112,14 +115,14 @@ export default function Account() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={tastatura ? undefined : Mail}
-      title={AUTH_MODE === 'otp' ? 'Koji ti je email?' : 'Napravi nalog'}
+      title={AUTH_MODE === 'otp' ? tx.naslovKod : tx.naslovLozinka}
       subtitle={AUTH_MODE === 'otp'
-        ? 'Šaljemo ti kod za prijavu. Bez lozinke, bez reklama, i email ne delimo ni sa kim.'
-        : 'Nalog čuva tvoju kartu kad promeniš telefon. Email ne delimo ni sa kim.'}
+        ? tx.podnaslovKod
+        : tx.podnaslovLozinka}
       center={false}
       note={null}
       primary={{
-        label: AUTH_MODE === 'otp' ? 'Pošalji mi kod' : 'Nastavi',
+        label: AUTH_MODE === 'otp' ? tx.posaljiKod : t.opste.nastavi,
         onPress: submit,
         disabled: !valid,
         ucitava: busy,
@@ -128,8 +131,8 @@ export default function Account() {
       <Input
         povrsina="siva"
         value={email}
-        onChangeText={(t) => { setEmail(t); setError(null); }}
-        placeholder="Email adresa"
+        onChangeText={(v) => { setEmail(v); setError(null); }}
+        placeholder={tx.placeholderEmail}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
@@ -145,8 +148,8 @@ export default function Account() {
           ref={lozinka}
           povrsina="siva"
           value={password}
-          onChangeText={(t) => { setPassword(t); setError(null); }}
-          placeholder="Lozinka (bar 6 znakova)"
+          onChangeText={(v) => { setPassword(v); setError(null); }}
+          placeholder={tx.placeholderLozinka}
           secureTextEntry
           autoCapitalize="none"
           autoComplete="new-password"
@@ -165,7 +168,7 @@ export default function Account() {
 
       {socialNote && (
         <Text variant="muted" className="mt-4 px-6 text-center text-xs">
-          Prijava preko Apple i Google naloga uključuje se kad napravimo dev build.
+          {tx.drustvenaPrijava}
         </Text>
       )}
 

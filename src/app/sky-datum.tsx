@@ -11,6 +11,7 @@ import { WheelPicker } from '@/components/ui/wheel-picker';
 import { danZaKalendar, zoneClock } from '@/lib/sky';
 import { useMestoNeba } from '@/store/sky-place';
 import { useSkyTimeStore } from '@/store/sky-time';
+import { useT } from '@/i18n';
 
 /**
  * Kalendar za ekran "Trenutno na nebu" — list odozdo sa dugmeta sa datumom
@@ -25,6 +26,7 @@ import { useSkyTimeStore } from '@/store/sky-time';
  * kalendar iz paketa, pa dobija polja za dan, mesec i godinu.
  */
 export default function SkyDatum() {
+  const t = useT();
   const grad = useMestoNeba();
   const izabran = useSkyTimeStore((s) => s.izabran);
   const izaberiDan = useSkyTimeStore((s) => s.izaberiDan);
@@ -46,9 +48,9 @@ export default function SkyDatum() {
   return (
     <View className="bg-background px-6 pt-8" style={dnoLista(insets.bottom)}>
       <SheetGrabber />
-      <Text variant="naslovLista">Izaberi dan</Text>
+      <Text variant="naslovLista">{t.karta.datumNeba.naslov}</Text>
       <Text variant="body" className="mt-2">
-        Nebo nad mestom {grad.name} tog dana u {zoneClock(trenutak, grad.tz)}.
+        {t.karta.datumNeba.opis(grad.name, zoneClock(trenutak, grad.tz))}
       </Text>
 
       <View className="mt-4">
@@ -58,7 +60,7 @@ export default function SkyDatum() {
             mode="date"
             display="inline"
             // "sr-RS" na iOS-u daje CIRILICU — za latinicu mora "sr-Latn-RS" (`wheel-picker.tsx`).
-            locale="sr-Latn-RS"
+            locale={t.gramatika.locale}
             // Svetla lila, ista kao "i" pored tocka na "Ti" (Ivan, 28.9.2026: danasnji
             // dan svetlo ljubicast, ne indigo). Boji i strelice za mesec.
             accentColor={OBLAST_BOJA}

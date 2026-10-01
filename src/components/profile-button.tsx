@@ -4,6 +4,7 @@ import { router, Stack } from 'expo-router';
 import { UserRound } from 'lucide-react-native';
 
 import { GlassIconButton } from '@/components/ui/glass-button';
+import { useT } from '@/i18n';
 import { STARI_IOS } from '@/lib/platform';
 import { neutral } from '@/theme/tokens';
 
@@ -26,15 +27,16 @@ const otvoriProfil = () => router.push('/profile');
  * `className` tiho odbaci — ikona je stajala 5pt nize nego na pocetnoj.
  */
 export function ProfileButton() {
+  const t = useT();
   if (NATIVE_TRAKA) {
     return (
       <Stack.Screen
         options={{
           unstable_headerRightItems: () => [{
             type: 'button',
-            label: 'Profil',
+            label: t.profil.dugmeProfil,
             icon: { type: 'sfSymbol', name: 'person' },
-            accessibilityLabel: 'Profil',
+            accessibilityLabel: t.profil.dugmeProfil,
             sharesBackground: false,
             onPress: otvoriProfil,
           }],
@@ -44,7 +46,7 @@ export function ProfileButton() {
   }
   return (
     <View style={{ transform: [{ translateY: -5 }] }}>
-      <GlassIconButton onPress={otvoriProfil} accessibilityLabel="Profil">
+      <GlassIconButton onPress={otvoriProfil} accessibilityLabel={t.profil.dugmeProfil}>
         <UserRound size={20} color={neutral.ink} />
       </GlassIconButton>
     </View>

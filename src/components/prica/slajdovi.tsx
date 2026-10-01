@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Minus, Plus, Share } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { OblastIkona } from '@/components/oblast-ikona';
@@ -17,7 +18,6 @@ import {
 import { useOkret } from '@/components/prica/sat';
 import { boljeNegoJuce, fazaOsmina, korakReci, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
-import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
@@ -73,6 +73,7 @@ function useMera() {
  * ------------------------------------------------------------------------- */
 
 export function SlikaNaslovna({ p, okvir }: SlikaProps) {
+  const t = useT();
   const [m, onLayout] = useMera();
   const n = p.naslovna.broj;
   return (
@@ -89,7 +90,7 @@ export function SlikaNaslovna({ p, okvir }: SlikaProps) {
             <Text className={TIP.oznaka} style={{ color: BELA_85 }}>{p.datumTekst}</Text>
           </Pojava>
           <View style={{ marginTop: 10 }}>
-            <Reci tekst="Tvoj dan" kasni={520} korak={110} className={TIP.naslovXL} style={{ color: BELA }} />
+            <Reci tekst={t.prica.dnevna.tvojDan} kasni={520} korak={110} className={TIP.naslovXL} style={{ color: BELA }} />
           </View>
           {n > 0 ? (
             <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 16, marginTop: 18 }}>
@@ -98,7 +99,7 @@ export function SlikaNaslovna({ p, okvir }: SlikaProps) {
                 <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
                   <Broj do={n} kasni={2200} style={{ fontSize: 26, lineHeight: 30, color: BELA, letterSpacing: -0.5 }} />
                   <Text className={cn('text-[26px] leading-[30px] tracking-[-0.5px]', tezina('display'))} style={{ color: BELA }}>
-                    {` ${mnozina(n, TRANZIT)}`}
+                    {` ${t.gramatika.tranzita(n)}`}
                   </Text>
                 </View>
                 <Text className={TIP.sitno} style={{ color: BELA_85 }} numberOfLines={1} adjustsFontSizeToFit>
@@ -108,7 +109,7 @@ export function SlikaNaslovna({ p, okvir }: SlikaProps) {
             </View>
           ) : (
             <Pojava kasni={1200} style={{ marginTop: 16 }}>
-              <Text className={TIP.tekst} style={{ color: BELA_85 }}>Danas nijedna planeta ne pravi aspekt sa tvojom kartom.</Text>
+              <Text className={TIP.tekst} style={{ color: BELA_85 }}>{t.prica.dnevna.nemaAspekata}</Text>
             </Pojava>
           )}
         </View>
@@ -122,6 +123,7 @@ export function SlikaNaslovna({ p, okvir }: SlikaProps) {
  * ------------------------------------------------------------------------- */
 
 export function SlikaTvojDan({ p, okvir }: SlikaProps) {
+  const t = useT();
   const [m, onLayout] = useMera();
   const td = p.tvojDan!;
   return (
@@ -141,7 +143,7 @@ export function SlikaTvojDan({ p, okvir }: SlikaProps) {
         </View>
         <View style={{ paddingTop: 12 }}>
           <Pojava kasni={900}>
-            <Text className={TIP.oznaka} style={{ color: MUTNO }}>{`Najvažnije danas · ${td.momenat}`}</Text>
+            <Text className={TIP.oznaka} style={{ color: MUTNO }}>{t.prica.dnevna.najvaznijeDanas(td.momenat)}</Text>
           </Pojava>
           <View style={{ marginTop: 10 }}>
             <Reci tekst={td.naslov} kasni={1050} className={TIP.naslov} />
@@ -170,6 +172,7 @@ export function SlikaTvojDan({ p, okvir }: SlikaProps) {
  * ------------------------------------------------------------------------- */
 
 export function SlikaOcene({ p, okvir }: SlikaProps) {
+  const t = useT();
   const o = p.ocene!;
   const naj = o.najbolja;
   return (
@@ -181,7 +184,7 @@ export function SlikaOcene({ p, okvir }: SlikaProps) {
           </Pojava>
         )}
         <Pojava kasni={450}>
-          <Text className={TIP.oznaka} style={{ color: MUTNO }}>Najbolje ti ide</Text>
+          <Text className={TIP.oznaka} style={{ color: MUTNO }}>{t.prica.dnevna.najboljeTiIde}</Text>
         </Pojava>
         {naj && (
           <View style={{ marginTop: 10 }}>
@@ -195,14 +198,14 @@ export function SlikaOcene({ p, okvir }: SlikaProps) {
               <View
                 key={r.key}
                 accessible
-                accessibilityLabel={`${r.name}, ${r.ocena} od 5, ${r.oznaka}${bolje ? ', bolje nego juče' : ''}`}
+                accessibilityLabel={t.prica.dnevna.ocenaA11y(r.name, r.ocena, r.oznaka, bolje)}
                 className={cn('flex-row items-center gap-2.5 px-4 py-3', i > 0 && 'border-t border-border')}>
                 <OblastIkona oblast={r.key} size={26} />
                 <View style={{ flex: 1 }}>
                   <Text variant="default" className="text-[16px] leading-[20px]">{r.name}</Text>
                   {bolje && (
                     <Text className={cn('mt-0.5 text-[10px] leading-[13px] uppercase tracking-[1.2px]', tezina('statOznaka'))} style={{ color: TON_MASTILO.povoljno }}>
-                      ↑ bolje nego juče
+                      {t.prica.dnevna.boljeNegoJuce}
                     </Text>
                   )}
                 </View>
@@ -247,17 +250,18 @@ function IdeKociBlok({ znak, natpis, tekst, ime, kasni }: {
 }
 
 export function SlikaIdeKoci({ p, okvir }: SlikaProps) {
+  const t = useT();
   const { ide, koci } = p.ideKoci!;
   if (ide && koci) {
     return (
       <View style={{ flex: 1, backgroundColor: MINUS }}>
         <Pojava trajanje={900} ublazavanje={ZAVESA} pomak={-okvir.visina} bledi={false} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '52%', backgroundColor: PLUS }}>
           <View style={{ position: 'absolute', left: 24, right: 24, bottom: 32 }}>
-            <IdeKociBlok znak="plus" natpis="Ide ti" tekst={ide.tekst} ime={ide.ime} kasni={500} />
+            <IdeKociBlok znak="plus" natpis={t.prica.dnevna.ideTi} tekst={ide.tekst} ime={ide.ime} kasni={500} />
           </View>
         </Pojava>
         <View style={{ position: 'absolute', top: '52%', left: 24, right: 24, paddingTop: 32 }}>
-          <IdeKociBlok znak="minus" natpis="Koči te" tekst={koci.tekst} ime={koci.ime} kasni={1400} />
+          <IdeKociBlok znak="minus" natpis={t.prica.dnevna.kociTe} tekst={koci.tekst} ime={koci.ime} kasni={1400} />
         </View>
       </View>
     );
@@ -267,7 +271,7 @@ export function SlikaIdeKoci({ p, okvir }: SlikaProps) {
   return (
     <View style={{ flex: 1, backgroundColor: ide ? PLUS : MINUS }}>
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24, justifyContent: 'center' }}>
-        <IdeKociBlok znak={ide ? 'plus' : 'minus'} natpis={ide ? 'Ide ti' : 'Koči te'} tekst={jedna.tekst} ime={jedna.ime} kasni={400} />
+        <IdeKociBlok znak={ide ? 'plus' : 'minus'} natpis={ide ? t.prica.dnevna.ideTi : t.prica.dnevna.kociTe} tekst={jedna.tekst} ime={jedna.ime} kasni={400} />
       </View>
     </View>
   );
@@ -278,6 +282,7 @@ export function SlikaIdeKoci({ p, okvir }: SlikaProps) {
  * ------------------------------------------------------------------------- */
 
 export function SlikaMesec({ p, okvir }: SlikaProps) {
+  const t = useT();
   const m = p.mesec;
   const prostor = okvir.visina - okvir.vrh - okvir.dno;
   const mesec = Math.max(120, Math.min(190, prostor * 0.3));
@@ -306,7 +311,7 @@ export function SlikaMesec({ p, okvir }: SlikaProps) {
           <FazeMeseca trenutna={fazaOsmina(m.faza.angle)} />
         </View>
         <Pojava kasni={1700} style={{ marginTop: 18 }}>
-          <Text className={TIP.oznaka} style={{ color: BELA_85 }}>{`Mesec danas · ${m.sledeca}`}</Text>
+          <Text className={TIP.oznaka} style={{ color: BELA_85 }}>{t.prica.dnevna.mesecDanas(m.sledeca)}</Text>
         </Pojava>
         <View style={{ marginTop: 10 }}>
           {/* Znak ispred naslova (Ivan, 30.9.2026) — ne na Mesecu. */}
@@ -325,7 +330,7 @@ export function SlikaMesec({ p, okvir }: SlikaProps) {
         </View>
         {m.zaTebe && (
           <Pojava kasni={2500} style={{ marginTop: 16, borderRadius: 12, padding: 14, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)' }}>
-            <Text className={TIP.oznaka} style={{ color: BELA_85 }}>Za tebe</Text>
+            <Text className={TIP.oznaka} style={{ color: BELA_85 }}>{t.prica.dnevna.zaTebe}</Text>
             <Text className={cn('mt-1 text-[17px] leading-[22px]', tezina('naslovUTekstu'))} style={{ color: BELA }}>{m.zaTebe.naslov}</Text>
             {!!m.zaTebe.tekst && (
               <Text className="mt-0.5 text-[15px] leading-[21px]" style={{ color: BELA_85 }}>{m.zaTebe.tekst}</Text>
@@ -345,11 +350,12 @@ export function SlikaMesec({ p, okvir }: SlikaProps) {
 export const DUGMAD_SAVETA = 50 + 6 + 44;
 
 export function SlikaSavet({ p, okvir, uvod, onPodeli, onProcitaj }: SlikaProps) {
+  const t = useT();
   const s = p.savet!;
   const dnoSadrzaja = okvir.donjiUmetak + 16 + DUGMAD_SAVETA + 12;
   // Velicina slova po duzini saveta (`lib/prica.ts`): prostor izmedju zaglavlja i dugmadi,
   // bez oznake "Savet dana" (15 + 16) i natpisa ispod (18 + njegovi redovi).
-  const natpis = `Iz tumačenja tranzita ${s.ime}.`;
+  const natpis = t.prica.dnevna.izTumacenja(s.ime);
   const sirina = okvir.sirina - 48;
   const vel = velicinaSaveta(s.tekst, sirina, okvir.visina - okvir.vrh - dnoSadrzaja - 15 - 16 - 18 - visinaNatpisa(natpis, sirina));
   return (
@@ -362,7 +368,7 @@ export function SlikaSavet({ p, okvir, uvod, onPodeli, onProcitaj }: SlikaProps)
         </View>
         <View style={{ paddingHorizontal: 24, alignItems: 'center' }}>
           <Pojava kasni={300}>
-            <Text className={cn(TIP.oznaka, 'text-center')} style={{ color: MUTNO }}>Savet dana</Text>
+            <Text className={cn(TIP.oznaka, 'text-center')} style={{ color: MUTNO }}>{t.prica.dnevna.savetDana}</Text>
           </Pojava>
           <View style={{ marginTop: 16 }}>
             <Reci
@@ -381,14 +387,14 @@ export function SlikaSavet({ p, okvir, uvod, onPodeli, onProcitaj }: SlikaProps)
       </View>
       {!uvod && (
       <Pojava kasni={1600} style={{ position: 'absolute', left: 24, right: 24, bottom: okvir.donjiUmetak + 16, gap: 6 }}>
-        <Button onPress={onPodeli} accessibilityLabel="Podeli svoj dan">
+        <Button onPress={onPodeli} accessibilityLabel={t.prica.dnevna.podeliSvojDan}>
           <View className="flex-row items-center gap-2">
             <Share size={19} color={BELA} strokeWidth={2} />
-            <Text>Podeli svoj dan</Text>
+            <Text>{t.prica.dnevna.podeliSvojDan}</Text>
           </View>
         </Button>
         <Pressable onPress={onProcitaj} accessibilityRole="button" className="h-11 items-center justify-center active:opacity-60">
-          <Text className={cn('text-[16px] leading-[20px]', tezina('dugme'))}>Pročitaj ceo tekst</Text>
+          <Text className={cn('text-[16px] leading-[20px]', tezina('dugme'))}>{t.prica.dnevna.procitajCeo}</Text>
         </Pressable>
       </Pojava>
       )}

@@ -5,8 +5,10 @@ import { Clock } from 'lucide-react-native';
 import { OnboardingStep } from '@/components/onboarding-step';
 import { WheelPicker } from '@/components/ui/wheel-picker';
 import { useDraft } from '@/store/draft';
+import { useT } from '@/i18n';
 
 export default function BirthTime() {
+  const t = useT();
   const draft = useDraft();
   const [value, setValue] = React.useState(() => {
     const d = new Date(2000, 0, 1, 12, 0, 0);
@@ -32,9 +34,9 @@ export default function BirthTime() {
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
       icon={Clock}
-      title="Vreme rođenja"
-      primary={{ label: izabrano ? 'Nastavi' : 'Izaberi vreme', onPress: next, disabled: !izabrano }}
-      secondary={{ label: 'Ne znam vreme', onPress: skip }}>
+      title={t.onboarding.vreme.naslov}
+      primary={{ label: izabrano ? t.opste.nastavi : t.onboarding.vreme.izaberi, onPress: next, disabled: !izabrano }}
+      secondary={{ label: t.onboarding.vreme.neZnam, onPress: skip }}>
       <WheelPicker mode="time" value={value} onChange={(d) => { setValue(d); setIzabrano(true); }} />
     </OnboardingStep>
   );

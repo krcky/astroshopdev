@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { ChevronRight, Lock, Plus } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { leaveSheetTo } from '@/components/sheet';
@@ -37,6 +38,7 @@ export function TvojiLjudi({ className, izLista = false }: {
   /** Na listu (profil): prelaz ide kroz `leaveSheetTo`, da se strana ne otvori ISPOD lista. */
   izLista?: boolean;
 }) {
+  const t = useT().profil.tvojiLjudi;
   const osobe = useOsobe();
   const otvorene = useOtvoreneOsobe();
   // Spisak se osvezi sa servera kad se kartica pokaze (osobe dodate na drugom telefonu).
@@ -64,7 +66,7 @@ export function TvojiLjudi({ className, izLista = false }: {
     <View className={className}>
       {/* Naslov IZNAD kartice, kao datum na pocetnoj ("TVOJ DAN · …", Ivan 29.9.2026). */}
       <Text variant="oznaka" className={cn(OZNAKA_12, 'mb-2')}>
-        {osobe.length > 0 ? `Tvoji ljudi\u00A0\u00A0·\u00A0\u00A0${osobe.length}` : 'Tvoji ljudi'}
+        {osobe.length > 0 ? t.naslovSaBrojem(osobe.length) : t.naslov}
       </Text>
       <View className={cn(CARD_SURFACE, 'overflow-hidden')}>
         {osobe.map((o, i) => (
@@ -101,12 +103,13 @@ function RedOsobe({ osoba, znak, zakljucana, last, onPress }: {
   last: boolean;
   onPress: () => void;
 }) {
+  const t = useT().profil.tvojiLjudi;
   const ispod = [nazivOdnosa(osoba.odnos), znak?.name].filter(Boolean).join(' · ');
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${osoba.name}${ispod ? `, ${ispod}` : ''}${zakljucana ? '. Uz Premium' : ''}`}
+      accessibilityLabel={t.redOsobe(osoba.name, ispod, zakljucana)}
       className={cn('min-h-row flex-row items-center py-3 pl-4 pr-3 active:opacity-60', !last && 'border-b border-border')}>
       {znak ? (
         <ZnakIkona znak={znak.key} element={znak.element} size={IKONA} />
@@ -131,20 +134,21 @@ function RedOsobe({ osoba, znak, zakljucana, last, onPress }: {
  * besplatna granica: katanac i Premium, ne forma koja bi pala na serveru.
  */
 function DodajRed({ prazno, zakljucan, onPress }: { prazno: boolean; zakljucan: boolean; onPress: () => void }) {
+  const t = useT().profil.tvojiLjudi;
   const ispod = zakljucan
-    ? `Uz Premium do ${PREMIUM_GRANICE.osobe} osoba`
-    : prazno ? 'Karta i tranziti partnera, deteta ili prijatelja' : null;
+    ? t.uzPremiumDo(PREMIUM_GRANICE.osobe)
+    : prazno ? t.praznoIspod : null;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Dodaj osobu${ispod ? `. ${ispod}` : ''}`}
+      accessibilityLabel={t.dodajOsobuOpis(ispod)}
       className="min-h-row flex-row items-center py-3 pl-4 pr-3 active:opacity-60">
       <View className="items-center justify-center rounded-full bg-fill" style={{ width: IKONA, height: IKONA }}>
         <Plus size={16} color={neutral.ink} strokeWidth={2.2} />
       </View>
       <View className="ml-3 mr-2 flex-1">
-        <Text variant="row">Dodaj osobu</Text>
+        <Text variant="row">{t.dodajOsobu}</Text>
         {!!ispod && <Text variant="caption" numberOfLines={2}>{ispod}</Text>}
       </View>
       {zakljucan

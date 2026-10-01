@@ -9,34 +9,31 @@
  * ista pravila 4 i 5. Karta se racuna na telefonu; tekstovi tumacenja stizu po
  * kljucu (`contentKey`), pa server ne zna o kome je rec.
  */
+import { tr } from '@/i18n/jezik';
 import { BESPLATNO, PREMIUM } from '@/lib/pristup';
 import type { Profile } from '@/store/profile';
 
 export type OdnosKljuc = 'partner' | 'dete' | 'roditelj' | 'brat_sestra' | 'prijatelj' | 'drugo';
 
+/** Kljucevi odnosa redom kako se nude. Isti su u bazi (`osobe.odnos`, check). */
+const KLJUCEVI_ODNOSA: readonly OdnosKljuc[] = ['partner', 'dete', 'roditelj', 'brat_sestra', 'prijatelj', 'drugo'];
+
 /**
- * "Ko ti je" — ponudjeni odnosi, redom. Kljucevi su u bazi (`osobe.odnos`,
- * check); naziv je bez roda gde god moze, jer pol ne pitamo.
+ * "Ko ti je" — ponudjeni odnosi, redom. Naziv je iz recnika (`profil.odnosi`), bez
+ * roda gde god moze, jer pol ne pitamo; GETTER, da prati jezik.
  */
-export const ODNOSI: readonly { key: OdnosKljuc; naziv: string }[] = [
-  { key: 'partner', naziv: 'Partner' },
-  { key: 'dete', naziv: 'Dete' },
-  { key: 'roditelj', naziv: 'Roditelj' },
-  { key: 'brat_sestra', naziv: 'Brat ili sestra' },
-  { key: 'prijatelj', naziv: 'Prijatelj' },
-  { key: 'drugo', naziv: 'Neko drugi' },
-];
+export const ODNOSI: readonly { key: OdnosKljuc; readonly naziv: string }[] = KLJUCEVI_ODNOSA.map((key) => ({
+  key,
+  get naziv() { return tr().profil.odnosi[key]; },
+}));
 
 /** Polje osobe koje se menja na listu odozdo (`/rodjenje-polje?polje=`, tabele u `/osoba-uredi` i na listu "Nalog"). */
 export type PoljeOsobe = 'ime' | 'odnos' | 'datum' | 'vreme' | 'mesto';
 
-/** Napomena ispod koraka unosa druge osobe (umesto "tvoju kartu" iz onboardinga). */
-export const NAPOMENA_PODACI = 'Podatke o rođenju vidiš samo ti. Ne delimo ih i ne prodajemo.';
-
 /** Naziv odnosa za prikaz; "Neko drugi" i neodabran nemaju sta da kazu — null. */
 export function nazivOdnosa(k: OdnosKljuc | null | undefined): string | null {
   if (!k || k === 'drugo') return null;
-  return ODNOSI.find((o) => o.key === k)?.naziv ?? null;
+  return tr().profil.odnosi[k] ?? null;
 }
 
 export type Osoba = Profile & {
@@ -75,10 +72,11 @@ export function otvoreneOsobe(osobe: readonly Pick<Osoba, 'id' | 'createdAt'>[],
  */
 export function porukaOsobe(poruka: string | undefined | null): string {
   const m = poruka ?? '';
-  if (/granica_osoba/.test(m)) return 'Za još osoba potreban je Premium.';
-  if (/nema_naloga|JWT/i.test(m)) return 'Prijava je istekla. Zatvori aplikaciju i otvori je ponovo.';
-  if (/fetch|network|timed? ?out/i.test(m)) return 'Nema veze sa serverom. Ništa nije sačuvano — probaj kad se internet vrati.';
+  const t = tr().profil.greske;
+  if (/granica_osoba/.test(m)) return t.granica;
+  if (/nema_naloga|JWT/i.test(m)) return t.prijavaIstekla;
+  if (/fetch|network|timed? ?out/i.test(m)) return t.mreza;
   // U razvoju i tacna poruka servera — bez nje se kvar ne vidi.
   const razvoj = typeof __DEV__ !== 'undefined' && __DEV__ ? ` (${m})` : '';
-  return `Nije sačuvano. Probaj ponovo za minut.${razvoj}`;
+  return `${t.opsta}${razvoj}`;
 }

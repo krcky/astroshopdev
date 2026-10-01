@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { ArrowRightLeft, TrendingDown, TrendingUp } from 'lucide-react-native';
 
 import { neutral } from '@/theme/tokens';
-import { TONE_LABEL, type Tone } from '@/lib/tone';
+import type { Tone } from '@/lib/tone';
+import { useT } from '@/i18n';
 
 /**
  * Boje tona (Ivan, 28.9.2026). Zelena i roze su njegove; Mesovito je topla
@@ -25,11 +26,12 @@ const TONE_ICON: Record<Tone, typeof TrendingUp> = {
 
 /** Obojen kruzic sa ikonicom tona. Rec ide u `accessibilityLabel`, za VoiceOver. */
 export function ToneBadge({ tone, size = 26 }: { tone: Tone; size?: number }) {
+  const t = useT();
   const Ikona = TONE_ICON[tone];
   return (
     <View
       accessible
-      accessibilityLabel={`Ton: ${TONE_LABEL[tone]}`}
+      accessibilityLabel={t.danas.ton.oznaka(t.danas.ton[tone])}
       style={{
         width: size, height: size, borderRadius: size / 2,
         backgroundColor: TONE_COLOR[tone], alignItems: 'center', justifyContent: 'center',

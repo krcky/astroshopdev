@@ -8,6 +8,7 @@
  * Izvor: specifikacija ekrana "Tranziti" (Ivan, 28.9.2026). Sve je PREDLOG koji
  * ceka potvrdu astrologa. Opis za astrologa: `docs/ASTRO-LOGIKA.md`, poglavlje 11.
  */
+import { tr } from '@/i18n/jezik';
 import type { PlanetKey } from '@/lib/astro';
 import type { Tone } from '@/lib/tone';
 
@@ -24,12 +25,17 @@ export type OblastDef = {
   points: readonly string[];
 };
 
-/** Tabela veze tranzita sa oblascu. */
+/** Oblast sa imenom iz recnika (`danas.oblasti.imena`) — ime se cita u trenutku upotrebe. */
+function oblast(def: Omit<OblastDef, 'name'>): OblastDef {
+  return { ...def, get name() { return tr().danas.oblasti.imena[def.key]; } };
+}
+
+/** Tabela veze tranzita sa oblascu. Imena oblasti su u recniku (`danas.oblasti.imena`). */
 export const OBLASTI: readonly OblastDef[] = [
-  { key: 'ljubav', name: 'Ljubav', houses: [5, 7], weakHouses: [], points: ['venus', 'moon', 'mars'] },
-  { key: 'zdravlje', name: 'Zdravlje i lepota', houses: [1, 6], weakHouses: [], points: ['sun', 'mars', 'ascendant'] },
-  { key: 'karijera', name: 'Karijera i finansije', houses: [2, 10], weakHouses: [6, 8], points: ['jupiter', 'saturn', 'mercury', 'midheaven'] },
-  { key: 'kuca', name: 'Kuća i bašta', houses: [4], weakHouses: [], points: ['moon', 'saturn'] },
+  oblast({ key: 'ljubav', houses: [5, 7], weakHouses: [], points: ['venus', 'moon', 'mars'] }),
+  oblast({ key: 'zdravlje', houses: [1, 6], weakHouses: [], points: ['sun', 'mars', 'ascendant'] }),
+  oblast({ key: 'karijera', houses: [2, 10], weakHouses: [6, 8], points: ['jupiter', 'saturn', 'mercury', 'midheaven'] }),
+  oblast({ key: 'kuca', houses: [4], weakHouses: [], points: ['moon', 'saturn'] }),
 ];
 
 /**
@@ -83,10 +89,8 @@ export const DOPRINOS_FAKTOR = 2;
 /** Znak doprinosa po tonu. Mesovit tranzit se prikazuje, ali ne pomera ocenu. */
 export const ZNAK_TONA: Record<Tone, number> = { povoljno: 1, izazovno: -1, mesovito: 0 };
 
-/** Kratka oznaka uz ocenu. */
-export const OZNAKA_OCENE: Record<number, string> = {
-  5: 'Odličan dan', 4: 'Dobar dan', 3: 'Miran dan', 2: 'Oprezno', 1: 'Težak dan',
-};
+/** Kratka oznaka uz ocenu ("Odličan dan"…) je u recniku: `danas.oblasti.oznakaOcene`. */
+export const oznakaOceneTekst = (ocena: number): string => tr().danas.oblasti.oznakaOcene[ocena] ?? '';
 
 /**
  * Tranziti Meseca traju nekoliko sati i zatrpali bi listu — ne prikazuju se i
@@ -97,6 +101,7 @@ export const INCLUDE_MOON_TRANSITS = false;
 /** Mlad i Pun Mesec u natalnoj kuci — poseban red, samo na dan faze. */
 export const LUNACIJA = {
   jacina: 0.5,
-  new: { naslov: 'Novi početak', ton: 'povoljno' as Tone },
-  full: { naslov: 'Vrhunac', ton: 'mesovito' as Tone },
+  // Naslov iz recnika (`danas.oblasti.lunacijaMlad` / `lunacijaPun`).
+  new: { get naslov() { return tr().danas.oblasti.lunacijaMlad; }, ton: 'povoljno' as Tone },
+  full: { get naslov() { return tr().danas.oblasti.lunacijaPun; }, ton: 'mesovito' as Tone },
 };

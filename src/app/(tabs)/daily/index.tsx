@@ -10,6 +10,7 @@ import { useDanas } from '@/store/danas';
 import { TranzitiLista } from '@/components/tranziti-lista';
 import { useOblastiDana } from '@/lib/use-oblasti';
 import { BESPLATNO } from '@/lib/pristup';
+import { useT } from '@/i18n';
 
 /**
  * Tab "Tranziti": svi tranziti dana po vaznosti, svaki u svojoj kartici
@@ -18,6 +19,7 @@ import { BESPLATNO } from '@/lib/pristup';
  * pod katancem. Do tada je besplatni imao stari prikaz sa svim kratkim tekstovima.
  */
 export default function Daily() {
+  const t = useT();
   const hydrated = useProfileStore((s) => s.hydrated);
   const authLoading = useAuthStore((s) => s.loading);
   const resolved = useResolvedProfile();
@@ -31,7 +33,7 @@ export default function Daily() {
   if (!resolved || !rez) return <Redirect href="/" />;
 
   return (
-    <Screen label="Tranziti" tint="blue" right={<ProfileButton />}>
+    <Screen label={t.danas.tabovi.tranziti} tint="blue" right={<ProfileButton />}>
       <TranzitiLista rez={rez} date={today} besplatno={premium ? undefined : BESPLATNO.tranzitiDana} />
     </Screen>
   );

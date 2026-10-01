@@ -9,7 +9,8 @@ const SLIKA = require('../../assets/images/boban-vujovic.png');
 // tabu "Pitaj" je inace "iskakala" posle teksta — u razvoju stize sa Metro servera
 // tek pri prvom prikazu (Ivan, 29.9.2026). U buildu je u paketu; neuspeh ne smeta.
 {
-  const uri = Image.resolveAssetSource(SLIKA)?.uri;
+  // Na vebu `resolveAssetSource` ne postoji — bez provere je pad celog bundle-a.
+  const uri = Image.resolveAssetSource?.(SLIKA)?.uri;
   if (uri?.startsWith('http')) Image.prefetch(uri).catch(() => {});
 }
 

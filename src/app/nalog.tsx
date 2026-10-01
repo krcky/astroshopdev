@@ -14,17 +14,11 @@ import { datum, datumRodjenja } from '@/lib/horoscope';
 import type { PoljeOsobe } from '@/lib/osobe';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /** Naslov sekcije kao na profilu — kao datum na pocetnoj (`oznaka` 12pt). */
 const NASLOV = cn('ml-0', OZNAKA_12);
 const dvo = (n: number) => String(n).padStart(2, '0');
-
-/** Kako se korisnik prijavljuje — `app_metadata.provider` iz Supabase-a. */
-const NACIN: Record<string, string> = {
-  email: 'Kod na email',
-  apple: 'Apple nalog',
-  google: 'Google nalog',
-};
 
 /**
  * NALOG — list sa profila (Ivan, 29.9.2026): email (i njegova promena, `/email`),
@@ -34,6 +28,7 @@ const NACIN: Record<string, string> = {
  * stoji na dohvat palca. I dalje dva koraka — dugme pa potvrda.
  */
 export default function NalogSheet() {
+  const tn = useT().onboarding.nalog;
   const user = useAuthStore((s) => s.user);
   const profil = useProfileStore((s) => s.profile);
   const [brise, setBrise] = React.useState(false);
@@ -43,12 +38,12 @@ export default function NalogSheet() {
   // samo ovaj telefon. Potvrda, jer izbacuje i telefon, tablet i sve ostalo.
   const odjaviSvuda = () => {
     Alert.alert(
-      'Odjaviti se sa svih uređaja?',
-      'Bićeš odjavljen i na ovom telefonu i na svakom drugom uređaju na kom si prijavljen.',
+      tn.odjavaNaslov,
+      tn.odjavaTekst,
       [
-        { text: 'Odustani', style: 'cancel' },
+        { text: tn.odustani, style: 'cancel' },
         {
-          text: 'Odjavi se svuda',
+          text: tn.odjaviSeSvuda,
           onPress: async () => {
             setOdjavaSvuda(true);
             await signOut('global');
@@ -68,20 +63,19 @@ export default function NalogSheet() {
   // kroz ceo onboarding — jedan pogresan dodir ne sme da ih odnese.
   const obrisi = () => {
     Alert.alert(
-      'Obrisati nalog?',
-      'Briše se nalog, ime, slika i svi podaci o rođenju. Ovo se ne može poništiti.\n\n' +
-        'Pretplata se ovim NE otkazuje — nju otkazuješ u podešavanjima Apple ili Google naloga.',
+      tn.obrisatiNaslov,
+      tn.obrisatiTekst,
       [
-        { text: 'Odustani', style: 'cancel' },
+        { text: tn.odustani, style: 'cancel' },
         {
-          text: 'Obriši nalog',
+          text: tn.obrisiNalog,
           style: 'destructive',
           onPress: async () => {
             setBrise(true);
             const { error } = await deleteAccount();
             setBrise(false);
             if (error) {
-              Alert.alert('Nije uspelo', 'Nalog nije obrisan. Proveri internet pa probaj ponovo.');
+              Alert.alert(tn.nijeUspelo, tn.nijeObrisan);
               return;
             }
             router.dismissAll();
@@ -99,36 +93,36 @@ export default function NalogSheet() {
 
   return (
     <SheetScroll siva>
-      <Text variant="naslovLista">Nalog</Text>
+      <Text variant="naslovLista">{tn.naslov}</Text>
 
       {/* Ime prvo (Ivan, 29.9.2026), pa prijava; podaci o rodjenju ispod. */}
-      <GroupHeader variant="oznaka" className={NASLOV}>Ime i prijava</GroupHeader>
+      <GroupHeader variant="oznaka" className={NASLOV}>{tn.imeIPrijava}</GroupHeader>
       <Group className="mx-0">
-        {profil && <ListRow title="Ime" trailing={<VrednostReda>{profil.name}</VrednostReda>} onPress={() => otvori('ime')} />}
+        {profil && <ListRow title={tn.ime} trailing={<VrednostReda>{profil.name}</VrednostReda>} onPress={() => otvori('ime')} />}
         <ListRow
-          title="Email"
+          title={tn.email}
           trailing={<VrednostReda>{user?.email ?? '—'}</VrednostReda>}
           onPress={menjaEmail ? () => router.push('/email') : undefined}
         />
-        {!!provider && <ListRow title="Način prijave" trailing={<VrednostReda>{NACIN[provider] ?? provider}</VrednostReda>} />}
-        {!!od && <ListRow title="Nalog od" trailing={<VrednostReda>{od}</VrednostReda>} />}
+        {!!provider && <ListRow title={tn.nacinPrijave} trailing={<VrednostReda>{tn.nacin[provider] ?? provider}</VrednostReda>} />}
+        {!!od && <ListRow title={tn.nalogOd} trailing={<VrednostReda>{od}</VrednostReda>} />}
       </Group>
 
       {profil && (
         <>
-          <GroupHeader variant="oznaka" className={NASLOV}>Podaci o rođenju</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>{tn.podaciORodjenju}</GroupHeader>
           <Group className="mx-0">
-            <ListRow title="Datum rođenja" trailing={<VrednostReda>{datumRodjenja(profil.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
+            <ListRow title={tn.datumRodjenja} trailing={<VrednostReda>{datumRodjenja(profil.birth)}</VrednostReda>} onPress={() => otvori('datum')} />
             <ListRow
-              title="Vreme rođenja"
-              trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : 'Ne znam'}</VrednostReda>}
+              title={tn.vremeRodjenja}
+              trailing={<VrednostReda>{t ? `${dvo(t.hour)}:${dvo(t.minute)}` : tn.neZnam}</VrednostReda>}
               onPress={() => otvori('vreme')}
             />
-            <ListRow title="Mesto rođenja" trailing={<VrednostReda>{profil.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />
+            <ListRow title={tn.mestoRodjenja} trailing={<VrednostReda>{profil.cityName}</VrednostReda>} onPress={() => otvori('mesto')} />
           </Group>
           {!t && (
             <Text variant="caption" className="mt-2 px-1">
-              Bez vremena rođenja podznak i kuće nisu pouzdani. Dodirni „Vreme rođenja“ da ga dodaš.
+              {tn.bezVremena}
             </Text>
           )}
         </>
@@ -136,19 +130,19 @@ export default function NalogSheet() {
 
       <Group className="mx-0 mt-8">
         <ListRow
-          title="Odjavi se sa svih uređaja"
+          title={tn.odjavaSvuda}
           chevron={false}
           onPress={odjavaSvuda ? undefined : odjaviSvuda}
           trailing={odjavaSvuda ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
         />
       </Group>
 
-      <Text variant="h3" className="mt-10">Brisanje naloga</Text>
+      <Text variant="h3" className="mt-10">{tn.brisanjeNaslov}</Text>
       <Text variant="body" className="mt-2">
-        Trajno briše nalog, podatke o rođenju, sliku i pitanja astrologu. Pretplata se ne otkazuje sama.
+        {tn.brisanjeTekst}
       </Text>
       <Button variant="outline" className="mt-5" ucitava={brise} onPress={obrisi}>
-        <Text className="text-destructive">Obriši nalog</Text>
+        <Text className="text-destructive">{tn.obrisiNalog}</Text>
       </Button>
     </SheetScroll>
   );

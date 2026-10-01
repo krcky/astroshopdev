@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Camera, ChevronRight, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
 import { TvojiLjudi } from '@/components/tvoji-ljudi';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
@@ -47,6 +48,8 @@ const ZNACKA = 30;
  * trazi (5.1.1(v)), samo ne na dohvat palca.
  */
 export default function ProfileSheet() {
+  const t = useT();
+  const tp = t.profil.profil;
   const hydrated = useProfileStore((s) => s.hydrated);
   const { user, loading } = useAuthStore();
   const entitlement = useEntitlement();
@@ -68,9 +71,9 @@ export default function ProfileSheet() {
 
   const posleSlike = (ishod: IshodSlike) => {
     if (ishod === 'bez-dozvole') {
-      Alert.alert('Nema pristupa fotografijama', 'Dozvoli pristup u podešavanjima telefona, pa probaj ponovo.');
+      Alert.alert(tp.nemaPristupaNaslov, tp.nemaPristupaTekst);
     } else if (ishod === 'greska') {
-      Alert.alert('Slika nije sačuvana', 'Proveri internet pa probaj ponovo.');
+      Alert.alert(tp.slikaNijeSacuvanaNaslov, tp.slikaNijeSacuvanaTekst);
     }
   };
 
@@ -90,14 +93,14 @@ export default function ProfileSheet() {
     if (!imaSvojuSliku(user)) { izaberi(); return; }
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options: ['Izaberi drugu sliku', 'Ukloni sliku', 'Odustani'], destructiveButtonIndex: 1, cancelButtonIndex: 2 },
+        { options: [tp.izaberiDruguSliku, tp.ukloniSliku, tp.odustani], destructiveButtonIndex: 1, cancelButtonIndex: 2 },
         (i) => { if (i === 0) izaberi(); else if (i === 1) ukloni(); },
       );
     } else {
-      Alert.alert('Slika profila', undefined, [
-        { text: 'Izaberi drugu sliku', onPress: izaberi },
-        { text: 'Ukloni sliku', style: 'destructive', onPress: ukloni },
-        { text: 'Odustani', style: 'cancel' },
+      Alert.alert(tp.slikaProfila, undefined, [
+        { text: tp.izaberiDruguSliku, onPress: izaberi },
+        { text: tp.ukloniSliku, style: 'destructive', onPress: ukloni },
+        { text: tp.odustani, style: 'cancel' },
       ]);
     }
   };
@@ -118,9 +121,9 @@ export default function ProfileSheet() {
 
   const vrati = async () => {
     const ishod = await vratiKupovine();
-    if (ishod === 'nedostupno') Alert.alert('Još nije moguće', 'Kupovina u aplikaciji još nije uključena.');
-    else if (ishod === 'nema') Alert.alert('Nema pretplate', 'Na ovom nalogu prodavnice nema pretplate za Astroshop.');
-    else if (ishod === 'greska') Alert.alert('Provera nije uspela', 'Pokušaj ponovo za koji trenutak.');
+    if (ishod === 'nedostupno') Alert.alert(tp.josNijeMoguceNaslov, tp.josNijeMoguceTekst);
+    else if (ishod === 'nema') Alert.alert(tp.nemaPretplateNaslov, tp.nemaPretplateTekst);
+    else if (ishod === 'greska') Alert.alert(tp.proveraNijeUspelaNaslov, tp.proveraNijeUspelaTekst);
   };
 
   return (
@@ -133,7 +136,7 @@ export default function ProfileSheet() {
           onPress={meniSlike}
           disabled={radiSlika}
           accessibilityRole="button"
-          accessibilityLabel={imaSvojuSliku(user) ? 'Promeni ili ukloni sliku profila' : 'Dodaj sliku profila'}
+          accessibilityLabel={imaSvojuSliku(user) ? tp.promeniSliku : tp.dodajSliku}
           className="active:opacity-80">
           <SlikaProfila ime={profile.name} vladar={vladar} />
           <View
@@ -154,21 +157,21 @@ export default function ProfileSheet() {
           prodavnici) i vracanje kupovina za besplatne. */}
       {premium ? (
         <>
-          <GroupHeader variant="oznaka" className={NASLOV}>Pretplata</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>{tp.pretplata}</GroupHeader>
           <Group className={GRUPA}>
             <ListRow
-              title="Premium"
+              title={tp.premium}
               subtitle={
                 saPrekidaca
-                  ? 'Uključen test prekidačem'
+                  ? tp.ukljucenTestom
                   : entitlement?.productId === 'poklon'
-                    ? `Poklon${istice ? `, do ${istice}` : ''}`
-                    : istice ? `Aktivan, obnavlja se ${istice}` : 'Aktivan'
+                    ? tp.poklon(istice)
+                    : istice ? tp.aktivanObnavljaSe(istice) : tp.aktivan
               }
             />
             {izProdavnice && (
               <ListRow
-                title="Upravljaj pretplatom"
+                title={tp.upravljajPretplatom}
                 onPress={() => Linking.openURL(PRETPLATE)}
               />
             )}
@@ -176,24 +179,24 @@ export default function ProfileSheet() {
         </>
       ) : (
         <>
-          <GroupHeader variant="oznaka" className={NASLOV}>Pretplata</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>{tp.pretplata}</GroupHeader>
           {/* Jedan NAGLASEN red umesto kartice (Ivan, 29.9.2026: "da bude manji"):
               pun indigo (boja Premium-a svuda, pravilo 2) i beo tekst. */}
           <Group className={GRUPA}>
             <Pressable
               onPress={() => otvoriPremium(true)}
               accessibilityRole="button"
-              accessibilityLabel="Otključaj Premium"
+              accessibilityLabel={tp.otkljucajPremium}
               style={{ backgroundColor: PREMIUM }}
               className="min-h-row flex-row items-center gap-3 px-gutter py-3 active:opacity-80">
               <Lock size={18} color={neutral.white} strokeWidth={2.2} />
               <View className="flex-1">
-                <Text variant="row" className={tezina('naslovUTekstu')} style={{ color: neutral.white }}>Otključaj Premium</Text>
-                <Text variant="caption" style={{ color: neutral.white, opacity: 0.8 }}>Svi tranziti, ceo tekst i drugi dani</Text>
+                <Text variant="row" className={tezina('naslovUTekstu')} style={{ color: neutral.white }}>{tp.otkljucajPremium}</Text>
+                <Text variant="caption" style={{ color: neutral.white, opacity: 0.8 }}>{tp.otkljucajPremiumIspod}</Text>
               </View>
               <ChevronRight size={20} color={neutral.white} strokeWidth={2.2} />
             </Pressable>
-            <ListRow title="Vrati kupovine" chevron={false} onPress={vrati} />
+            <ListRow title={tp.vratiKupovine} chevron={false} onPress={vrati} />
           </Group>
         </>
       )}
@@ -203,36 +206,36 @@ export default function ProfileSheet() {
           Menja samo prikaz; duge tekstove salje samo server (pravilo 8). */}
       {PROBNI_BUILD && (
         <>
-          <GroupHeader variant="oznaka" className={NASLOV}>Test</GroupHeader>
+          <GroupHeader variant="oznaka" className={NASLOV}>{tp.test}</GroupHeader>
           <Group className={GRUPA}>
             <ListRow
-              title="Plaćeni korisnik"
+              title={tp.placeniKorisnik}
               subtitle={
                 premiumRucno === null
-                  ? `Prati server (${naServeru ? 'plaćen' : 'besplatan'})`
-                  : 'Ručno, samo na ovom telefonu'
+                  ? tp.pratiServer(naServeru)
+                  : tp.rucno
               }
               trailing={
                 <Switch
                   value={premium}
                   onValueChange={setPremiumRucno}
-                  accessibilityLabel="Test prekidač: plaćeni korisnik"
+                  accessibilityLabel={tp.prekidacOpis}
                 />
               }
             />
             {premiumRucno !== null && (
-              <ListRow title="Vrati na stanje sa servera" chevron={false} onPress={() => setPremiumRucno(null)} />
+              <ListRow title={tp.vratiNaServer} chevron={false} onPress={() => setPremiumRucno(null)} />
             )}
           </Group>
         </>
       )}
 
       {/* Nalog: email i odjava. Brisanje je na listu "Nalog". */}
-      <GroupHeader variant="oznaka" className={NASLOV}>Nalog</GroupHeader>
+      <GroupHeader variant="oznaka" className={NASLOV}>{tp.nalog}</GroupHeader>
       <Group className={GRUPA}>
-        <ListRow title="Nalog" subtitle="Email i podaci o rođenju" onPress={() => router.push('/nalog')} />
+        <ListRow title={tp.nalog} subtitle={tp.nalogIspod} onPress={() => router.push('/nalog')} />
         <ListRow
-          title="Odjavi se"
+          title={tp.odjaviSe}
           // Crno, ne crveno (Ivan, 29.9.2026): odjava nista ne brise.
           chevron={false}
           onPress={odjava ? undefined : doSignOut}
@@ -241,14 +244,14 @@ export default function ProfileSheet() {
       </Group>
 
       {/* Pravila na sajtu — isti linkovi kao na paywall-u. */}
-      <GroupHeader variant="oznaka" className={NASLOV}>Pravila</GroupHeader>
+      <GroupHeader variant="oznaka" className={NASLOV}>{tp.pravila}</GroupHeader>
       <Group className={GRUPA}>
-        <ListRow title="Pravila privatnosti" onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)} />
-        <ListRow title="Uslovi korišćenja" onPress={() => WebBrowser.openBrowserAsync(USLOVI)} />
+        <ListRow title={tp.pravilaPrivatnosti} onPress={() => WebBrowser.openBrowserAsync(PRIVATNOST)} />
+        <ListRow title={tp.usloviKoriscenja} onPress={() => WebBrowser.openBrowserAsync(USLOVI)} />
       </Group>
 
       <Text variant="caption" className="mt-6 text-center">
-        Astro Shop {Constants.expoConfig?.version ?? ''}
+        {tp.verzija(t.opste.imeAplikacije, Constants.expoConfig?.version ?? '')}
       </Text>
     </SheetScroll>
   );

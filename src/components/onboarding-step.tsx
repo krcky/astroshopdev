@@ -13,6 +13,7 @@ import { ScreenBackdrop, VRH_ANDROID } from '@/components/screen';
 import { STARI_IOS } from '@/lib/platform';
 import { FONT } from '@/theme/font';
 import { neutral } from '@/theme/tokens';
+import { useT } from '@/i18n';
 
 /**
  * Zajednicki okvir svih koraka onboardinga.
@@ -51,7 +52,7 @@ type Props = {
   subtitle?: React.ReactNode;
   question?: string;
   children?: React.ReactNode;
-  /** Recenica iznad dugmeta. Podrazumevano objasnjenje o privatnosti. */
+  /** Recenica iznad dugmeta. Bez nje (`undefined`) objasnjenje o privatnosti; `null` = nista. */
   note?: string | null;
   primary: Action;
   secondary?: Action;
@@ -90,13 +91,13 @@ function IznadTastature({ children }: { children: React.ReactNode }) {
 /** Native traka postoji samo na iOS-u 26 (vidi `(onboarding)/_layout.tsx`). */
 const NATIVE_TRAKA = Platform.OS === 'ios' && !STARI_IOS;
 
-export const PRIVACY_NOTE =
-  'Koristimo ovo da izračunamo tvoju natalnu kartu. Ne delimo i ne prodajemo tvoje podatke.';
-
 export function OnboardingStep({
-  exit, skip, icon, title, subtitle, question, children, note = PRIVACY_NOTE, primary, secondary, center = true,
+  exit, skip, icon, title, subtitle, question, children, note: notePoruka, primary, secondary, center = true,
   pretapanje = false,
 }: Props) {
+  const t = useT();
+  const note = notePoruka === undefined ? t.onboarding.korak.privatnost : notePoruka;
+  const izlaz = exit?.kind === 'cancel' ? t.onboarding.korak.odustani : t.opste.nazad;
   return (
     <View className="flex-1 bg-grouped">
       <SafeAreaView className="flex-1" edges={['top', 'bottom']}>
@@ -107,9 +108,9 @@ export function OnboardingStep({
               options={{
                 unstable_headerLeftItems: () => exit ? [{
                   type: 'button',
-                  label: exit.kind === 'cancel' ? 'Odustani' : 'Nazad',
+                  label: izlaz,
                   icon: { type: 'sfSymbol', name: exit.kind === 'cancel' ? 'xmark' : 'chevron.left' },
-                  accessibilityLabel: exit.kind === 'cancel' ? 'Odustani' : 'Nazad',
+                  accessibilityLabel: izlaz,
                   onPress: exit.onPress,
                 }] : [],
                 unstable_headerRightItems: () => skip ? [{
@@ -129,7 +130,7 @@ export function OnboardingStep({
             {!NATIVE_TRAKA && exit && (
               <GlassIconButton
                 onPress={exit.onPress}
-                accessibilityLabel={exit.kind === 'cancel' ? 'Odustani' : 'Nazad'}>
+                accessibilityLabel={izlaz}>
                 {exit.kind === 'cancel'
                   ? <X size={20} color={neutral.ink} />
                   : <ChevronLeft size={22} color={neutral.ink} />}

@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 import { cn } from '@/lib/utils';
-import { SIGN_CASES } from '@/lib/zodiac';
+import { useT, tr, type Recnik } from '@/i18n';
 import { isFreeNatalKey, natalTopic, tacnostAspekta, udeoUZnaku } from '@/lib/natal-keys';
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
@@ -45,6 +45,8 @@ export default function NatalTumacenje() {
   // `deo=kuca`: otvoreno sa reda "u 2. kući" na ekranu "Ti" — kuca ide prva.
   // `osoba`: karta druge osobe (strana osobe, 29.9.2026) — bez njega korisnikova.
   const { tema, deo, osoba } = useLocalSearchParams<{ tema: string; deo?: string; osoba?: string }>();
+  const t = useT();
+  const tt = t.karta.tumacenje;
   const resolved = useKarta(osoba);
   const premium = !!useEntitlement()?.active;
 
@@ -65,13 +67,13 @@ export default function NatalTumacenje() {
 
   if (!resolved) {
     // Osoba je u medjuvremenu obrisana (ili je drugi nalog) — list to kaze, ne salje na kapiju.
-    if (osoba) return <SheetScroll><Text variant="muted">Ova osoba više nije na tvojoj listi.</Text></SheetScroll>;
+    if (osoba) return <SheetScroll><Text variant="muted">{tt.osobaObrisana}</Text></SheetScroll>;
     return <Redirect href="/" />;
   }
   if (!topic) {
     return (
       <SheetScroll>
-        <Text variant="muted">{osoba ? 'Ovo tumačenje nije deo ove karte.' : 'Ovo tumačenje nije deo tvoje karte.'}</Text>
+        <Text variant="muted">{osoba ? tt.nijeDeoOveKarte : tt.nijeDeoKarte}</Text>
       </SheetScroll>
     );
   }
@@ -93,7 +95,7 @@ export default function NatalTumacenje() {
       <Glava
         tacke={[{ key: p.key, glyph: p.glyph }]}
         slika={{ key: p.key, glyph: p.glyph }}
-        oznaka={[neznan ? p.name : `${p.name} u ${SIGN_CASES[p.position.sign.key].loc}`, topic.houseKey ? `${p.house}. kuća` : null].filter(Boolean).join(' · ')}
+        oznaka={[neznan ? p.name : t.karta.uZnaku(p.name, p.position.sign.key as ZnakKljuc), topic.houseKey ? t.karta.kuca(p.house) : null].filter(Boolean).join(' · ')}
         naslov={prvi?.subtitle || p.name}
         traka={neznan ? null : trakaZnaka(p.position)}
       />
@@ -103,21 +105,22 @@ export default function NatalTumacenje() {
     zaglavlje = (
       <Glava
         tacke={[{ key: 'ascendant', glyph: 'ASC' }]}
-        oznaka={`Ascendent u ${SIGN_CASES[asc.sign.key].loc}`}
-        naslov={prvi?.subtitle || 'Ascendent'}
+        oznaka={t.karta.uZnaku(t.karta.ascendent, asc.sign.key as ZnakKljuc)}
+        naslov={prvi?.subtitle || t.karta.ascendent}
         traka={trakaZnaka(asc)}
       />
     );
   } else {
     const a = topic.aspect;
-    const t = tacnostAspekta(a.aspect.key, a.orb);
+    const tacnost = tacnostAspekta(a.aspect.key, a.orb);
+    const ime = t.karta.aspekt(a.a.name, a.aspect.name, a.b.name);
     zaglavlje = (
       <Glava
         tacke={[a.a, a.b]}
         aspekt={a.aspect.key}
-        oznaka={`${a.a.name} ${a.aspect.name} ${a.b.name}`}
-        naslov={prvi?.subtitle || `${a.a.name} ${a.aspect.name} ${a.b.name}`}
-        traka={t && { levo: 'Tačnost aspekta', desno: `orbis ${stepen(a.orb)} od ${t.max}°`, udeo: t.udeo }}
+        oznaka={ime}
+        naslov={prvi?.subtitle || ime}
+        traka={tacnost && { levo: tt.tacnostAspekta, desno: tt.orbisOd(t.karta.stepenDecimalno(a.orb), tacnost.max), udeo: tacnost.udeo }}
       />
     );
   }
@@ -133,14 +136,11 @@ export default function NatalTumacenje() {
       {topic.kind === 'planet' && topic.moon && !topic.moon.certain && (
         <View className={cn(CARD_SURFACE, 'mt-6 p-5')}>
           <Text variant="body">
-            {osoba ? 'Na dan rođenja' : 'Na dan tvog rođenja'} Mesec je bio u {SIGN_CASES[topic.moon.from.key].loc}, pa prešao u {SIGN_CASES[topic.moon.to.key].acc}.
-            {osoba
-              ? ' Bez vremena rođenja ne znamo u kom je znaku bio u trenutku rođenja, pa tumačenje ne prikazujemo.'
-              : ' Bez vremena rođenja ne znamo u kom je znaku bio u trenutku tvog rođenja, pa tumačenje ne prikazujemo.'}
+            {(osoba ? tt.mesecPresaoOsoba : tt.mesecPresao)(topic.moon.from.key as ZnakKljuc, topic.moon.to.key as ZnakKljuc)}
           </Text>
           <Button variant="secondary" className="mt-4 self-start"
             onPress={() => leaveSheetTo({ pathname: '/rodjenje-polje', params: osoba ? { osoba, polje: 'vreme' } : { polje: 'vreme' } })}>
-            <Text>Dodaj vreme rođenja</Text>
+            <Text>{tt.dodajVreme}</Text>
           </Button>
         </View>
       )}
@@ -152,18 +152,16 @@ export default function NatalTumacenje() {
 
       {/* Kuca zavisi od vremena rodjenja — bez njega se ne tumaci (pravilo 5). */}
       {topic.kind === 'planet' && !topic.houseKey && (
-        <Text variant="muted" className="mt-8">
-          U kojoj je kući planeta zavisi od tačnog vremena rođenja. Kad ga uneseš, ovde će biti i tumačenje kuće.
-        </Text>
+        <Text variant="muted" className="mt-8">{tt.kucaBezVremena}</Text>
       )}
 
       {zakljucani.length > 0 && (
         <PremiumKartica
           izLista
           className="mt-12"
-          naslov={osoba ? 'Cela karta ove osobe' : 'Tvoja cela karta'}
-          opis="Sunce, Mesec i podznak su već otvoreni. Ostale planete u znakovima i kućama i svi aspekti su uz Premium."
-          dugme="Otključaj celu kartu"
+          naslov={osoba ? tt.premiumNaslovOsoba : tt.premiumNaslov}
+          opis={tt.premiumOpis}
+          dugme={tt.premiumDugme}
         />
       )}
     </SheetScroll>
@@ -177,14 +175,15 @@ const SLIKA_PLANETE = 96;
 
 type Traka = { levo: string; desno: string; udeo: number };
 
-/** "2,3°" — decimalni zarez. */
-const stepen = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
+/** Kljuc znaka u recniku (`SIGNS[].key` je `string`). */
+type ZnakKljuc = keyof Recnik['nebo']['znaci'];
 
-/** Traka polozaja u znaku: koliko je tacka odmakla kroz svojih 30°. */
+/** Traka polozaja u znaku: koliko je tacka odmakla kroz svojih 30°. Van crtanja — `tr()`. */
 function trakaZnaka(pos: SignPosition): Traka {
+  const tt = tr().karta.tumacenje;
   return {
-    levo: `Položaj u ${SIGN_CASES[pos.sign.key].loc}`,
-    desno: `${pos.deg}° ${String(pos.min).padStart(2, '0')}' od 30°`,
+    levo: tt.polozajUZnaku(pos.sign.key as ZnakKljuc),
+    desno: tt.stepenOd30(pos.deg, String(pos.min).padStart(2, '0')),
     udeo: udeoUZnaku(pos.degree),
   };
 }
@@ -256,6 +255,7 @@ function Odeljak({ tekst, loading, zakljucan, prvi, bezNaslova = false }: {
    */
   bezNaslova?: boolean;
 }) {
+  const t = useT();
   if (zakljucan) return null; // jedna kartica za otkljucavanje ispod svih
   return (
     <View className="mt-7">
@@ -270,7 +270,7 @@ function Odeljak({ tekst, loading, zakljucan, prvi, bezNaslova = false }: {
       ) : (
         // Korpus je kompletan (`npm run check:natal-tekst`): tekst koji ne stigne
         // je problem veze ili prijave, ne nenapisan tekst.
-        <Text variant="muted">Tumačenje trenutno ne može da se učita. Proveri vezu sa internetom.</Text>
+        <Text variant="muted">{t.karta.tumacenje.nijeUcitano}</Text>
       )}
     </View>
   );
@@ -284,6 +284,7 @@ type StavkaSimbolike = { key: string; ikona: React.ReactNode; ime: string; reci:
  * rodjenja se ne pogadja.
  */
 function simbolikaTeme(topic: NatalTopic, chart: NatalChart): StavkaSimbolike[] {
+  const t = tr().karta;
   const out: (StavkaSimbolike | null)[] = [];
   const tacka = (key: string, glyph: string, ime: string) =>
     SIMBOLIKA_PLANETA[key] ? { key, ikona: <IkonaTacke tacka={{ key, glyph }} size={SIMBOL} />, ime, reci: SIMBOLIKA_PLANETA[key] } : null;
@@ -296,10 +297,10 @@ function simbolikaTeme(topic: NatalTopic, chart: NatalChart): StavkaSimbolike[] 
     out.push(tacka(p.key, p.glyph, p.name));
     if (!topic.moon || topic.moon.certain) out.push(znak(p.position));
     if (topic.houseKey && SIMBOLIKA_KUCE[p.house]) {
-      out.push({ key: `kuca${p.house}`, ikona: <KucaBroj kuca={p.house} size={SIMBOL} />, ime: `${p.house}. kuća`, reci: SIMBOLIKA_KUCE[p.house] });
+      out.push({ key: `kuca${p.house}`, ikona: <KucaBroj kuca={p.house} size={SIMBOL} />, ime: t.kuca(p.house), reci: SIMBOLIKA_KUCE[p.house] });
     }
   } else if (topic.kind === 'ascendant') {
-    out.push(tacka('ascendant', 'ASC', 'Ascendent'));
+    out.push(tacka('ascendant', 'ASC', t.ascendent));
     out.push(znak(chart.ascendantSign));
   } else {
     const a = topic.aspect;
@@ -311,7 +312,7 @@ function simbolikaTeme(topic: NatalTopic, chart: NatalChart): StavkaSimbolike[] 
         key: a.aspect.key,
         ikona: <AspektIkona aspekt={a.aspect.key} size={18} potez={PLANETA_POTEZ * SIMBOL} />,
         // "Konjunkcija – Borba", kao u tekstu astrologa (`files/simbolika/`).
-        ime: `${a.aspect.name.charAt(0).toUpperCase() + a.aspect.name.slice(1)} – ${sim.tema}`,
+        ime: t.tumacenje.simbolikaAspekta(a.aspect.name, sim.tema),
         reci: sim.opis,
       });
     }

@@ -7,6 +7,7 @@ import Animated, {
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Okret } from '@/components/okret';
 import { Planeta, SLIKA, skalaSlike } from '@/components/planete-par';
 import { INDIGO, PRSTEN_PRELIV } from '@/components/prica/boje';
@@ -55,6 +56,7 @@ export function UlazUPricu({ tranzitna, natalna, datum }: {
   natalna: { key: string; glyph: string };
   datum: Date;
 }) {
+  const t = useT();
   const userId = useAuthStore((s) => s.user?.id ?? null);
   const pogledana = usePricaPogledana(userId, dayKey(datum));
   // Svaki fokus pocetne = nov ciklus animacije (dok prica nije pogledana).
@@ -83,8 +85,8 @@ export function UlazUPricu({ tranzitna, natalna, datum }: {
     <Pressable
       onPress={() => router.push('/prica')}
       accessibilityRole="button"
-      accessibilityLabel="Priča dana"
-      accessibilityHint="Otvara kratku priču o tvom danu"
+      accessibilityLabel={t.prica.ulaz.pricaDana}
+      accessibilityHint={t.prica.ulaz.hint}
       style={{ width: SIRINA, height: D - BALON_GORE + BALON_VISINA }}
       className="active:opacity-80">
       <View style={{ position: 'absolute', left: x0, top: 0, width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
@@ -149,7 +151,8 @@ export function Prsten({ puni, D = 91 }: { puni: boolean; D?: number }) {
 const PLAY = 'M3 1.9v8.2c0 .7.8 1.1 1.4.7l6.2-4.1c.5-.3.5-1.1 0-1.4L4.4 1.2C3.8.8 3 1.2 3 1.9z';
 
 /** Balon ispod planete, kao beleska na Instagramu: dve tackice pa balon sa "▶ Priča dana" (ili `natpis`). */
-export function Balon({ animiraj, natpis = 'Priča dana' }: { animiraj: boolean; natpis?: string }) {
+export function Balon({ animiraj, natpis }: { animiraj: boolean; natpis?: string }) {
+  const t = useT();
   const ulaz = (kasni: number) => (animiraj ? ZoomIn.delay(kasni).duration(420).easing(Easing.out(Easing.back(1.8))) : undefined);
   return (
     <View style={{ alignItems: 'center' }} pointerEvents="none">
@@ -160,7 +163,7 @@ export function Balon({ animiraj, natpis = 'Priča dana' }: { animiraj: boolean;
         className="mt-0.5 flex-row items-center gap-1.5 rounded-pill bg-background px-3 py-1.5"
         style={shadow.soft}>
         <Svg width={11} height={11} viewBox="0 0 12 12"><Path d={PLAY} fill={INDIGO} /></Svg>
-        <Text className={cn('text-[13px] leading-[17px]', tezina('dugme'))}>{natpis}</Text>
+        <Text className={cn('text-[13px] leading-[17px]', tezina('dugme'))}>{natpis ?? t.prica.ulaz.pricaDana}</Text>
       </Animated.View>
     </View>
   );

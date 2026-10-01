@@ -28,11 +28,11 @@
  * Cista funkcija, bez RN uvoza (pravilo 6). Dnevnik prikaza je
  * `store/tvoj-dan-log.ts`; provere u `scripts/check-tvoj-dan.ts`.
  */
+import { tr } from '@/i18n/jezik';
 import { BODIES, ASPECTS, bodyLongitude, type AspectDef, type PlanetKey } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
 import { chartRulers, rulerRole, type RulerRole } from '@/lib/rulers';
 import { dayKey, daysBetween, localMidnight, natalTargets, type NatalTarget } from '@/lib/transits';
-import { SIGN_CASES } from '@/lib/zodiac';
 
 export const TD_ORB: Record<PlanetKey, number> = {
   sun: 1.5, mercury: 1.5, venus: 1.5, mars: 1.5, jupiter: 1.5, saturn: 1.5,
@@ -312,14 +312,6 @@ export function tvojDanEnd(pick: WindowPick, date: Date, orb?: number): Date | n
  * Sve se cita iz KARTE korisnika; iz kljuca se uzimaju samo imena tela i aspekta.
  * ------------------------------------------------------------------------- */
 
-/** "tvoje Sunce", "tvoju Veneru" — akuzativ sa prisvojnom zamenicom. */
-const TVOJ_AKUZATIV: Record<string, string> = {
-  sun: 'tvoje Sunce', moon: 'tvoj Mesec', mercury: 'tvoj Merkur', venus: 'tvoju Veneru',
-  mars: 'tvog Marsa', jupiter: 'tvog Jupitera', saturn: 'tvog Saturna', uranus: 'tvog Urana',
-  neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj Ascendent', midheaven: 'tvoj MC',
-};
-
-
 export type TvojDanInfo = {
   transiting: { key: PlanetKey; name: string; glyph: string };
   aspect: AspectDef;
@@ -335,10 +327,12 @@ export function rulerSentence(
   natal: { key: string; name: string },
   chart: NatalChart
 ): string {
-  const znak = SIGN_CASES[chart.ascendantSign.sign.key].loc;
+  const t = tr();
+  const uZnaku = t.nebo.uZnaku(chart.ascendantSign.sign.key as keyof typeof t.nebo.znaci);
+  const r = t.danas.tvojDanInfo;
   return ruler === 'natal'
-    ? `${natal.name} je vladar tvog Ascendenta u ${znak}. Kad ga tranzit dodirne, dan se oseća ličnije i jače, zato ovaj tranzit danas ima prednost.`
-    : `${transitingName} je vladar tvog Ascendenta u ${znak}, a danas pokreće ${TVOJ_AKUZATIV[natal.key] ?? natal.name}. Zato ovaj tranzit danas ima prednost.`;
+    ? r.vladarNatalni(natal.name, uZnaku)
+    : r.vladarTranzitni(transitingName, uZnaku, r.tvojAkuzativ[natal.key] ?? natal.name);
 }
 
 /** Iz kljuca `transit.<telo>.<aspekt>.natal.<meta>` i karte; null ako kljuc ne pripada karti. */

@@ -11,9 +11,9 @@ import { ProfileButton } from '@/components/profile-button';
 import { PitajUvod } from '@/components/pitaj-uvod';
 import { PodvuceniTabovi } from '@/components/ui/podvuceni-tabovi';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 import { datumPitanja, natpisStatusa, neprocitan, oKome, type Pitanje } from '@/lib/pitanja';
 import { useKrediti, useMojaPitanja } from '@/lib/pitanja-api';
-import { mnozina } from '@/lib/mnozina';
 import { brand, neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
@@ -28,26 +28,28 @@ type Strana = 'covek' | 'ai';
  * posle toga prvi korak lista. Cena dolazi iz prodavnice (`lib/kupovina.ts`).
  */
 export default function AskScreen() {
+  const t = useT();
   const [strana, setStrana] = React.useState<Strana>('covek');
   return (
-    <Screen label="Pitaj astrologa" tint="gold" right={<ProfileButton />}>
+    <Screen label={t.pitaj.tab.naslov} tint="gold" right={<ProfileButton />}>
       <Tabovi strana={strana} onChange={setStrana} />
       {strana === 'covek' ? <PitajCoveka /> : <PitajAI />}
     </Screen>
   );
 }
 
-const STRANE = [
-  { key: 'covek', natpis: 'Pitaj čoveka' },
-  { key: 'ai', natpis: 'Pitaj AI', oznaka: 'uskoro' },
-] as const;
-
 /** Dve strane, podvucena izabrana (`ui/podvuceni-tabovi.tsx`). */
 function Tabovi({ strana, onChange }: { strana: Strana; onChange: (s: Strana) => void }) {
-  return <PodvuceniTabovi stavke={STRANE} izabrana={strana} onIzbor={onChange} className="mt-2" />;
+  const t = useT().pitaj.tab;
+  const strane = [
+    { key: 'covek', natpis: t.covek },
+    { key: 'ai', natpis: t.ai, oznaka: t.uskoro },
+  ] as const;
+  return <PodvuceniTabovi stavke={strane} izabrana={strana} onIzbor={onChange} className="mt-2" />;
 }
 
 function PitajCoveka() {
+  const t = useT().pitaj.tab;
   const pitanja = useMojaPitanja();
   const krediti = useKrediti();
   const brojKredita = krediti.data ?? 0;
@@ -66,9 +68,7 @@ function PitajCoveka() {
   const moja = pitanja.data ?? [];
   const kredit = brojKredita > 0 && (
     <Text variant="note" className="mb-3">
-      {brojKredita === 1
-        ? 'Imaš jedno plaćeno pitanje.'
-        : `Imaš ${brojKredita} ${mnozina(brojKredita, ['plaćeno pitanje', 'plaćena pitanja', 'plaćenih pitanja'])}.`}
+      {t.krediti(brojKredita)}
     </Text>
   );
 
@@ -81,7 +81,7 @@ function PitajCoveka() {
           {kredit}
           {/* Isto dugme kao "Saznaj više" na pocetnoj (Ivan, 29.9.2026), preko cele sirine. */}
           <Button istaknuto onPress={() => router.push('/pitanje-novo')}>
-            <Text>Pitaj</Text>
+            <Text>{t.pitaj}</Text>
           </Button>
         </View>
       </View>
@@ -93,10 +93,10 @@ function PitajCoveka() {
     <View className="mt-6">
       {kredit}
       <Button istaknuto onPress={() => router.push({ pathname: '/pitanje-novo', params: { korak: 'uvod' } })}>
-        <Text>Postavi pitanje</Text>
+        <Text>{t.postavi}</Text>
       </Button>
 
-      <Text variant="label" className="mb-3 mt-8">Moja pitanja</Text>
+      <Text variant="label" className="mb-3 mt-8">{t.mojaPitanja}</Text>
       <View className={CARD_SURFACE}>
         {moja.map((p, i) => (
           <React.Fragment key={p.id}>
@@ -115,6 +115,7 @@ function PitajCoveka() {
  * pisanje, ostalo detalj.
  */
 function RedPitanja({ p }: { p: Pitanje }) {
+  const t = useT().pitaj;
   const novo = neprocitan(p);
   // Nacrt (nije placeno, astrolog ga ne vidi) se izdvaja od poslatih (UX recenzija
   // 1.10.2026): do tada je "Nije poslato" izgledalo isto kao "Odgovoreno", bez akcije.
@@ -127,33 +128,34 @@ function RedPitanja({ p }: { p: Pitanje }) {
         ? router.push('/pitanje-novo')
         : router.push({ pathname: '/pitanje', params: { id: p.id } }))}
       accessibilityRole="button"
-      accessibilityHint={novo ? 'Novi odgovor' : undefined}
+      accessibilityHint={novo ? t.status.noviOdgovor : undefined}
       className="min-h-row flex-row items-center gap-3 px-gutter py-3 active:opacity-60">
       <View className="flex-1">
         <Text variant="row" numberOfLines={2}>{p.tekst}</Text>
         <View className="mt-1 flex-row items-center gap-1.5">
           {novo && <View className="h-2 w-2 rounded-full" style={{ backgroundColor: brand.indigo }} />}
           <Text variant="caption" className={cn((novo || nacrt) && cn('text-foreground', tezina('izabranRed')))}>
-            {o ? `${o} · ` : ''}{natpisStatusa(p)} · {datumPitanja(p)}
+            {t.tab.redOpis(o, natpisStatusa(p), datumPitanja(p))}
           </Text>
         </View>
       </View>
-      {nacrt && <Text variant="muted" className="text-foreground">Završi</Text>}
+      {nacrt && <Text variant="muted" className="text-foreground">{t.tab.zavrsi}</Text>}
       <ChevronRight size={18} color={neutral.inkSubtle} />
     </Pressable>
   );
 }
 
 function PitajAI() {
+  const t = useT().pitaj.tab;
   return (
     <View className={cn(CARD_SURFACE, 'mt-6 p-5')}>
       <View className="flex-row items-center gap-2">
         <Sparkles size={18} color={neutral.ink} strokeWidth={1.8} />
-        <Text variant="h3">Pitaj AI</Text>
-        <Text variant="caption" className="text-subtle">uskoro</Text>
+        <Text variant="h3">{t.ai}</Text>
+        <Text variant="caption" className="text-subtle">{t.uskoro}</Text>
       </View>
       <Text variant="body" className="mt-2">
-        Za kraća pitanja, odgovor odmah — sastavljen iz tekstova astrologa koje već čitaš u aplikaciji. Radimo na tome.
+        {t.aiOpis}
       </Text>
     </View>
   );

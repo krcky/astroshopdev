@@ -22,6 +22,7 @@
  *
  * Cisto, bez RN uvoza (pravilo 6). Provere: `npm run check:oblasti`.
  */
+import { tr } from '@/i18n/jezik';
 import { BODIES, ASPECTS, bodyLongitude, type AspectDef, type PlanetKey } from '@/lib/astro';
 import { houseOf, type NatalChart } from '@/lib/natal';
 import { chartRulers, rulerRole, type RulerRole } from '@/lib/rulers';
@@ -33,7 +34,7 @@ import { HOUSE_THEMES, PHASE_NAME, phaseDay } from '@/lib/moon';
 import {
   BLIZINA_PAD, DOPRINOS_FAKTOR, INCLUDE_MOON_TRANSITS, JACINA_ASPEKTA, JACINA_PLANETE,
   KLJUCNA_TACKA_FAKTOR, KLJUCNE_TACKE, LUNACIJA, OBLASTI, OCENA_MAX, OCENA_MIN, OCENA_SREDINA,
-  OZNAKA_OCENE, PODRAZUMEVANI_REDOSLED, VEZA, ZNAK_TONA, type OblastDef, type OblastKey,
+  oznakaOceneTekst, PODRAZUMEVANI_REDOSLED, VEZA, ZNAK_TONA, type OblastDef, type OblastKey,
 } from '@/lib/oblasti-config';
 
 const TIME_DEPENDENT = ['ascendant', 'midheaven'];
@@ -155,7 +156,7 @@ export function trajanjeTranzita(pick: Pick<TranzitRed, 'transiting' | 'aspect' 
 }
 
 /** "Samo danas" za Mesec, inace `josTraje` — isti natpis svuda. */
-export const trajanjeTekst = (t: Trajanje): string => (t.mesec ? 'Samo danas' : josTraje(t.preostalo));
+export const trajanjeTekst = (t: Trajanje): string => (t.mesec ? tr().danas.tranzit.samoDanas : josTraje(t.preostalo));
 
 /** Svi tranziti u orbisu tog lokalnog dana, najjaci prvi. `orbZa` podrazumevano je `TD_ORB`. */
 export function aktivniTranziti(
@@ -236,7 +237,7 @@ export function ocenaIzDoprinosa(doprinosi: number[]): number {
   return Math.min(OCENA_MAX, Math.max(OCENA_MIN, OCENA_SREDINA + pomak));
 }
 
-export const oznakaOcene = (ocena: number) => OZNAKA_OCENE[ocena] ?? '';
+export const oznakaOcene = (ocena: number) => oznakaOceneTekst(ocena);
 
 function tonReda(red: Red, rucni: Map<string, string>): { ton: Tone; tonIzvor: ToneSource } {
   if (red.kind === 'lunacija') return { ton: LUNACIJA[red.faza].ton, tonIzvor: 'rule' };
@@ -339,7 +340,7 @@ export function parseNaslov(title: string | null | undefined): { naslov: string 
 
 /** "Sunce konjunkcija Jupiter" — iz kljuceva, ne iz teksta; bez reci "natal". */
 export function imeTranzita(r: Pick<TranzitRed, 'transiting' | 'aspect' | 'natal'>): string {
-  return `${r.transiting.name} ${r.aspect.name} ${r.natal.name}`;
+  return tr().danas.tranzit.ime(r.transiting.name, r.aspect.name, r.natal.name);
 }
 
 /**
@@ -360,5 +361,6 @@ export function tekstReda(
 
 /** Red za Mlad/Pun Mesec: "Novi početak: ljubav…" / "Mlad Mesec u tvojoj 5. kući". */
 export function tekstLunacije(r: LunacijaRed): { veci: string; manji: string } {
-  return { veci: `${LUNACIJA[r.faza].naslov}: ${r.theme}`, manji: `${r.fazaIme} u tvojoj ${r.house}. kući` };
+  const t = tr().danas.tranzit;
+  return { veci: t.lunacijaVeci(LUNACIJA[r.faza].naslov, r.theme), manji: t.lunacijaManji(r.fazaIme, r.house) };
 }

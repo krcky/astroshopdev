@@ -14,6 +14,7 @@ import { useSkyPlaceStore } from '@/store/sky-place';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
+import { useT } from '@/i18n';
 
 /**
  * Izbor mesta odakle se gleda nebo. Od 28.9.2026 LIST ODOZDO (Ivan), sa
@@ -26,6 +27,7 @@ import { tezina } from '@/theme/tipografija';
  * ne kvari.
  */
 export default function SkyPlace() {
+  const tm = useT().karta.mesto;
   const resolved = useResolvedProfile();
   const izabran = useSkyPlaceStore((s) => s.city);
   const setCity = useSkyPlaceStore((s) => s.setCity);
@@ -46,16 +48,13 @@ export default function SkyPlace() {
   return (
     <SheetScroll keyboardShouldPersistTaps="handled">
           {/* Naslov lista kao na ostalim listovima; izabran grad je red sa kvacicom ispod. */}
-          <Text variant="naslovLista">Odakle gledaš</Text>
-          <Text variant="body" className="mb-6 mt-2">
-            Kuće i ascendent zavise od mesta — nebo iznad Beograda i iznad
-            Sidneja u istom trenutku nije isto.
-          </Text>
+          <Text variant="naslovLista">{tm.naslov}</Text>
+          <Text variant="body" className="mb-6 mt-2">{tm.opis}</Text>
 
           <Input
             value={query}
             onChangeText={setQuery}
-            placeholder="Traži grad"
+            placeholder={tm.trazi}
             autoCorrect={false}
             returnKeyType="search"
           />
@@ -70,7 +69,7 @@ export default function SkyPlace() {
                 )}
                 <Izbor
                   naslov={rodni.name}
-                  opis="Grad iz tvog profila"
+                  opis={tm.gradIzProfila}
                   aktivno={izabran === null || izabran.id === rodni.id}
                   onPress={() => izaberi(null)}
                 />
@@ -87,13 +86,10 @@ export default function SkyPlace() {
                   />
                 ))}
                 {loading && (
-                  <Text variant="muted" className="py-3 text-center text-sm">Tražim dalje…</Text>
+                  <Text variant="muted" className="py-3 text-center text-sm">{tm.trazimDalje}</Text>
                 )}
                 {!loading && results.length === 0 && query.trim().length >= 2 && (
-                  <Text variant="muted" className="py-3 text-sm">
-                    Nema grada pod tim imenom. Probaj bez kvačica ili napiši
-                    veći grad u blizini.
-                  </Text>
+                  <Text variant="muted" className="py-3 text-sm">{tm.nemaGrada}</Text>
                 )}
               </>
             )}
@@ -104,14 +100,11 @@ export default function SkyPlace() {
               onPress={() => izaberi(null)}
               accessibilityRole="button"
               className={cn(CARD_SURFACE, 'mt-6 self-start rounded-full px-5 py-2.5 active:opacity-60')}>
-              <Text variant="label" className="text-xs">Vrati na {rodni.name}</Text>
+              <Text variant="label" className="text-xs">{tm.vratiNa(rodni.name)}</Text>
             </Pressable>
           )}
 
-          <Text variant="muted" className="mt-8 text-xs">
-            Ovim se menja samo ekran „Trenutno na nebu“. Tvoja natalna karta
-            ostaje računata za mesto rođenja — ono se menja u profilu.
-          </Text>
+          <Text variant="muted" className="mt-8 text-xs">{tm.napomena}</Text>
     </SheetScroll>
   );
 }

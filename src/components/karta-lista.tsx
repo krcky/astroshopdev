@@ -17,6 +17,7 @@ import type { SignPosition, ZodiacSign } from '@/lib/zodiac';
 import { neutral } from '@/theme/tokens';
 import { PREMIUM } from '@/components/zakljucano';
 import { Balon, Prsten } from '@/components/prica/ulaz';
+import { tr, useT } from '@/i18n';
 
 /**
  * Delovi liste ispod tocka — zajednicki za natalnu kartu (tab "Ti") i
@@ -47,8 +48,8 @@ export function redosledPlaneta<T extends { key: string }>(planete: T[]): T[] {
 /** "15°23'" — stepen i minut u znaku, isti brojevi kao na tocku. */
 export const stepenMinut = (pos: SignPosition) => `${pos.deg}°${String(pos.min).padStart(2, '0')}'`;
 
-/** "1,4°" — decimalni zarez. */
-export const orbis = (x: number) => `${x.toFixed(1).replace('.', ',')}°`;
+/** "1,4°" — decimalni zarez (po jeziku, iz recnika). */
+export const orbis = (x: number) => tr().karta.stepenDecimalno(x);
 
 /** Ikonica tacke — ista bela kao u zaglavlju tumacenja (`IkonaTacke`). */
 export function Tacka({ tacka, glyph, size }: { tacka: string; glyph: string; size: number }) {
@@ -86,15 +87,16 @@ export function TackaRed({ tacka, glyph, ime, pos, retro, kuca, last }: {
   kuca?: number;
   last?: boolean;
 }) {
+  const t = useT();
   return (
     <View
       accessible
-      accessibilityLabel={`${ime}, ${pos.deg}° ${pos.min}' u znaku ${pos.sign.name}${retro ? ', retrogradno' : ''}${kuca ? `, ${kuca}. kuća` : ''}`}
+      accessibilityLabel={t.karta.lista.tackaA11y(ime, pos.deg, pos.min, pos.sign.name, !!retro, kuca)}
       className={cn('flex-row items-center py-3 pl-4 pr-4', !last && 'border-b border-border')}>
       <Tacka tacka={tacka} glyph={glyph} size={28} />
       <View className="ml-3 mr-2 flex-1 flex-row flex-wrap items-baseline gap-x-1">
         <Text variant="row" numberOfLines={1}>{ime}</Text>
-        <Text variant="caption">{stepenMinut(pos)}{retro ? ' R' : ''}</Text>
+        <Text variant="caption">{stepenMinut(pos)}{retro ? ` ${t.karta.retro}` : ''}</Text>
       </View>
       <ZnakKolona znak={pos.sign} />
       <View className="items-end" style={{ width: KUCA_KOLONA }}>
@@ -148,7 +150,8 @@ export function TrojkaPlocica({ oznaka, slika, znak, ime, onPress, prica }: {
    */
   prica?: { pogledana: boolean; natpis: string };
 }) {
-  const tekst = ime ?? (znak ? znak.name : 'Nepoznat');
+  const t = useT();
+  const tekst = ime ?? (znak ? znak.name : t.karta.lista.nepoznat);
   const nepoznat = !znak && !ime;
   const [ciklus, setCiklus] = React.useState(0);
   const pogledana = prica?.pogledana ?? true;
@@ -160,7 +163,7 @@ export function TrojkaPlocica({ oznaka, slika, znak, ime, onPress, prica }: {
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={`${oznaka}: ${tekst}${prica ? `. ${prica.natpis}` : onPress ? '. Tumačenje' : ''}`}
+      accessibilityLabel={t.karta.lista.trojkaA11y(oznaka, tekst, prica ? prica.natpis : null, !!onPress)}
       // Obicna bela kartica (Ivan, 28.9.2026: Liquid Glass probano pa vraceno).
       className={cn(CARD_SURFACE, 'flex-1 items-center px-2 py-4 active:opacity-80')}
       style={prica ? { zIndex: 1 } : undefined}>
@@ -214,7 +217,8 @@ export function AspektRed({ aspekt: a, naslov = '', zakljucan = false, muted, la
   last: boolean;
   onPress?: () => void;
 }) {
-  const ime = `${a.a.name} ${a.aspect.name} ${a.b.name}`;
+  const t = useT();
+  const ime = t.karta.aspekt(a.a.name, a.aspect.name, a.b.name);
   const siv = muted ?? !onPress;
   const sadrzaj = (
     <>
@@ -240,10 +244,10 @@ export function AspektRed({ aspekt: a, naslov = '', zakljucan = false, muted, la
     </>
   );
   const klasa = cn('flex-row items-center py-3 pl-4 pr-3', !last && 'border-b border-border');
-  if (!onPress) return <View className={klasa} accessible accessibilityLabel={`${ime}, orbis ${orbis(a.orb)}`}>{sadrzaj}</View>;
+  if (!onPress) return <View className={klasa} accessible accessibilityLabel={t.karta.lista.aspektOrbisA11y(ime, orbis(a.orb))}>{sadrzaj}</View>;
   return (
     <Pressable onPress={onPress} accessibilityRole="button"
-      accessibilityLabel={`${naslov ? `${naslov}. ` : ''}${ime}${zakljucan ? '. Zaključano' : ''}. Tumačenje`}
+      accessibilityLabel={t.karta.lista.aspektA11y(naslov, ime, zakljucan)}
       className={cn(klasa, 'active:opacity-60')}>
       {sadrzaj}
     </Pressable>

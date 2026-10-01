@@ -6,7 +6,8 @@ import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { cn } from '@/lib/utils';
-import { ASTROLOG, ROK_KRATKO } from '@/lib/pitanja';
+import { useT } from '@/i18n';
+import { ASTROLOG } from '@/lib/pitanja';
 import { useCenaPitanja } from '@/lib/kupovina';
 import { useEntitlement } from '@/store/auth';
 import { neutral } from '@/theme/tokens';
@@ -22,6 +23,7 @@ import { tezina } from '@/theme/tipografija';
  * beloj se ne vidi (DESIGN.md, poglavlje 5).
  */
 export function PitajUvod({ naBelom = false }: { naBelom?: boolean }) {
+  const t = useT().pitaj.uvod;
   const premium = !!useEntitlement()?.active;
   const cena = useCenaPitanja(premium);
 
@@ -33,10 +35,10 @@ export function PitajUvod({ naBelom = false }: { naBelom?: boolean }) {
       <View className="items-center">
         <AstrologSlika velicina={88} />
         <Text variant="row" className="mt-2">{ASTROLOG.ime}</Text>
-        <Text variant="caption">Astrolog</Text>
-        <Text variant="h1" className="mt-4 text-center">Odgovara pravi astrolog, ne AI</Text>
+        <Text variant="caption">{ASTROLOG.zvanje}</Text>
+        <Text variant="h1" className="mt-4 text-center">{t.naslov}</Text>
         <Text variant="body" className="mt-2 px-2 text-center">
-          Napiši šta te zanima, a {ASTROLOG.kratko} pogleda tvoju natalnu kartu i odgovori ti lično.
+          {t.opis(ASTROLOG.kratko)}
         </Text>
       </View>
 
@@ -44,15 +46,15 @@ export function PitajUvod({ naBelom = false }: { naBelom?: boolean }) {
           napomena o savetu, pa placanje i cena na kraju. Linije od ivice do ivice — padding je u redovima, ne u kartici. */}
       <View className={cn(naBelom ? 'rounded-lg border border-border' : CARD_SURFACE, 'mt-5')}>
         <Red ikona={<Mic size={18} color={neutral.ink} strokeWidth={1.8} />}>
-          Odgovor ti stiže glasovnom porukom u roku od {ROK_KRATKO}.
+          {t.glasovno}
         </Red>
         <View className="h-px bg-border" />
         <Red ikona={<Info size={18} color={neutral.ink} strokeWidth={1.8} />}>
-          Astrološko tumačenje nije medicinski, pravni ni finansijski savet.
+          {t.nijeSavet}
         </Red>
         <View className="h-px bg-border" />
         <Red ikona={<Wallet size={18} color={neutral.ink} strokeWidth={1.8} />} desno={cena}>
-          Jednokratno plaćanje po pitanju
+          {t.placanje}
         </Red>
       </View>
     </View>

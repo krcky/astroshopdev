@@ -4,6 +4,7 @@ import { Users } from 'lucide-react-native';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { IzborOdnosa } from '@/components/izbor-odnosa';
+import { useT } from '@/i18n';
 import type { OdnosKljuc } from '@/lib/osobe';
 import { useNovaOsoba } from '@/store/nova-osoba';
 
@@ -13,6 +14,7 @@ import { useNovaOsoba } from '@/store/nova-osoba';
  * Ana?"), jer unetom imenu ne znamo padeze.
  */
 export default function NovaOsobaOdnos() {
+  const t = useT();
   const nacrt = useNovaOsoba();
   const [odnos, setOdnos] = React.useState<OdnosKljuc | null>(nacrt.odnos);
 
@@ -27,12 +29,12 @@ export default function NovaOsobaOdnos() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
-      skip={{ label: 'Preskoči', onPress: () => dalje(null) }}
+      skip={{ label: t.opste.preskoci, onPress: () => dalje(null) }}
       icon={Users}
-      title={`Ko ti je ${nacrt.ime}?`}
+      title={t.profil.rodjenje.koTiJe(nacrt.ime)}
       center={false}
       note={null}
-      primary={{ label: 'Nastavi', onPress: () => dalje(odnos), disabled: !odnos }}>
+      primary={{ label: t.opste.nastavi, onPress: () => dalje(odnos), disabled: !odnos }}>
       <IzborOdnosa izabran={odnos} onIzbor={setOdnos} />
     </OnboardingStep>
   );

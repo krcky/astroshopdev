@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Check } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { ODNOSI, type OdnosKljuc } from '@/lib/osobe';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,8 @@ export function IzborOdnosa({ izabran, onIzbor, naBelom = false }: {
   onIzbor: (k: OdnosKljuc) => void;
   naBelom?: boolean;
 }) {
+  // Nazivi su getteri (`ODNOSI`) — `useT` samo da se crta iznova kad se jezik promeni.
+  useT();
   return (
     <View accessibilityRole="radiogroup" className={cn(!naBelom && cn(CARD_SURFACE, 'overflow-hidden'))}>
       {ODNOSI.map((o, i) => {

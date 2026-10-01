@@ -6,6 +6,7 @@ import { Pause, Play } from 'lucide-react-native';
 import { ISTAKNUTO_SENKA, SjajCrnogDugmeta } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 import { trajanjeZvuka } from '@/lib/pitanja';
 import { neutral } from '@/theme/tokens';
 
@@ -23,6 +24,7 @@ const BRZINE = [1, 1.5] as const;
  * "pusti" i nista ne bi cuo. Kad se list zatvori, plejer se oslobadja sam.
  */
 export function GlasovnaPoruka({ url, trajanje, greska }: { url: string | null; trajanje: number | null; greska?: boolean }) {
+  const t = useT().pitaj.plejer;
   const player = useAudioPlayer(url);
   const status = useAudioPlayerStatus(player);
   const [brzina, setBrzina] = React.useState<(typeof BRZINE)[number]>(1);
@@ -69,7 +71,7 @@ export function GlasovnaPoruka({ url, trajanje, greska }: { url: string | null; 
           onPress={pusti}
           disabled={!spreman}
           accessibilityRole="button"
-          accessibilityLabel={status.playing ? 'Pauziraj odgovor' : 'Pusti odgovor'}
+          accessibilityLabel={status.playing ? t.pauziraj : t.pusti}
           className={cn('h-12 w-12 items-center justify-center rounded-full active:opacity-80', spreman ? 'bg-primary' : 'bg-fill-strong')}
           // Crno dugme kao sva ostala: preliv, sjaj i senka (Ivan, 29.9.2026).
           style={spreman ? ISTAKNUTO_SENKA : undefined}>
@@ -87,8 +89,8 @@ export function GlasovnaPoruka({ url, trajanje, greska }: { url: string | null; 
           onLayout={(e: LayoutChangeEvent) => setSirina(e.nativeEvent.layout.width)}
           disabled={!spreman}
           accessibilityRole="adjustable"
-          accessibilityLabel="Napredak odgovora"
-          accessibilityValue={{ text: `${trajanjeZvuka(sada)} od ${trajanjeZvuka(ukupno)}` }}
+          accessibilityLabel={t.napredak}
+          accessibilityValue={{ text: t.vremeOd(trajanjeZvuka(sada), trajanjeZvuka(ukupno)) }}
           className="h-11 flex-1 justify-center">
           <View className="h-1 overflow-hidden rounded-full bg-fill-strong">
             <View className="h-1 rounded-full bg-foreground" style={{ width: `${udeo * 100}%` }} />
@@ -98,10 +100,10 @@ export function GlasovnaPoruka({ url, trajanje, greska }: { url: string | null; 
         <Pressable
           onPress={promeniBrzinu}
           accessibilityRole="button"
-          accessibilityLabel={`Brzina ${brzina === 1 ? 'normalna' : 'jedan i po puta'}`}
+          accessibilityLabel={brzina === 1 ? t.brzinaNormalna : t.brzinaPoIPo}
           hitSlop={8}
           className="h-8 min-w-[44px] items-center justify-center rounded-pill bg-fill px-2.5 active:opacity-60">
-          <Text variant="chip">{brzina === 1 ? '1x' : '1,5x'}</Text>
+          <Text variant="chip">{brzina === 1 ? t.brzina1 : t.brzina15}</Text>
         </Pressable>
       </View>
 
@@ -112,12 +114,12 @@ export function GlasovnaPoruka({ url, trajanje, greska }: { url: string | null; 
 
       {greska && (
         <Text variant="muted" className="mt-3">
-          Snimak nije stigao. Proveri internet pa otvori pitanje ponovo.
+          {t.nijeStigao}
         </Text>
       )}
       {!greska && status.error && (
         <Text variant="muted" className="mt-3">
-          Snimak ne može da se pusti. Zatvori pitanje pa ga otvori ponovo.
+          {t.neMozeDaSePusti}
         </Text>
       )}
     </View>

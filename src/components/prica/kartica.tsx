@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { Minus, Plus } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { OblastIkona } from '@/components/oblast-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { MoonDisc } from '@/components/moon-disc';
@@ -17,7 +18,6 @@ import { useOkret } from '@/components/prica/sat';
 import type { Nijansa } from '@/components/prica/boje';
 import { boljeNegoJuce, fazaOsmina, korakReci, PRORED_IDE_KOCI, velicinaSaveta, VELICINE_IDE_KOCI_KARTICA, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
-import { mnozina, TRANZIT } from '@/lib/mnozina';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
@@ -70,6 +70,7 @@ function Okvir({ pozadina, nijansa, datum, boja, negativ = false, ekstra, childr
   children: React.ReactNode;
   poravnanje?: 'center' | 'flex-start';
 }) {
+  const t = useT();
   return (
     <View style={{ width: KARTICA.w, height: KARTICA.h, backgroundColor: pozadina, overflow: 'hidden' }} collapsable={false}>
       {nijansa && <PricaPozadina nijansa={nijansa} sirina={KARTICA.w} visina={KARTICA.h} />}
@@ -77,7 +78,7 @@ function Okvir({ pozadina, nijansa, datum, boja, negativ = false, ekstra, childr
       <Text
         className={OZN}
         style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: boja }}>
-        {`${datum} · astroshop.rs`}
+        {t.prica.uzSajt(datum)}
       </Text>
       <View style={{ position: 'absolute', left: 22, right: 22, top: 116, bottom: 138, justifyContent: 'center', alignItems: poravnanje === 'center' ? 'stretch' : 'flex-start' }}>
         {children}
@@ -94,6 +95,7 @@ const Ozn = ({ children, boja, style }: { children: string; boja: string; style?
 /* ------------------------------------------------------------------------- */
 
 function KNaslovna({ p }: { p: PricaDana }) {
+  const t = useT();
   const n = p.naslovna.broj;
   return (
     <Okvir pozadina={INDIGO} nijansa="noc" datum={p.datumTekst} boja="rgba(255,255,255,0.75)" negativ>
@@ -104,7 +106,7 @@ function KNaslovna({ p }: { p: PricaDana }) {
         <Ozn boja={BELA_80}>{p.datumTekst}</Ozn>
       </Pojava>
       <View style={{ marginTop: 4 }}>
-        <Reci tekst="Moj dan" kasni={520} korak={110} className={cn('text-[58px] leading-[60px] tracking-[-2.5px]', tezina('display'))} style={{ color: BELA }} />
+        <Reci tekst={t.prica.kartica.mojDan} kasni={520} korak={110} className={cn('text-[58px] leading-[60px] tracking-[-2.5px]', tezina('display'))} style={{ color: BELA }} />
       </View>
       {n > 0 && (
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 12, marginTop: 14 }}>
@@ -113,7 +115,7 @@ function KNaslovna({ p }: { p: PricaDana }) {
             <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
               <Broj do={n} kasni={2200} style={{ fontSize: 22, lineHeight: 25, color: BELA, letterSpacing: -0.4 }} />
               <Text className={cn('text-[22px] leading-[25px] tracking-[-0.4px]', tezina('display'))} style={{ color: BELA }}>
-                {` ${mnozina(n, TRANZIT)}`}
+                {` ${t.gramatika.tranzita(n)}`}
               </Text>
             </View>
             <Text className="text-[11.5px] leading-[15px]" style={{ color: BELA_80 }} numberOfLines={1} adjustsFontSizeToFit>
@@ -127,6 +129,7 @@ function KNaslovna({ p }: { p: PricaDana }) {
 }
 
 function KTvojDan({ p }: { p: PricaDana }) {
+  const t = useT();
   const td = p.tvojDan!;
   return (
     <Okvir pozadina={SIVA} nijansa="indigo" datum={p.datumTekst} boja={MUTNO}>
@@ -134,7 +137,7 @@ function KTvojDan({ p }: { p: PricaDana }) {
         <UgaoAspekta ugao={td.aspekt.angle} imeAspekta={td.aspekt.name} tranzitna={td.tranzitna} natalna={td.natalna} sirina={180} />
       </View>
       <Pojava kasni={900}>
-        <Ozn boja={MUTNO}>{`Najvažnije danas · ${td.momenat}`}</Ozn>
+        <Ozn boja={MUTNO}>{t.prica.dnevna.najvaznijeDanas(td.momenat)}</Ozn>
       </Pojava>
       <View style={{ marginTop: 6 }}>
         <Reci tekst={td.naslov} kasni={1050} className={cn('text-[31px] leading-[34px] tracking-[-0.9px]', tezina('display'))} />
@@ -154,6 +157,7 @@ function KTvojDan({ p }: { p: PricaDana }) {
 }
 
 function KOcene({ p }: { p: PricaDana }) {
+  const t = useT();
   const o = p.ocene!;
   const naj = o.najbolja;
   return (
@@ -164,7 +168,7 @@ function KOcene({ p }: { p: PricaDana }) {
         </Pojava>
       )}
       <Pojava kasni={450}>
-        <Ozn boja={MUTNO}>Najbolje mi ide</Ozn>
+        <Ozn boja={MUTNO}>{t.prica.kartica.najboljeMiIde}</Ozn>
       </Pojava>
       {naj && (
         <View style={{ marginTop: 6 }}>
@@ -185,7 +189,7 @@ function KOcene({ p }: { p: PricaDana }) {
                 <Text className="text-[16px] leading-[20px]">{r.name}</Text>
                 {bolje && (
                   <Text className={cn('text-[9.5px] leading-[12px] uppercase tracking-[1.1px]', tezina('statOznaka'))} style={{ color: TON_MASTILO.povoljno }}>
-                    ↑ bolje nego juče
+                    {t.prica.dnevna.boljeNegoJuce}
                   </Text>
                 )}
               </View>
@@ -211,10 +215,11 @@ function KOcene({ p }: { p: PricaDana }) {
 const IDE_KOCI_VISINA = { gore: 320 - 22 - 116 - 62, dole: LOGO_VRH - 8 - 342 - 62, sama: 502 - 116 - 62 } as const;
 
 function KIdeKoci({ p }: { p: PricaDana }) {
+  const t = useT();
   const { ide, koci } = p.ideKoci!;
-  const blok = (znak: 'plus' | 'minus', natpis: string, t: { tekst: string; ime: string }, kasni: number, visina: number) => {
+  const blok = (znak: 'plus' | 'minus', natpis: string, r: { tekst: string; ime: string }, kasni: number, visina: number) => {
     const Ikona = znak === 'plus' ? Plus : Minus;
-    const vel = velicinaSaveta(t.tekst, KARTICA.w - 44, visina, VELICINE_IDE_KOCI_KARTICA, PRORED_IDE_KOCI);
+    const vel = velicinaSaveta(r.tekst, KARTICA.w - 44, visina, VELICINE_IDE_KOCI_KARTICA, PRORED_IDE_KOCI);
     return (
       <View>
         <Pojava kasni={kasni} style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -225,7 +230,7 @@ function KIdeKoci({ p }: { p: PricaDana }) {
         </Pojava>
         <View style={{ marginTop: 10 }}>
           <Reci
-            tekst={t.tekst}
+            tekst={r.tekst}
             kasni={kasni + 150}
             korak={55}
             className={tezina('display')}
@@ -233,7 +238,7 @@ function KIdeKoci({ p }: { p: PricaDana }) {
           />
         </View>
         <Pojava kasni={kasni + 800} style={{ marginTop: 6 }}>
-          <Text className="text-[12px] leading-[16px]" style={{ color: INK, opacity: 0.6 }}>{t.ime}</Text>
+          <Text className="text-[12px] leading-[16px]" style={{ color: INK, opacity: 0.6 }}>{r.ime}</Text>
         </Pojava>
       </View>
     );
@@ -244,12 +249,12 @@ function KIdeKoci({ p }: { p: PricaDana }) {
       <View style={{ width: KARTICA.w, height: KARTICA.h, backgroundColor: MINUS, overflow: 'hidden' }} collapsable={false}>
         {/* Gornja polovina se spusti kao zavesa, sa svojom recenicom (kao na slici price). */}
         <Pojava trajanje={900} ublazavanje={ZAVESA} pomak={-KARTICA.h} bledi={false} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: KARTICA.h / 2, backgroundColor: PLUS }}>
-          <View style={{ position: 'absolute', left: 22, right: 22, bottom: 22 }}>{blok('plus', 'Ide mi', ide, 500, IDE_KOCI_VISINA.gore)}</View>
+          <View style={{ position: 'absolute', left: 22, right: 22, bottom: 22 }}>{blok('plus', t.prica.kartica.ideMi, ide, 500, IDE_KOCI_VISINA.gore)}</View>
         </Pojava>
         <Text className={OZN} style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: 'rgba(21,21,21,0.6)' }}>
-          {`${p.datumTekst} · astroshop.rs`}
+          {t.prica.uzSajt(p.datumTekst)}
         </Text>
-        <View style={{ position: 'absolute', left: 22, right: 22, top: KARTICA.h / 2 + 22 }}>{blok('minus', 'Koči me', koci, 1400, IDE_KOCI_VISINA.dole)}</View>
+        <View style={{ position: 'absolute', left: 22, right: 22, top: KARTICA.h / 2 + 22 }}>{blok('minus', t.prica.kartica.kociMe, koci, 1400, IDE_KOCI_VISINA.dole)}</View>
         <LogoPrice sirina={LOGO_W} negativ style={{ position: 'absolute', top: LOGO_VRH, left: (KARTICA.w - LOGO_W) / 2 }} />
       </View>
     );
@@ -257,12 +262,13 @@ function KIdeKoci({ p }: { p: PricaDana }) {
   const jedna = ide ?? koci!;
   return (
     <Okvir pozadina={ide ? PLUS : MINUS} datum={p.datumTekst} boja="rgba(21,21,21,0.6)" negativ>
-      {blok(ide ? 'plus' : 'minus', ide ? 'Ide mi' : 'Koči me', jedna, 400, IDE_KOCI_VISINA.sama)}
+      {blok(ide ? 'plus' : 'minus', ide ? t.prica.kartica.ideMi : t.prica.kartica.kociMe, jedna, 400, IDE_KOCI_VISINA.sama)}
     </Okvir>
   );
 }
 
 function KMesec({ p }: { p: PricaDana }) {
+  const t = useT();
   const m = p.mesec;
   const okret = useOkret(240);
   const stil = useAnimatedStyle(() => ({ transform: [{ rotate: `${okret.get()}deg` }] }));
@@ -283,7 +289,7 @@ function KMesec({ p }: { p: PricaDana }) {
         <FazeMeseca trenutna={fazaOsmina(m.faza.angle)} velicina={22} />
       </View>
       <Pojava kasni={1700} style={{ marginTop: 14 }}>
-        <Ozn boja={BELA_80}>{`Mesec danas · ${m.sledeca}`}</Ozn>
+        <Ozn boja={BELA_80}>{t.prica.dnevna.mesecDanas(m.sledeca)}</Ozn>
       </Pojava>
       <View style={{ marginTop: 6 }}>
         <Reci
@@ -303,7 +309,7 @@ function KMesec({ p }: { p: PricaDana }) {
         // `overflow: hidden`: bez njega RN crta podlogu i ivicu u posebnim slojevima, a `layer.render` (video) ih
         // stavi PREKO teksta (pravilo 23).
         <Pojava kasni={2500} style={{ marginTop: 12, borderRadius: 12, padding: 11, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)', overflow: 'hidden' }}>
-          <Ozn boja={BELA_80}>Za mene</Ozn>
+          <Ozn boja={BELA_80}>{t.prica.kartica.zaMene}</Ozn>
           <Text className={cn('mt-0.5 text-[15px] leading-[19px]', tezina('naslovUTekstu'))} style={{ color: BELA }}>{m.zaTebe.naslov}</Text>
           {!!m.zaTebe.tekst && <Text className="text-[13px] leading-[18px]" style={{ color: BELA_80 }}>{m.zaTebe.tekst}</Text>}
         </Pojava>
@@ -313,11 +319,12 @@ function KMesec({ p }: { p: PricaDana }) {
 }
 
 function KSavet({ p }: { p: PricaDana }) {
+  const t = useT();
   const s = p.savet!;
   // Blok je centriran na sredistu zraka (282 od 640), kao na slici price.
   const SREDINA = 282;
   // Velicina po duzini saveta, kao na slici price: visina bloka bez oznake (13 + 12) i natpisa ispod (14 + redovi).
-  const natpis = `Iz tumačenja tranzita ${s.ime}.`;
+  const natpis = t.prica.dnevna.izTumacenja(s.ime);
   const sirina = KARTICA.w - 44;
   const vel = velicinaSaveta(s.tekst, sirina, (SREDINA - 116) * 2 - 25 - 14 - visinaNatpisa(natpis, sirina), VELICINE_SAVETA_KARTICA);
   return (
@@ -327,11 +334,11 @@ function KSavet({ p }: { p: PricaDana }) {
         <Zraci velicina={700} />
       </View>
       <Text className={OZN} style={{ position: 'absolute', top: 90, left: 0, right: 0, textAlign: 'center', fontSize: 10.5, lineHeight: 14, letterSpacing: 1.5, color: MUTNO }}>
-        {`${p.datumTekst} · astroshop.rs`}
+        {t.prica.uzSajt(p.datumTekst)}
       </Text>
       <View style={{ position: 'absolute', left: 22, right: 22, top: 116, height: (SREDINA - 116) * 2, justifyContent: 'center', alignItems: 'center' }}>
         <Pojava kasni={300}>
-          <Ozn boja={MUTNO}>Savet dana</Ozn>
+          <Ozn boja={MUTNO}>{t.prica.dnevna.savetDana}</Ozn>
         </Pojava>
         <View style={{ marginTop: 12 }}>
           <Reci
@@ -367,6 +374,7 @@ const KARTICE: Record<SlikaKljuc, (props: { p: PricaDana }) => React.ReactElemen
  * zavrsava bojom brenda.
  */
 export function KarticaKraj() {
+  const t = useT();
   const w = 280;
   return (
     <View style={{ width: KARTICA.w, height: KARTICA.h, backgroundColor: INDIGO, overflow: 'hidden' }} collapsable={false}>
@@ -376,7 +384,7 @@ export function KarticaKraj() {
           <LogoPrice sirina={w} negativ />
         </Pojava>
         <Pojava kasni={700} style={{ marginTop: 22 }}>
-          <Text className={OZN} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 2.4, color: BELA_80 }}>astroshop.rs</Text>
+          <Text className={OZN} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 2.4, color: BELA_80 }}>{t.prica.sajt}</Text>
         </Pojava>
       </View>
     </View>

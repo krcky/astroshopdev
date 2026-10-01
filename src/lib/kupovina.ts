@@ -13,6 +13,7 @@
  * Do tada `kupiPitanje` iskreno kaze da placanje ne postoji, a cena se ne
  * prikazuje. Pitanje moze da se posalje samo kreditom (`admin.daj_pitanje`).
  */
+import { tr } from '@/i18n/jezik';
 
 export type IshodKupovine =
   /** Prodavnica je naplatila; webhook ce nacrt prebaciti u `paid`. */
@@ -103,7 +104,7 @@ export function ustedaGodisnje(godisnje: number, mesecno: number): number | null
   return u > 0 ? u : null;
 }
 
-/** "4,17 €" — godisnja cena podeljena na 12, u valuti paketa, srpskim zapisom. */
+/** "4,17 €" — godisnja cena podeljena na 12, u valuti paketa, zapisom jezika. */
 export function cenaPoMesecu(godisnje: number, valuta: string): string {
   // Na dole, da "mesecno" nikad ne izgleda jeftinije nego sto jeste zaokruzivanjem navise.
   return formatCena(Math.floor((godisnje / 12) * 100) / 100, valuta);
@@ -120,10 +121,10 @@ export function cenaBezPopusta(godisnje: number, mesecno: number, valuta: string
   return formatCena(Math.round(mesecno * 12 * 100) / 100, valuta);
 }
 
-/** Iznos u valuti paketa, srpskim zapisom: "71,88 €". */
+/** Iznos u valuti paketa, zapisom jezika (`gramatika.locale`): "71,88 €". */
 function formatCena(iznos: number, valuta: string): string {
   try {
-    return new Intl.NumberFormat('sr-Latn-RS', { style: 'currency', currency: valuta }).format(iznos);
+    return new Intl.NumberFormat(tr().gramatika.locale, { style: 'currency', currency: valuta }).format(iznos);
   } catch {
     // Android Hermes ume da nema punu Intl podrsku — tada rucno, decimalni zarez.
     return `${iznos.toFixed(2).replace('.', ',')} ${valuta === 'EUR' ? '€' : valuta}`;

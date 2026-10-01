@@ -17,6 +17,7 @@ import { trajanjeTranzita } from '@/lib/oblasti';
 import { TransitTrajanje } from '@/components/transit-trajanje';
 import { SheetGrabber, dnoLista } from '@/components/sheet';
 import { useResolvedProfile } from '@/store/profile';
+import { useT } from '@/i18n';
 
 /** Precnik crnih ikonica — isti kao u zaglavlju tumacenja tranzita (`transit.tsx`). */
 const SIMBOL = 26;
@@ -33,6 +34,8 @@ const VLADAR = 56;
  * Zatvara se povlacenjem nadole — iOS list ima rucicu, dugme nije potrebno.
  */
 export default function TvojDanInfo() {
+  const t = useT();
+  const tx = t.danas.tvojDanInfo;
   const { key, day } = useLocalSearchParams<{ key: string; day?: string }>();
   const resolved = useResolvedProfile();
   const insets = useSafeAreaInsets();
@@ -52,13 +55,13 @@ export default function TvojDanInfo() {
     <View className="bg-background px-6 pt-8" style={dnoLista(insets.bottom)}>
       <SheetGrabber />
       {/* Ista velicina kao naslov lista "Šta je natalna karta" (Ivan, 28.9.2026). */}
-      <Text variant="naslovLista">Zašto baš ovaj tekst?</Text>
+      <Text variant="naslovLista">{tx.naslov}</Text>
 
       {info ? (
         <>
           {/* Razmaci veci nego ranije, da list "prodise" (Ivan, 28.9.2026: "sve je mnogo zbijeno"). */}
           <Text variant="body" className="mt-3">
-            Tekst je napisan za tranzit koji je danas najvažniji u tvojoj natalnoj karti.
+            {tx.uvod}
           </Text>
 
           {/* Koji tranzit — u obliku zaglavlja tumacenja tranzita (Ivan, 28.9.2026:
@@ -68,7 +71,7 @@ export default function TvojDanInfo() {
             <View
               className="flex-1 justify-between"
               accessible
-              accessibilityLabel={`${info.transiting.name} ${info.aspect.name} natalni ${info.natal.name}`}>
+              accessibilityLabel={t.danas.tranzit.imeNatalni(info.transiting.name, info.aspect.name, info.natal.name)}>
               <View className="flex-row items-center gap-2">
                 <Tacka tacka={info.transiting} vladar={info.ruler === 'transiting'} />
                 {imaAspekt(info.aspect.key) && (
@@ -77,9 +80,9 @@ export default function TvojDanInfo() {
                 <Tacka tacka={info.natal} vladar={info.ruler === 'natal'} />
               </View>
               <View className="mt-5">
-                <Text variant="oznaka">Tranzit dana</Text>
+                <Text variant="oznaka">{tx.tranzitDana}</Text>
                 <Text variant="h2" className="mt-1.5">
-                  {info.transiting.name} {info.aspect.name} natalni {info.natal.name}
+                  {t.danas.tranzit.imeNatalni(info.transiting.name, info.aspect.name, info.natal.name)}
                 </Text>
               </View>
             </View>
@@ -102,7 +105,7 @@ export default function TvojDanInfo() {
           )}
 
           <Text variant="muted" className="mt-4">
-            Planeta sa današnjeg neba i ugao od {info.aspect.angle}° koji zaklapa sa tačkom iz tvoje natalne karte.
+            {tx.objasnjenje(info.aspect.angle)}
           </Text>
 
           {info.rulerText && info.ruler && (
@@ -111,7 +114,7 @@ export default function TvojDanInfo() {
             <View className="mt-8 rounded-lg bg-fill p-5">
               <View className="flex-row items-center gap-1.5">
                 <Crown size={15} color={neutral.ink} strokeWidth={2} />
-                <Text variant="h3">Tranzit tvog vladara</Text>
+                <Text variant="h3">{tx.tranzitVladara}</Text>
               </View>
               <View className="mt-4 flex-row items-start gap-4">
                 {(() => {
@@ -126,7 +129,7 @@ export default function TvojDanInfo() {
           )}
         </>
       ) : (
-        <Text variant="muted" className="mt-4">Ovaj tranzit nije deo tvoje karte.</Text>
+        <Text variant="muted" className="mt-4">{tx.nijeDeoKarte}</Text>
       )}
     </View>
   );

@@ -18,11 +18,12 @@
 import { useDraft } from '@/store/draft';
 import { placeFields, useProfileStore, type Profile } from '@/store/profile';
 import { pullProfile, pushProfile } from '@/lib/sync';
+import { tr } from '@/i18n/jezik';
 
 /** Privremeno ime dok korisnik ne unese svoje — baza ne prima prazno. */
 export function initialName(email: string): string {
   const local = email.split('@')[0].replace(/[._-]+/g, ' ').trim();
-  return local ? local.charAt(0).toUpperCase() + local.slice(1) : 'Ti';
+  return local ? local.charAt(0).toUpperCase() + local.slice(1) : tr().onboarding.podrazumevanoIme;
 }
 
 export type SignupOutcome =

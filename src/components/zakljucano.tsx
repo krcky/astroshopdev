@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { brand, neutral, shadow } from '@/theme/tokens';
 import { leaveSheetTo } from '@/components/sheet';
 import { cn } from '@/lib/utils';
@@ -41,7 +42,7 @@ export function otvoriPremium(izLista = false) {
 }
 
 /** Kartica sa katancem i dugmetom "Otključaj" — ispod zakljucane liste ili teksta. */
-export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = false, ilustracija = true, className }: {
+export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustracija = true, className }: {
   naslov: string;
   opis: string;
   /** Natpis na dugmetu; podrazumevano "Otključaj". */
@@ -57,6 +58,7 @@ export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = f
   ilustracija?: boolean;
   className?: string;
 }) {
+  const t = useT();
   const [sirina, setSirina] = React.useState(0);
   const tekstIDugme = (
     <>
@@ -64,7 +66,7 @@ export function PremiumKartica({ naslov, opis, dugme = 'Otključaj', izLista = f
       <Text variant={ilustracija ? 'title' : 'h3'} className={cn('mt-4 text-center', ilustracija && tezina('naslovStrane'))}>{naslov}</Text>
       <Text variant="muted" className="mt-2 text-center">{opis}</Text>
       <Button className="mt-5 w-full" onPress={() => otvoriPremium(izLista)}>
-        <Text>{dugme}</Text>
+        <Text>{dugme ?? t.opste.otkljucaj}</Text>
       </Button>
     </>
   );
@@ -152,6 +154,7 @@ export function ZakljucaniRedovi({ redovi, className }: {
   redovi: { key: string; naslov: string; ispod?: string }[];
   className?: string;
 }) {
+  const t = useT();
   if (redovi.length === 0) return null;
   return (
     <View className={cn(CARD_SURFACE, 'py-1', className)}>
@@ -161,7 +164,7 @@ export function ZakljucaniRedovi({ redovi, className }: {
           <Pressable
             onPress={() => otvoriPremium()}
             accessibilityRole="button"
-            accessibilityLabel={`${r.naslov}. Uz Premium`}
+            accessibilityLabel={t.profil.zakljucano.red(r.naslov)}
             className="flex-row items-center gap-3 px-4 py-3 active:opacity-80">
             <View className="flex-1">
               <Text variant="default" numberOfLines={2}>{r.naslov}</Text>

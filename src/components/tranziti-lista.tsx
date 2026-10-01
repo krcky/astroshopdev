@@ -18,7 +18,7 @@ import { TONE_LABEL, type Tone } from '@/lib/tone';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
 import { PremiumKartica, ZakljucaniRedovi } from '@/components/zakljucano';
-import { mnozina, TRANZIT } from '@/lib/mnozina';
+import { useT } from '@/i18n';
 
 /** Precnik slike planete na kartici (dve se preklapaju, `planete-par.tsx`). */
 const PLANETA = 36;
@@ -49,6 +49,7 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
   /** Kljucevi tranzita bez naslova tumacenja — za dev pregled i konzolu. */
   onZaProveru?: (keys: string[]) => void;
 }) {
+  const t = useT();
   const keys = React.useMemo(() => rez.poVaznosti.map((t) => t.red.key), [rez]);
   const { texts: kratke, loading: l1 } = useTransitTexts(keys, 'short');
   const { texts: duge, loading: l2 } = useTransitTexts(keys, 'long');
@@ -57,9 +58,10 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
   // Koliko jos traje — isto racunanje kao na celom tekstu tranzita (`trajanjeTranzita`).
   const trajanja = React.useMemo(() => {
     const m = new Map<string, string>();
-    for (const t of rez.poVaznosti) m.set(t.red.key, trajanjeTekst(trajanjeTranzita(t.red, date)));
+    for (const x of rez.poVaznosti) m.set(x.red.key, trajanjeTekst(trajanjeTranzita(x.red, date)));
     return m;
-  }, [rez, date]);
+    // `t`: natpis trajanja je iz recnika, pa se racuna iznova kad se jezik promeni.
+  }, [rez, date, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const otvoreni = besplatno === undefined ? rez.poVaznosti : rez.poVaznosti.slice(0, besplatno);
   const zakljucani = rez.poVaznosti.slice(otvoreni.length);
@@ -80,13 +82,13 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
     // traci ekrana, a kartice pocinju odmah ispod.
     <View className="pt-6">
       {rez.poVaznosti.length === 0 && (
-        <Text variant="body">{osobaId ? 'Danas nema tranzita na ovu kartu.' : 'Danas nema tvojih tranzita.'}</Text>
+        <Text variant="body">{osobaId ? t.danas.tranziti.nemaNaKarti : t.danas.tranziti.nemaTvojih}</Text>
       )}
 
       <View className="gap-3">
-        {otvoreni.map((t) => (
-          <KarticaTranzita key={t.red.key} red={t.red} ton={t.ton} naslov={naslov(t.red.key)} loading={loading}
-            trajanje={trajanja.get(t.red.key) ?? ''} osobaId={osobaId} />
+        {otvoreni.map((x) => (
+          <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={loading}
+            trajanje={trajanja.get(x.red.key) ?? ''} osobaId={osobaId} />
         ))}
       </View>
 
@@ -98,17 +100,17 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
         <>
           <ZakljucaniRedovi
             className="mt-3"
-            redovi={zakljucani.map((t) => ({
-              key: t.red.key,
-              naslov: tekstReda(t.red, naslov(t.red.key)).veci,
-              ispod: [TONE_LABEL[t.ton], trajanja.get(t.red.key)].filter(Boolean).join(' · '),
+            redovi={zakljucani.map((z) => ({
+              key: z.red.key,
+              naslov: tekstReda(z.red, naslov(z.red.key)).veci,
+              ispod: [TONE_LABEL[z.ton], trajanja.get(z.red.key)].filter(Boolean).join(' · '),
             }))}
           />
           <PremiumKartica
             className="mt-10"
-            naslov={`Još ${zakljucani.length} ${mnozina(zakljucani.length, TRANZIT)} danas`}
-            opis="Najjači su otvoreni na vrhu liste. I ostali utiču na tvoj dan, i svaki ima svoje celo tumačenje."
-            dugme="Otključaj sve tranzite"
+            naslov={t.danas.tranziti.josDanas(zakljucani.length, t.gramatika.tranzita(zakljucani.length))}
+            opis={t.danas.tranziti.zakljucaniOpis}
+            dugme={t.danas.tranziti.otkljucajSve}
           />
         </>
       )}
@@ -141,6 +143,7 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, ozn
   /** Oznaka iznad naslova umesto imena tranzita ("Za tebe", Ivan 28.9.2026). */
   oznaka?: string;
 }) {
+  const t = useT();
   const r = red;
   const tekst = tekstReda(r, naslov);
   const ime = tekstReda(r, '').veci;
@@ -152,7 +155,7 @@ export function KarticaTranzita({ red, ton, naslov, loading, trajanje, opis, ozn
       onPress={() => router.push({ pathname: '/transit', params: osobaId ? { key: r.key, osoba: osobaId } : { key: r.key } })}
       accessibilityRole="button"
       accessibilityLabel={a11y}
-      accessibilityHint="Otvara ceo tekst tranzita"
+      accessibilityHint={t.danas.tranziti.otvaraCeoTekst}
       className={cn(CARD_SURFACE, 'flex-row items-center gap-3 py-4 pl-4 pr-3 active:opacity-80')}>
       <View className="flex-1">
         {/* Oznaka: verzal 11pt, siva (Ivan, 28.9.2026). Strelica je skroz desno na kartici. */}

@@ -4,6 +4,7 @@ import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 import { GLYPH_FONT } from '@/components/ui/glyph';
 import { ZNAK_VIEWBOX, ZnakOblik } from '@/components/znak-ikona';
 import { fontUloge } from '@/theme/tipografija';
+import { useT } from '@/i18n';
 import {
   ASPECT_STYLE, CENTAR, DEGREES_MIN_SIZE, OKVIR, TACKA_PLANETE, TICK, TICK_STYLE, TOCAK_BOJE as COLORS, VIEW, ZNAK_TOCAK,
 } from '@/lib/tocak-stil';
@@ -106,6 +107,7 @@ type Props = {
 };
 
 export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false }: Props) {
+  const rec = useT();
   const cx = CENTAR;
   const cy = CENTAR;
   const leva = levaTacka(chart.houses.ascendant, bezKuca);
@@ -304,7 +306,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
                   <SvgText x={r.x} y={degrees ? r.y + 2.7 : r.y}
                            fontSize={degrees ? NUM.rSize : NUM.rSize + 1} fontFamily={fontUloge('tockKuca')}
                            fill={COLORS.muted} textAnchor="middle">
-                    R
+                    {rec.karta.retro}
                   </SvgText>
                 );
               })()}
@@ -352,7 +354,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
       {/* --- oznake uglova: crtica van kruga + natpis, da ne udju u zodijacki prsten --- */}
       {!bezKuca && (
         <G>
-          {([['ASC', chart.houses.ascendant], ['MC', chart.houses.midheaven]] as const).map(([label, lon]) => {
+          {([[rec.karta.asc, chart.houses.ascendant], [rec.karta.mc, chart.houses.midheaven]] as const).map(([label, lon]) => {
             const a = at(lon, R.outer);
             const b = at(lon, R.outer + 7);
             const t = at(lon, R.outer + 16);

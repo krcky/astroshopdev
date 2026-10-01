@@ -25,7 +25,10 @@ import {
   type MoonSign, type NatalTopic,
 } from '@/lib/natal-keys';
 import { useNatalNaslovi, type NatalNaslov } from '@/lib/natal-texts';
-import { SIGN_CASES, type SignPosition } from '@/lib/zodiac';
+import type { SignPosition } from '@/lib/zodiac';
+import { useT, type Recnik } from '@/i18n';
+
+type ZnakKljuc = keyof Recnik['nebo']['znaci'];
 import type { NatalChart } from '@/lib/natal';
 import { neutral } from '@/theme/tokens';
 
@@ -48,6 +51,8 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   /** Umetak posle velike trojke ("Tvoji ljudi" na tabu "Ti"). */
   posleTrojke?: React.ReactNode;
 }) {
+  const rec = useT();
+  const tp = rec.karta.prikaz;
   const { width } = useWindowDimensions();
 
   // Aspekti izmedju planeta i na Ascendent (na MC ne — Ivan, 28.9.2026), najtesnji prvi.
@@ -94,16 +99,9 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
     <>
       {zoneUnreliable ? (
         <View className={cn(KARTICA, 'mx-5 border-destructive/40 p-5')}>
-          <Text variant="h3">Karta ne može da se izračuna</Text>
-          <Text variant="muted" className="mt-2">
-            Ne možemo pouzdano da utvrdimo koliko je sati bilo po UTC-u u
-            mestu {city.name} na taj datum. Greška od sat vremena pomeri
-            ascendent za pola znaka, pa radije ne prikazujemo ništa nego
-            pogrešne brojeve.
-          </Text>
-          <Text variant="muted" className="mt-3 text-xs">
-            Javi nam ovo — zona: {city.tz.name}
-          </Text>
+          <Text variant="h3">{tp.nemozeNaslov}</Text>
+          <Text variant="muted" className="mt-2">{tp.nemozeOpis(city.name)}</Text>
+          <Text variant="muted" className="mt-3 text-xs">{tp.javiNam(city.tz.name)}</Text>
         </View>
       ) : (
         // Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Nebu"), i IZNAD
@@ -116,7 +114,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}
           <TockInfo velicina={wheelSize} onPress={() => router.push('/natalna-karta-info')}
-            accessibilityLabel="Šta je natalna karta?" />
+            accessibilityLabel={tp.infoA11y} />
         </IznadPreliva>
       )}
 
@@ -124,9 +122,11 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
       <View className="-mt-4 items-center px-5">
         <Text variant="h1" className="text-center">{profile.name}</Text>
         <Text variant="muted" className="mt-1 text-center">
-          {datumRodjenja(b)}
-          {t ? ` u ${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}` : ''}
-          {' · '}{city.name}
+          {tp.rodjenje(
+            datumRodjenja(b),
+            t ? `${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}` : null,
+            city.name,
+          )}
         </Text>
       </View>
 
@@ -134,31 +134,28 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
       {!zoneUnreliable && (
         <View className="mx-5 mt-5 flex-row gap-2" style={imaPricu ? { paddingBottom: BALON_VISINA - BALON_PREKO - 8 } : undefined}>
           <TrojkaPlocica
-            oznaka="Sunce"
+            oznaka={rec.nebo.tela.sun}
             slika="sun"
             znak={sunce.position.sign}
             onPress={imaPricu ? () => router.push('/prica-znak') : () => otvori('sun')}
-            prica={imaPricu ? { pogledana: pricaPogledana, natpis: 'Tvoj znak' } : undefined}
+            prica={imaPricu ? { pogledana: pricaPogledana, natpis: tp.tvojZnak } : undefined}
           />
           {mesecZnak.certain ? (
-            <TrojkaPlocica oznaka="Mesec" slika="moon" znak={mesecZnak.sign} onPress={() => otvori('moon')} />
+            <TrojkaPlocica oznaka={rec.nebo.tela.moon} slika="moon" znak={mesecZnak.sign} onPress={() => otvori('moon')} />
           ) : (
             // Bez vremena rodjenja Mesec je tog dana presao u sledeci znak — oba imena,
             // a na slici znak pitanja umesto znaka: ne pogadja se.
-            <TrojkaPlocica oznaka="Mesec" slika="moon" znak={null} ime={`${mesecZnak.from.name} ili ${mesecZnak.to.name}`}
+            <TrojkaPlocica oznaka={rec.nebo.tela.moon} slika="moon" znak={null} ime={tp.znakIli(mesecZnak.from.name, mesecZnak.to.name)}
               onPress={() => otvori('moon')} />
           )}
-          <TrojkaPlocica oznaka="Podznak" slika="earth" znak={timeUnknown ? null : chart.ascendantSign.sign}
+          <TrojkaPlocica oznaka={rec.karta.podznak} slika="earth" znak={timeUnknown ? null : chart.ascendantSign.sign}
             onPress={timeUnknown ? undefined : () => otvori('ascendant')} />
         </View>
       )}
 
       {timeUnknown && (
         <View className={cn(KARTICA, 'mx-5 mt-4 p-4')}>
-          <Text variant="muted">
-            Vreme rođenja nije uneto, pa su ascendent i kuće samo procena.
-            Pozicije planeta su tačne — osim Meseca, koji za 12 sati pređe i do 7°.
-          </Text>
+          <Text variant="muted">{tp.bezVremena}</Text>
         </View>
       )}
 
@@ -172,7 +169,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
             {/* Redosled (Ivan, 28.9.2026): Ascendent, Sunce, Mesec, pa ostale planete; MC na kraju. */}
             {/* "Podznak", kao plocica iznad (UX recenzija 1.10.2026): isti pojam je na istom ekranu
                 imao dva imena. Ikonica ASC ostaje i veze ga sa tockom. */}
-            <UgaoRed tacka="ascendant" ime="Podznak" pos={chart.ascendantSign} muted={timeUnknown}
+            <UgaoRed tacka="ascendant" ime={rec.karta.podznak} pos={chart.ascendantSign} muted={timeUnknown}
               // Bez vremena rodjenja podznak nije poznat — nema ni tumacenja.
               onPress={timeUnknown ? undefined : () => otvori('ascendant')} />
             {redosledPlaneta(chart.planets).map((p) => {
@@ -191,7 +188,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
                 />
               );
             })}
-            <UgaoRed tacka="midheaven" ime="MC" pos={chart.midheavenSign} muted={timeUnknown} last />
+            <UgaoRed tacka="midheaven" ime={rec.karta.mc} pos={chart.midheavenSign} muted={timeUnknown} last />
           </View>
 
           {/* Aspekti: naslov tumacenja je glavni red, ime aspekta i orbis sitno ispod (kao sajt). */}
@@ -199,7 +196,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           <View className={cn(KARTICA, 'mx-5 mt-4 overflow-hidden')}>
             <View className="border-b border-border px-4 py-3">
               <Text variant="oznaka" className={OZNAKA_12} accessibilityRole="header">
-                Aspekti{'\u00A0\u00A0·\u00A0\u00A0'}{aspects.length}
+                {rec.karta.aspektiNaslov(aspects.length)}
               </Text>
             </View>
             {aspects.map((a, i) => (
@@ -234,24 +231,25 @@ function PlanetaRed({ planeta: p, topic, otvoren, onToggle, naslovi, zakljucan, 
   zakljucan: (k: string) => boolean;
   otvori: (tema: string, deo?: 'kuca') => void;
 }) {
+  const t = useT();
   const neznan = !!topic.moon && !topic.moon.certain; // Mesec bez vremena rodjenja
   const Strelica = otvoren ? ChevronUp : ChevronDown;
   const znakTekst = neznan && topic.moon && !topic.moon.certain
-    ? `u ${SIGN_CASES[topic.moon.from.key].loc} ili ${SIGN_CASES[topic.moon.to.key].loc}`
-    : `u ${SIGN_CASES[p.position.sign.key].loc}`;
+    ? t.karta.prikaz.uZnakuIli(topic.moon.from.key as ZnakKljuc, topic.moon.to.key as ZnakKljuc)
+    : t.nebo.uZnaku(p.position.sign.key as ZnakKljuc);
   return (
     <View className="border-b border-border">
       <Pressable
         onPress={onToggle}
         accessibilityRole="button"
         accessibilityState={{ expanded: otvoren }}
-        accessibilityLabel={`${p.name}, ${neznan ? 'znak nije siguran' : p.position.sign.name}${topic.houseKey ? `, ${p.house}. kuća` : ''}`}
+        accessibilityLabel={t.karta.prikaz.planetaA11y(p.name, neznan ? null : p.position.sign.name, topic.houseKey ? p.house : null)}
         className="flex-row items-center py-3 pl-4 pr-3 active:opacity-60">
         <Tacka tacka={p.key} glyph={p.glyph} size={28} />
         {/* Ime i stepen u ISTOM redu (Ivan, 28.9.2026); stepen prelazi ispod samo kad ne stane. */}
         <View className="ml-3 mr-2 flex-1 flex-row flex-wrap items-baseline gap-x-1">
           <Text variant="row" numberOfLines={1}>{p.name}</Text>
-          <Text variant="caption">{stepenMinut(p.position)}{p.retrograde ? ' R' : ''}</Text>
+          <Text variant="caption">{stepenMinut(p.position)}{p.retrograde ? ` ${t.karta.retro}` : ''}</Text>
         </View>
         {/* Rasklopljen red: znak i kuca su u redovima ispod, u zaglavlju se ne ponavljaju (Ivan, 28.9.2026). */}
         {!otvoren && (
@@ -276,7 +274,7 @@ function PlanetaRed({ planeta: p, topic, otvoren, onToggle, naslovi, zakljucan, 
           {topic.houseKey && (
             <PodRed
               ikona={<KucaBroj kuca={p.house} size={20} />}
-              tekst={`u ${p.house}. kući`}
+              tekst={t.karta.uKuci(p.house)}
               naslov={naslovi.get(topic.houseKey)?.subtitle ?? ''}
               zakljucan={zakljucan(topic.houseKey)}
               onPress={() => otvori(p.key, 'kuca')}
@@ -298,11 +296,12 @@ function PodRed({ ikona, tekst, naslov, zakljucan, onPress, prvi = true }: {
   onPress: () => void;
   prvi?: boolean;
 }) {
+  const t = useT();
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${tekst}${naslov ? `: ${naslov}` : ''}${zakljucan ? '. Zaključano' : ''}. Tumačenje`}
+      accessibilityLabel={t.karta.prikaz.podRedA11y(tekst, naslov, zakljucan)}
       className={cn('min-h-[44px] flex-row items-center py-2.5 pl-4 pr-3 active:opacity-60', !prvi && 'border-t border-border')}>
       {/* Bez uvlacenja (Ivan, 28.9.2026): ikonica u koloni ikonice planete, tekst u liniji sa imenom. */}
       <View className="mr-3 items-center" style={{ width: 28 }}>{ikona}</View>
@@ -325,6 +324,7 @@ function UgaoRed({ tacka, ime, pos, muted, onPress, last }: {
   onPress?: () => void;
   last?: boolean;
 }) {
+  const t = useT();
   const sadrzaj = (
     <>
       <View style={{ opacity: muted ? 0.5 : 1 }}><Tacka tacka={tacka} glyph={tacka === 'ascendant' ? 'ASC' : 'MC'} size={28} /></View>
@@ -342,7 +342,7 @@ function UgaoRed({ tacka, ime, pos, muted, onPress, last }: {
   const klasa = cn('flex-row items-center py-3 pl-4 pr-3', !last && 'border-b border-border');
   if (!onPress) return <View className={klasa}>{sadrzaj}</View>;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${ime} u ${SIGN_CASES[pos.sign.key].loc}. Tumačenje`}
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={t.karta.prikaz.ugaoA11y(ime, pos.sign.key as ZnakKljuc)}
       className={cn(klasa, 'active:opacity-60')}>
       {sadrzaj}
     </Pressable>

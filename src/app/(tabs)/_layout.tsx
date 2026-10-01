@@ -8,6 +8,7 @@ import { SISTEMSKA_TRAKA, useTrakaVidea, VideoTraka, VideoTrakaPlutajuca } from 
 import { useVisinaTrakeTabova } from '@/components/screen';
 import { brand, neutral } from '@/theme/tokens';
 import { fontUloge } from '@/theme/tipografija';
+import { useT } from '@/i18n';
 
 /*
  * NATIVE traka tabova (UITabBarController na iOS-u, Liquid Glass na iOS-u 26;
@@ -70,6 +71,7 @@ const IZABRANI = '#7E57C2';
  * `belina` u `Screen`); provereno u iOS 26.5 simulatoru, Ivan 27.9.2026.
  */
 export default function TabsLayout() {
+  const t = useT();
   // Novi odgovori astrologa (Ivan, 29.9.2026): broj u indigo krugu na tabu "Pitaj".
   const noviOdgovori = useBrojNeprocitanih();
   // Video price (Ivan, 30.9.2026): traka iznad tabova dok se pravi i kad je gotov — na iOS-u 26
@@ -113,25 +115,25 @@ export default function TabsLayout() {
         )}
         <NativeTabs.Trigger name="home" disableAutomaticContentInsets>
           <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
-          <NativeTabs.Trigger.Label>Danas</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.danas}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="daily" disableAutomaticContentInsets>
           <NativeTabs.Trigger.Icon sf="sparkles" md="auto_awesome" />
-          <NativeTabs.Trigger.Label>Tranziti</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.tranziti}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="ask" disableAutomaticContentInsets>
           <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.message', selected: 'ellipsis.message.fill' }} md="sms" />
-          <NativeTabs.Trigger.Label>Pitaj</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.pitaj}</NativeTabs.Trigger.Label>
           {/* Bez teksta nema oznake. `hidden` sam ne sklanja vec prikazanu — ostajalo je "0". */}
           <NativeTabs.Trigger.Badge hidden={noviOdgovori === 0}>{noviOdgovori > 0 ? String(noviOdgovori) : undefined}</NativeTabs.Trigger.Badge>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="chart" disableAutomaticContentInsets>
           <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
-          <NativeTabs.Trigger.Label>Ti</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.ti}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="sky" disableAutomaticContentInsets>
           <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
-          <NativeTabs.Trigger.Label>Nebo</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.nebo}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       </NativeTabs>
       {!SISTEMSKA_TRAKA && <VideoTrakaPlutajuca odDna={odDna} />}

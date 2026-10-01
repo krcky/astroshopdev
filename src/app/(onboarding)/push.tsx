@@ -9,6 +9,7 @@ import { OnboardingStep } from '@/components/onboarding-step';
 import { usePremium } from '@/store/auth';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { ASTROLOG } from '@/lib/pitanja';
 import { shadow } from '@/theme/tokens';
 
@@ -24,6 +25,7 @@ const IKONICA = require('../../../assets/images/ikonica-obavestenja.png');
  * horoskop i odgovor astrologa (CLAUDE.md, pravilo 21 — push jos ne postoji).
  */
 export default function Push() {
+  const t = useT();
   const [busy, setBusy] = React.useState(false);
 
   // Obavestenja dolaze POSLE prve price dana (`prva-prica.tsx`, Ivan 30.9.2026): korisnik
@@ -52,16 +54,16 @@ export default function Push() {
 
   return (
     <OnboardingStep
-      skip={{ label: 'Preskoči', onPress: done, disabled: busy }}
+      skip={{ label: t.opste.preskoci, onPress: done, disabled: busy }}
       icon={BellRing}
       // Naslov (Ivan, 30.9.2026; ranije "Da ti javimo?").
-      title="Da ne propustiš svoj dan"
+      title={t.onboarding.push.naslov}
       subtitle={Platform.OS === 'web'
-        ? 'Notifikacije rade na telefonu; na vebu ovaj korak preskačemo.'
-        : 'Jednom ujutru, sa horoskopom za taj dan, i kad ti astrolog odgovori. Ništa drugo ti ne šaljemo.'}
+        ? t.onboarding.push.podnaslovWeb
+        : t.onboarding.push.podnaslov}
       center={false}
       note={null}
-      primary={{ label: 'Uključi obaveštenja', onPress: ask, ucitava: busy }}>
+      primary={{ label: t.onboarding.push.ukljuci, onPress: ask, ucitava: busy }}>
 
       <PrimeriObavestenja />
     </OnboardingStep>
@@ -83,6 +85,7 @@ const IZNAD_KARTICA = 92;
  * Ukras je — citac ekrana cita samo kartice.
  */
 function PrimeriObavestenja() {
+  const t = useT().onboarding.push;
   return (
     <View className="mt-6">
       <View
@@ -106,23 +109,23 @@ function PrimeriObavestenja() {
         <Obavestenje
           redosled={0}
           slika={<IkonicaAplikacije />}
-          naslov="Tvoj dan"
-          tekst="Horoskop za danas je spreman."
-          vreme="sada"
+          naslov={t.primerDanNaslov}
+          tekst={t.primerDanTekst}
+          vreme={t.sada}
         />
         <Obavestenje
           redosled={1}
           slika={<AstrologSlika velicina={SLIKA} />}
           naslov={ASTROLOG.ime}
-          tekst="Odgovorio je na tvoje pitanje."
-          vreme="1 h"
+          tekst={t.primerOdgovorTekst}
+          vreme={t.preSat}
         />
         <Obavestenje
           redosled={2}
           slika={<IkonicaAplikacije />}
-          naslov="Tvoj dan"
-          tekst="Venera je u trigonu sa tvojim Suncem."
-          vreme="juče"
+          naslov={t.primerDanNaslov}
+          tekst={t.primerAspektTekst}
+          vreme={t.juce}
         />
       </View>
     </View>

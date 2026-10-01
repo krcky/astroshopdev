@@ -18,6 +18,7 @@
  *
  * Cist racun, bez RN uvoza (pravilo 6); provera u `scripts/check-natal-tekst.ts`.
  */
+import { tr } from '@/i18n/jezik';
 import { ASPECTS, bodyLongitude, findAspects, type Aspect } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
 import { signFromLongitude, type ZodiacSign } from '@/lib/zodiac';
@@ -64,7 +65,7 @@ export function ascendantAspects(chart: NatalChart): NatalAspect[] {
       out.push({
         key: `natal.${p.key}.${a.key}.ascendant`,
         a: { key: p.key, name: p.name, glyph: p.glyph },
-        b: { key: 'ascendant', name: 'Ascendent', glyph: 'ASC' },
+        b: { key: 'ascendant', name: tr().karta.ascendent, glyph: 'ASC' },
         aspect: { key: a.key, name: a.name, glyph: a.glyph },
         orb,
       });

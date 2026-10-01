@@ -14,6 +14,7 @@
  * Kiron ovde nema mesta: nije ni telo iz `astronomy-engine` ni geometrijska
  * tacka, nego asteroid kome treba zasebna efemerida.
  */
+import { tr } from '@/i18n/jezik';
 import * as Astronomy from 'astronomy-engine';
 import { norm360, signFromLongitude, type SignPosition } from '@/lib/zodiac';
 
@@ -150,10 +151,13 @@ export function isDayChart(sunHouse: number): boolean {
  * (`scripts/font/build-astroglyphs.py`) cita bas ovaj oblik — `glyph: '...'` —
  * da bi znala koje znakove mora da ubaci u `AstroGlyphs.ttf`.
  */
-export const POINTS: { key: PointKey; name: string; glyph: string }[] = [
-  { key: 'northNode', name: 'Severni čvor', glyph: '☊\uFE0E' },
-  { key: 'lilith',    name: 'Lilit',        glyph: '⚸\uFE0E' },
-  { key: 'fortune',   name: 'Tačka sreće',  glyph: '⊗\uFE0E' },
+const tacka = (d: { key: PointKey; glyph: string }) => ({ ...d, get name() { return tr().nebo.tacke[d.key]; } });
+
+/** Ime se cita iz recnika u trenutku citanja (getter), da prati jezik. */
+export const POINTS: { key: PointKey; readonly name: string; glyph: string }[] = [
+  tacka({ key: 'northNode', glyph: '☊\uFE0E' }),
+  tacka({ key: 'lilith',    glyph: '⚸\uFE0E' }),
+  tacka({ key: 'fortune',   glyph: '⊗\uFE0E' }),
 ];
 
 /** Sve tri tacke za dati trenutak. Kucu dodeljuje pozivalac — ona trazi kuspide. */

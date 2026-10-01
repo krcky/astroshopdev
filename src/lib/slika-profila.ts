@@ -19,6 +19,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import type { User } from '@supabase/supabase-js';
 
+import { tr } from '@/i18n/jezik';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/store/auth';
 
@@ -46,7 +47,7 @@ export function izvorSlike(meta: Record<string, unknown> | undefined | null): Iz
 /** Inicijali za krug bez slike: "Ivan Krstić" -> "IK", "ivan" -> "I". */
 export function inicijali(ime: string): string {
   const reci = ime.trim().split(/\s+/).filter(Boolean);
-  return reci.slice(0, 2).map((r) => r[0]!.toLocaleUpperCase('sr')).join('');
+  return reci.slice(0, 2).map((r) => tr().gramatika.veliko(r[0]!)).join('');
 }
 
 /** `{ uri, cacheKey }` za `expo-image`, ili null dok nema slike. */

@@ -9,6 +9,7 @@
  * podnosi 6—8 stepeni; tranzit treba da opise JEDAN dan, pa preko ~3 stepena
  * prestaje da bude dogadjaj i postaje pozadina.
  */
+import { tr } from '@/i18n/jezik';
 import { planetPositions, bodyLongitude, ASPECTS, type PlanetPosition, type PlanetKey, type AspectDef } from '@/lib/astro';
 import { houseOf, type NatalChart } from '@/lib/natal';
 import { norm360, SIGNS, type ZodiacSign } from '@/lib/zodiac';
@@ -42,8 +43,9 @@ export type NatalTarget = {
 export function natalTargets(chart: NatalChart): NatalTarget[] {
   return [
     ...chart.planets.map((p) => ({ key: p.key as string, name: p.name, glyph: p.glyph, longitude: p.longitude })),
-    { key: 'ascendant', name: 'Ascendent', glyph: 'ASC', longitude: chart.houses.ascendant },
-    { key: 'midheaven', name: 'MC', glyph: 'MC', longitude: chart.houses.midheaven },
+    // Ime iz recnika (`danas.tranzit`), getter — da prati jezik.
+    { key: 'ascendant', get name() { return tr().danas.tranzit.ascendent; }, glyph: 'ASC', longitude: chart.houses.ascendant },
+    { key: 'midheaven', get name() { return tr().danas.tranzit.mc; }, glyph: 'MC', longitude: chart.houses.midheaven },
   ];
 }
 

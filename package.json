@@ -97,11 +97,12 @@
     "panel": "vite --config panel/vite.config.mts",
     "panel:build": "vite build --config panel/vite.config.mts",
     "typecheck:panel": "tsc -p panel",
-    "check": "npm run typecheck && npm run typecheck:panel && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:lunarni-kalendar && npm run check:natal-tekst && npm run check:oblasti && npm run check:uvod && npm run check:pitanja && npm run check:pitanja-baza && npm run check:osobe && npm run check:osobe-baza && npm run check:prica && npm run check:prica-znaka && npm run check:slike",
+    "check": "npm run typecheck && npm run typecheck:panel && npm run check:tokens && npm run check:ephemeris && npm run check:natal && npm run check:timezone && npm run check:sky && npm run check:cities && npm run check:tumacenje && npm run check:tvoj-dan && npm run check:lunarni-kalendar && npm run check:natal-tekst && npm run check:oblasti && npm run check:uvod && npm run check:pitanja && npm run check:pitanja-baza && npm run check:osobe && npm run check:osobe-baza && npm run check:prica && npm run check:prica-znaka && npm run check:slike && npm run check:prevod",
     "check:tokens": "tsx scripts/check-tokens.ts",
     "slike": "tsx scripts/slike.ts",
     "check:slike": "tsx scripts/check-slike.ts",
-    "check:prica-znaka": "tsx scripts/check-prica-znaka.ts"
+    "check:prica-znaka": "tsx scripts/check-prica-znaka.ts",
+    "check:prevod": "tsx scripts/check-prevod.ts"
   },
   "reanimated": {
     "staticFeatureFlags": {

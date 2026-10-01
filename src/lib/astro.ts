@@ -7,6 +7,7 @@
  * zbog precesije i pomerilo bi svaku poziciju.
  */
 import * as Astronomy from 'astronomy-engine';
+import { tr, type Recnik } from '@/i18n/jezik';
 import { norm360, signFromLongitude, type SignPosition } from '@/lib/zodiac';
 
 export type PlanetKey =
@@ -16,23 +17,29 @@ export type PlanetKey =
 type BodyDef = {
   key: PlanetKey;
   body: Astronomy.Body;
-  name: string;
+  /** Ime na jeziku aplikacije (getter, iz recnika). */
+  readonly name: string;
   glyph: string;
   /** Tezina u odabiru sadrzaja: brza tela nose dnevni ton, spora nose kontekst. */
   weight: number;
 };
 
+/** Ime se cita iz recnika u trenutku citanja (getter), da prati jezik. */
+function telo(d: Omit<BodyDef, 'name'>): BodyDef {
+  return { ...d, get name() { return tr().nebo.tela[d.key]; } };
+}
+
 export const BODIES: BodyDef[] = [
-  { key: 'moon',    body: Astronomy.Body.Moon,    name: 'Mesec',   glyph: '☽\uFE0E', weight: 1.0 },
-  { key: 'sun',     body: Astronomy.Body.Sun,     name: 'Sunce',   glyph: '☉\uFE0E', weight: 1.0 },
-  { key: 'mercury', body: Astronomy.Body.Mercury, name: 'Merkur',  glyph: '☿\uFE0E', weight: 0.8 },
-  { key: 'venus',   body: Astronomy.Body.Venus,   name: 'Venera',  glyph: '♀\uFE0E', weight: 0.8 },
-  { key: 'mars',    body: Astronomy.Body.Mars,    name: 'Mars',    glyph: '♂\uFE0E', weight: 0.8 },
-  { key: 'jupiter', body: Astronomy.Body.Jupiter, name: 'Jupiter', glyph: '♃\uFE0E', weight: 0.6 },
-  { key: 'saturn',  body: Astronomy.Body.Saturn,  name: 'Saturn',  glyph: '♄\uFE0E', weight: 0.6 },
-  { key: 'uranus',  body: Astronomy.Body.Uranus,  name: 'Uran',    glyph: '♅\uFE0E', weight: 0.4 },
-  { key: 'neptune', body: Astronomy.Body.Neptune, name: 'Neptun',  glyph: '♆\uFE0E', weight: 0.4 },
-  { key: 'pluto',   body: Astronomy.Body.Pluto,   name: 'Pluton',  glyph: '♇\uFE0E', weight: 0.4 },
+  telo({ key: 'moon', body: Astronomy.Body.Moon, glyph: '☽\uFE0E', weight: 1.0 }),
+  telo({ key: 'sun', body: Astronomy.Body.Sun, glyph: '☉\uFE0E', weight: 1.0 }),
+  telo({ key: 'mercury', body: Astronomy.Body.Mercury, glyph: '☿\uFE0E', weight: 0.8 }),
+  telo({ key: 'venus', body: Astronomy.Body.Venus, glyph: '♀\uFE0E', weight: 0.8 }),
+  telo({ key: 'mars', body: Astronomy.Body.Mars, glyph: '♂\uFE0E', weight: 0.8 }),
+  telo({ key: 'jupiter', body: Astronomy.Body.Jupiter, glyph: '♃\uFE0E', weight: 0.6 }),
+  telo({ key: 'saturn', body: Astronomy.Body.Saturn, glyph: '♄\uFE0E', weight: 0.6 }),
+  telo({ key: 'uranus', body: Astronomy.Body.Uranus, glyph: '♅\uFE0E', weight: 0.4 }),
+  telo({ key: 'neptune', body: Astronomy.Body.Neptune, glyph: '♆\uFE0E', weight: 0.4 }),
+  telo({ key: 'pluto', body: Astronomy.Body.Pluto, glyph: '♇\uFE0E', weight: 0.4 }),
 ];
 
 /** Geocentricna ekliptička longituda tela, u ekliptici datuma. */
@@ -58,7 +65,7 @@ function angleDelta(a: number, b: number): number {
 
 export type PlanetPosition = {
   key: PlanetKey;
-  name: string;
+  readonly name: string;
   glyph: string;
   weight: number;
   longitude: number;
@@ -73,12 +80,13 @@ export function planetPositions(date: Date = new Date()): PlanetPosition[] {
   const dt = 0.5; // pola dana — dovoljno za stabilnu brzinu i kod sporih tela
   const t1 = t0.AddDays(dt);
 
-  return BODIES.map(({ key, body, name, glyph, weight }) => {
+  return BODIES.map(({ key, body, glyph, weight }) => {
     const l0 = eclipticLongitude(body, t0);
     const l1 = eclipticLongitude(body, t1);
     const speed = angleDelta(l1, l0) / dt;
     return {
-      key, name, glyph, weight,
+      key, glyph, weight,
+      get name() { return tr().nebo.tela[key]; },
       longitude: l0,
       position: signFromLongitude(l0),
       speed,
@@ -89,19 +97,24 @@ export function planetPositions(date: Date = new Date()): PlanetPosition[] {
 
 export type AspectDef = {
   key: string;
-  name: string;
+  /** Ime na jeziku aplikacije (getter, iz recnika). */
+  readonly name: string;
   angle: number;
   glyph: string;
   /** Maksimalna dozvoljena orbita u stepenima. */
   orb: number;
 };
 
+function aspekt(d: Omit<AspectDef, 'name'> & { key: keyof Recnik['nebo']['aspekti'] }): AspectDef {
+  return { ...d, get name() { return tr().nebo.aspekti[d.key]; } };
+}
+
 export const ASPECTS: AspectDef[] = [
-  { key: 'conjunction', name: 'konjunkcija', angle: 0,   glyph: '☌\uFE0E', orb: 8 },
-  { key: 'sextile',     name: 'sekstil',     angle: 60,  glyph: '⚹\uFE0E', orb: 4 },
-  { key: 'square',      name: 'kvadrat',     angle: 90,  glyph: '□\uFE0E', orb: 6 },
-  { key: 'trine',       name: 'trigon',      angle: 120, glyph: '△\uFE0E', orb: 6 },
-  { key: 'opposition',  name: 'opozicija',   angle: 180, glyph: '☍\uFE0E', orb: 8 },
+  aspekt({ key: 'conjunction', angle: 0, glyph: '☌\uFE0E', orb: 8 }),
+  aspekt({ key: 'sextile', angle: 60, glyph: '⚹\uFE0E', orb: 4 }),
+  aspekt({ key: 'square', angle: 90, glyph: '□\uFE0E', orb: 6 }),
+  aspekt({ key: 'trine', angle: 120, glyph: '△\uFE0E', orb: 6 }),
+  aspekt({ key: 'opposition', angle: 180, glyph: '☍\uFE0E', orb: 8 }),
 ];
 
 export type Aspect = {
@@ -160,9 +173,5 @@ export function findAspects(positions: PlanetPosition[]): Aspect[] {
 /** Faza Meseca u stepenima (0 = mlad, 90 = prva cetvrt, 180 = pun). */
 export function moonPhase(date: Date = new Date()): { angle: number; name: string } {
   const angle = Astronomy.MoonPhase(date);
-  const names = [
-    'Mlad Mesec', 'Mladi srp', 'Prva četvrt', 'Rastući Mesec',
-    'Pun Mesec', 'Opadajući Mesec', 'Poslednja četvrt', 'Stari srp',
-  ];
-  return { angle, name: names[Math.floor(norm360(angle + 22.5) / 45)] };
+  return { angle, name: tr().nebo.fazeMeseca[Math.floor(norm360(angle + 22.5) / 45)] };
 }

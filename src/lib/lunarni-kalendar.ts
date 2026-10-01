@@ -6,16 +6,15 @@
  */
 import * as Astronomy from 'astronomy-engine';
 
+import { tr } from '@/i18n/jezik';
 import { MAIN_PHASES } from '@/lib/moon';
 import { dayKey } from '@/lib/transits';
 
-export const MESECI_PUNO = [
-  'januar', 'februar', 'mart', 'april', 'maj', 'jun',
-  'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar',
-];
+/** "Oktobar 2026" — naslov celog kalendara, iz recnika (`karta.kalendar`). */
+export const naslovKalendara = (mesec: number, godina: number): string => tr().karta.kalendar.naslov(mesec, godina);
 
-/** Zaglavlje kolona, ponedeljak prvi. */
-export const DANI_U_NEDELJI = ['P', 'U', 'S', 'Č', 'P', 'S', 'N'];
+/** Zaglavlje kolona, ponedeljak prvi — iz recnika, po jeziku. */
+export const daniUNedelji = (): readonly string[] => tr().karta.kalendar.daniUNedelji;
 
 /**
  * Nedelje meseca: svaka je 7 celija, `null` = dan iz susednog meseca (prazno).

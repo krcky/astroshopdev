@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { WheelPicker } from '@/components/ui/wheel-picker';
@@ -29,6 +30,9 @@ import { pushProfile } from '@/lib/sync';
  * cim se izabere, ostalo na "Sačuvaj". Upis ide na server (bez mreze ne ide).
  */
 export default function OsobaPolje() {
+  const t = useT();
+  const td = t.profil.rodjenje;
+  const tl = t.profil.rodjenjePolje;
   const { osoba: id, polje } = useLocalSearchParams<{ osoba?: string; polje: PoljeOsobe }>();
   const drugaOsoba = useOsoba(id);
   const svoj = useProfileStore((s) => s.profile);
@@ -54,7 +58,7 @@ export default function OsobaPolje() {
   const [poruka, setPoruka] = React.useState<string | null>(null);
 
   if (!osoba || !uid) {
-    return <SheetScroll><Text variant="muted">Ova osoba više nije na tvojoj listi.</Text></SheetScroll>;
+    return <SheetScroll><Text variant="muted">{td.nemaVise}</Text></SheetScroll>;
   }
 
   const sacuvaj = async (izmena: Partial<NovaOsoba>) => {
@@ -83,7 +87,7 @@ export default function OsobaPolje() {
   const dno = (dugme: { label: string; onPress: () => void; disabled?: boolean } | null) => (
     <>
       {!!poruka && <Text variant="note" className="mt-5 text-foreground">{poruka}</Text>}
-      {!naMrezi && !poruka && <Text variant="note" className="mt-5">Za izmenu je potreban internet.</Text>}
+      {!naMrezi && !poruka && <Text variant="note" className="mt-5">{tl.trebaInternet}</Text>}
       {dugme && (
         <Button className="mt-5" disabled={dugme.disabled || !naMrezi} ucitava={radi} onPress={dugme.onPress}>
           <Text>{dugme.label}</Text>
@@ -96,13 +100,13 @@ export default function OsobaPolje() {
   if (polje === 'ime' || polje === 'mesto') {
     return (
       <SheetScroll keyboardShouldPersistTaps="handled">
-        <Text variant="naslovLista">{polje === 'ime' ? 'Ime' : 'Mesto rođenja'}</Text>
+        <Text variant="naslovLista">{polje === 'ime' ? td.ime : td.mesto}</Text>
         <View className="mt-6">
           {polje === 'ime' ? (
             <Input
               value={ime}
               onChangeText={setIme}
-              placeholder={id ? 'Ime ili nadimak' : 'Tvoje ime'}
+              placeholder={id ? td.imeIliNadimak : tl.tvojeIme}
               autoCapitalize="words"
               autoCorrect={false}
               autoFocus
@@ -115,9 +119,9 @@ export default function OsobaPolje() {
           )}
         </View>
         {polje === 'ime'
-          ? dno({ label: 'Sačuvaj', onPress: () => sacuvaj({ name: ime.trim() }), disabled: !ime.trim() || ime.trim() === osoba.name })
+          ? dno({ label: t.opste.sacuvaj, onPress: () => sacuvaj({ name: ime.trim() }), disabled: !ime.trim() || ime.trim() === osoba.name })
           // Mesto: dugme tek kad je grad izabran (dok se kuca, predlozi trebaju prostor).
-          : dno(grad ? { label: 'Sačuvaj', onPress: () => sacuvaj(placeFields(grad)) } : null)}
+          : dno(grad ? { label: t.opste.sacuvaj, onPress: () => sacuvaj(placeFields(grad)) } : null)}
       </SheetScroll>
     );
   }
@@ -129,7 +133,7 @@ export default function OsobaPolje() {
       <BezInterneta className="mb-4" />
       {polje === 'odnos' ? (
         <>
-          <Text variant="naslovLista">Ko ti je {osoba.name}?</Text>
+          <Text variant="naslovLista">{td.koTiJe(osoba.name)}</Text>
           <View className="mt-4">
             <IzborOdnosa naBelom izabran={osoba.odnos ?? null}
               onIzbor={(k: OdnosKljuc) => (k === osoba.odnos ? router.back() : sacuvaj({ odnos: k }))} />
@@ -138,25 +142,25 @@ export default function OsobaPolje() {
         </>
       ) : polje === 'datum' ? (
         <>
-          <Text variant="naslovLista">Datum rođenja</Text>
+          <Text variant="naslovLista">{td.datum}</Text>
           <View className="mt-4">
             <WheelPicker mode="date" value={datum} onChange={setDatum} maximumDate={new Date()} />
           </View>
           {dno({
-            label: 'Sačuvaj',
+            label: t.opste.sacuvaj,
             onPress: () => sacuvaj({ birth: { year: datum.getFullYear(), month: datum.getMonth() + 1, day: datum.getDate() } }),
           })}
         </>
       ) : (
         <>
-          <Text variant="naslovLista">Vreme rođenja</Text>
+          <Text variant="naslovLista">{td.vreme}</Text>
           {vremePoznato ? (
             <View className="mt-4">
               <WheelPicker mode="time" value={vreme} onChange={setVreme} />
             </View>
           ) : (
             <Text variant="body" className="mt-3">
-              Vreme nije uneto — karta nema podznak ni kuće.
+              {tl.vremeNijeUneto}
             </Text>
           )}
           <Pressable
@@ -164,11 +168,11 @@ export default function OsobaPolje() {
             accessibilityRole="button"
             className="mt-3 items-center py-2 active:opacity-60">
             <Text variant="label" className="text-foreground underline">
-              {vremePoznato ? 'Ne znam vreme' : 'Znam vreme, hoću da ga unesem'}
+              {vremePoznato ? td.neZnamVreme : tl.znamVreme}
             </Text>
           </Pressable>
           {dno({
-            label: 'Sačuvaj',
+            label: t.opste.sacuvaj,
             onPress: () => sacuvaj({ time: vremePoznato ? { hour: vreme.getHours(), minute: vreme.getMinutes() } : null }),
           })}
         </>

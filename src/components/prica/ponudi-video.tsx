@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ActionSheetIOS, Alert, Platform } from 'react-native';
 
+import { useT } from '@/i18n';
 import { IMA_VIDEO } from '@/components/prica/platno-videa';
 import { pitajZaObavestenje } from '@/components/prica/video-radionica';
 import { otvoriVideo, procenat } from '@/components/prica/video-traka';
@@ -25,6 +26,7 @@ export function usePonudiVideo({ posao, pauza, naslov }: {
   /** Naslov menija: "Podeli svoj dan", "Podeli svoj znak". */
   naslov: string;
 }) {
+  const t = useT();
   const uid = useAuthStore((s) => s.user?.id ?? null);
   const video = useVideo(uid, posao?.vrsta ?? 'dan', posao?.kljuc ?? null);
   const drugi = useVideoPrice((s) => (s.posao && s.posao.vrsta !== posao?.vrsta ? s.posao.naslov : null));
@@ -34,13 +36,14 @@ export function usePonudiVideo({ posao, pauza, naslov }: {
     pauza(true);
     const gotov = video?.stanje === 'gotov' && video.uri ? video.uri : null;
     const pravi = video?.stanje === 'pravi';
+    const tp = t.prica.ponudi;
     const opis = drugi
-      ? `Upravo pravimo video: ${drugi}. Ovaj možeš čim taj bude gotov.`
+      ? tp.upravoPravimo(drugi)
       : pravi
-        ? `Video se pravi · ${procenat(video!.napredak)}. Javićemo ti kad bude gotov.`
+        ? tp.sePravi(procenat(video!.napredak))
         : gotov
-          ? 'Video cele priče je spreman.'
-          : 'Video pravimo oko minut. Za to vreme koristi aplikaciju — javićemo ti kad bude gotov.';
+          ? tp.spreman
+          : tp.pravimoOkoMinut;
     const moze = !pravi && !drugi;
     const video1 = () => {
       pauza(false);
@@ -58,9 +61,9 @@ export function usePonudiVideo({ posao, pauza, naslov }: {
         naslov,
         opis,
         [
-          { text: 'Otkaži', style: 'cancel', onPress: otkazi },
-          { text: 'Ova slika', onPress: podeliSliku },
-          ...(gotov || moze ? [{ text: gotov ? 'Pogledaj video' : 'Cela priča, video', onPress: video1 }] : []),
+          { text: t.opste.otkazi, style: 'cancel', onPress: otkazi },
+          { text: tp.ovaSlika, onPress: podeliSliku },
+          ...(gotov || moze ? [{ text: gotov ? tp.pogledajVideo : tp.celaPrica, onPress: video1 }] : []),
         ],
         { cancelable: true, onDismiss: otkazi },
       );
@@ -71,9 +74,9 @@ export function usePonudiVideo({ posao, pauza, naslov }: {
         title: naslov,
         message: gotov ? undefined : opis,
         options: [
-          'Ova slika',
-          gotov ? 'Pogledaj video' : pravi ? `Video se pravi · ${procenat(video!.napredak)}` : drugi ? 'Video — čeka drugi video' : 'Cela priča, video',
-          'Otkaži',
+          tp.ovaSlika,
+          gotov ? tp.pogledajVideo : pravi ? tp.sePraviDugme(procenat(video!.napredak)) : drugi ? tp.cekaDrugi : tp.celaPrica,
+          t.opste.otkazi,
         ],
         cancelButtonIndex: 2,
         disabledButtonIndices: gotov || moze ? undefined : [1],
@@ -84,7 +87,7 @@ export function usePonudiVideo({ posao, pauza, naslov }: {
         else otkazi();
       },
     );
-  }, [uid, posao, video, drugi, pauza, naslov]);
+  }, [uid, posao, video, drugi, pauza, naslov, t]);
 
   return { ponudi, video };
 }

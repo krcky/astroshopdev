@@ -12,7 +12,7 @@
  *
  * Cisto, bez RN uvoza (pravilo 6). Provere: `npm run check:prica`.
  */
-import { mnozina, TRANZIT, type Oblici } from '@/lib/mnozina';
+import { tr } from '@/i18n/jezik';
 import type { Tone } from '@/lib/tone';
 
 export type SlikaKljuc = 'naslovna' | 'tvojDan' | 'ocene' | 'ideKoci' | 'mesec' | 'savet';
@@ -65,6 +65,7 @@ export function trajanjeSlike(tekst: string): number {
  * Reci naslova za ispis rec po rec. Jednoslovna rec (u, i, a, o, s, k) se veze za
  * sledecu nelomljivim razmakom, kao u srpskom slogu — da ne ostane sama na kraju reda
  * i da "Biku" ne padne sam u drugi red ("Opadajući Mesec / u Biku").
+ * PRAVILO SRPSKOG SLOGA: drugi jezik ima svoje (engleski ga nema, slovenacki i hrvatski slicno).
  */
 export const NELOMLJIV = '\u00A0';
 export function reciZaPrelom(tekst: string): string[] {
@@ -160,10 +161,6 @@ export function velicinaSaveta(
  * Naslovna: ton tranzita
  * ------------------------------------------------------------------------- */
 
-export const SKLADAN: Oblici = ['skladan', 'skladna', 'skladnih'];
-export const MESOVIT: Oblici = ['mešovit', 'mešovita', 'mešovitih'];
-export const NAPET: Oblici = ['napet', 'napeta', 'napetih'];
-
 export type BrojTonova = { povoljno: number; mesovito: number; izazovno: number };
 
 export function brojTonova(tonovi: readonly Tone[]): BrojTonova {
@@ -172,20 +169,24 @@ export function brojTonova(tonovi: readonly Tone[]): BrojTonova {
   return b;
 }
 
-/** "7 skladnih · 2 mešovita · 1 napet"; ton kog nema se ne pise. */
+/**
+ * "7 skladnih · 2 mešovita · 1 napet"; ton kog nema se ne pise. Reci uz broj su u recniku
+ * (`prica.racun.ton`), po jeziku.
+ */
 export function legendaTonova(b: BrojTonova): string {
+  const ton = tr().prica.racun.ton;
   return ([
-    [b.povoljno, SKLADAN],
-    [b.mesovito, MESOVIT],
-    [b.izazovno, NAPET],
+    [b.povoljno, ton.povoljno],
+    [b.mesovito, ton.mesovito],
+    [b.izazovno, ton.izazovno],
   ] as const)
     .filter(([n]) => n > 0)
-    .map(([n, o]) => `${n} ${mnozina(n, o)}`)
+    .map(([n, f]) => f(n))
     .join(' · ');
 }
 
 /** "10 tranzita", "1 tranzit", "3 tranzita". */
-export const brojTranzita = (n: number) => `${n} ${mnozina(n, TRANZIT)}`;
+export const brojTranzita = (n: number) => `${n} ${tr().gramatika.tranzita(n)}`;
 
 /* ------------------------------------------------------------------------- *
  * Naslovna: dvostruki tocak (tranzitna planeta spolja -> natalna tacka unutra)
@@ -242,12 +243,9 @@ export function fazaOsmina(ugao: number): number {
 }
 
 /** Natpis trenutka "Tvog dana" uz "Najvažnije danas"; `null` kad tranzit samo traje. */
-export const MOMENAT_NATPIS: Record<'egzaktan' | 'pocinje' | 'zavrsava' | 'traje', string | null> = {
-  egzaktan: 'tačan danas',
-  pocinje: 'počinje danas',
-  zavrsava: 'poslednji dan',
-  traje: null,
-};
+export function momenatNatpis(m: 'egzaktan' | 'pocinje' | 'zavrsava' | 'traje'): string | null {
+  return m === 'traje' ? null : tr().prica.racun.momenat[m];
+}
 
 /* ------------------------------------------------------------------------- *
  * Putanje crteza (SVG `d`), da komponente samo crtaju

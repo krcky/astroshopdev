@@ -4,6 +4,7 @@ import { Redirect, router } from 'expo-router';
 
 import { OnboardingStep } from '@/components/onboarding-step';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/i18n';
 import { Kvacica } from '@/components/ui/kvacica';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { otvoriPremium } from '@/components/zakljucano';
@@ -30,6 +31,8 @@ const dvo = (n: number) => String(n).padStart(2, '0');
  * je roditelj ili staratelj. Konacan tekst ide pravniku uz politiku privatnosti.
  */
 export default function NovaOsobaPregled() {
+  const t = useT();
+  const tn = t.profil.novaOsoba;
   const nacrt = useNovaOsoba();
   const uid = useAuthStore((s) => s.user?.id);
   const naMrezi = useNaMrezi();
@@ -52,9 +55,9 @@ export default function NovaOsobaPregled() {
     return (
       <OnboardingStep
         exit={{ kind: 'back', onPress: () => router.back() }}
-        question="Ne možemo da izračunamo kartu"
-        note={`Ne znamo pouzdano koliko je sati bilo po UTC-u u mestu ${resolved.city.name} na taj datum. Probaj drugo mesto rođenja, ili nam javi — zona: ${resolved.city.tz.name}`}
-        primary={{ label: 'Nazad na mesto rođenja', onPress: () => router.back() }}
+        question={tn.neMozemoKartu}
+        note={tn.neMozemoKartuTekst(resolved.city.name, resolved.city.tz.name)}
+        primary={{ label: tn.nazadNaMesto, onPress: () => router.back() }}
       />
     );
   }
@@ -64,7 +67,9 @@ export default function NovaOsobaPregled() {
   const podznak = resolved.timeUnknown ? null : resolved.chart.ascendantSign.sign;
   const odnos = nazivOdnosa(nacrt.odnos);
   const rodjenje = [
-    datumRodjenja(profil.birth) + (profil.time ? ` u ${dvo(profil.time.hour)}:${dvo(profil.time.minute)}` : ''),
+    profil.time
+      ? tn.datumUVreme(datumRodjenja(profil.birth), `${dvo(profil.time.hour)}:${dvo(profil.time.minute)}`)
+      : datumRodjenja(profil.birth),
     profil.cityName,
   ].join(' · ');
 
@@ -93,24 +98,24 @@ export default function NovaOsobaPregled() {
       title={nacrt.ime}
       subtitle={odnos ? `${odnos} · ${rodjenje}` : rodjenje}
       note={poruka ?? (naMrezi
-        ? `Ove podatke vidiš samo ti. Ako postaviš pitanje o ovoj osobi, vidi ih i ${ASTROLOG.kratko}.`
-        : 'Za dodavanje osobe potreban je internet.')}
-      primary={{ label: 'Dodaj osobu', onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
+        ? tn.vidisSamoTi(ASTROLOG.kratko)
+        : tn.trebaInternet)}
+      primary={{ label: tn.dodajOsobu, onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
       <View className="items-center">
         {/* Velika trojka, kao na kraju onboardinga. */}
         <View className="w-full flex-row justify-center gap-8">
-          <Placement uloga="Sunce" znak={sunce} />
-          <Placement uloga="Mesec" znak={mesec} />
-          <Placement uloga="Podznak" znak={podznak} />
+          <Placement uloga={tn.sunce} znak={sunce} />
+          <Placement uloga={tn.mesec} znak={mesec} />
+          <Placement uloga={tn.podznak} znak={podznak} />
         </View>
         {resolved.timeUnknown && (
           <Text variant="muted" className="mt-6 px-4 text-center text-xs">
-            Bez vremena rođenja podznak i kuće ne mogu da se izračunaju. Vreme možeš da dodaš kasnije.
+            {tn.bezVremena}
           </Text>
         )}
       </View>
       <Kvacica ukljuceno={pristanak} onPromena={setPristanak} className="mt-10">
-        Osoba zna da unosim njene podatke o rođenju. Ako je dete, ja sam roditelj ili staratelj.
+        {tn.pristanak}
       </Kvacica>
     </OnboardingStep>
   );
@@ -118,8 +123,9 @@ export default function NovaOsobaPregled() {
 
 /** Znak, ime znaka, ispod sitno cije je — isto kao na kraju onboardinga (`reveal.tsx`). */
 function Placement({ uloga, znak }: { uloga: string; znak: ZodiacSign | null }) {
+  const t = useT();
   return (
-    <View className="items-center" accessible accessibilityLabel={`${uloga}: ${znak ? znak.name : 'nepoznat'}`}>
+    <View className="items-center" accessible accessibilityLabel={t.profil.novaOsoba.ulogaZnak(uloga, znak ? znak.name : null)}>
       {znak ? (
         <ZnakIkona znak={znak.key} element={znak.element} size={40} />
       ) : (
