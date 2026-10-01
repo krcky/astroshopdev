@@ -200,6 +200,6 @@ KAŽU da je odgovor glasovna poruka NA SRPSKOM (Ivan) — u `pitaj.uvod.glasovno
 
 ### FONT ZA MAKEDONSKI
 
-Plus Jakarta Sans NEMA ćirilicu. Dok se ne doda font sa ćirilicom, telefon crta ćirilicu sistemskim
-fontom (iOS i Android sami zamenjuju slova koja font nema) — čitljivo, ali latinica i brojevi ostaju u
-Jakarti, pa se pismo vidno meša.
+Plus Jakarta Sans NEMA ćirilicu, pa je za makedonski CEO tekst u Manrope-u (Ivan, 1.10.2026): `FONT` u
+`theme/font.ts` ima gettere i vraća Manrope kad je jezik `mk`. Polja za unos dobijaju isto pismo kroz `style`
+(klasa `font-sans` je Jakarta). Poreklo i skripta: `assets/fonts/POREKLO.md`, `scripts/font/build-manrope.py`.

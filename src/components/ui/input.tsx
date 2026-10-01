@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TextInput } from 'react-native';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { FONT } from '@/theme/font';
 
 /**
  * Polje za unos: ISPUNJENA KAPSULA, ne linija i ne okvir (Ivan, 29.9.2026:
@@ -49,6 +50,8 @@ export const Input = React.forwardRef<TextInput, Props>(function Input(
         className
       )}
       {...props}
+      // `font-sans` je Jakarta; pismo tekuceg jezika (makedonski = Manrope, `theme/font.ts`).
+      style={[{ fontFamily: FONT.regular }, props.style]}
     />
   );
 });

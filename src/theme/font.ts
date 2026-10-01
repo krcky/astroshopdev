@@ -22,13 +22,46 @@
  *
  * Astroloski simboli i dalje idu kroz `<Glyph>` i svoj font (pravilo 3).
  */
-export const FONT = {
+import { jezik } from '@/i18n/jezik';
+
+const FONT_JAKARTA = {
   regular: 'PlusJakartaSans-Regular',
   medium: 'PlusJakartaSans-Medium',
   semibold: 'PlusJakartaSans-SemiBold',
   bold: 'PlusJakartaSans-Bold',
   extrabold: 'PlusJakartaSans-ExtraBold',
 } as const;
+
+/**
+ * MAKEDONSKI = CIRILICA (Ivan, 1.10.2026): Plus Jakarta Sans nema ciriliska slova, pa bi ih telefon
+ * crtao sistemskim fontom, a latinica i brojevi bi ostali u Jakarti. Za `mk` je ceo tekst u
+ * MANROPE-u (SIL OFL, `assets/fonts/manrope/OFL.txt`) — geometrijski kao Jakarta, ima cirilicu
+ * sa makedonskim slovima (ѓ ќ ѕ ј љ њ џ). Google Fonts daje samo varijabilni fajl; pet statickih
+ * rezova (400—800, iste debljine kao Jakarta) napravljeno je fontTools-om (`varLib.instancer`),
+ * oblici neizmenjeni. Poreklo: `assets/fonts/POREKLO.md`.
+ */
+export const FONT_MANROPE = {
+  regular: 'Manrope-Regular',
+  medium: 'Manrope-Medium',
+  semibold: 'Manrope-SemiBold',
+  bold: 'Manrope-Bold',
+  extrabold: 'Manrope-ExtraBold',
+} as const;
+
+type Rezovi = { readonly regular: string; readonly medium: string; readonly semibold: string; readonly bold: string; readonly extrabold: string };
+const rezovi = (): Rezovi => (jezik() === 'mk' ? FONT_MANROPE : FONT_JAKARTA);
+
+/**
+ * Pismo TEKUCEG JEZIKA — getteri, pa `FONT.medium` uvek vraca rez za jezik koji je sada izabran
+ * (promena jezika sklapa navigaciju iznova, `_layout.tsx`, pa se sve iscrta novim pismom).
+ */
+export const FONT: Rezovi = {
+  get regular() { return rezovi().regular; },
+  get medium() { return rezovi().medium; },
+  get semibold() { return rezovi().semibold; },
+  get bold() { return rezovi().bold; },
+  get extrabold() { return rezovi().extrabold; },
+};
 
 /**
  * Prethodno pismo (28.9.2026), za povratak — vidi gore; uz njega i
@@ -44,11 +77,16 @@ export const FONT_SATOSHI = {
 
 /** Za `useFonts` u `app/_layout.tsx` — ime familije -> fajl. */
 export const FONT_FILES = {
-  [FONT.regular]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Regular.ttf'),
-  [FONT.medium]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Medium.ttf'),
-  [FONT.semibold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-SemiBold.ttf'),
-  [FONT.bold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Bold.ttf'),
-  [FONT.extrabold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-ExtraBold.ttf'),
+  [FONT_JAKARTA.regular]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Regular.ttf'),
+  [FONT_JAKARTA.medium]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Medium.ttf'),
+  [FONT_JAKARTA.semibold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-SemiBold.ttf'),
+  [FONT_JAKARTA.bold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-Bold.ttf'),
+  [FONT_JAKARTA.extrabold]: require('../../assets/fonts/plus-jakarta-sans/PlusJakartaSans-ExtraBold.ttf'),
+  [FONT_MANROPE.regular]: require('../../assets/fonts/manrope/Manrope-Regular.ttf'),
+  [FONT_MANROPE.medium]: require('../../assets/fonts/manrope/Manrope-Medium.ttf'),
+  [FONT_MANROPE.semibold]: require('../../assets/fonts/manrope/Manrope-SemiBold.ttf'),
+  [FONT_MANROPE.bold]: require('../../assets/fonts/manrope/Manrope-Bold.ttf'),
+  [FONT_MANROPE.extrabold]: require('../../assets/fonts/manrope/Manrope-ExtraBold.ttf'),
 };
 
 /** Familija po Tailwind klasi tezine u konacnom nizu klasa (poslednja pobedjuje). */

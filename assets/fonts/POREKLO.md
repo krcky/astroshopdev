@@ -44,3 +44,12 @@ sklapanja poredi obrise sa prethodnom verzijom i javlja svaku promenu.
 Dodaj `glyph: '…'` u kod, pokreni skriptu, pogledaj sta je ispisala. Kiron (⚷)
 i juzni cvor (☋) u fontu NE postoje — za njih bi bilo potrebno jos jedno
 sklapanje.
+
+# Manrope (makedonski, 1.10.2026)
+
+Plus Jakarta Sans nema ćirilicu. Za makedonski ceo tekst ide u Manrope-u (`assets/fonts/manrope/`,
+SIL OFL 1.1, `OFL.txt` pored fontova; licenca nema "Reserved Font Name", pa izmenjeni rezovi smeju da
+nose ime). Izvor: `github.com/google/fonts/ofl/manrope/Manrope[wght].ttf` (varijabilni, 200—800).
+Pet statičkih rezova (400—800) napravljeno je skriptom `scripts/font/build-manrope.py` (fontTools
+`varLib.instancer`); oblici neizmenjeni, menjaju se samo imena. Provereno: sva makedonska slova
+(ѓ ќ ѕ ј љ њ џ) i srpska latinica (č ć š ž đ, „ " – — · …) postoje. Izbor pisma po jeziku: `src/theme/font.ts`.

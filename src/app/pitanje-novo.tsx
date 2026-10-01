@@ -27,6 +27,7 @@ import { useAuthStore, useEntitlement } from '@/store/auth';
 import { useResolvedProfile } from '@/store/profile';
 import { cn } from '@/lib/utils';
 import { neutral } from '@/theme/tokens';
+import { FONT } from '@/theme/font';
 
 /** Izbor "Ja" u redu "O kome je pitanje". */
 const JA = 'ja';
@@ -256,7 +257,8 @@ export default function PitanjeNovo() {
         accessibilityLabel={tn.poljeOpis}
         // Bez okvira i bez sive podloge — polje je papir, kursor je jedini znak.
         className="mt-5 flex-1 px-6 font-sans text-row leading-[26px] text-foreground"
-        style={Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : undefined}
+        // `font-sans` je Jakarta; pismo tekuceg jezika (makedonski = Manrope, `theme/font.ts`).
+        style={[{ fontFamily: FONT.regular }, Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null]}
       />
 
       {/* Animirani omotac nosi SAMO razmak za tastaturu — NativeWind klase na
