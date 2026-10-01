@@ -21,12 +21,17 @@ const ZONES: TimeZoneInfo[] = [
 ].map((name) => ({ name, standardOffsetMinutes: 60, europeanDst: true }));
 
 const COUNTRIES = ['BiH', 'Crna Gora', 'Hrvatska', 'S. Makedonija', 'Slovenija', 'Srbija'];
+/** ISO kod zemlje, istim redom kao `COUNTRIES` — za ime zemlje na jeziku aplikacije. */
+const COUNTRY_CODES = ['BA', 'ME', 'HR', 'MK', 'SI', 'RS'];
 
 export type City = {
   /** GeoNames id. Profil cuva OVO, ne ime. */
   id: number;
   name: string;
+  /** Ime zemlje na srpskom (snimak za astrologa); za ekran `imeZemlje()` iz `city-search.ts`. */
   country: string;
+  /** ISO kod zemlje ("HR", "US"); stari profili ga nemaju. */
+  kodZemlje?: string;
   latitude: number;
   longitude: number;
   tz: TimeZoneInfo;
@@ -2147,6 +2152,7 @@ function all(): City[] {
       id: Number(id),
       name,
       country: COUNTRIES[Number(ci)],
+      kodZemlje: COUNTRY_CODES[Number(ci)],
       latitude: Number(lat),
       longitude: Number(lon),
       tz: ZONES[Number(zi)],
@@ -2199,11 +2205,70 @@ export const suggestedCityIds = [
   3188434, // Užice
 ];
 
-/** Predlozi bez upita — najveci gradovi Srbije, redom. */
-export function suggestedCities(limit = 8): City[] {
+/**
+ * PREDLOZI PO ZEMLJI JEZIKA (Ivan, 2.10.2026): hrvatski nudi hrvatske gradove, bosanski
+ * bosanske… Isti razlog za rucni izbor kao gore: podaci imaju cetvrti i opstine ("Sesvete",
+ * "Mestna občina Velenje") medju najvecim gradovima. Srbija je `suggestedCityIds`.
+ */
+export const predloziPoZemlji: Record<'RS' | 'HR' | 'BA' | 'SI' | 'MK', readonly number[]> = {
+  RS: suggestedCityIds,
+  HR: [
+    3186886, 3190261, 3191648, 3193935, 3186952, 3192224, 3190586, 3345300, // Zagreb, Split, Rijeka, Osijek, Zadar, Pula, Brod, Karlovac
+    3188383, 3190941, 3190813, 3201047, 3187719, 3203982, 3197728, 3187047, // Varaždin, Šibenik, Sisak, Dubrovnik, Vinkovci, Bjelovar, Koprivnica, Vukovar
+  ],
+  BA: [
+    3191281, 3204541, 3188582, 3186573, 3194828, 3204222, 3204186, 3203521, // Sarajevo, Banja Luka, Tuzla, Zenica, Mostar, Bihać, Bijeljina, Brčko
+    3192409, 3201984, 3188893, 3188924, 3202822, 3203099, 3200396, 3187609, // Prijedor, Doboj, Trebinje, Travnik, Cazin, Bugojno, Goražde, Visoko
+  ],
+  SI: [
+    3196359, 3195506, 3202781, 3197378, 3197753, 3194351, 3194452, 3198365, // Ljubljana, Maribor, Celje, Kranj, Koper, Novo mesto, Nova Gorica, Kamnik
+    3190717, 3199017, 3192673, 3187214, 3197943, 3190534,                   // Škofja Loka, Izola, Postojna, Vrhnika, Kočevje, Slovenska Bistrica
+  ],
+  MK: [
+    785842, 788886, 792578, 786735, 785082, 785058, 787487, 790295,         // Skopje, Kumanovo, Bitola, Prilep, Tetovo, Veles, Ohrid, Gostivar
+    785482, 785380, 789541, 785387, 789403, 789527,                         // Štip, Strumica, Kavadarci, Struga, Kočani, Kičevo
+  ],
+};
+
+/** Zona van regiona, za ugradjene americke gradove (bez evropskog letnjeg pravila — racuna Intl). */
+const zona = (name: string, standardOffsetMinutes: number): TimeZoneInfo => ({ name, standardOffsetMinutes, europeanDst: false });
+
+/**
+ * ENGLESKI NUDI AMERICKE GRADOVE (Ivan, 2.10.2026). Svet van regiona je u bazi (`city-search.ts`),
+ * ali predlozi moraju odmah, bez mreze — zato 16 najvecih ovde, sa ISTIM GeoNames id-jem i
+ * koordinatama kao u tabeli `cities` (upit po `population`, 2.10.2026; bez Brooklyna i Queensa,
+ * delova Njujorka).
+ */
+export const AMERICKI_GRADOVI: City[] = ([
+  [5128581, 'New York City', 40.7143, -74.006, 'America/New_York', -300],
+  [5368361, 'Los Angeles', 34.0522, -118.2437, 'America/Los_Angeles', -480],
+  [4887398, 'Chicago', 41.85, -87.65, 'America/Chicago', -360],
+  [4699066, 'Houston', 29.7633, -95.3633, 'America/Chicago', -360],
+  [5308655, 'Phoenix', 33.4484, -112.074, 'America/Phoenix', -420],
+  [4560349, 'Philadelphia', 39.9524, -75.1636, 'America/New_York', -300],
+  [4726206, 'San Antonio', 29.4241, -98.4936, 'America/Chicago', -360],
+  [5391811, 'San Diego', 32.7157, -117.1647, 'America/Los_Angeles', -480],
+  [4684888, 'Dallas', 32.7831, -96.8067, 'America/Chicago', -360],
+  [5392171, 'San Jose', 37.3394, -121.895, 'America/Los_Angeles', -480],
+  [4671654, 'Austin', 30.2672, -97.7431, 'America/Chicago', -360],
+  [4160021, 'Jacksonville', 30.3322, -81.6556, 'America/New_York', -300],
+  [5391959, 'San Francisco', 37.7749, -122.4194, 'America/Los_Angeles', -480],
+  [5809844, 'Seattle', 47.6062, -122.3321, 'America/Los_Angeles', -480],
+  [5419384, 'Denver', 39.7392, -104.9847, 'America/Denver', -420],
+  [4140963, 'Washington', 38.8951, -77.0364, 'America/New_York', -300],
+] as const).map(([id, name, latitude, longitude, tz, off]) => ({
+  id, name, country: 'SAD', kodZemlje: 'US', latitude, longitude, tz: zona(tz, off),
+}));
+
+/** Zemlja ciji se gradovi nude prvi: po jeziku aplikacije (`city-search.ts`). */
+export type ZemljaPredloga = keyof typeof predloziPoZemlji | 'US';
+
+/** Predlozi bez upita — najveci gradovi zemlje (podrazumevano Srbija), redom. */
+export function suggestedCities(limit = 8, zemlja: ZemljaPredloga = 'RS'): City[] {
+  if (zemlja === 'US') return AMERICKI_GRADOVI.slice(0, limit);
   const index = new Map(all().map((c) => [c.id, c]));
   const out: City[] = [];
-  for (const id of suggestedCityIds) {
+  for (const id of predloziPoZemlji[zemlja]) {
     const c = index.get(id);
     // Ako grad nekim cudom nestane iz podataka, preskace se u tisini — predlog
     // koji fali je sitnica, a pad ekrana zbog njega nije.
@@ -2213,10 +2278,12 @@ export function suggestedCities(limit = 8): City[] {
   return out;
 }
 
-export function searchCities(query: string, limit = 8): City[] {
-  const list = all();
+export function searchCities(query: string, limit = 8, zemlja: ZemljaPredloga = 'RS'): City[] {
   const q = fold(query.trim());
-  if (!q) return suggestedCities(limit);
+  if (!q) return suggestedCities(limit, zemlja);
+  // Pretraga ostaje po VELICINI za sve jezike: zemlja jezika na vrhu bi za "Zag" dala Žagubicu
+  // pre Zagreba, a za "Sar" selo pre Sarajeva (provereno, 2.10.2026). Po jeziku su samo predlozi.
+  const list = all();
 
   const starts: City[] = [];
   const contains: City[] = [];
@@ -2230,7 +2297,7 @@ export function searchCities(query: string, limit = 8): City[] {
 }
 
 export function cityById(id: number): City | undefined {
-  return all().find((c) => c.id === id);
+  return all().find((c) => c.id === id) ?? AMERICKI_GRADOVI.find((c) => c.id === id);
 }
 
 /**

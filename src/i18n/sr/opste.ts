@@ -14,4 +14,9 @@ export const opste = {
   gotovo: 'Gotovo',
   preskoci: 'Preskoči',
   otkljucaj: 'Otključaj',
+  /**
+   * Imena zemalja ispod grada (izbor mesta rodjenja), po ISO kodu. Kratko — staje uz ime grada.
+   * Zemlja van spiska ide imenom iz baze (`city-search.ts`).
+   */
+  zemlje: { RS: 'Srbija', HR: 'Hrvatska', BA: 'BiH', ME: 'Crna Gora', MK: 'S. Makedonija', SI: 'Slovenija', US: 'SAD' } as Record<string, string>,
 };

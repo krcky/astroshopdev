@@ -16,4 +16,5 @@ export const opste: Recnik['opste'] = {
   gotovo: 'Done',
   preskoci: 'Skip',
   otkljucaj: 'Unlock',
+  zemlje: { RS: 'Serbia', HR: 'Croatia', BA: 'Bosnia and Herzegovina', ME: 'Montenegro', MK: 'North Macedonia', SI: 'Slovenia', US: 'USA' },
 };

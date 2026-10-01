@@ -8,11 +8,22 @@
  * Lokalni pogoci uvek idu prvi: vecina korisnika je iz regiona i za njih
  * pretraga nikad ne ceka mrezu.
  */
-import { searchCities as searchLocal, type City } from '@/lib/cities';
+import { searchCities, type City, type ZemljaPredloga } from '@/lib/cities';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { ZONE_STANDARD_OFFSET } from '@/lib/zone-offsets';
 import type { TimeZoneInfo } from '@/lib/timezone';
-import { tr } from '@/i18n/jezik';
+import { jezik, tr, type Jezik } from '@/i18n/jezik';
+
+/** Zemlja ciji se gradovi nude prvi, po jeziku aplikacije; engleski = SAD (Ivan, 2.10.2026). */
+const ZEMLJA_JEZIKA: Record<Jezik, ZemljaPredloga> = { sr: 'RS', hr: 'HR', bs: 'BA', sl: 'SI', mk: 'MK', en: 'US' };
+
+/** Lokalna pretraga sa zemljom tekuceg jezika. */
+const searchLocal = (query: string, limit: number) => searchCities(query, limit, ZEMLJA_JEZIKA[jezik()]);
+
+/** Ime zemlje grada NA JEZIKU APLIKACIJE (recnik), inace sacuvano ime. */
+export function imeZemlje(c: Pick<City, 'country' | 'kodZemlje'>): string {
+  return (c.kodZemlje && tr().opste.zemlje[c.kodZemlje]) || c.country;
+}
 
 /** Isto presavijanje koje je primenjeno na `search_name` u bazi. */
 function fold(s: string): string {
@@ -64,6 +75,7 @@ export async function searchCitiesRemote(query: string, limit = 8): Promise<City
     id: r.id,
     name: r.name,
     country: countryName(r.country_code),
+    kodZemlje: r.country_code,
     latitude: r.latitude,
     longitude: r.longitude,
     tz: zoneFor(r.timezone),

@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
-import { useCitySearch } from '@/lib/city-search';
+import { imeZemlje, useCitySearch } from '@/lib/city-search';
 import { cn } from '@/lib/utils';
 import { useT } from '@/i18n';
 
@@ -32,7 +32,7 @@ export function PoljeMesto({ grad, onGrad, povrsina, autoFocus, linija = 'border
     <>
       <Input
         povrsina={povrsina}
-        value={grad ? (grad.country ? `${grad.name}, ${grad.country}` : grad.name) : upit}
+        value={grad ? (grad.country ? `${grad.name}, ${imeZemlje(grad)}` : grad.name) : upit}
         onChangeText={(v) => { setUpit(v); onGrad(null); }}
         placeholder={t.placeholder}
         autoFocus={autoFocus}
@@ -47,7 +47,7 @@ export function PoljeMesto({ grad, onGrad, povrsina, autoFocus, linija = 'border
               accessibilityRole="button"
               className={cn('flex-row items-center justify-between border-b py-3.5 active:opacity-60', linija)}>
               <Text className="text-base">{c.name}</Text>
-              <Text variant="muted">{c.country}</Text>
+              <Text variant="muted">{imeZemlje(c)}</Text>
             </Pressable>
           ))}
           {loading && (

@@ -7,7 +7,7 @@ import { OnboardingStep } from '@/components/onboarding-step';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import type { City } from '@/lib/cities';
-import { useCitySearch } from '@/lib/city-search';
+import { imeZemlje, useCitySearch } from '@/lib/city-search';
 import { useDraft } from '@/store/draft';
 import { useT } from '@/i18n';
 
@@ -40,7 +40,7 @@ export default function BirthPlace() {
 
       <Input
         povrsina="siva"
-        value={city ? `${city.name}, ${city.country}` : query}
+        value={city ? `${city.name}, ${imeZemlje(city)}` : query}
         onChangeText={(v) => { setQuery(v); setCity(null); }}
         placeholder={t.onboarding.pretragaGrada.placeholder}
         autoFocus
@@ -54,7 +54,7 @@ export default function BirthPlace() {
             onPress={() => { setCity(c); setQuery(''); }}
             className="flex-row items-center justify-between border-b border-fill-strong py-3.5 active:opacity-60">
             <Text className="text-base">{c.name}</Text>
-            <Text variant="muted">{c.country}</Text>
+            <Text variant="muted">{imeZemlje(c)}</Text>
           </Pressable>
         ))}
         {loading && (

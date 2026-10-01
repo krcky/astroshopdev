@@ -6,7 +6,7 @@
  * id se promeni, `suggestedCities()` taj grad preskace u tisini — korisnik bi
  * video sedam predloga umesto osam i niko ne bi primetio. Zato ova provera.
  */
-import { searchCities, suggestedCities, suggestedCityIds, cityById } from '../src/lib/cities';
+import { searchCities, suggestedCities, suggestedCityIds, cityById, predloziPoZemlji, AMERICKI_GRADOVI } from '../src/lib/cities';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -49,6 +49,24 @@ for (const [upit, ocekivan, zemlja] of [
   ok(r[0]?.name === ocekivan && r[0]?.country === zemlja,
      `"${upit}" nalazi ${ocekivan}`, `${r[0]?.name} (${r[0]?.country})`);
 }
+
+console.log('\n=== Predlozi po jeziku (Ivan, 2.10.2026) ===');
+// Svaki rucno izabran grad postoji, pripada SVOJOJ zemlji i nije ponovljen.
+for (const [zemlja, ids] of Object.entries(predloziPoZemlji)) {
+  const gradovi = ids.map((id) => cityById(id));
+  const fali = ids.filter((_, i) => !gradovi[i]);
+  const tudji = gradovi.filter((c) => c && c.kodZemlje !== zemlja).map((c) => `${c!.name} (${c!.kodZemlje})`);
+  ok(!fali.length && !tudji.length && new Set(ids).size === ids.length && ids.length >= 8,
+     `${zemlja}: ${ids.length} predloga, svi iz zemlje`, fali.join(', ') || tudji.join(', ') || gradovi.slice(0, 3).map((c) => c!.name).join(', '));
+  const prvih = suggestedCities(8, zemlja as keyof typeof predloziPoZemlji);
+  ok(prvih.length === 8, `${zemlja}: osam predloga`, String(prvih.length));
+}
+ok(AMERICKI_GRADOVI.length >= 8 && AMERICKI_GRADOVI.every((c) => c.kodZemlje === 'US' && c.tz.name.startsWith('America/') && !c.tz.europeanDst),
+   'US: americki gradovi, americke zone', suggestedCities(3, 'US').map((c) => c.name).join(', '));
+ok(cityById(5128581)?.name === 'New York City', 'americki grad se nalazi po id-ju (sacuvan profil)');
+// Pretraga ostaje po velicini i za drugi jezik: zemlja jezika menja samo PREDLOGE.
+ok(searchCities('Sar', 8, 'HR')[0]?.name === 'Sarajevo', 'hrvatski: "Sar" i dalje nalazi Sarajevo', searchCities('Sar', 8, 'HR')[0]?.name);
+ok(searchCities('', 8, 'HR')[0]?.name === 'Zagreb', 'hrvatski: prazan upit daje hrvatske predloge', searchCities('', 8, 'HR')[0]?.name);
 
 console.log(fail ? `\n${fail} PROVERA PALO\n` : '\nSve provere prosle.\n');
 process.exit(fail ? 1 : 0);

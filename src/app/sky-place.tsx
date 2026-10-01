@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/text';
 import { SheetScroll } from '@/components/sheet';
 import { CARD_SURFACE } from '@/components/ui/card';
 import type { City } from '@/lib/cities';
-import { useCitySearch } from '@/lib/city-search';
+import { imeZemlje, useCitySearch } from '@/lib/city-search';
 import { useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
 import { cn } from '@/lib/utils';
@@ -67,7 +67,7 @@ export default function SkyPlace() {
                 {/* Izabran drugi grad stoji iznad grada iz profila — na listu nema
                     velikog imena grada kao nekad na strani, pa se vidi ovde. */}
                 {izabran !== null && izabran.id !== rodni.id && (
-                  <Izbor naslov={izabran.name} opis={izabran.country} aktivno onPress={() => izaberi(izabran)} />
+                  <Izbor naslov={izabran.name} opis={imeZemlje(izabran)} aktivno onPress={() => izaberi(izabran)} />
                 )}
                 <Izbor
                   naslov={rodni.name}
@@ -82,7 +82,7 @@ export default function SkyPlace() {
                   <Izbor
                     key={c.id}
                     naslov={c.name}
-                    opis={c.country}
+                    opis={imeZemlje(c)}
                     aktivno={c.id === aktivan.id}
                     onPress={() => izaberi(c)}
                   />
