@@ -59,3 +59,54 @@ razmakom i velikim slovom, za ručni pregled.
 - Nativni tekst: ime ispod ikonice (`app.json`), sistemski upiti za dozvole (`infoPlist`),
   kanal obaveštenja u Kotlinu i Swift modulima. Za njih Expo ima `locales` u `app.json`.
 - Mejl sa kodom (Supabase šablon, jedan za sve) i panel astrologa (ostaje srpski).
+
+## Engleski (korak 2, 1.10.2026)
+
+`src/i18n/en/` je CEO rečnik (tip `Recnik`, ne dopuna) — TypeScript pada čim ključ fali ili funkcija ima
+drugi oblik nego u srpskom. Izbor jezika je u profilu, sekcija "Test" (samo probni build): tekstovi
+astrologa (tranziti, natal, lunarni, priča o znaku) su još samo na srpskom. Jezik telefona NE bira jezik
+aplikacije (mnogi u Srbiji drže telefon na engleskom); bez izbora je srpski (`store/jezik.ts`).
+
+### Glas (English voice)
+
+Same rules as Serbian (`copywriter-sr` skill): informal "you", the app INTERPRETS, never predicts
+("the sky shows", not "fate brings"), no exclamation marks, no flattery, short sentences, sentence case
+for titles and buttons ("Your day", not "Your Day"). Plain English for a lay reader; a term is explained
+the first time it appears, exactly as the Serbian does. British/US neutral spelling where possible;
+when it matters, US ("color", "favorite").
+
+### Pojmovnik (glossary) — use EXACTLY these
+
+| Srpski | English |
+|---|---|
+| Tvoj dan / Moj dan (kartica) | Your day / My day |
+| Danas, Tranziti, Pitaj, Ti, Nebo (tabovi) | Today, Transits, Ask, You, Sky |
+| Danas ukratko | Today at a glance |
+| Ide ti / Koči te (prvo lice: Ide mi / Koči me) | Going your way / Holding you back (Going my way / Holding me back) |
+| Natalna karta | Birth chart |
+| tumačenje | reading |
+| Velika trojka | Big Three |
+| Ascendent / podznak | Ascendant / rising sign ("Rising" as a short label) |
+| MC | MC (Midheaven when spelled out) |
+| kuća (5. kuća) | house (5th house) |
+| tranzit, tranzitna planeta, natalna planeta | transit, transiting planet, natal planet |
+| retrogradna / ponovo direktna | retrograde / direct again |
+| aspekti | aspects (conjunction, sextile, square, trine, opposition) |
+| orbis | orb |
+| Severni čvor, Lilit, Tačka sreće | North Node, Lilith, Part of Fortune |
+| element: vatra, zemlja, vazduh, voda | fire, earth, air, water |
+| kvalitet: kardinalan, fiksan, promenljiv | cardinal, fixed, mutable |
+| polaritet: pozitivan / negativan | positive / negative |
+| vladar (znaka) | ruler / ruling planet |
+| Mesec (planeta), lunarni kalendar, lunarni dan | Moon, lunar calendar, lunar day |
+| mlad / pun Mesec, faza | new / full Moon, phase |
+| Promene na nebu | Changes in the sky |
+| Priča dana / Priča o znaku | Story of the day / Your sign's story |
+| Tvoji ljudi | Your people |
+| Pitaj astrologa / Pitaj čoveka / Pitaj AI | Ask an astrologer / Ask a human / Ask AI |
+| Premium, Otključaj, Vrati kupovine | Premium, Unlock, Restore purchases |
+| nalog, prijava, odjava, kod sa mejla | account, sign in, sign out, code from your email |
+| Ljubav, Posao/Karijera, Zdravlje, Novac (oblasti) | Love, Career, Health, Money (match the Serbian key's meaning) |
+
+Planet, sign and aspect names come from `t.nebo` — never re-type them. `nebo.uZnaku(k)` = "in Leo",
+`nebo.uZnak(k)` = "into Leo".

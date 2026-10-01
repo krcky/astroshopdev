@@ -14,6 +14,8 @@ import { isRunningInExpoGo } from 'expo';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useAuthListener, useAuthStore } from '@/store/auth';
 import { useProfileStore } from '@/store/profile';
+import { useJezikStore } from '@/store/jezik';
+import { useJezik } from '@/i18n';
 import { neutral } from '@/theme/tokens';
 import { useFonts } from 'expo-font';
 import { FONT_FILES } from '@/theme/font';
@@ -94,6 +96,9 @@ export default function RootLayout() {
   // Nikad mrezu: sesija i profil se citaju sa diska (pravilo 19).
   const authLoading = useAuthStore((s) => s.loading);
   const hydrated = useProfileStore((s) => s.hydrated);
+  // Jezik sa diska (pravilo 26): prvi kadar posle uvoda mora biti na izabranom jeziku.
+  const jezikHydrated = useJezikStore((s) => s.hydrated);
+  const jezik = useJezik();
   const [uvod, setUvod] = React.useState(true);
   const krajUvoda = React.useCallback(() => setUvod(false), []);
   // Aplikacija se montira tek kad uvod krene — njeno prvo crtanje zauzme JS, pa
@@ -119,7 +124,10 @@ export default function RootLayout() {
             <ObavestenjeVidea />
             <Animated.View style={[{ flex: 1 }, zumStil]}>
               {pismo && aplikacija && (
+                // `key` = jezik: posle promene jezika cela navigacija se sklopi iznova (kapija
+                // vodi dalje), pa nijedan montiran ekran ni `useMemo` ne ostane na starom jeziku.
                 <Stack
+                  key={jezik}
                   screenOptions={{
                     headerShown: false,
                     // Siva, ne bela — ista pozadina koju crta `Screen`. Sa belom
@@ -201,7 +209,7 @@ export default function RootLayout() {
             {/* Uvod pri pokretanju: pokriva aplikaciju dok se ne otvori, pa nestaje. */}
             {uvod && (
               <Uvod
-                spremno={pismo && aplikacija && !authLoading && hydrated}
+                spremno={pismo && aplikacija && !authLoading && hydrated && jezikHydrated}
                 zum={zum}
                 onPocetak={pocetakUvoda}
                 onKraj={krajUvoda}

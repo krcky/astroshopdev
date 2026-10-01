@@ -23,6 +23,7 @@
  * Cisto, bez RN uvoza (pravilo 6). Provere: `npm run check:oblasti`.
  */
 import { tr } from '@/i18n/jezik';
+import { sr } from '@/i18n/sr';
 import { BODIES, ASPECTS, bodyLongitude, type AspectDef, type PlanetKey } from '@/lib/astro';
 import { houseOf, type NatalChart } from '@/lib/natal';
 import { chartRulers, rulerRole, type RulerRole } from '@/lib/rulers';
@@ -354,7 +355,9 @@ export function tekstReda(
 ): { veci: string; manji: string | null; zaProveru: boolean } {
   const ime = imeTranzita(r);
   const { naslov } = parseNaslov(title);
-  const samoIme = !!naslov && naslov.toLowerCase().startsWith(`${r.transiting.name} ${r.aspect.name}`.toLowerCase());
+  // Naslov je iz korpusa, a korpus je na SRPSKOM — poredi se sa srpskim imenima, ne tekucim jezikom.
+  const srIme = `${sr.nebo.tela[r.transiting.key as keyof typeof sr.nebo.tela] ?? r.transiting.name} ${sr.nebo.aspekti[r.aspect.key as keyof typeof sr.nebo.aspekti] ?? r.aspect.name}`;
+  const samoIme = !!naslov && naslov.toLowerCase().startsWith(srIme.toLowerCase());
   if (!naslov || samoIme) return { veci: ime, manji: null, zaProveru: true };
   return { veci: naslov, manji: ime, zaProveru: false };
 }

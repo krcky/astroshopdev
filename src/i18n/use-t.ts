@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import { jezik, pretplati, tr, type Recnik } from './jezik';
+import { jezik, pretplati, tr, type Jezik, type Recnik } from './jezik';
 
 /**
  * Recnik tekuceg jezika za komponentu: `const t = useT();` pa `t.profil.naslov`.
@@ -9,4 +9,9 @@ import { jezik, pretplati, tr, type Recnik } from './jezik';
 export function useT(): Recnik {
   useSyncExternalStore(pretplati, jezik, jezik);
   return tr();
+}
+
+/** Tekuci jezik — za `key` korena, da se posle promene jezika sve sklopi iznova. */
+export function useJezik(): Jezik {
+  return useSyncExternalStore(pretplati, jezik, jezik);
 }

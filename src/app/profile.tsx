@@ -6,7 +6,9 @@ import * as WebBrowser from 'expo-web-browser';
 import { Camera, ChevronRight, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { useT } from '@/i18n';
+import { dostupniJezici, IME_JEZIKA, useJezik, useT } from '@/i18n';
+import { useJezikStore } from '@/store/jezik';
+import { VrednostReda } from '@/components/ui/vrednost-reda';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
 import { TvojiLjudi } from '@/components/tvoji-ljudi';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
@@ -50,6 +52,23 @@ const ZNACKA = 30;
 export default function ProfileSheet() {
   const t = useT();
   const tp = t.profil.profil;
+  const jezik = useJezik();
+  const izaberiJezikUStore = useJezikStore((s) => s.izaberi);
+  // Imena jezika su na SVOM jeziku ("English", "Srpski") i ne prevode se.
+  const izaberiJezik = () => {
+    const jezici = dostupniJezici();
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: [...jezici.map((j) => IME_JEZIKA[j]), t.opste.otkazi], cancelButtonIndex: jezici.length },
+        (i) => { if (i < jezici.length) izaberiJezikUStore(jezici[i]); },
+      );
+    } else {
+      Alert.alert(tp.jezik, undefined, [
+        ...jezici.map((j) => ({ text: IME_JEZIKA[j], onPress: () => izaberiJezikUStore(j) })),
+        { text: t.opste.otkazi, style: 'cancel' as const },
+      ]);
+    }
+  };
   const hydrated = useProfileStore((s) => s.hydrated);
   const { user, loading } = useAuthStore();
   const entitlement = useEntitlement();
@@ -226,6 +245,13 @@ export default function ProfileSheet() {
             {premiumRucno !== null && (
               <ListRow title={tp.vratiNaServer} chevron={false} onPress={() => setPremiumRucno(null)} />
             )}
+            {/* Jezik (pravilo 26): samo u probnom buildu dok korpus nije preveden. */}
+            <ListRow
+              title={tp.jezik}
+              subtitle={tp.jezikIspod}
+              trailing={<VrednostReda>{IME_JEZIKA[jezik]}</VrednostReda>}
+              onPress={izaberiJezik}
+            />
           </Group>
         </>
       )}

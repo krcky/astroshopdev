@@ -15,7 +15,6 @@ export function mnozina(n: number, [jedan, dva, pet]: Oblici): string {
 }
 
 export const gramatika = {
-  mnozina,
   /** "21 dan", "22 dana", "11 dana". */
   dana: (n: number) => `${n} ${mnozina(n, ['dan', 'dana', 'dana'])}`,
   /** "1 mesec", "3 meseca", "12 meseci". */

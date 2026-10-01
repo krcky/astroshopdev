@@ -79,9 +79,57 @@ if (process.argv.includes('--po-fajlu')) {
   process.exit(0);
 }
 
+let greske = 0;
 if (nalazi.length) {
   for (const n of nalazi) console.error(`  ${n.fajl}:${n.red}  ${n.tekst}`);
   console.error(`\n✗ ${nalazi.length} tekstova van recnika. Tekst za korisnika ide u \`src/i18n/sr/\` i cita se kroz \`useT()\` ili \`tr()\`.`);
-  process.exit(1);
+  greske++;
+} else {
+  console.log('Prevod: sav tekst za korisnika ide kroz recnik.');
 }
-console.log('Prevod: sav tekst za korisnika ide kroz recnik.');
+
+/*
+ * ENGLESKI (`src/i18n/en/`): ceo recnik, bez praznog dela (`{} as Recnik[...]`) i bez srpskih slova —
+ * srpsko slovo u engleskom recniku je skoro uvek zaboravljen prevod. Vlastita imena su izuzetak.
+ */
+const VLASTITA = /Vujović|Boban Vujović/g;
+const EN = path.join(KOREN, 'i18n', 'en');
+for (const f of fs.readdirSync(EN)) {
+  const izvor = fs.readFileSync(path.join(EN, f), 'utf8');
+  if (/\{\}\s*as\s+Recnik/.test(izvor)) { console.error(`✗ en/${f}: deo jos nije preveden ({} as Recnik)`); greske++; }
+  izvor.split('\n').forEach((red, i) => {
+    const bez = red.replace(/\/\/.*$|\/?\*.*$/, '').replace(VLASTITA, '');
+    if (SRPSKO.test(bez)) { console.error(`✗ en/${f}:${i + 1}  srpsko slovo: ${red.trim().slice(0, 70)}`); greske++; }
+  });
+}
+
+/* Racun koji sklapa tekst mora da prati jezik (getteri, datum, mnozina). */
+async function proveraJezika() {
+  const { postaviJezik } = await import('../src/i18n/jezik');
+  const { datum } = await import('../src/lib/horoscope');
+  const { josTraje } = await import('../src/lib/mnozina');
+  const { signFromLongitude, SIGNS } = await import('../src/lib/zodiac');
+  const { BODIES, ASPECTS } = await import('../src/lib/astro');
+  const dan = new Date(2026, 8, 29, 12);
+  const ocekivano: [string, () => string, string, string][] = [
+    ['datum', () => datum(dan, { dan: true, godina: true }), 'Uto, 29. sep 2026', 'Tue, Sep 29, 2026'],
+    ['trajanje', () => josTraje(3), 'Traje još 3 dana', '3 days left'],
+    ['znak', () => signFromLongitude(42.5).formatted, "12° 30' Bik", "12° 30' Taurus"],
+    ['vladar', () => SIGNS[7].ruler, 'Pluton', 'Pluto'],
+    ['planeta', () => BODIES[0].name, 'Mesec', 'Moon'],
+    ['aspekt', () => ASPECTS[2].name, 'kvadrat', 'square'],
+  ];
+  for (const [ime, f, sr, en] of ocekivano) {
+    for (const [j, v] of [['sr', sr], ['en', en]] as const) {
+      postaviJezik(j);
+      const dobijeno = f();
+      if (dobijeno !== v) { console.error(`✗ ${ime} (${j}): "${dobijeno}", ocekivano "${v}"`); greske++; }
+    }
+  }
+  postaviJezik('sr');
+}
+
+proveraJezika().then(() => {
+  if (greske) process.exit(1);
+  console.log('Prevod: engleski recnik je ceo, racun prati jezik.');
+});

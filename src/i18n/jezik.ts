@@ -12,6 +12,7 @@
  * uzima se iz srpskog. Cist modul, bez RN uvoza (pravilo 6) — `tr()` radi i u proverama.
  * Provera: `npm run check:prevod`.
  */
+import { en } from './en';
 import { sr, type Recnik } from './sr';
 
 export type { Recnik };
@@ -29,7 +30,15 @@ export type Delimicno<T> = T extends (...a: never[]) => unknown
       ? { [K in keyof T]?: Delimicno<T[K]> }
       : T;
 
-const recnici: Partial<Record<Jezik, Recnik>> = { sr };
+const recnici: Partial<Record<Jezik, Recnik>> = { sr, en };
+
+/** Ime jezika NA TOM JEZIKU — za izbor u profilu (ne prevodi se). */
+export const IME_JEZIKA: Record<Jezik, string> = {
+  sr: 'Srpski', hr: 'Hrvatski', bs: 'Bosanski', sl: 'Slovenščina', mk: 'Македонски', en: 'English',
+};
+
+/** Jezici za koje recnik postoji, redom za izbor. */
+export const dostupniJezici = (): Jezik[] => JEZICI.filter((j) => recnici[j] !== undefined);
 
 /** Spaja dopunu preko osnove; nizovi i funkcije se menjaju celi, objekti grana po grana. */
 export function spoji<T>(osnova: T, dopuna: Delimicno<T> | undefined): T {
