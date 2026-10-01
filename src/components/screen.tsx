@@ -134,6 +134,15 @@ const IZNAD_PRELIVA_BLEDI = 24;
 /** Element koji `Screen` crta iznad preliva — gde je u sadrzaju i koliko je velik. */
 type Podignuto = { element: React.ReactNode; x: number; y: number; w: number; h: number };
 
+/**
+ * ANDROID: JEDAN PRIMERAK (Ivan, 1.10.2026: "zasto uopste imamo dupli krug"). Na iOS-u primerak
+ * u sadrzaju klizi pod ZAMUCENU traku, pa mora da postoji. Android traku ne muti (puna je, vidi
+ * "ANDROID NEMA ZAMUCENJA"), pa tamo element postoji SAMO iznad preliva: klizi sa skrolom i
+ * nestaje na ivici trake, a u sadrzaju stoji prazno mesto iste velicine (`velicina`). Tocak se
+ * crtao dvaput — prelazak na "Ti" i "Nebo" je cekao (kadrovi od 130—200 ms, Xiaomi 11T).
+ */
+const JEDAN_PRIMERAK = Platform.OS === 'android';
+
 /** `Screen` preko ovoga prima podignuti element; `null` kad ekran nema preliv. */
 const IznadPrelivaContext = React.createContext<((p: Podignuto | null) => void) | null>(null);
 
@@ -325,9 +334,14 @@ export function Screen({
   // pokret) i bledi cim krene klizanje — vidi `IznadPreliva`.
   const [podignuto, setPodignuto] = React.useState<Podignuto | null>(null);
   const podignutoStil = useAnimatedStyle(() => ({
-    opacity: interpolate(pomeraj.value, [0, IZNAD_PRELIVA_BLEDI], [1, 0], Extrapolation.CLAMP),
+    // Android: jedini primerak, pa ne bledi (`JEDAN_PRIMERAK`).
+    opacity: JEDAN_PRIMERAK ? 1 : interpolate(pomeraj.value, [0, IZNAD_PRELIVA_BLEDI], [1, 0], Extrapolation.CLAMP),
     transform: [{ translateY: -pomeraj.value }],
   }));
+  // Gornja ivica sloja 3b. iOS: ivica trake (iznad nje sadrzaj ide pod zamucenje). Android:
+  // ne nize od samog elementa — krug je `-mt-3`, pa bi mu ivica trake odsekla vrh vec u miru;
+  // tu jedini primerak nestaje dok klizi (traka je iste boje kao pozadina, ivica joj se ne vidi).
+  const vrhPodignutog = podignuto && JEDAN_PRIMERAK ? Math.min(traka, podignuto.y) : traka;
 
   return (
     // Koren nosi SAMO raspored — bez pozadine, da ga React Native izbaci iz
@@ -396,10 +410,10 @@ export function Screen({
           pointerEvents="none"
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
-          style={{ position: 'absolute', top: traka, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+          style={{ position: 'absolute', top: vrhPodignutog, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
           <Animated.View
             style={[
-              { position: 'absolute', left: podignuto.x, top: podignuto.y - traka, width: podignuto.w, height: podignuto.h },
+              { position: 'absolute', left: podignuto.x, top: podignuto.y - vrhPodignutog, width: podignuto.w, height: podignuto.h },
               podignutoStil,
             ]}>
             {podignuto.element}
@@ -452,15 +466,21 @@ export function Screen({
  * stari krug stajao preko novog.
  *
  * Bez preliva (gurnut ekran, `tint="none"`) ovo je obican `View`.
+ *
+ * ANDROID (`JEDAN_PRIMERAK`, 1.10.2026): primerka u sadrzaju NEMA — tamo je samo prazno mesto
+ * velicine `velicina`, a element se crta jednom, u sloju 3b. Bez `velicina` ostaju oba primerka.
  */
-export function IznadPreliva({ podignuto, className, children }: {
+export function IznadPreliva({ podignuto, velicina, className, children }: {
   podignuto: React.ReactNode;
+  /** Stalna velicina elementa (tocak: `size` x `size`) — za prazno mesto na Androidu. */
+  velicina?: { w: number; h: number };
   className?: string;
   children?: React.ReactNode;
 }) {
   const postavi = React.useContext(IznadPrelivaContext);
   const [omot, setOmot] = React.useState<LayoutRectangle | null>(null);
   const [unutra, setUnutra] = React.useState<LayoutRectangle | null>(null);
+  const samoGore = !!postavi && JEDAN_PRIMERAK && !!velicina;
 
   React.useLayoutEffect(() => {
     if (!postavi || !omot || !unutra) return;
@@ -470,7 +490,9 @@ export function IznadPreliva({ podignuto, className, children }: {
 
   return (
     <View className={className} onLayout={postavi ? (e) => setOmot(e.nativeEvent.layout) : undefined}>
-      <View onLayout={postavi ? (e) => setUnutra(e.nativeEvent.layout) : undefined}>{podignuto}</View>
+      <View onLayout={postavi ? (e) => setUnutra(e.nativeEvent.layout) : undefined}>
+        {samoGore ? <View style={{ width: velicina!.w, height: velicina!.h }} /> : podignuto}
+      </View>
       {children}
     </View>
   );

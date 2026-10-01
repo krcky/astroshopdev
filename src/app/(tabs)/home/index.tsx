@@ -7,7 +7,6 @@ import type { NativeStackHeaderItem } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Screen, VRH_ANDROID } from '@/components/screen';
 import { KapsuleRed } from '@/components/ui/kapsule';
-import { GledasDrugo } from '@/components/gledas-drugo';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { GlassBubble } from '@/components/ui/glass-button';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -276,10 +275,6 @@ export default function Home() {
       <View className="pt-4">
         <KapsuleRed tabovi stavke={tabovi(t)} izabrana={tab} onIzbor={izaberiTab} />
       </View>
-      {offset !== 0 && (
-        <GledasDrugo className="mt-4" tekst={`${relativ(t, offset)} · ${formatDate(date)}`}
-          dugme={p.nazadNaDanas} onPress={() => setOffset(0)} />
-      )}
       <Animated.View key={tab} entering={ODOZDO} className="pt-7">
         {sadrzaj[tab]}
       </Animated.View>

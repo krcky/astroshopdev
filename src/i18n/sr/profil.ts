@@ -29,6 +29,10 @@ export const profil = {
     test: 'Test',
     nalog: 'Nalog',
     pravila: 'Pravila',
+    /** Pomoc: mejl podrsci. */
+    pomoc: 'Pomoć',
+    pisiteNam: 'Pišite nam',
+    nemaMejlAplikacije: (adresa: string) => `Na telefonu nema aplikacije za mejl. Adresa je ${adresa}.`,
     premium: 'Premium',
     ukljucenTestom: 'Uključen test prekidačem',
     /** `istice` je datum ("Uto, 29. sep 2026") ili null. */
@@ -73,8 +77,6 @@ export const profil = {
     natalnaTekst: 'Tumačenje svake planete po znaku i kući i svih aspekata.',
     tranzitiNaslov: 'Tranziti',
     tranzitiTekst: 'Svi tranziti dana sa celim tumačenjem — i za sutra i prekosutra.',
-    temeNaslov: 'Teme perioda',
-    temeTekst: 'Tranziti koji traju nedeljama i mesecima.',
     ljudiNaslov: 'Tvoji ljudi',
     ljudiTekst: (n: number) => `Karte i tranziti do ${n} ${mnozina(n, ['bliske osobe', 'bliske osobe', 'bliskih osoba'])}.`,
     /** Naslov kartice paketa (veliko slovo) i period uz cenu (malo). */
@@ -105,9 +107,14 @@ export const profil = {
     obnavljanje: (proba: { cena: string; godisnje: boolean } | null, ios: boolean) =>
       (proba ? `Posle probe ${proba.cena} ${proba.godisnje ? 'godišnje' : 'mesečno'}. ` : '')
       + `Pretplata se obnavlja sama dok je ne otkažeš u podešavanjima ${ios ? 'App Store-a' : 'Google Play-a'}.`,
+    /** Posle recenice o obnavljanju: da Premium ne izgleda kao da ukljucuje i pitanje astrologu. */
+    pitanjaPosebno: 'Pitanja astrologu se plaćaju posebno.',
     uslovi: 'Uslovi',
     vratiKupovine: 'Vrati kupovine',
     privatnost: 'Privatnost',
+    /** Stavka "ko pise" (B7 iz UX recenzije). */
+    pisteAstrologNaslov: 'Piše astrolog',
+    pisteAstrologTekst: (astrolog: string) => `Sva tumačenja piše astrolog ${astrolog}.`,
   },
 
   /** `components/zakljucano.tsx` — katanci i kartica "Otključaj". */
@@ -224,6 +231,8 @@ export const profil = {
     vidisSamoTi,
     trebaInternet: 'Za dodavanje osobe potreban je internet.',
     dodajOsobu: 'Dodaj osobu',
+    /** Ugaseno dugme dok pristanak nije potvrdjen — kaze sta fali. */
+    potvrdiPristanak: 'Potvrdi pristanak',
     sunce: 'Sunce',
     mesec: 'Mesec',
     podznak: 'Podznak',

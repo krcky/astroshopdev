@@ -98,6 +98,8 @@ export type PricaZnaka = {
    * `null` kad znak vladara nije poznat.
    */
   vladarRecenica: string | null;
+  /** Ista recenica u prvom licu, za karticu i video ("U mojoj natalnoj karti…", Ivan 1.10.2026). */
+  vladarRecenicaJa: string | null;
   /** Naslov poglavlja sa tackom na kraju: "Otvorenost i ishitrenost." */
   ukratko: string;
   /** Prve recenice poglavlja; `null` kad su preduge za sliku. */
@@ -137,13 +139,13 @@ export function srodniZnaci(z: ZodiacSign): ZodiacSign[] {
  * "U tvojoj natalnoj karti Mars je u Biku." Dva znaka (Mesec bez vremena rodjenja) -> "u Blizancima ili Raku",
  * kao trojka na tabu "Ti" — radije priznati nego pogadjati (pravilo 4).
  */
-export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null): string | null {
+export function recenicaVladara(vladarKey: string, vladarIme: string, znaci: readonly string[] | null, lice: 'ti' | 'ja' = 'ti'): string | null {
   const t = tr();
   // Za Lava (vladar Sunce, uvek u Lavu) umesto znaka vladara: grcko ime Sunca (Ivan, 1.10.2026).
   const mit = t.prica.znak.vladarMit[vladarKey];
   if (mit) return mit;
   if (!znaci?.length) return null;
-  return t.prica.znak.vladarRecenica(vladarIme, znaci.map((z) => t.nebo.znaci[z as keyof typeof t.nebo.znaci].lokativ));
+  return t.prica.znak.vladarRecenica(vladarIme, znaci.map((z) => t.nebo.znaci[z as keyof typeof t.nebo.znaci].lokativ), lice);
 }
 
 /**
@@ -183,6 +185,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: 
     vladarNaslov,
     vladar: { key: znak.rulerKey, ime: znak.ruler },
     vladarRecenica: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci),
+    vladarRecenicaJa: recenicaVladara(znak.rulerKey, znak.ruler, vladarZnaci, 'ja'),
     ukratko,
     ukratkoRecenica: recenica(opis.ukratkoRecenica),
     ljubavRecenica: recenica(opis.ljubavRecenica),

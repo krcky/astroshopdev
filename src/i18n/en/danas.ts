@@ -56,7 +56,6 @@ export const danas: Recnik['danas'] = {
     nemaTema: 'Right now no slow planet is in aspect with your chart.',
     /** "4 more in Transits" — link to the Transits tab. */
     josUTranzitima: (n: number) => `${n} more in Transits`,
-    nazadNaDanas: 'Back to today',
     profil: 'Profile',
     /** Day menu: iOS menu title. */
     dan: 'Day',
@@ -147,8 +146,8 @@ export const danas: Recnik['danas'] = {
     zastoOvajTekst: 'Why this text?',
     saznajVise: 'Learn more',
     /** Labels of the three items from the text. */
-    efekat: 'Effect',
-    pazi: 'Watch out',
+    efekat: 'Positive effect',
+    pazi: 'Challenge',
     savet: 'Tip',
   },
 
@@ -183,6 +182,11 @@ export const danas: Recnik['danas'] = {
     nijeNapisano: 'The reading for this transit has not been written yet.',
     stizeKadVeza: 'The full text will appear when you are back online.',
     procitajDoKraja: 'Read to the end',
+    viseOTranzitu: 'More about this transit',
+    pitajNaslov: 'Ask an astrologer about this transit',
+    pitajOpis: (astrolog, oOsobi) =>
+      `${astrolog} sees ${oOsobi ? "this person's chart" : 'your chart'} and answers with a voice message, in Serbian, usually within 2–3 business days.`,
+    postaviPitanje: 'Ask a question',
     kratkaVerzija: 'This is the short version. The full one covers the areas of life the transit touches, its long-term effects and practical tips.',
     otkljucajCeo: 'Unlock the full text',
   },

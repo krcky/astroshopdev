@@ -35,7 +35,6 @@ export const danas = {
     nemaTema: 'Ovih dana nijedna spora planeta nije u aspektu sa tvojom kartom.',
     /** "Još 4 u Tranzitima" — link na tab "Tranziti". */
     josUTranzitima: (n: number) => `Još ${n} u Tranzitima`,
-    nazadNaDanas: 'Nazad na danas',
     profil: 'Profil',
     /** Dan-meni: naslov iOS menija. */
     dan: 'Dan',
@@ -125,8 +124,8 @@ export const danas = {
     zastoOvajTekst: 'Zašto baš ovaj tekst?',
     saznajVise: 'Saznaj više',
     /** Oznake tri stavke iz teksta. */
-    efekat: 'Efekat',
-    pazi: 'Pazi',
+    efekat: 'Pozitivni efekat',
+    pazi: 'Izazov',
     savet: 'Savet',
   },
 
@@ -161,6 +160,13 @@ export const danas = {
     nijeNapisano: 'Tumačenje za ovaj tranzit još nije napisano.',
     stizeKadVeza: 'Ceo tekst će se pojaviti kad se veza vrati.',
     procitajDoKraja: 'Pročitaj do kraja',
+    /** Naslov ostalih pasusa duge verzije, posle odeljaka. */
+    viseOTranzitu: 'Više o ovom tranzitu',
+    /** Kartica na dnu tumacenja: pitanje astrologu o ovom tranzitu. */
+    pitajNaslov: 'Pitaj astrologa o ovom tranzitu',
+    pitajOpis: (astrolog: string, oOsobi: boolean) =>
+      `${astrolog} vidi ${oOsobi ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, obično za 2–3 radna dana.`,
+    postaviPitanje: 'Postavi pitanje',
     kratkaVerzija: 'Ovo je kratka verzija. U celoj su oblasti života na koje tranzit deluje, dugoročni efekti i konkretni saveti.',
     otkljucajCeo: 'Otključaj ceo tekst',
   },

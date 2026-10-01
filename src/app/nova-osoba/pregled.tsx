@@ -100,7 +100,8 @@ export default function NovaOsobaPregled() {
       note={poruka ?? (naMrezi
         ? tn.vidisSamoTi(ASTROLOG.kratko)
         : tn.trebaInternet)}
-      primary={{ label: tn.dodajOsobu, onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
+      // Ugaseno dugme kaze sta fali (B14 iz UX recenzije, 1.10.2026; isto kao "Izaberi datum").
+      primary={{ label: pristanak ? tn.dodajOsobu : tn.potvrdiPristanak, onPress: dodaj, disabled: !pristanak || !naMrezi || !uid, ucitava: radi }}>
       <View className="items-center">
         {/* Velika trojka, kao na kraju onboardinga. */}
         <View className="w-full flex-row justify-center gap-8">

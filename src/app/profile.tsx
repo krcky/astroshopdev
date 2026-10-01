@@ -6,7 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Camera, ChevronRight, Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { dostupniJezici, IME_JEZIKA, useJezik, useT } from '@/i18n';
+import { dostupniJezici, IME_JEZIKA, tr, useJezik, useT } from '@/i18n';
 import { useJezikStore } from '@/store/jezik';
 import { VrednostReda } from '@/components/ui/vrednost-reda';
 import { Group, GroupHeader, ListRow } from '@/components/ui/list';
@@ -49,6 +49,19 @@ const ZNACKA = 30;
  * (Ivan: "ne treba da bude dostupno odmah") — i dalje u aplikaciji, kako Apple
  * trazi (5.1.1(v)), samo ne na dohvat palca.
  */
+/** Adresa podrske — ista kao na sajtu (`web/podrska.html`). */
+const PODRSKA = 'podrska@astroshop.rs';
+
+/**
+ * Mejl podrsci. Bez mejl aplikacije na telefonu `openURL` pada — tada se adresa
+ * pokaze, da korisnik moze da je prepise.
+ */
+function pisiPodrsci() {
+  const telo = `\n\n—\nAstro Shop ${Constants.expoConfig?.version ?? ''} · ${Platform.OS} ${Platform.Version}`;
+  Linking.openURL(`mailto:${PODRSKA}?subject=${encodeURIComponent('Astro Shop')}&body=${encodeURIComponent(telo)}`)
+    .catch(() => { const tp = tr().profil.profil; Alert.alert(tp.pisiteNam, tp.nemaMejlAplikacije(PODRSKA)); });
+}
+
 export default function ProfileSheet() {
   const t = useT();
   const tp = t.profil.profil;
@@ -267,6 +280,14 @@ export default function ProfileSheet() {
           onPress={odjava ? undefined : doSignOut}
           trailing={odjava ? <ActivityIndicator color={neutral.inkSubtle} /> : undefined}
         />
+      </Group>
+
+      {/* Pomoc (B10 iz UX recenzije, Ivan 1.10.2026): mejl podrsci, sa verzijom aplikacije i
+          telefona u telu poruke. Adresa je ista kao na sajtu (`web/podrska.html`). Obavestenja
+          dolaze ovde kad push postoji. */}
+      <GroupHeader variant="oznaka" className={NASLOV}>{tp.pomoc}</GroupHeader>
+      <Group className={GRUPA}>
+        <ListRow title={tp.pisiteNam} subtitle={PODRSKA} onPress={pisiPodrsci} />
       </Group>
 
       {/* Pravila na sajtu — isti linkovi kao na paywall-u. */}

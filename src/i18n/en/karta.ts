@@ -103,8 +103,6 @@ export const karta: Recnik['karta'] = {
   /** `app/(tabs)/sky/index.tsx` — "The sky right now". */
   nebo: {
     naslov: 'The sky right now',
-    /** When time is shifted the title no longer claims "right now". */
-    naslovPomereno: 'Sky',
     infoA11y: 'What is the sky right now?',
     datumA11y: (datum) => `Date: ${datum} Tap to choose a day.`,
     mestoA11y: (grad) => `Viewing location: ${grad}. Tap to change.`,
@@ -117,8 +115,6 @@ export const karta: Recnik['karta'] = {
     satNapred: 'Hour forward',
     danNapred: 'Day forward',
     trenutnoA11y: 'Go back to the present moment',
-    nijeSadasnje: 'This is not the sky right now.',
-    vratiNaSada: 'Back to now',
     bezPlacidusa: (grad) =>
       `At the latitude of ${grad}, Placidus houses don’t exist — the points of the ecliptic that define them never rise above the horizon. Whole Sign houses are shown.`,
   },

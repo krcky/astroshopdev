@@ -177,3 +177,60 @@ export function lunarneStavke(tekst: string, koliko = 3): LunarneStavke {
   out.izbegavaj = out.izbegavaj.slice(0, koliko);
   return out;
 }
+
+/* ------------------------------------------------------------------------- *
+ * RASPORED DUGE VERZIJE TRANZITA (Ivan, 1.10.2026, posle UX recenzije):
+ *
+ *   1. prva recenica — veca i crna (uvod)
+ *   2. ostatak prvog pasusa — siv, kao do sada
+ *   3. SVI odeljci, redom kako ih je astrolog napisao: Suština, Dugoročni efekti, Specifične
+ *      sfere života, Opšte preporuke, pa Pozitivni efekti / Izazovi / Saveti (u korpusu uvek
+ *      poslednji), i ~17 jednokratnih naslova ("Mitološke paralele"…). Ivan, 1.10.2026: i
+ *      odeljci pre efekata idu gore — do tada su bili u nastavku, na dnu.
+ *   4. nastavak: ostali pasusi teksta
+ *   5. "Pitaj astrologa" (crta ekran, ne ovaj racun)
+ *
+ * Do tada su stavke stajale na samom dnu, posle ~300 reci. Korpus (595 dugih,
+ * 1.10.2026): svaki tekst pocinje pasusom; prva recenica ima medijanu 103 znaka,
+ * samo 8 je duze od `UVOD_MAX` — njima uvod ostaje siv (ceo pasus kao do sada).
+ * Recenica se zavrsava na . ! ? IZA KOJIH ide razmak i VELIKO slovo: "U periodu
+ * između 83. i 85. godine…" se inace prekidao posle "83.". Nista se ne dopisuje
+ * i nista ne brise — samo se menja redosled astrologovih delova.
+ * ------------------------------------------------------------------------- */
+
+/** Duza prva recenica ne ide kao veliki uvod — bila bi crni blok od 4—5 redova. */
+export const UVOD_MAX = 200;
+
+/** Prva recenica pasusa i ostatak. `null` kad recenica nije nadjena ili je preduga. */
+export function prvaRecenica(pasus: string, max = UVOD_MAX): { recenica: string; ostatak: string } | null {
+  const t = pasus.replace(/\s+/g, ' ').trim();
+  const m = /[.!?…]["“”»]?(?=\s+["„«]?[A-ZČĆŠŽĐ])/.exec(t);
+  const kraj = m ? m.index + m[0].length : t.length;
+  const recenica = t.slice(0, kraj).trim();
+  if (!recenica || recenica.length > max) return null;
+  return { recenica, ostatak: t.slice(kraj).trim() };
+}
+
+export type RasporedDuge<S extends { heading: string; body: string }> = {
+  /** Prva recenica (null: ceo prvi pasus ide u `prviPasus`). */
+  uvod: string | null;
+  /** Ostatak prvog pasusa (ili ceo pasus kad uvoda nema). Prazno kad je pasus jedna recenica. */
+  prviPasus: string;
+  /** Svi odeljci, redom kako ih je astrolog napisao (efekti, izazovi i saveti su poslednji). */
+  odeljci: S[];
+  /** Ostali pasusi `body`-ja (spojeni praznim redom, kao u bazi). */
+  nastavakTekst: string;
+};
+
+export function rasporedDuge<S extends { heading: string; body: string }>(body: string, sections: S[]): RasporedDuge<S> {
+  const pasusi = body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const prvi = pasusi[0] ?? '';
+  // Prvi pasus koji je lista ("• …") ne deli se na uvod — u korpusu ga nema, ali da ne pukne.
+  const deo = prvi && !prvi.startsWith(BULLET) ? prvaRecenica(prvi) : null;
+  return {
+    uvod: deo?.recenica ?? null,
+    prviPasus: deo ? deo.ostatak : prvi,
+    odeljci: sections,
+    nastavakTekst: pasusi.slice(1).join('\n\n'),
+  };
+}

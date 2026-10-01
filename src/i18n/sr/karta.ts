@@ -96,8 +96,6 @@ export const karta = {
   /** `app/(tabs)/sky/index.tsx` — "Trenutno na nebu". */
   nebo: {
     naslov: 'Trenutno na nebu',
-    /** Kad je vreme pomereno: naslov vise ne tvrdi "trenutno". */
-    naslovPomereno: 'Nebo',
     infoA11y: 'Šta je trenutno nebo?',
     datumA11y: (datum: string) => `Datum: ${datum} Dodirni da izabereš dan.`,
     mestoA11y: (grad: string) => `Mesto posmatranja: ${grad}. Dodirni da promeniš.`,
@@ -110,8 +108,6 @@ export const karta = {
     satNapred: 'Sat napred',
     danNapred: 'Dan napred',
     trenutnoA11y: 'Vrati se na sadašnji trenutak',
-    nijeSadasnje: 'Ovo nije sadašnje nebo.',
-    vratiNaSada: 'Vrati na sada',
     bezPlacidusa: (grad: string) =>
       `Na geografskoj širini mesta ${grad} Placidus kuće ne postoje — tačke ekliptike koje ih određuju nikad ne izlaze nad horizont. Prikazane su Whole Sign kuće.`,
   },

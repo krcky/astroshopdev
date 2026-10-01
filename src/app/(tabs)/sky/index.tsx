@@ -10,7 +10,6 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { IznadPreliva, Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
-import { GledasDrugo } from '@/components/gledas-drugo';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
 import { buildSky, danZaKalendar, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
@@ -68,7 +67,9 @@ export default function Sky() {
   useFocusEffect(
     React.useCallback(() => {
       if (izabran) return;
-      setSada(new Date());
+      // Isti minut = isto nebo (i isti sat ispod tocka): bez novog racuna i crtanja tocka pri
+      // svakom dolasku na tab (Ivan, 1.10.2026: prelazak na "Nebo" je cekao).
+      setSada((pre) => (Math.floor(Date.now() / 60_000) === Math.floor(pre.getTime() / 60_000) ? pre : new Date()));
       const id = setInterval(() => setSada(new Date()), 60_000);
       return () => clearInterval(id);
     }, [izabran])
@@ -118,13 +119,12 @@ export default function Sky() {
   const wheelSize = Math.min(width - 16, 430);
 
   return (
-    <Screen
-      // Pomereno vreme: naslov vise ne tvrdi "trenutno" (UX recenzija 1.10.2026).
-      label={izabran ? tn.naslovPomereno : tn.naslov} padded={false} tint="pink" right={<ProfileButton />}>
+    <Screen label={tn.naslov} padded={false} tint="pink" right={<ProfileButton />}>
       {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
           preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
       <IznadPreliva
         className="-mt-3 items-center"
+        velicina={{ w: wheelSize, h: wheelSize }}
         podignuto={<NatalWheel chart={chart} size={wheelSize} points={points} />}>
         {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
             linija, pa je legenda ispod liste uklonjena. */}
@@ -133,9 +133,10 @@ export default function Sky() {
       </IznadPreliva>
 
       {/* Sat ISPOD tocka, centrirano — na mestu imena na natalnoj karti.
-          Veliki, `display` (Ivan, 28.9.2026: "font za vreme povecati"). */}
+          Do 1.10.2026 `display` (Ivan, 28.9.2026: "font za vreme povecati"); sada `h1`, kao ime. */}
       <View className="-mt-4 items-center px-5">
-        <Text variant="display" className="text-center">{zoneClock(now, grad.tz)}</Text>
+        {/* Iste velicine kao ime ispod tocka na "Ti" (`h1`) — B13 iz UX recenzije, Ivan 1.10.2026. */}
+        <Text variant="h1" className="text-center">{zoneClock(now, grad.tz)}</Text>
       </View>
 
       {/* Datum i mesto u staklu, JEDNO PORED DRUGOG, malo odmaknuti od sata
@@ -176,11 +177,6 @@ export default function Sky() {
         <StakloDugme siroko strelica="desno" tekst={tn.sat} onPress={() => pomeriSat(1)} accessibilityLabel={tn.satNapred} />
         <StakloDugme siroko strelica="desno" tekst={tn.dan} onPress={() => pomeriDan(1)} accessibilityLabel={tn.danNapred} />
       </View>
-      {/* Ista traka kao na pocetnoj kad je izabran drugi dan (`gledas-drugo.tsx`). */}
-      {izabran && (
-        <GledasDrugo className="mx-5 mt-4" tekst={tn.nijeSadasnje}
-          dugme={tn.vratiNaSada} onPress={() => setIzabran(null)} />
-      )}
 
       {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
           Ascendent su prvi redovi liste. */}

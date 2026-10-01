@@ -41,6 +41,9 @@ src/
                      iPhone SE (sve=1 pravi ekran), crvene linije = granice okvira — provera snimkom ekrana
     premium.tsx      PAYWALL (po uzoru na CHANI) — modal preko celog ekrana, sa svakog "Otključaj"; paketi iz `kupovina.ts`
     transit.tsx      tumacenje tranzita — NATIVNI LIST odozdo (formSheet u _layout.tsx), kao SVA TUMACENJA
+                     redosled duge (1.10.2026): prva recenica crna i veca, ostatak pasusa, SVI ODELJCI redom astrologa
+                     (Suština, Sfere, Preporuke… pa efekti/izazovi/saveti), "Više o ovom tranzitu" (ostali pasusi),
+                     pa "Pitaj astrologa" — `rasporedDuge` u `lib/tumacenje.ts`
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     natalna-karta-info.tsx  list "Šta je natalna karta" (ikonica "i" pored tocka): sazetak, legenda aspekata, elementi
@@ -350,7 +353,10 @@ IZUZETAK: ASTROLOSKI KRUG ("Ti", "Nebo") stoji IZNAD preliva, beo (Ivan, 30.9.20
 Ne spusta se preliv, nego `IznadPreliva` (`screen.tsx`) crta PRIMERAK kruga u sloju
 3b, izmedju preliva i natpisa, ispod trake, pomeren za skrol; primerak u sadrzaju
 ostaje za klizanje pod traku, a podignuti izbledi posle 24 pt klizanja. Mora biti
-direktno dete sadrzaja `Screen`-a (meri se `onLayout`). TABOVI POCETNE ostaju ISPOD preliva,
+direktno dete sadrzaja `Screen`-a (meri se `onLayout`). NA ANDROIDU KRUG JE JEDAN (Ivan,
+1.10.2026: "zasto uopste imamo dupli krug"): traka tamo ne muti, pa primerka u sadrzaju nema —
+samo prazno mesto (`velicina`), a krug iz sloja 3b klizi i nestaje na ivici trake (`JEDAN_PRIMERAK`).
+Dva SVG tocka su usporavala prelazak na "Ti" i "Nebo" (kadrovi 130—200 ms). TABOVI POCETNE ostaju ISPOD preliva,
 providni (Ivan, 30.9.2026: podignuti iznad preliva, cisto beli, probani na Androidu i vraceni).
 
 ZAMUCENJE IDE PREKO `animatedProps`, NE PREKO RN-ovog `Animated`. Pali se tek
@@ -641,6 +647,10 @@ spolja -> natalna tacka unutra, ASC na 9 sati — trake tona, legenda), Tvoj dan
 polje), Mesec (procenat, 8 faza, znak ISPRED naslova — ne na Mesecu, Ivan 30.9.2026 — "Za tebe"), savet
 (zraci iz loga, "Podeli svoj dan", "Pročitaj ceo tekst"). PRELOM NASLOVA po srpskom slogu: jednoslovna rec
 (u, i, a…) ide uz sledecu (`reciZaPrelom`, i na kartici) — "Opadajući Mesec / u Biku", ne "… u / Biku".
+ANDROID SECE REP SLOVA (Ivan, 1.10.2026: "odseceno mi je slovo j"): prored manji od ~1,26 em i RN na
+Androidu odsece donji deo j, g, ć (`TextView` crta samo u svom okviru; iOS ne sece). Naslovi price idu kroz
+`Reci`, koja reci i omotacu daje `REP_SLOVA` (vazduh ispod + negativna margina, red ostaje isti); nov
+krupan tekst u prici sa tesnim proredom mora isto.
 SAVET: VELICINA SLOVA PO DUZINI (Ivan, 30.9.2026 — savet od 141 znaka je prelazio preko zaglavlja i dugmeta):
 `velicinaSaveta` (`lib/prica.ts`) bira najvecu velicinu (44 -> 20; kartica 39 -> 18) pri kojoj savet staje u
 prostor koji slika stvarno ima. Model preloma je OPREZAN (`ZNAK_EM` 0,53, podesen na dva snimka: 72 znaka = 6
@@ -766,7 +776,7 @@ kvalitet, pol, polaritet, izgled, deo tela — SVAKI RED SVOJA KARTICA, ulaze je
 (`files/*.svg` -> `lib/ikone-osnova.ts`), BEZ vladara -> 8 kamen, boja, biljka, hrana (fotografije sa sajta; CEO
 SLAJD BEO, bez plocica, da se ne vidi granica slike — Ivan 1.10.2026; providnost/mesanje boja video ne bi snimio) i zivotinja -> 9 vladar (planeta u zracima),
 recenica "U tvojoj natalnoj karti Mars je u Biku." iz KARTE (`pricaZaKartu`; Mesec bez vremena "u Blizancima ili Raku",
-Lav: "Grci su ga zvali Helios." — Ivan 1.10.2026; samo u prici, ne na kartici),
+Lav: "Grci su ga zvali Helios." — Ivan 1.10.2026; na kartici i u VIDEU u prvom licu, "U mojoj natalnoj karti…"),
 "Podeli svoj znak" i "Pročitaj: Sunce u Ovnu" (`/natal?tema=sun`). Opis za astrologa: `docs/ASTRO-LOGIKA.md`, 4.8. Boje NE zavise od elementa (Ivan). Slike 3, 4 i 5 imaju sadrzaj na SREDINI visine (Ivan, 1.10.2026), i na kartici.
 TEKST je sa astroshop.rs/znak/* (javan) — `lib/znak-opis-podaci.ts`, GENERISANO `scripts/znak/pripremi.py`:
 naslov poglavlja (deo posle dvotacke) i prva recenica (samo do 34 reci); ispravljene samo slovne greske.

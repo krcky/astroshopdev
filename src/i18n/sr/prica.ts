@@ -143,7 +143,9 @@ export const prica = {
     /** Umesto znaka vladara, kad je vladar uvek u istom znaku (Sunce u Lavu). */
     vladarMit: { sun: 'Grci su ga zvali Helios.' } as Record<string, string>,
     /** "U tvojoj natalnoj karti Mars je u Biku." — `lokativi`: jedan znak, ili dva kad vreme rodjenja nije poznato ("u Blizancima ili Raku"). */
-    vladarRecenica: (vladar: string, lokativi: readonly string[]) => `U tvojoj natalnoj karti ${vladar} je u ${lokativi.join(' ili ')}.`,
+    /** `lice` 'ja' = kartica i video (prvo lice), 'ti' = slika u prici. */
+    vladarRecenica: (vladar: string, lokativi: readonly string[], lice: 'ti' | 'ja' = 'ti') =>
+      `U ${lice === 'ja' ? 'mojoj' : 'tvojoj'} natalnoj karti ${vladar} je u ${lokativi.join(' ili ')}.`,
     /** Tema tumacenja za dugme: "Sunce u Ovnu" (`uZnaku` = "u Ovnu"). */
     sunceU: (uZnaku: string) => `Sunce ${uZnaku}`,
     /** Dugme na poslednjoj slici: "Pročitaj: Sunce u Ovnu". */

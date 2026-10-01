@@ -42,7 +42,7 @@ export function otvoriPremium(izLista = false) {
 }
 
 /** Kartica sa katancem i dugmetom "Otključaj" — ispod zakljucane liste ili teksta. */
-export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustracija = true, className }: {
+export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustracija = true, znacka, onPress, className }: {
   naslov: string;
   opis: string;
   /** Natpis na dugmetu; podrazumevano "Otključaj". */
@@ -56,16 +56,25 @@ export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustraci
    * `false` = stara ravna kartica.
    */
   ilustracija?: boolean;
+  /**
+   * Umesto indigo kruga sa katancem — npr. Bobanova slika na kartici "Pitaj astrologa o ovom
+   * tranzitu" (Ivan, 1.10.2026: "isti dizajn kao box za otkljucavanje, umesto katanca slika").
+   * `velicina` je precnik; pola viri iznad kartice, kao krug sa katancem.
+   */
+  znacka?: { sadrzaj: React.ReactNode; velicina: number };
+  /** Dugme radi nesto drugo, ne otvara paywall (uz `znacka`, kartica nije Premium). */
+  onPress?: () => void;
   className?: string;
 }) {
   const t = useT();
   const [sirina, setSirina] = React.useState(0);
+  const krug = znacka?.velicina ?? KATANAC;
   const tekstIDugme = (
     <>
       {/* Uz ilustraciju naslov veci i deblji (21pt, Bold — Ivan, 30.9.2026). */}
       <Text variant={ilustracija ? 'title' : 'h3'} className={cn('mt-4 text-center', ilustracija && tezina('naslovStrane'))}>{naslov}</Text>
       <Text variant="muted" className="mt-2 text-center">{opis}</Text>
-      <Button className="mt-5 w-full" onPress={() => otvoriPremium(izLista)}>
+      <Button className="mt-5 w-full" onPress={onPress ?? (() => otvoriPremium(izLista))}>
         <Text>{dugme ?? t.opste.otkljucaj}</Text>
       </Button>
     </>
@@ -92,10 +101,10 @@ export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustraci
   return (
     // `className` (razmak od teksta iznad) na OMOTACU: `marginTop` za krug u `style` bi ga pregazio.
     <View className={className}>
-    <View className="rounded-lg bg-card" style={[shadow.soft, { marginTop: KATANAC / 2 }]}>
+    <View className="rounded-lg bg-card" style={[shadow.soft, { marginTop: krug / 2 }]}>
       <View
         className="overflow-hidden rounded-lg border px-6 pb-6"
-        style={{ borderColor: PREMIUM_OBOD, paddingTop: KATANAC / 2 + SPUSTI_TEKST }}
+        style={{ borderColor: PREMIUM_OBOD, paddingTop: krug / 2 + SPUSTI_TEKST }}
         onLayout={(e) => setSirina(e.nativeEvent.layout.width)}>
         {sirina > 0 && (
           <>
@@ -119,11 +128,15 @@ export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustraci
         )}
         {tekstIDugme}
       </View>
-      <View
-        className="absolute items-center justify-center self-center rounded-full"
-        style={{ top: -KATANAC / 2, width: KATANAC, height: KATANAC, backgroundColor: PREMIUM }}>
-        <Lock size={20} color={neutral.white} strokeWidth={2.2} />
-      </View>
+      {znacka ? (
+        <View className="absolute self-center" style={{ top: -krug / 2 }}>{znacka.sadrzaj}</View>
+      ) : (
+        <View
+          className="absolute items-center justify-center self-center rounded-full"
+          style={{ top: -KATANAC / 2, width: KATANAC, height: KATANAC, backgroundColor: PREMIUM }}>
+          <Lock size={20} color={neutral.white} strokeWidth={2.2} />
+        </View>
+      )}
     </View>
     </View>
   );

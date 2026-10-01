@@ -14,7 +14,7 @@ import { PlatnoVidea, type PlatnoVideaRef } from '@/components/prica/platno-vide
 import { procenat, VideoTrakaSadrzaj } from '@/components/prica/video-traka';
 import { pitajZaObavestenje } from '@/components/prica/video-radionica';
 import { posaoDnevnePrice, posaoPriceZnaka } from '@/components/prica/poslovi-videa';
-import { pricaZnaka } from '@/lib/prica-znaka';
+import { pricaZaKartu } from '@/lib/prica-znaka';
 import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import { REDOSLED } from '@/lib/prica';
 import { PROBNI_BUILD } from '@/store/dev';
@@ -53,11 +53,7 @@ function PravaPrica() {
   const p = usePricaDana();
   const resolved = useResolvedProfile();
   // Prica o znaku za isti profil (kao `app/prica-znak.tsx`).
-  const znak = React.useMemo(() => {
-    const sunce = resolved?.chart.planets.find((x) => x.key === 'sun');
-    if (!resolved || resolved.zoneUnreliable || !sunce) return null;
-    return pricaZnaka(sunce.position.sign.key, resolved.timeUnknown ? null : sunce.position.deg);
-  }, [resolved]);
+  const znak = React.useMemo(() => (resolved ? pricaZaKartu(resolved) : null), [resolved]);
   const imaProfil = useProfileStore((s) => !!s.profile);
   const vrsta = useVideoPrice((s) => s.poslednja) ?? 'dan';
   const x = useVideoPrice((s) => s.videi[vrsta]);

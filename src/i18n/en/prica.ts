@@ -127,7 +127,7 @@ export const prica: Recnik['prica'] = {
     /** Instead of the ruler's sign, when the ruler is always in the same sign (Sun in Leo). */
     vladarMit: { sun: 'The Greeks called it Helios.' },
     /** "In your birth chart Mars is in Taurus." — two signs when birth time is unknown ("in Gemini or Cancer"). */
-    vladarRecenica: (vladar, lokativi) => `In your birth chart ${vladar} is in ${lokativi.join(' or ')}.`,
+    vladarRecenica: (vladar, lokativi, lice = 'ti') => `In ${lice === 'ja' ? 'my' : 'your'} birth chart ${vladar} is in ${lokativi.join(' or ')}.`,
     /** Reading topic for the button: "Sun in Aries" (`uZnaku` = "in Aries"). */
     sunceU: (uZnaku) => `Sun ${uZnaku}`,
     /** Button on the last slide: "Read: Sun in Aries". */

@@ -13,7 +13,7 @@ import { ZnakIkona, ELEMENT_BOJA } from '@/components/znak-ikona';
 import { SLIKA as SLIKA_PLANETE, skalaSlike } from '@/components/planete-par';
 import { PricaPozadina } from '@/components/prica/pozadina';
 import { INDIGO, LILA, SIVA, type Nijansa } from '@/components/prica/boje';
-import { ISKOK, Pojava, Reci, Zraci } from '@/components/prica/crtezi';
+import { ISKOK, Pojava, Reci, REP_SLOVA, Zraci } from '@/components/prica/crtezi';
 import { useNapredak, useOkret, useSekunde } from '@/components/prica/sat';
 import type { OkvirSlike } from '@/components/prica/slajdovi';
 import { IkonaOsnove } from '@/components/prica-znaka/ikona-osnove';
@@ -269,9 +269,10 @@ function SlikaUkratko({ p, okvir, kartica }: SlikaZnakaProps) {
         </Pojava>
         <View style={{ marginTop: 8 * s }}>
           {p.opis.vrednosti.map((v, i) => (
-            <Pojava key={v} kasni={2300 + i * 200} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 * s }}>
+            <Pojava key={v} kasni={2300 + i * 200} style={[{ flexDirection: 'row', alignItems: 'center', gap: 10 * s }, REP_SLOVA]}>
               <View className="rounded-pill" style={{ width: 9 * s, height: 9 * s, backgroundColor: ELEMENT_BOJA[p.element] }} />
-              <Text className={DISP} style={{ fontSize: velVr, lineHeight: velVr * 1.2, letterSpacing: -0.035 * velVr }}>{v}</Text>
+              {/* Android: rep slova ("Pamćenje") bi se odsekao — vidi `REP_SLOVA`. */}
+              <Text className={DISP} style={[{ fontSize: velVr, lineHeight: velVr * 1.2, letterSpacing: -0.035 * velVr }, REP_SLOVA]}>{v}</Text>
             </Pojava>
           ))}
         </View>
@@ -533,10 +534,10 @@ function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZna
           <View style={{ marginTop: 10 * s }}>
             <Reci tekst={p.vladarNaslov} kasni={650} className={DISP} style={T.naslov(40 * s)} />
           </View>
-          {/* "U tvojoj natalnoj karti Mars je u Biku." — samo u prici: na slici za deljenje bi uz ime znaka odala jos podataka o rodjenju. */}
-          {!kartica && !!p.vladarRecenica && (
+          {/* "U tvojoj natalnoj karti Mars je u Biku." — na kartici i u videu prvo lice (Ivan, 1.10.2026). */}
+          {!!(kartica ? p.vladarRecenicaJa : p.vladarRecenica) && (
             <Pojava kasni={1200} style={{ marginTop: 12 * s }}>
-              <Text className={tezina('reading')} style={[T.tekst, { color: MUTNO }]}>{p.vladarRecenica}</Text>
+              <Text className={tezina('reading')} style={[T.tekst, { color: MUTNO }]}>{kartica ? p.vladarRecenicaJa : p.vladarRecenica}</Text>
             </Pojava>
           )}
         </View>

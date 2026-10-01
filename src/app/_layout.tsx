@@ -1,7 +1,7 @@
 import '@/global.css';
 
 import * as React from 'react';
-import { Dimensions, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -68,7 +68,8 @@ const TUMACENJE_LIST = {
  */
 const PAYWALL_LIST = {
   presentation: 'formSheet' as const,
-  sheetAllowedDetents: [Math.min(0.92, 790 / Dimensions.get('window').height)],
+  // List do vrha (Ivan, 1.10.2026: "napravi da je 100% list"); do tada 92% / najvise 790 pt.
+  sheetAllowedDetents: [1],
   sheetGrabberVisible: true,
   sheetCornerRadius: 24,
   contentStyle: { backgroundColor: neutral.grouped },

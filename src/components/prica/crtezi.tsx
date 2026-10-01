@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, StyleSheet, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import { Image, Platform, StyleSheet, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import Animated, { Easing, useAnimatedProps, useAnimatedStyle } from 'react-native-reanimated';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 
@@ -46,6 +46,17 @@ function useCrtanje(kasni: number, trajanje: number) {
  * Tekst koji ulazi: reci jedna za drugom, broj koji se odbrojava
  * ------------------------------------------------------------------------- */
 
+/**
+ * ANDROID: REP SLOVA (j, g, ć) ispod reda (Ivan, 1.10.2026: "odseceno mi je slovo j"). Kad je
+ * prored manji od prirodne visine pisma (~1,26 em za Plus Jakarta Sans; u prici 1,0—1,2), React
+ * Native na Androidu zadrzi ceo gornji deo slova, a DONJI ODSECE — `TextView` crta samo unutar
+ * svog okvira. iOS ne sece. Zato tekst dobija vazduh ispod sebe, a negativna margina ga vraca, pa
+ * red ostaje gde je bio. Isto i OMOTAC (`Pojava`): dok bledi, Android ga crta u sloj velicine
+ * njegovog okvira, pa bi rep izronio tek na kraju pretapanja. 24 pt pokriva i naslov od 68 px.
+ */
+export const REP_SLOVA: { paddingBottom: number; marginBottom: number } | undefined =
+  Platform.OS === 'android' ? { paddingBottom: 24, marginBottom: -24 } : undefined;
+
 /** Naslov koji se dize rec po rec. Bez sata — obican tekst u istom rasporedu. */
 export function Reci({ tekst, kasni = 0, korak = 70, className, style, centar = false, pre }: {
   tekst: string;
@@ -64,13 +75,15 @@ export function Reci({ tekst, kasni = 0, korak = 70, className, style, centar = 
       accessibilityRole="header"
       accessibilityLabel={tekst}
       style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: centar ? 'center' : 'flex-start', alignItems: pre ? 'center' : undefined }}>
-      {pre}
+      {/* Isti vazduh kao reci (`REP_SLOVA`), da ih red centrira isto — bez njega je znak ispred
+          naslova Meseca na Androidu pao izmedju dva reda. */}
+      {pre && <View style={REP_SLOVA}>{pre}</View>}
       {reci.map((r, i) => (
-        <Pojava key={`${i}-${r}`} kasni={kasni + i * korak}>
+        <Pojava key={`${i}-${r}`} kasni={kasni + i * korak} style={REP_SLOVA}>
           {/* Uvek levo: na sredinu slaze red (`centar`). iOS pri `text-center` ne racuna razmak na
               kraju, pa pomeri rec udesno za ceo razmak — poslednja rec (bez razmaka) se ne pomeri
               i pretposlednja se zalepi za nju ("svojrast", Ivan 30.9.2026). */}
-          <Text className={className} style={[style, { textAlign: 'left' }]}>{i < reci.length - 1 ? `${r} ` : r}</Text>
+          <Text className={className} style={[style, { textAlign: 'left' }, REP_SLOVA]}>{i < reci.length - 1 ? `${r} ` : r}</Text>
         </Pojava>
       ))}
     </View>

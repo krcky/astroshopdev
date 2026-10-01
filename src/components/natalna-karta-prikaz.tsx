@@ -110,6 +110,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
         <IznadPreliva
           className="-mt-3 items-center"
           // Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5).
+          velicina={{ w: wheelSize, h: wheelSize }}
           podignuto={<NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} />}>
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}

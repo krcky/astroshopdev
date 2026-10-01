@@ -115,6 +115,7 @@ ok(pricaZnaka('cancer', null, ['gemini', 'cancer']).vladarRecenica === 'U tvojoj
   'dva znaka: "u Blizancima ili Raku"', String(pricaZnaka('cancer', null, ['gemini', 'cancer']).vladarRecenica));
 ok(pricaZnaka('leo', 14, ['leo']).vladarRecenica === 'Grci su ga zvali Helios.' && pricaZnaka('leo', null).vladarRecenica === 'Grci su ga zvali Helios.',
   'Lav: Sunce je uvek u Lavu, pa ime iz mita');
+ok(pricaZnaka('aries', 14, ['taurus']).vladarRecenicaJa === 'U mojoj natalnoj karti Mars je u Biku.', 'kartica i video u prvom licu');
 ok(pricaZnaka('aries', 14).vladarRecenica === null, 'bez znaka vladara nema recenice (ne izmisljati)');
 // Iz prave karte: znak vladara je onaj koji karta kaze; Mesec bez vremena rodjenja ume da bude u dva znaka.
 const beograd = cityByName('Beograd')!;

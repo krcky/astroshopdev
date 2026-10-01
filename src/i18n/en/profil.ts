@@ -28,6 +28,9 @@ export const profil: Recnik['profil'] = {
     test: 'Test',
     nalog: 'Account',
     pravila: 'Legal',
+    pomoc: 'Help',
+    pisiteNam: 'Write to us',
+    nemaMejlAplikacije: (adresa) => `There is no email app on this phone. The address is ${adresa}.`,
     premium: 'Premium',
     ukljucenTestom: 'On via test switch',
     /** `istice` is a formatted date or null. */
@@ -70,8 +73,6 @@ export const profil: Recnik['profil'] = {
     natalnaTekst: 'A reading of every planet by sign and house, and of every aspect.',
     tranzitiNaslov: 'Transits',
     tranzitiTekst: 'Every transit of the day with the full reading — for the next two days too.',
-    temeNaslov: 'Themes of the period',
-    temeTekst: 'Transits that last for weeks and months.',
     ljudiNaslov: 'Your people',
     ljudiTekst: (n) => `Charts and transits for up to ${n} ${mnozina(n, 'person', 'people')} close to you.`,
     /** Package card title (capitalized) and period next to the price (lowercase). */
@@ -102,9 +103,12 @@ export const profil: Recnik['profil'] = {
     obnavljanje: (proba, ios) =>
       (proba ? `After the trial, ${proba.cena} ${proba.godisnje ? 'per year' : 'per month'}. ` : '')
       + `The subscription renews automatically until you cancel it in ${ios ? 'App Store' : 'Google Play'} settings.`,
+    pitanjaPosebno: 'Questions to the astrologer are paid separately.',
     uslovi: 'Terms',
     vratiKupovine: 'Restore purchases',
     privatnost: 'Privacy',
+    pisteAstrologNaslov: 'Written by an astrologer',
+    pisteAstrologTekst: (astrolog) => `Every reading is written by astrologer ${astrolog}.`,
   },
 
   /** `components/zakljucano.tsx` — locks and the "Unlock" card. */
@@ -219,6 +223,7 @@ export const profil: Recnik['profil'] = {
     vidisSamoTi,
     trebaInternet: 'You need an internet connection to add a person.',
     dodajOsobu: 'Add person',
+    potvrdiPristanak: 'Confirm consent',
     sunce: nebo.tela.sun,
     mesec: nebo.tela.moon,
     podznak: 'Rising',
