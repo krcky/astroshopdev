@@ -1,3 +1,8 @@
+import { nebo } from './nebo';
+
+type TeloKljuc = keyof typeof nebo.tela;
+type AspektKljuc = keyof typeof nebo.aspekti;
+
 /** Koraci onboardinga, prijava i nalog. Jedan objekat po ekranu, redom kao u toku. */
 export const onboarding = {
   /** `components/onboarding-step.tsx` — zajednicki okvir svih koraka. */
@@ -203,6 +208,11 @@ export const onboarding = {
     /** Tri primera obavestenja na ilustraciji telefona. */
     primerDanNaslov: 'Tvoj dan',
     primerDanTekst: 'Horoskop za danas je spreman.',
+    /** "Venera je u trigonu sa tvojim Suncem." — kljucevi planeta i aspekta, padezi iz `nebo`. */
+    primerAspektTekst: (tranzitna: TeloKljuc, aspekt: AspektKljuc, natalna: TeloKljuc) => {
+      const n = nebo.padeziTela[natalna];
+      return `${nebo.tela[tranzitna]} je u ${nebo.padeziAspekta[aspekt].lokativ} sa ${n.rod === 'z' ? 'tvojom' : 'tvojim'} ${n.instrumental}.`;
+    },
     primerOdgovorTekst: 'Odgovorio je na tvoje pitanje.',
     sada: 'sada',
     preSat: '1 h',

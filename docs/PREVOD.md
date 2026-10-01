@@ -14,7 +14,7 @@ rečnici iste oblike.
 | `src/i18n/sr/opste.ts` | reči sa mnogo ekrana: Nastavi, Sačuvaj, Otkaži… |
 | `src/i18n/sr/gramatika.ts` | množina (`dana`, `meseci`, `tranzita`, `mnozina`), `veliko`, `locale` za `Intl` |
 | `src/i18n/sr/datum.ts` | imena dana i meseci, OBLIK datuma ("Uto, 29. sep 2026") |
-| `src/i18n/sr/nebo.ts` | planete, tačke, aspekti, znakovi sa padežima, faze Meseca, `uZnaku` / `uZnak` |
+| `src/i18n/sr/nebo.ts` | planete, tačke, aspekti, znakovi sa padežima, faze Meseca, `uZnaku` / `uZnak`; PADEŽI planeta (sa rodom) i aspekata: `padeziTela`, `padeziAspekta` |
 | `src/i18n/sr/<deo>.ts` | po delu aplikacije: `onboarding`, `profil`, `pitaj`, `prica`, `danas`, `karta` |
 
 ## Pravila
@@ -28,7 +28,7 @@ rečnici iste oblike.
 3. **Cela rečenica je jedna stavka.** Ako rečenica nosi promenljivu, stavka je funkcija:
    `trajeJos: (koliko: string) => \`Traje još ${koliko}\``. Ne lepiti delove u ekranu —
    drugi jezik ima drugi red reči.
-4. **Gramatika iz rečnika:** množina `t.gramatika.dana(n)`, `meseci(n)`, `tranzita(n)`, a nova
+4. **Gramatika iz rečnika:** planeta ili aspekt u padežu NIKAD ručno — `t.nebo.padeziTela[key].instrumental`, `t.nebo.padeziAspekta[key].lokativ`, a rod planete (`rod`: m/z/s) bira "tvojim / tvojom". množina `t.gramatika.dana(n)`, `meseci(n)`, `tranzita(n)`, a nova
    reč uz broj je funkcija u svom delu, preko `mnozina` iz `./gramatika`. Znak u padežu:
    `t.nebo.uZnaku(key)` ("u Lavu"), `t.nebo.uZnak(key)` ("u Lava"), ili
    `t.nebo.znaci[key].lokativ`. Ime planete: `.name` (getter) ili `t.nebo.tela[key]`.

@@ -18,31 +18,31 @@ const znaci: Recnik['nebo']['znaci'] = {
   pisces: znak('Pisces'),
 };
 
+/** English has no case and no grammatical gender: every form is the name itself. */
+const bez = (ime: string) => ({ genitiv: ime, dativ: ime, akuzativ: ime, instrumental: ime, lokativ: ime });
+
+const TELA = {
+  sun: 'Sun', moon: 'Moon', mercury: 'Mercury', venus: 'Venus', mars: 'Mars',
+  jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus', neptune: 'Neptune', pluto: 'Pluto',
+};
+const ASPEKTI = {
+  conjunction: 'conjunction', sextile: 'sextile', square: 'square', trine: 'trine', opposition: 'opposition',
+};
+
 export const nebo: Recnik['nebo'] = {
-  tela: {
-    sun: 'Sun',
-    moon: 'Moon',
-    mercury: 'Mercury',
-    venus: 'Venus',
-    mars: 'Mars',
-    jupiter: 'Jupiter',
-    saturn: 'Saturn',
-    uranus: 'Uranus',
-    neptune: 'Neptune',
-    pluto: 'Pluto',
-  },
+  tela: TELA,
   tacke: {
     northNode: 'North Node',
     lilith: 'Lilith',
     fortune: 'Part of Fortune',
   },
-  aspekti: {
-    conjunction: 'conjunction',
-    sextile: 'sextile',
-    square: 'square',
-    trine: 'trine',
-    opposition: 'opposition',
-  },
+  aspekti: ASPEKTI,
+  padeziTela: Object.fromEntries(
+    Object.entries(TELA).map(([k, ime]) => [k, { rod: 's' as const, ...bez(ime) }]),
+  ) as Recnik['nebo']['padeziTela'],
+  padeziAspekta: Object.fromEntries(
+    Object.entries(ASPEKTI).map(([k, ime]) => [k, bez(ime)]),
+  ) as Recnik['nebo']['padeziAspekta'],
   znaci,
   /** "in Leo" — where something is. */
   uZnaku: (k) => `in ${znaci[k].ime}`,

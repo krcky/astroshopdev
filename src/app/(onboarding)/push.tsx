@@ -85,11 +85,7 @@ const IZNAD_KARTICA = 92;
  * Ukras je — citac ekrana cita samo kartice.
  */
 function PrimeriObavestenja() {
-  const recnik = useT();
-  const t = recnik.onboarding.push;
-  // Primer tranzita iz recnika (imena planeta i aspekta), istim oblikom kao "Tvoj dan".
-  const { tela, aspekti } = recnik.nebo;
-  const primerTranzit = recnik.danas.tranzit.imeNatalni(tela.venus, aspekti.trine, tela.sun);
+  const t = useT().onboarding.push;
   return (
     <View className="mt-6">
       <View
@@ -128,7 +124,7 @@ function PrimeriObavestenja() {
           redosled={2}
           slika={<IkonicaAplikacije />}
           naslov={t.primerDanNaslov}
-          tekst={primerTranzit}
+          tekst={t.primerAspektTekst('venus', 'trine', 'sun')}
           vreme={t.juce}
         />
       </View>

@@ -105,7 +105,7 @@ for (const f of fs.readdirSync(EN)) {
 
 /* Racun koji sklapa tekst mora da prati jezik (getteri, datum, mnozina). */
 async function proveraJezika() {
-  const { postaviJezik } = await import('../src/i18n/jezik');
+  const { postaviJezik, tr } = await import('../src/i18n/jezik');
   const { datum } = await import('../src/lib/horoscope');
   const { josTraje } = await import('../src/lib/mnozina');
   const { signFromLongitude, SIGNS } = await import('../src/lib/zodiac');
@@ -118,6 +118,8 @@ async function proveraJezika() {
     ['vladar', () => SIGNS[7].ruler, 'Pluton', 'Pluto'],
     ['planeta', () => BODIES[0].name, 'Mesec', 'Moon'],
     ['aspekt', () => ASPECTS[2].name, 'kvadrat', 'square'],
+    ['padezi', () => tr().onboarding.push.primerAspektTekst('venus', 'trine', 'sun'), 'Venera je u trigonu sa tvojim Suncem.', 'Venus is trine your Sun.'],
+    ['rod', () => tr().onboarding.push.primerAspektTekst('mars', 'conjunction', 'venus'), 'Mars je u konjunkciji sa tvojom Venerom.', 'Mars is conjunct your Venus.'],
   ];
   for (const [ime, f, sr, en] of ocekivano) {
     for (const [j, v] of [['sr', sr], ['en', en]] as const) {
