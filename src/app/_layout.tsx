@@ -2,7 +2,7 @@ import '@/global.css';
 
 import * as React from 'react';
 import { Platform } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -101,15 +101,9 @@ export default function RootLayout() {
   const jezikHydrated = useJezikStore((s) => s.hydrated);
   // PROMENA JEZIKA (Ivan, 2.10.2026): navigacija se sklapa iznova (`key` dole) — React Compiler
   // pamti tekst koji sklapaju funkcije iz `lib/`, pa samo ponovno crtanje ne bi prevelo sve.
-  // Posle toga ide se na KAPIJU (`/`): sama obnova je otvarala "Unesi kod" bez nazad.
+  // Na KAPIJU vodi rucni izbor (`store/jezik.ts`, `izaberi`), ne ova promena: jezik se menja i pri
+  // pokretanju (citanje telefona), a tada bi skok na kapiju prekinuo otvaranje preko linka.
   const jezik = useJezik();
-  const prethodniJezik = React.useRef(jezik);
-  React.useEffect(() => {
-    if (prethodniJezik.current === jezik) return;
-    prethodniJezik.current = jezik;
-    const t = setTimeout(() => router.replace('/'), 0);
-    return () => clearTimeout(t);
-  }, [jezik]);
   const [uvod, setUvod] = React.useState(true);
   const krajUvoda = React.useCallback(() => setUvod(false), []);
   // Aplikacija se montira tek kad uvod krene — njeno prvo crtanje zauzme JS, pa

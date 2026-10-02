@@ -64,8 +64,10 @@ razmakom i velikim slovom, za ručni pregled.
 
 `src/i18n/en/` je CEO rečnik (tip `Recnik`, ne dopuna) — TypeScript pada čim ključ fali ili funkcija ima
 drugi oblik nego u srpskom. Izbor jezika je u profilu, sekcija "Test" (samo probni build): tekstovi
-astrologa (tranziti, natal, lunarni, priča o znaku) su još samo na srpskom. Jezik telefona NE bira jezik
-aplikacije (mnogi u Srbiji drže telefon na engleskom); bez izbora je srpski (`store/jezik.ts`).
+astrologa (tranziti, natal, lunarni, priča o znaku) su još samo na srpskom. Bez ručnog izbora jezik
+se uzima iz telefona: naš jezik na spisku željenih jezika, pa REGION telefona, pa engleski
+(`i18n/jezik-uredjaja.ts`, 2.10.2026) — srpski region sa engleskim telefonom daje srpski. Ručni izbor
+(prvi ekran, profil) uvek pobeđuje i pamti se (`store/jezik.ts`).
 
 ### Glas (English voice)
 

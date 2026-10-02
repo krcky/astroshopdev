@@ -813,8 +813,13 @@ prvom ekranu (`welcome.tsx`) na DNU, centrirano — `components/izbor-jezika` (i
 staklu + `Picker`, kvacicu crta sistem; Android/iOS < 26: kapsula + nas spisak, jer Android `Alert` prima
 najvise 3 dugmeta) — i u profilu, sekcija "Nalog". Uz ime jezika zastava (`ZASTAVA` u `i18n/jezik.ts`).
 Tekstovi astrologa (tranziti, natal, lunarni, prica o znaku, simbolika) su jos samo na srpskom — profil to
-kaze ispod reda kad jezik nije srpski. Jezik se pamti na telefonu (`store/jezik.ts`); jezik telefona ga NE bira —
-bez izbora je srpski. Promena jezika sklapa navigaciju iznova (`key` na `Stack` u `_layout.tsx`). Naslov iz
+kaze ispod reda kad jezik nije srpski. Rucni izbor se pamti na telefonu (`store/jezik.ts`) i uvek pobedjuje. BEZ RUCNOG
+IZBORA jezik je PO TELEFONU (Ivan, 2.10.2026; `i18n/jezik-uredjaja.ts`, `expo-localization`, bez dozvole i
+mreze): nas jezik na spisku zeljenih jezika -> REGION telefona (RS/ME/XK sr, HR hr, BA bs, SI sl, MK mk) ->
+engleski. Engleski telefon sa regionom Srbija = srpski. Lokacija (GPS/IP) NE. Promena jezika sklapa
+navigaciju iznova (`key` na `Stack` u `_layout.tsx`), a RUCNI izbor zatim vodi na kapiju (`izaberi`:
+`router.replace('/')` — bez toga "Unesi kod" bez nazad); jezik po telefonu pri pokretanju ne skace na kapiju.
+`useT` vraca `recnikZa(jezik)`, ne `tr()` — React Compiler pamti `tr()`. Naslov iz
 korpusa se poredi sa SRPSKIM imenima (`tekstReda`). ODGOVOR ASTROLOGA JE NA SRPSKOM (Ivan, 1.10.2026): en, sl i mk to
 kazu u tekstu "Pitaj astrologa" (hr i bs ne trebaju); tab se ne sakriva. HRVATSKI I BOSANSKI (1.10.2026): `src/i18n/hr/`, `src/i18n/bs/`, isto CELI
 recnici, isti izbor u profilu (Test). Ijekavica — `check:prevod` pada na cestu ekavsku rec; datum sa tackom

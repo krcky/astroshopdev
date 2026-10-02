@@ -149,6 +149,29 @@ async function proveraJezika() {
     }
   }
   postaviJezik('sr');
+
+  // Jezik po telefonu (Ivan, 2.10.2026): nas jezik na spisku -> region -> engleski.
+  const { jezikTelefona } = await import('../src/i18n/jezik-uredjaja');
+  const l = (languageCode: string, regionCode: string | null) => ({ languageCode, regionCode });
+  const slucajevi: [string, Parameters<typeof jezikTelefona>[0], string][] = [
+    ['srpski telefon', [l('sr', 'RS')], 'sr'],
+    ['engleski telefon, region Srbija', [l('en', 'RS')], 'sr'],
+    ['engleski telefon, region Hrvatska', [l('en', 'HR')], 'hr'],
+    ['engleski telefon, region BiH', [l('en', 'BA')], 'bs'],
+    ['srpski telefon u BiH', [l('sr', 'BA')], 'sr'],
+    ['engleski telefon, region Slovenija', [l('en', 'SI')], 'sl'],
+    ['engleski telefon, region Makedonija', [l('en', 'MK')], 'mk'],
+    ['crnogorski region', [l('en', 'ME')], 'sr'],
+    ['nemacki pa hrvatski, region Nemacka', [l('de', 'DE'), l('hr', 'DE')], 'hr'],
+    ['nemacki telefon, region Nemacka', [l('de', 'DE')], 'en'],
+    ['engleski telefon, region SAD', [l('en', 'US')], 'en'],
+    ['slovenacki telefon, region Austrija', [l('sl', 'AT')], 'sl'],
+    ['prazan spisak', [], 'en'],
+  ];
+  for (const [ime, spisak, ocekivano] of slucajevi) {
+    const dobijeno = jezikTelefona(spisak);
+    if (dobijeno !== ocekivano) { console.error(`✗ jezik po telefonu, ${ime}: ${dobijeno}, ocekivano ${ocekivano}`); greske++; }
+  }
 }
 
 proveraJezika().then(() => {
