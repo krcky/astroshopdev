@@ -130,7 +130,8 @@ def proveri_tekst(jezik, polje, s, t):
         donja = 0.5 if jezik == 'en' else 0.6
         if not (donja <= k <= 1.6):
             g.append(f'{polje}: duzina {k:.2f} x srpska (dozvoljeno {donja}—1,6)')
-        if t.strip() == s.strip():
+        # Bosanski je blizak srpskom: kratak odeljak bez jata ume da bude ISPRAVNO isti (3.10.2026).
+        if t.strip() == s.strip() and (jezik != 'bs' or len(s) >= 300):
             g.append(f'{polje}: identicno srpskom — nije prevedeno')
     if jezik in ('hr', 'bs'):
         for m in EKAVICA.finditer(t):
