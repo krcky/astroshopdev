@@ -5,6 +5,7 @@
  * razidju, stavke se na telefonu prikazu kao obican tekst sa bulletom u sebi,
  * ili se naslov ne podebljava — tiho, bez greske.
  */
+import { poJeziku, jezikKorpusa, jeziciUpita } from '../src/lib/jezik-korpusa';
 import { blokovi, prvaRecenica, rasporedDuge, stavka, UVOD_MAX, vrstaSekcije, vrstaOdeljka } from '../src/lib/tumacenje';
 
 let fail = 0;
@@ -49,6 +50,19 @@ const vrste: [string, string | null][] = [
   ['Kako najbolje iskoristiti ovaj tranzit?', null],
 ];
 for (const [n, v] of vrste) ok(vrstaSekcije(n) === v, n, String(vrstaSekcije(n)));
+// Prevodi korpusa (6.10.2026): naslovi odeljaka na hr, bs i en moraju dobiti istu vrstu kao srpski,
+// inace kartica "Tvoj dan" (Efekat / Pazi / Savet) na prevodu ostane prazna.
+const prevodi: [string, ReturnType<typeof vrstaSekcije>][] = [
+  ['Bit', 'sustina'], ['Specifična područja života', 'sfere'], ['Opće preporuke', 'preporuke'],
+  ['Pozitivni učinci', 'efekat'], ['Pozitivna djelovanja', 'efekat'], ['Savjeti', 'savet'], ['Savjet', 'savet'],
+  ['Dugoročni učinci', 'dugorocno'], ['Suština', 'sustina'], ['Specifične sfere života', 'sfere'],
+  ['Essence', 'sustina'], ['Specific areas of life', 'sfere'], ['General recommendations', 'preporuke'],
+  ['Positive effects', 'efekat'], ['Challenges', 'pazi'], ['Advice', 'savet'], ['Long-term effects', 'dugorocno'],
+  ['Bitka za slobodu', null],
+];
+for (const [n, v] of prevodi) ok(vrstaSekcije(n) === v, `prevod: ${n}`, String(vrstaSekcije(n)));
+ok(vrstaOdeljka('Opće preporuke') === null, 'hr/bs preporuke NISU savet u kartici "Tvoj dan"');
+
 ok(vrstaOdeljka('Opšte preporuke') === null, 'preporuke NISU savet u kartici "Tvoj dan"');
 
 console.log('\n=== Raspored duge verzije (uvod, stavke, nastavak) ===');
@@ -72,6 +86,26 @@ const sve = [rd.uvod, rd.prviPasus, rd.nastavakTekst].join(' ');
 ok(['Prva.', 'Ostatak prvog.', 'Drugi pasus.', 'Treći pasus.'].every((x) => sve.includes(x)), 'nijedan deo teksta se ne gubi');
 const dug = rasporedDuge(`${'b'.repeat(UVOD_MAX + 5)}. Dalje.`, []);
 ok(dug.uvod === null && dug.prviPasus.startsWith('bbb'), 'bez uvoda ceo prvi pasus ostaje siv');
+
+console.log('\n=== Jezik korpusa: prevod ima prednost, srpski je rezerva ===');
+{
+  type R = { key: string; jezik?: string | null; t: string };
+  const redovi: R[] = [
+    { key: 'a', jezik: 'sr', t: 'a-sr' }, { key: 'a', jezik: 'hr', t: 'a-hr' },
+    { key: 'b', jezik: 'sr', t: 'b-sr' }, { key: 'c', jezik: 'hr', t: 'c-hr' }, { key: 'c', jezik: 'sr', t: 'c-sr' },
+    { key: 'd', t: 'd-bez-kolone' }, { key: 'a', jezik: 'bs', t: 'a-bs' },
+  ];
+  const hr = new Map(poJeziku(redovi, 'hr', (r) => r.key).map((r) => [r.key, r.t]));
+  ok(hr.get('a') === 'a-hr' && hr.get('c') === 'c-hr', 'prevod ima prednost, bez obzira na redosled redova', [...hr.values()].join(','));
+  ok(hr.get('b') === 'b-sr', 'kljuc bez prevoda dobija srpski');
+  ok(hr.get('d') === 'd-bez-kolone', 'red bez kolone jezik je srpski');
+  ok(hr.size === 4, 'po jedan red za kljuc', String(hr.size));
+  const srp = new Map(poJeziku(redovi, 'sr', (r) => r.key).map((r) => [r.key, r.t]));
+  ok(srp.get('a') === 'a-sr' && srp.get('c') === 'c-sr', 'srpski korisnik nikad ne dobija prevod');
+  ok(jezikKorpusa('hr') === 'hr' && jezikKorpusa('bs') === 'bs', 'hr i bs imaju prevod korpusa');
+  ok(jezikKorpusa('en') === 'sr' && jezikKorpusa('mk') === 'sr' && jezikKorpusa('sr') === 'sr', 'jezik bez prevoda cita srpski');
+  ok(jeziciUpita('hr').join() === 'hr,sr' && jeziciUpita('sr').join() === 'sr', 'upit trazi jezik i srpski');
+}
 
 console.log(fail ? `\n${fail} FAIL` : '\nsve OK');
 process.exit(fail ? 1 : 0);

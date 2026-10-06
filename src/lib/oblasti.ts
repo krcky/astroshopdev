@@ -357,7 +357,10 @@ export function tekstReda(
   const { naslov } = parseNaslov(title);
   // Naslov je iz korpusa, a korpus je na SRPSKOM — poredi se sa srpskim imenima, ne tekucim jezikom.
   const srIme = `${sr.nebo.tela[r.transiting.key as keyof typeof sr.nebo.tela] ?? r.transiting.name} ${sr.nebo.aspekti[r.aspect.key as keyof typeof sr.nebo.aspekti] ?? r.aspect.name}`;
-  const samoIme = !!naslov && naslov.toLowerCase().startsWith(srIme.toLowerCase());
+  // Od 6.10.2026 korpus ima i prevode: naslov koji je samo ime tranzita moze biti i na jeziku aplikacije.
+  const ovdeIme = `${r.transiting.name} ${r.aspect.name}`;
+  const n = (naslov ?? '').toLowerCase();
+  const samoIme = !!naslov && (n.startsWith(srIme.toLowerCase()) || n.startsWith(ovdeIme.toLowerCase()));
   if (!naslov || samoIme) return { veci: ime, manji: null, zaProveru: true };
   return { veci: naslov, manji: ime, zaProveru: false };
 }

@@ -16,6 +16,9 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { useAuthStore, usePremium } from '@/store/auth';
 import { kesProcitaj, kesUpisi, ucitajKes, useKesUcitan } from '@/lib/kes-na-disku';
 import { usePovratakMreze } from '@/lib/mreza';
+import { jeziciUpita, jezikKorpusa, kesJezika, poJeziku } from '@/lib/jezik-korpusa';
+import { useJezik } from '@/i18n';
+import type { Jezik } from '@/i18n/jezik';
 
 export type TransitVersion = 'short' | 'long';
 
@@ -41,6 +44,7 @@ type Row = {
   challenge: string | null;
   advice: string | null;
   sections: string | null;
+  jezik?: string | null;
 };
 
 function toText(r: Row): TransitText {
@@ -67,19 +71,22 @@ function toText(r: Row): TransitText {
  */
 export async function fetchTransitTexts(
   keys: string[],
-  version: TransitVersion = 'short'
+  version: TransitVersion = 'short',
+  j: Jezik = jezikKorpusa()
 ): Promise<Map<string, TransitText> | null> {
   const out = new Map<string, TransitText>();
   if (!isSupabaseConfigured || keys.length === 0) return out;
 
   const { data, error } = await supabase
     .from('transit_texts')
-    .select('key, version, title, body, positive, challenge, advice, sections')
+    .select('key, version, title, body, positive, challenge, advice, sections, jezik')
     .eq('version', version)
+    .in('jezik', jeziciUpita(j))
     .in('key', keys);
 
   if (error || !data) return null;
-  for (const r of data as Row[]) out.set(r.key, toText(r));
+  // Prevod ako postoji, inace srpski (`lib/jezik-korpusa.ts`).
+  for (const r of poJeziku(data as Row[], j, (x) => x.key)) out.set(r.key, toText(r));
   return out;
 }
 
@@ -106,7 +113,9 @@ export function useTransitTexts(sviKljucevi: string[], version: TransitVersion =
   const keys = version === 'long' && !premiumPrikaz ? BEZ_KLJUCEVA : sviKljucevi;
   const korisnik = useAuthStore((s) => s.user?.id ?? '');
   const pristup = useAuthStore((s) => (s.entitlement?.active ? 'p' : ''));
-  const kesKljuc = (k: string) => `${korisnik}|${pristup}|${version}|${k}`;
+  // Jezik je deo kljuca: posle promene jezika stari tekst ne sme da ostane na ekranu.
+  const j = jezikKorpusa(useJezik());
+  const kesKljuc = (k: string) => `${kesJezika(j)}${korisnik}|${pristup}|${version}|${k}`;
 
   // Kljucevi se menjaju svakog dana; poredi se sadrzaj, ne referenca niza.
   const potpis = keys.join('|');
@@ -122,7 +131,7 @@ export function useTransitTexts(sviKljucevi: string[], version: TransitVersion =
   React.useEffect(() => {
     if (fali.length === 0) return;
     let otkazano = false;
-    fetchTransitTexts(fali, version).then((m) => {
+    fetchTransitTexts(fali, version, j).then((m) => {
       if (otkazano) return;
       // Pad upita se ne pamti: `loading` se spusti, a upit ide ponovo sa sledecim
       // kljucevima (drugi dan) ili kad se ekran ponovo otvori.
@@ -136,7 +145,7 @@ export function useTransitTexts(sviKljucevi: string[], version: TransitVersion =
     });
     return () => { otkazano = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, version, korisnik, pristup, fali.length, povratak]);
+  }, [potpis, version, korisnik, pristup, fali.length, povratak, j]);
 
   // Sa servera, pa sa diska ako server jos nije odgovorio (ili ne moze).
   const nadji = (k: string) => kes.get(kesKljuc(k)) ?? kesProcitaj<TransitText>(`tranzit|${kesKljuc(k)}`) ?? null;
@@ -154,7 +163,7 @@ export function useTransitTexts(sviKljucevi: string[], version: TransitVersion =
     }
     return m;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, version, korisnik, pristup, stiglo, fali.length, diskUcitan]);
+  }, [potpis, version, korisnik, pristup, stiglo, fali.length, diskUcitan, j]);
   // Ceka se samo tekst kog nema ni na disku; ostalo se vec prikazuje.
   const ceka = fali.filter((k) => !naDisku(k));
   return { texts, loading: ceka.length > 0 && palo !== potpis };
@@ -177,6 +186,8 @@ export async function fetchTransitTones(keys: string[]): Promise<Map<string, str
     .from('transit_texts')
     .select('key, tone')
     .eq('version', 'short')
+    // Ton je osobina TRANZITA, ne jezika: stoji samo na srpskom redu.
+    .eq('jezik', 'sr')
     .in('key', keys);
   if (error || !data) {
     await ucitajKes();

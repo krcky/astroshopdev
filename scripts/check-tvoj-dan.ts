@@ -273,6 +273,10 @@ console.log('\n=== 8. Lunarni kalendar na kartici: tri stavke, Basta uradi/izbeg
   ok(kratka.stavke.length === 3 && kratka.izUvoda === 2, 'lista od 1 -> dopuna do 3 iz uvoda', String(kratka.stavke.length));
   ok(kratka.stavke[0].tekst === 'Jedina stavka.' && kratka.stavke[2].tekst === 'Poslednja, savet.', 'prvo lista, pa POSLEDNJE recenice uvoda');
   ok(!kratka.stavke.some((x) => /deo biljke/i.test(x.tekst)), 'red o delu biljke se preskace');
+  // Prevod (hr/bs): "Odgovarajući dio biljke", "Izbjegavajte".
+  const ije = lunarneStavke('Uvod jedan. Uvod dva.\n\n• Izbjegavajte presađivanje.\n• Zalijte vrt.\n\nOdgovarajući dio biljke: cvijet (kupus).');
+  ok(!ije.stavke.some((x) => /dio biljke/i.test(x.tekst)), 'ijekavski red o dijelu biljke se preskace');
+  ok(ije.izbegavaj.map((x) => x.tekst).join('|') === 'Izbjegavajte presađivanje.' && ije.uradi.map((x) => x.tekst).join('|') === 'Zalijte vrt.', '"Izbjegavajte" ide u Izbegavaj', ije.izbegavaj.length + '/' + ije.uradi.length);
   const duga = lunarneStavke('Uvod.\n\n• A.\n• B.\n• C.\n• D.');
   ok(duga.stavke.map((x) => x.tekst).join('') === 'A.B.C.' && duga.izUvoda === 0, 'lista od 4 -> prve tri, bez uvoda');
 

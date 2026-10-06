@@ -57,9 +57,10 @@ export type Odeljak = 'efekat' | 'pazi' | 'savet';
 
 export function vrstaOdeljka(naslov: string): Odeljak | null {
   const n = naslov.trim().toLowerCase();
-  if (/^p?ozitiv/.test(n)) return 'efekat';
-  if (/^izazov/.test(n)) return 'pazi';
-  if (/^savet/.test(n)) return 'savet';
+  if (/^p?ozitiv/.test(n) || /^positive/.test(n)) return 'efekat';
+  if (/^izazov/.test(n) || /^challenge/.test(n)) return 'pazi';
+  // Prevodi korpusa (6.10.2026): hr/bs "Savjeti"; en "Positive effects", "Challenges", "Advice".
+  if (/^sav(j)?et/.test(n) || /^advice/.test(n)) return 'savet';
   return null;
 }
 
@@ -74,11 +75,12 @@ export type VrstaSekcije = 'sustina' | 'dugorocno' | 'sfere' | 'preporuke' | Ode
 
 export function vrstaSekcije(naslov: string): VrstaSekcije | null {
   const n = naslov.trim().toLowerCase();
-  if (/^su[sš]tin/.test(n)) return 'sustina';
-  if (/^dugoro[cč]n/.test(n)) return 'dugorocno';
-  if (/^specifi[cč]n\S* (sfer|oblast)/.test(n)) return 'sfere';
+  // hr "Bit", "Specifična područja života", "Opće preporuke", "Dugoročni učinci"; bs "Opće preporuke"; en po smislu.
+  if (/^su[sš]tin/.test(n) || n === 'bit' || /^essence/.test(n)) return 'sustina';
+  if (/^dugoro[cč]n/.test(n) || /^long-term/.test(n)) return 'dugorocno';
+  if (/^specifi[cč]n\S* (sfer|oblast|podru[cč]j)/.test(n) || /^specific areas/.test(n)) return 'sfere';
   // Od 1.10.2026 svoja ikonica (kompas) — do tada ista sijalica kao "Saveti" odmah ispod.
-  if (/^op[sš]t\S* preporuk/.test(n)) return 'preporuke';
+  if (/^op[sšć]\S* preporuk/.test(n) || /^general recommend/.test(n)) return 'preporuke';
   return vrstaOdeljka(naslov);
 }
 
@@ -137,8 +139,9 @@ export type LunarneStavke = {
   izUvoda: number;
 };
 
-const IZBEGAVAJ = /^(ne|nemojte|izbegavajte|izbegavati)\s/i;
-const DEO_BILJKE = /^odgovaraju[cć]\w* d[ae]o biljke/i;
+// I ijekavski oblici iz prevoda (hr/bs): "Izbjegavajte", "Odgovarajući dio biljke".
+const IZBEGAVAJ = /^(ne|nemojte|izbj?egavajte|izbj?egavati)\s/i;
+const DEO_BILJKE = /^odgovaraju[cć]\w* d(eo|ao|io) biljke/i;
 
 function zabrana(s: Stavka): boolean {
   const pun = `${s.naslov ? `${s.naslov} ` : ''}${s.tekst}`;

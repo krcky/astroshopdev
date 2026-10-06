@@ -22,6 +22,7 @@ import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { imaSvojuSliku, ukloniSliku, usePromeniSliku, type IshodSlike } from '@/lib/slika-profila';
 import { formatDatum } from '@/lib/horoscope';
 import { chartRulers } from '@/lib/rulers';
+import { jezikKorpusa } from '@/lib/jezik-korpusa';
 import { vratiKupovine } from '@/lib/kupovina';
 import { PRIVATNOST, USLOVI } from '@/lib/pravila';
 import { cn } from '@/lib/utils';
@@ -269,7 +270,7 @@ export default function ProfileSheet() {
             tekstovima astrologa samo kad jezik nije srpski: korpus je za sada samo srpski. */}
         <ListRow
           title={tp.jezik}
-          subtitle={jezik === 'sr' ? undefined : tp.jezikIspod}
+          subtitle={jezikKorpusa(jezik) === jezik ? undefined : tp.jezikIspod}
           trailing={<VrednostReda>{natpisJezika(jezik)}</VrednostReda>}
           onPress={izaberiJezik}
         />

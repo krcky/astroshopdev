@@ -14,19 +14,25 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { kesProcitaj, kesUpisi, ucitajKes } from '@/lib/kes-na-disku';
 import { usePovratakMreze } from '@/lib/mreza';
 import { useAuthStore } from '@/store/auth';
+import { jeziciUpita, jezikKorpusa, kesJezika, poJeziku } from '@/lib/jezik-korpusa';
+import { useJezik } from '@/i18n';
+import type { Jezik } from '@/i18n/jezik';
 
 export type NatalText = { key: string; title: string; subtitle: string; body: string };
 
 /** `null` = upit nije uspeo (mreza) — razlicito od praznog odgovora. */
-export async function fetchNatalTexts(keys: string[]): Promise<Map<string, NatalText> | null> {
+export async function fetchNatalTexts(keys: string[], j: Jezik = jezikKorpusa()): Promise<Map<string, NatalText> | null> {
   const out = new Map<string, NatalText>();
   if (!isSupabaseConfigured || keys.length === 0) return out;
   const { data, error } = await supabase
     .from('natal_texts')
-    .select('key, title, subtitle, body')
+    .select('key, title, subtitle, body, jezik')
+    .in('jezik', jeziciUpita(j))
     .in('key', keys);
   if (error || !data) return null;
-  for (const r of data as { key: string; title: string; subtitle: string | null; body: string }[]) {
+  type Red = { key: string; title: string; subtitle: string | null; body: string; jezik?: string | null };
+  // Prevod ako postoji, inace srpski (`lib/jezik-korpusa.ts`).
+  for (const r of poJeziku(data as Red[], j, (x) => x.key)) {
     out.set(r.key, { key: r.key, title: r.title, subtitle: r.subtitle ?? '', body: r.body });
   }
   return out;
@@ -42,12 +48,13 @@ export function useNatalTexts(keys: string[]) {
   const korisnik = useAuthStore((s) => s.user?.id ?? '');
   const pristup = useAuthStore((s) => (s.entitlement?.active ? 'p' : ''));
   const povratak = usePovratakMreze();
+  const j = jezikKorpusa(useJezik());
 
   React.useEffect(() => {
     if (keys.length === 0) { setTexts(new Map()); setLoading(false); return; }
     // Disk i server u isto vreme (`kes-na-disku.ts`): disk popuni dok server ne
     // odgovori, a bez interneta ostaje on. Odgovor servera uvek ima prednost.
-    const kljuc = (k: string) => `natal|${korisnik}|${pristup}|${k}`;
+    const kljuc = (k: string) => `natal|${kesJezika(j)}${korisnik}|${pristup}|${k}`;
     let otkazano = false;
     let server = false;
     setTexts(new Map());
@@ -62,7 +69,7 @@ export function useNatalTexts(keys: string[]) {
       setTexts(disk);
       setLoading(false);
     });
-    fetchNatalTexts(keys).then((m) => {
+    fetchNatalTexts(keys, j).then((m) => {
       if (otkazano) return;
       if (m) {
         server = true;
@@ -73,7 +80,7 @@ export function useNatalTexts(keys: string[]) {
     });
     return () => { otkazano = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, korisnik, pristup, povratak]);
+  }, [potpis, korisnik, pristup, povratak, j]);
 
   return { texts, loading };
 }
@@ -89,11 +96,12 @@ export function useNatalNaslovi(keys: string[]) {
   const [naslovi, setNaslovi] = React.useState<Map<string, NatalNaslov>>(new Map());
   const potpis = keys.join('|');
   const povratak = usePovratakMreze();
+  const j = jezikKorpusa(useJezik());
 
   React.useEffect(() => {
     if (keys.length === 0 || !isSupabaseConfigured) { setNaslovi(new Map()); return; }
     // Naslovi su isti za svakog korisnika i ne zavise od prava pristupa.
-    const kljuc = (k: string) => `natal-naslov|${k}`;
+    const kljuc = (k: string) => `natal-naslov|${kesJezika(j)}${k}`;
     let otkazano = false;
     let server = false;
     ucitajKes().then(() => {
@@ -104,7 +112,8 @@ export function useNatalNaslovi(keys: string[]) {
       }
       if (!otkazano && !server && disk.size > 0) setNaslovi(disk);
     });
-    supabase.rpc('natal_naslovi', { kljucevi: keys }).then(({ data, error }) => {
+    // Sa jezikom (rezerva na srpski je u funkciji, `supabase/prevod-jezik.sql`).
+    supabase.rpc('natal_naslovi', { kljucevi: keys, jez: j }).then(({ data, error }) => {
       if (otkazano || error || !data) return;
       server = true;
       const m = new Map<string, NatalNaslov>();
@@ -117,7 +126,7 @@ export function useNatalNaslovi(keys: string[]) {
     });
     return () => { otkazano = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [potpis, povratak]);
+  }, [potpis, povratak, j]);
 
   return naslovi;
 }
