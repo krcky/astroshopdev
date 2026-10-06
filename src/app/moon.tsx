@@ -265,13 +265,15 @@ export default function MoonScreen() {
           onIzbor={setOblast}
         />
       </Animated.View>
-      {/* Kartica klizi na novu visinu; nov tekst se pretopi (key = pocetak teksta). Dok
-          stize tekst za drugi dan, stari ostaje prigusen (`useLunarTexts`). */}
-      <Animated.View entering={ulaz(4)} layout={KLIZANJE} className={cn(CARD_SURFACE, 'mt-3 overflow-hidden p-4')}>
+      {/* Tekst klizi na novu visinu; nov tekst se pretopi (key = pocetak teksta). Dok
+          stize tekst za drugi dan, stari ostaje prigusen (`useLunarTexts`). BEZ KARTICE i UVOD
+          PRVI (Ivan, 1.10.2026, D4 iz UX recenzije): kartica od dva ekrana nije delovala kao
+          kartica, a saveti pre uvoda su se citali obrnuto. Isti redosled kao tekst tranzita. */}
+      <Animated.View entering={ulaz(4)} layout={KLIZANJE} className="mt-6 overflow-hidden px-1">
         <Animated.View key={savet ? `${oblast}|${savet.slice(0, 48)}` : lunarniLoading ? 'ceka' : 'nema'} entering={FadeIn.duration(220)}
           style={{ opacity: savet && lunarniLoading ? 0.45 : 1 }}>
           {savet ? (
-            <TumacenjeTekst tekst={savet} listePrvo />
+            <TumacenjeTekst tekst={savet} uvod />
           ) : lunarniLoading ? (
             <TextPlaceholder lines={4} />
           ) : (

@@ -7,7 +7,7 @@ import { NaslovSekcije } from '@/components/naslov-sekcije';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { leaveSheetTo, SheetScroll } from '@/components/sheet';
 import { PremiumKartica } from '@/components/zakljucano';
-import { TumacenjeTekst } from '@/components/tumacenje-tekst';
+import { TumacenjeTekst, UvodRecenica } from '@/components/tumacenje-tekst';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { useKarta } from '@/lib/osobe-api';
 import { useEntitlement } from '@/store/auth';
@@ -23,8 +23,6 @@ import { OdeljakIkona } from '@/components/odeljak-ikona';
 import { rasporedDuge, vrstaSekcije } from '@/lib/tumacenje';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { ASTROLOG } from '@/lib/pitanja';
-import { cn } from '@/lib/utils';
-import { tezina } from '@/theme/tipografija';
 import { useNaMrezi } from '@/lib/mreza';
 import { useT } from '@/i18n';
 
@@ -118,9 +116,7 @@ export default function TransitDetail() {
               return (
                 <>
                   {!!r.uvod && (
-                    <Text variant="default" className={cn('text-[20px] leading-[29px] tracking-[-0.2px]', tezina('naslovUTekstu'))}>
-                      {r.uvod}
-                    </Text>
+                    <UvodRecenica>{r.uvod}</UvodRecenica>
                   )}
                   {!!r.prviPasus && (
                     <View className={r.uvod ? 'mt-3' : undefined}><TumacenjeTekst tekst={r.prviPasus} /></View>
