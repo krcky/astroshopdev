@@ -8,6 +8,8 @@ istog oblika kao red u rad/ulaz/<serija>.json, sa prevedenim vrednostima.
 
   python3 scripts/prevod/korpus-provera.py provera <jezik> [serija ...]   provera redova (izlaz 1 = ima gresaka)
   python3 scripts/prevod/korpus-provera.py sklopi <jezik>                 CSV-ovi + pojmovnik.json + IZVESTAJ.md
+  python3 scripts/prevod/korpus-provera.py razdeli <jezik> <serija>       STEDLJIVO: cela serija iz rad/<jezik>/serije/<serija>.json
+                                                                         (lista redova) -> fajl po redu, pa provera te serije
   python3 scripts/prevod/korpus-provera.py stanje                        koliko je gotovo, po jeziku i grupi
   python3 scripts/prevod/korpus-provera.py uporedi <jezik> <izvor>-<red> ...  srpski i prevod jedan ispod drugog (za pregled)
 
@@ -405,6 +407,26 @@ def uporedi(jezik, oznake):
                 print(f'--- {k}\nSR: {src[k]}\n{jezik.upper()}: {dst.get(k)}')
 
 
+def razdeli(jezik, serija):
+    """Prevodilac pise JEDAN fajl za celu seriju (manje koraka = manje potrosnje); ovde se deli na redove."""
+    p = RAD / jezik / 'serije' / f'{serija}.json'
+    try:
+        redovi = json.loads(p.read_text(encoding='utf-8'))
+    except Exception as e:  # noqa
+        print(f'✗ {p}: nije validan JSON: {e}')
+        return 1
+    if not isinstance(redovi, list):
+        print('✗ fajl serije mora biti LISTA redova')
+        return 1
+    ocekivano = {(r['izvor'], r['red']) for r in ulaz_serije(serija)}
+    for r in redovi:
+        if (r.get('izvor'), r.get('red')) not in ocekivano:
+            print(f"✗ red koji nije u seriji: {r.get('izvor')}-{r.get('red')}")
+            return 1
+        atomski(put_reda(jezik, r['izvor'], r['red']), json.dumps(r, ensure_ascii=False, indent=1))
+    return provera(jezik, [serija])
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__)
@@ -412,6 +434,8 @@ def main(argv):
     cmd = argv[1]
     if cmd == 'provera':
         return provera(argv[2], argv[3:])
+    if cmd == 'razdeli':
+        return razdeli(argv[2], argv[3])
     if cmd == 'sklopi':
         sklopi(argv[2])
         return 0
