@@ -12,7 +12,7 @@ Preduslov: `supabase/prevod-jezik.sql` je pokrenut (kolona `jezik`, kljuc sa jez
 Upis je `insert … on conflict do update` SAMO za red tog jezika, pa je ponavljanje bezbedno.
 `tone` se ne upisuje: ton je osobina tranzita i stoji na srpskom redu.
 """
-import csv, json, subprocess, sys, tempfile
+import csv, json, re, subprocess, sys, tempfile
 from pathlib import Path
 
 DESK = Path.home() / 'Desktop' / 'Astroshop App' / 'Prevod korpusa'
@@ -41,11 +41,17 @@ def upit(sql):
     with tempfile.NamedTemporaryFile('w', suffix='.sql', delete=False, encoding='utf-8') as f:
         f.write(sql)
     ref = json.loads((REPO / 'supabase/.temp/linked-project.json').read_text())['ref']
-    r = subprocess.run([str(SB), 'db', 'query', '--linked', '--project-ref', ref, '--output-format', 'json', '-f', f.name], capture_output=True, text=True)
+    # stdin zatvoren: CLI se tada ponasa isto u terminalu i van njega (bez tabele i upita korisniku).
+    r = subprocess.run([str(SB), 'db', 'query', '--linked', '--project-ref', ref, '--output-format', 'json', '-f', f.name],
+                       capture_output=True, text=True, stdin=subprocess.DEVNULL)
     t = r.stdout
-    if r.returncode != 0 or '{' not in t:
-        raise SystemExit(f'upit nije uspeo: {r.stderr[-400:]} {t[-200:]}')
-    return json.loads(t[t.index('{'):t.rindex('}') + 1])['rows']
+    m = re.search(r'\{\s*"boundary"', t)
+    if r.returncode != 0 or not m:
+        raise SystemExit(f'upit nije uspeo (izlaz {r.returncode}).\nSTDERR: {r.stderr[-600:]}\nSTDOUT: {t[:600]}')
+    try:
+        return json.JSONDecoder().raw_decode(t[m.start():])[0]['rows']
+    except Exception as e:  # noqa
+        raise SystemExit(f'odgovor nije citljiv ({e}).\nSTDOUT: {t[:800]}')
 
 
 def main(argv):
