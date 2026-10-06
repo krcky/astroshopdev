@@ -45,11 +45,13 @@ def upit(sql):
     r = subprocess.run([str(SB), 'db', 'query', '--linked', '--project-ref', ref, '--output-format', 'json', '-f', f.name],
                        capture_output=True, text=True, stdin=subprocess.DEVNULL)
     t = r.stdout
-    m = re.search(r'\{\s*"boundary"', t)
+    # Dva oblika odgovora: obican niz redova (terminal) ili objekat {"boundary", "rows"} (kad CLI pokrece agent).
+    m = re.search(r'[\[{]', t)
     if r.returncode != 0 or not m:
         raise SystemExit(f'upit nije uspeo (izlaz {r.returncode}).\nSTDERR: {r.stderr[-600:]}\nSTDOUT: {t[:600]}')
     try:
-        return json.JSONDecoder().raw_decode(t[m.start():])[0]['rows']
+        d = json.JSONDecoder().raw_decode(t[m.start():])[0]
+        return d['rows'] if isinstance(d, dict) else d
     except Exception as e:  # noqa
         raise SystemExit(f'odgovor nije citljiv ({e}).\nSTDOUT: {t[:800]}')
 
