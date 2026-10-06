@@ -37,10 +37,11 @@ def lit(v, kol):
 
 
 def upit(sql):
+    # `--output-format json`: u terminalu CLI inace crta tabelu, koju ovde ne umemo da procitamo.
     with tempfile.NamedTemporaryFile('w', suffix='.sql', delete=False, encoding='utf-8') as f:
         f.write(sql)
     ref = json.loads((REPO / 'supabase/.temp/linked-project.json').read_text())['ref']
-    r = subprocess.run([str(SB), 'db', 'query', '--linked', '--project-ref', ref, '-f', f.name], capture_output=True, text=True)
+    r = subprocess.run([str(SB), 'db', 'query', '--linked', '--project-ref', ref, '--output-format', 'json', '-f', f.name], capture_output=True, text=True)
     t = r.stdout
     if r.returncode != 0 or '{' not in t:
         raise SystemExit(f'upit nije uspeo: {r.stderr[-400:]} {t[-200:]}')
