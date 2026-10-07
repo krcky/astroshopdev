@@ -81,7 +81,7 @@ src/
     izbor-odnosa.tsx     "Ko ti je" (redovi sa kvacicom) — korak nove osobe i list izmene
     karta-lista.tsx      redovi ispod tocka (trojka, planeta, aspekt) i "i" uz tocak — ZAJEDNICKI za "Ti" i "Nebo"
     info-list.tsx        delovi listova sa objasnjenjem tocka (odeljak, stavka, aspekti) — oba "i" lista
-    moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca)
+    moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca; kad se VRTI (`vrti`), okrece se samo tekstura `pun.png`, a senka `senka-NN.png` stoji — Ivan, 7.10.2026)
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
     turnstile.tsx        CAPTCHA kapija pred slanje koda

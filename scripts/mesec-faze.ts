@@ -6,6 +6,10 @@
  * Izvor: `files/mesec@2x.png`. Izlaz: `assets/images/mesec/mesec-01.png` ... `-30.png`,
  * iseceni na disk (disk ispunjava kvadrat). Senka se racuna kao kugla osvetljena
  * Suncem pod uglom faze, pa osvetljeni deo odgovara procentu (1 - cos D) / 2.
+ * Za Mesec koji se vrti (`moon-disc.tsx`, `vrti`) isto se pravi u dva sloja: `pun.png`
+ * (tekstura bez senke, okrece se) i `senka-NN.png` (crna, providnost = senka; stoji na
+ * mestu, jer Sunce ne prati okretanje — Ivan, 7.10.2026). Senka je KVADRAT, bez ivice
+ * diska: disk joj dolazi od okvira sa `borderRadius`.
  * Uglovi su isti kao u `MESEC_SLIKA_UGLOVI` (lib/moon.ts), koji bira sliku.
  * Podesavanja: tamni deo 35%, mekoca 0,2 (Ivan, 28.9.2026, izabrano na pregledu).
  * Posle ove skripte: `npm run slike` (pravilo 24), inace `check:slike` pada.
@@ -54,7 +58,25 @@ MESEC_SLIKA_UGLOVI.forEach((ugao, i) => {
     out.data[o + 2] = src.data[s + 2] * k;
     out.data[o + 3] = src.data[s + 3];
   }
+  const senka = new PNG({ width: strana, height: strana });
+  for (let y = 0; y < strana; y++) for (let x = 0; x < strana; x++) {
+    const o = (y * strana + x) * 4;
+    const nx = (x + 0.5 - r) / r, ny = (y + 0.5 - r) / r;
+    const nz = Math.sqrt(Math.max(0, 1 - Math.min(nx * nx + ny * ny, 1)));
+    let t = Math.min(1, Math.max(0, (nx * sx + nz * sz + MEKOCA) / (2 * MEKOCA)));
+    t = t * t * (3 - 2 * t);
+    senka.data[o + 3] = Math.round((1 - (SENKA + (1 - SENKA) * t)) * 255);
+  }
+  fs.writeFileSync(path.join(izlaz, `senka-${String(i + 1).padStart(2, '0')}.png`), PNG.sync.write(senka));
   const ime = `mesec-${String(i + 1).padStart(2, '0')}.png`;
   fs.writeFileSync(path.join(izlaz, ime), PNG.sync.write(out));
 });
+const pun = new PNG({ width: strana, height: strana });
+for (let y = 0; y < strana; y++) for (let x = 0; x < strana; x++) {
+  const X = x + ox, Y = y + oy;
+  if (X < 0 || Y < 0 || X >= src.width || Y >= src.height) continue;
+  const s = (Y * src.width + X) * 4, o = (y * strana + x) * 4;
+  for (let k = 0; k < 4; k++) pun.data[o + k] = src.data[s + k];
+}
+fs.writeFileSync(path.join(izlaz, 'pun.png'), PNG.sync.write(pun));
 console.log(`${MESEC_SLIKA_UGLOVI.length} slika, ${strana}x${strana} px -> ${izlaz}/`);
