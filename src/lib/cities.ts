@@ -41,7 +41,7 @@ export type City = {
 const PACKED = `792680|Beograd|5|44.804|20.4651|0
 3191281|Sarajevo|0|43.8486|18.3564|3
 3186886|Zagreb|2|45.8144|15.978|5
-786714|Pristina|5|42.6727|21.1669|0
+786714|Priština|5|42.6727|21.1669|0
 785842|Skopje|3|41.9965|21.4314|4
 3196359|Ljubljana|4|46.0511|14.5051|1
 787657|Niš|5|43.3247|21.9033|0
@@ -2305,5 +2305,7 @@ export function cityById(id: number): City | undefined {
  * sa tim imenom. Postoji samo za profile sacuvane pre uvodjenja id-ja.
  */
 export function cityByName(name: string): City | undefined {
-  return all().find((c) => c.name === name);
+  // Tacno ime, pa ime bez kvacica: profil sacuvan kao "Pristina" (do 7.10.2026 u listi bez š) i dalje nadje grad.
+  const lista = all();
+  return lista.find((c) => c.name === name) ?? lista.find((c) => fold(c.name) === fold(name));
 }
