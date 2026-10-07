@@ -102,8 +102,8 @@ console.log('\n=== Jezik korpusa: prevod ima prednost, srpski je rezerva ===');
   ok(hr.size === 4, 'po jedan red za kljuc', String(hr.size));
   const srp = new Map(poJeziku(redovi, 'sr', (r) => r.key).map((r) => [r.key, r.t]));
   ok(srp.get('a') === 'a-sr' && srp.get('c') === 'c-sr', 'srpski korisnik nikad ne dobija prevod');
-  ok(jezikKorpusa('hr') === 'hr' && jezikKorpusa('bs') === 'bs', 'hr i bs imaju prevod korpusa');
-  ok(jezikKorpusa('en') === 'sr' && jezikKorpusa('mk') === 'sr' && jezikKorpusa('sr') === 'sr', 'jezik bez prevoda cita srpski');
+  ok(jezikKorpusa('hr') === 'hr' && jezikKorpusa('bs') === 'bs' && jezikKorpusa('en') === 'en', 'hr, bs i en imaju prevod korpusa');
+  ok(jezikKorpusa('sl') === 'sr' && jezikKorpusa('mk') === 'sr' && jezikKorpusa('sr') === 'sr', 'jezik bez prevoda cita srpski');
   ok(jeziciUpita('hr').join() === 'hr,sr' && jeziciUpita('sr').join() === 'sr', 'upit trazi jezik i srpski');
 }
 

@@ -812,7 +812,7 @@ ENGLESKI (1.10.2026): `src/i18n/en/` je CEO recnik (tip `Recnik` — TS pada cim
 prvom ekranu (`welcome.tsx`) na DNU, centrirano — `components/izbor-jezika` (iOS 26: SwiftUI `Menu` u sistemskom
 staklu + `Picker`, kvacicu crta sistem; Android/iOS < 26: kapsula + nas spisak, jer Android `Alert` prima
 najvise 3 dugmeta) — i u profilu, sekcija "Nalog". Uz ime jezika zastava (`ZASTAVA` u `i18n/jezik.ts`).
-Tekstovi astrologa su prevedeni na hr i bs (vidi nize); za ostale jezike su jos na srpskom — profil to
+Tekstovi astrologa su prevedeni na hr, bs i en (vidi nize); za ostale jezike su jos na srpskom — profil to
 kaze ispod reda (prica o znaku i simbolika su jos samo srpski za sve). Rucni izbor se pamti na telefonu (`store/jezik.ts`) i uvek pobedjuje. BEZ RUCNOG
 IZBORA jezik je PO TELEFONU (Ivan, 2.10.2026; `i18n/jezik-uredjaja.ts`, `expo-localization`, bez dozvole i
 mreze): nas jezik na spisku zeljenih jezika -> REGION telefona (RS/ME/XK sr, HR hr, BA bs, SI sl, MK mk) ->
@@ -828,10 +828,10 @@ sedmica, telefon. SLOVENACKI I MAKEDONSKI (1.10.2026): `src/i18n/sl/` (mnozina s
 DVOJINOM, cetiri oblika; Mesec = Luna) i `src/i18n/mk/` (CIRILICA, bez padeza, clan po rodu; Mesec =
 Месечина); oba kazu da je odgovor astrologa na srpskom. Plus Jakarta Sans NEMA cirilicu — za mk je CEO tekst u
 MANROPE-u (`assets/fonts/manrope/`, `scripts/font/build-manrope.py`); `FONT` u `theme/font.ts` bira pismo po jeziku. Pojmovnik i glas: `docs/PREVOD.md`.
-KORPUS NA HRVATSKOM I BOSANSKOM (Ivan, 6.10.2026): tabele korpusa imaju kolonu `jezik` (`supabase/prevod-jezik.sql`,
+KORPUS NA HRVATSKOM, BOSANSKOM I ENGLESKOM (Ivan, 6. i 7.10.2026): tabele korpusa imaju kolonu `jezik` (`supabase/prevod-jezik.sql`,
 kljuc `(key, version, jezik)` / `(key, jezik)`; srpski je original, `tone` stoji samo na srpskom redu). Aplikacija trazi
 jezik aplikacije I srpski i uzima prevod, a srpski samo kad prevoda nema — SVE kroz `lib/jezik-korpusa.ts`
-(`PREVEDEN_KORPUS` = hr, bs; nov jezik se dodaje tek POSLE uvoza). Upit bez filtera po jeziku dobija vise redova za isti
+(`PREVEDEN_KORPUS` = hr, bs, en — engleski uvezen 7.10.2026; nov jezik se dodaje tek POSLE uvoza). Upit bez filtera po jeziku dobija vise redova za isti
 kljuc — nov upit u tabele korpusa MORA kroz `jeziciUpita` + `poJeziku`, a kes mora imati jezik u kljucu (`kesJezika`).
 Naslove odeljaka (`vrstaOdeljka`, `vrstaSekcije`) i lunarni red o delu biljke `lib/tumacenje.ts` prepoznaje i na hr/bs/en;
 prevod ih pise UVEK isto (`Prevod korpusa/rad/pojmovnik-osnova.json`). Prevod, provera i uvoz: `scripts/prevod/korpus-*.py`

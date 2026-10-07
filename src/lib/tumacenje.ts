@@ -140,12 +140,14 @@ export type LunarneStavke = {
 };
 
 // I ijekavski oblici iz prevoda (hr/bs): "Izbjegavajte", "Odgovarajući dio biljke".
-const IZBEGAVAJ = /^(ne|nemojte|izbj?egavajte|izbj?egavati)\s/i;
-const DEO_BILJKE = /^odgovaraju[cć]\w* d(eo|ao|io) biljke/i;
+const IZBEGAVAJ = /^(ne|nemojte|izbj?egavajte|izbj?egavati|do not|don[’']t|avoid|never|refrain from)\s/i;
+// Engleski prevod (7.10.2026): "Corresponding part of the plant: …", "unfavorable", "not favorable", "not recommended".
+const DEO_BILJKE = /^(odgovaraju[cć]\w* d(eo|ao|io) biljke|corresponding part of the plant)/i;
+const NEPOVOLJNO = /nepovolj|unfavorabl|not (favorable|recommended|advisable)/i;
 
 function zabrana(s: Stavka): boolean {
   const pun = `${s.naslov ? `${s.naslov} ` : ''}${s.tekst}`;
-  return IZBEGAVAJ.test(pun) || /nepovolj/i.test(pun); // i "Nepovoljan", ne samo "nepovoljn"
+  return IZBEGAVAJ.test(pun) || NEPOVOLJNO.test(pun); // i "Nepovoljan", ne samo "nepovoljn"
 }
 
 export function lunarneStavke(tekst: string, koliko = 3): LunarneStavke {

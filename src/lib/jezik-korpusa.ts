@@ -12,7 +12,7 @@
 import { jezik, type Jezik } from '@/i18n/jezik';
 
 /** Jezici na koje je korpus PREVEDEN i uvezen. Novi jezik se dodaje ovde tek posle uvoza. */
-export const PREVEDEN_KORPUS: readonly Jezik[] = ['hr', 'bs'];
+export const PREVEDEN_KORPUS: readonly Jezik[] = ['hr', 'bs', 'en'];
 
 /** Jezik na kom se traze tekstovi astrologa: jezik aplikacije ako ima prevod, inace srpski. */
 export function jezikKorpusa(j: Jezik = jezik()): Jezik {

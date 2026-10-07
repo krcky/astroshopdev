@@ -277,6 +277,10 @@ console.log('\n=== 8. Lunarni kalendar na kartici: tri stavke, Basta uradi/izbeg
   const ije = lunarneStavke('Uvod jedan. Uvod dva.\n\n• Izbjegavajte presađivanje.\n• Zalijte vrt.\n\nOdgovarajući dio biljke: cvijet (kupus).');
   ok(!ije.stavke.some((x) => /dio biljke/i.test(x.tekst)), 'ijekavski red o dijelu biljke se preskace');
   ok(ije.izbegavaj.map((x) => x.tekst).join('|') === 'Izbjegavajte presađivanje.' && ije.uradi.map((x) => x.tekst).join('|') === 'Zalijte vrt.', '"Izbjegavajte" ide u Izbegavaj', ije.izbegavaj.length + '/' + ije.uradi.length);
+  // Engleski prevod: "Corresponding part of the plant", "Do not…", "Avoid…", "not favorable".
+  const en = lunarneStavke('Intro one. Intro two.\n\n• Do not pull weeds yet.\n• Water the garden.\n• It is not favorable to apply fertilizer.\n• Avoid pruning.\n\nCorresponding part of the plant: flower (cabbage).');
+  ok(!en.stavke.some((x) => /part of the plant/i.test(x.tekst)), 'engleski red o delu biljke se preskace');
+  ok(en.izbegavaj.map((x) => x.tekst).join('|') === 'Do not pull weeds yet.|It is not favorable to apply fertilizer.|Avoid pruning.' && en.uradi.map((x) => x.tekst).join('|') === 'Water the garden.', 'engleske zabrane idu u Izbegavaj', en.izbegavaj.length + '/' + en.uradi.length);
   const duga = lunarneStavke('Uvod.\n\n• A.\n• B.\n• C.\n• D.');
   ok(duga.stavke.map((x) => x.tekst).join('') === 'A.B.C.' && duga.izUvoda === 0, 'lista od 4 -> prve tri, bez uvoda');
 
