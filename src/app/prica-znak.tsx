@@ -7,7 +7,11 @@ import { useT } from '@/i18n';
 import { KarticaZnaka } from '@/components/prica-znaka/kartica';
 import { posaoPriceZnaka } from '@/components/prica/poslovi-videa';
 import { SLIKE_PRICE_ZNAKA } from '@/components/prica-znaka/slike';
-import { imeSlikeZnaka, pricaZaKartu, SLIKE_ZNAKA, tamnaSlikaZnaka } from '@/lib/prica-znaka';
+import {
+  danasUPrici, imeSlikeZnaka, pricaZaKartu, SLIKE_ZNAKA, SLIKE_ZNAKA_UVOD, tamnaSlikaZnaka, trajanjaSlika,
+  type DanasUPrici, type SlikaZnaka,
+} from '@/lib/prica-znaka';
+import { usePricaDana, type PricaDana } from '@/lib/use-prica';
 import { useAuthStore } from '@/store/auth';
 import { usePricaZnakaLog } from '@/store/prica-znaka-log';
 import { useResolvedProfile } from '@/store/profile';
@@ -26,7 +30,29 @@ export default function Prica() {
   return <PricaZnakaEkran />;
 }
 
+/** Koliko se ceka da stignu tekstovi za sliku "A sta je danas?" pre nego sto prica krene bez nje (ms). */
+const CEKANJE_DANAS = 3000;
+
 export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
+  return uvod ? <PricaZnakaUvod /> : <Ekran uvod={false} dan={null} saceka={false} />;
+}
+
+/**
+ * Onboarding: poslednja slika je "A sta je danas?" (`danasUPrici`) i trazi podatke dnevne price. Prica
+ * saceka da stignu tekstovi (do `CEKANJE_DANAS`), pa se sastav slika ZAMRZNE — da broj slika ne skace
+ * usred price kad tekst stigne kasnije.
+ */
+function PricaZnakaUvod() {
+  const dan = usePricaDana();
+  const [istekla, setIstekla] = React.useState(false);
+  React.useEffect(() => {
+    const tajmer = setTimeout(() => setIstekla(true), CEKANJE_DANAS);
+    return () => clearTimeout(tajmer);
+  }, []);
+  return <Ekran uvod dan={dan} saceka={!!dan && dan.ucitava && !istekla} />;
+}
+
+function Ekran({ uvod, dan, saceka }: { uvod: boolean; dan: PricaDana | null; saceka: boolean }) {
   const t = useT();
   const resolved = useResolvedProfile();
   const userId = useAuthStore((s) => s.user?.id ?? null);
@@ -43,19 +69,31 @@ export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
     return () => clearTimeout(tajmer);
   }, [p, uvod]);
 
+  // Sastav slika se odredi JEDNOM, kad podaci stignu (ili istekne cekanje): u uvodu sa slikom "A sta je danas?"
+  // samo ako ima teksta, inace bez nje. Pozivalac: `saceka` drzi sliku price dok se ne odluci.
+  const sastav = React.useRef<{ slike: readonly SlikaZnaka[]; danas: DanasUPrici | null } | null>(null);
+  if (!saceka && sastav.current === null) {
+    const danas = uvod ? danasUPrici(dan) : null;
+    sastav.current = uvod
+      ? { slike: SLIKE_ZNAKA_UVOD.filter((k) => k !== 'danas' || danas), danas }
+      : { slike: SLIKE_ZNAKA, danas: null };
+  }
+  const slike = sastav.current?.slike ?? SLIKE_ZNAKA;
+  const danas = sastav.current?.danas ?? null;
+
   const opis = React.useMemo<OpisPrice | null>(() => {
-    if (!p) return null;
+    if (!p || saceka) return null;
     return {
-      trajanja: p.trajanja,
+      trajanja: trajanjaSlika(p, slike, danas),
       podnaslov: t.prica.znak.podnaslov,
-      tamna: (i) => tamnaSlikaZnaka(SLIKE_ZNAKA[i]),
+      tamna: (i) => tamnaSlikaZnaka(slike[i]),
       slika: (i, { okvir, onPodeli }) => {
-        const Slika = SLIKE_PRICE_ZNAKA[SLIKE_ZNAKA[i]];
-        return <Slika p={p} okvir={okvir} uvod={uvod} onPodeli={onPodeli} onProcitaj={procitaj} />;
+        const Slika = SLIKE_PRICE_ZNAKA[slike[i]];
+        return <Slika p={p} okvir={okvir} uvod={uvod} danas={danas} onPodeli={onPodeli} onProcitaj={procitaj} />;
       },
-      kartica: (i) => <KarticaZnaka p={p} k={SLIKE_ZNAKA[i]} />,
+      kartica: (i) => <KarticaZnaka p={p} k={slike[i]} />,
       // Poslednja slika ima veliko "Podeli svoj znak".
-      bezMalogPodeli: (i) => SLIKE_ZNAKA[i] === 'vladar',
+      bezMalogPodeli: (i) => slike[i] === 'vladar',
       imeFajla: imeSlikeZnaka(p.znak),
       naslovDeljenja: t.prica.znak.podeliSvojZnak,
       onPoslednja: () => { if (userId) oznaci(userId, p.znak.key); },
@@ -63,7 +101,7 @@ export function PricaZnakaEkran({ uvod = false }: { uvod?: boolean }) {
       // U uvodu deljenja nema.
       video: uvod ? undefined : posaoPriceZnaka(p),
     };
-  }, [p, uvod, userId, oznaci, t]);
+  }, [p, saceka, slike, danas, uvod, userId, oznaci, t]);
 
   if (!opis) {
     return (

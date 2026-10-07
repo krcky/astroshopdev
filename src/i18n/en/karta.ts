@@ -160,7 +160,7 @@ export const karta: Recnik['karta'] = {
     kucaBezVremena: 'Which house a planet is in depends on the exact birth time. Once you add it, the house reading will be here too.',
     premiumNaslov: 'Your whole chart',
     premiumNaslovOsoba: 'This person’s whole chart',
-    premiumOpis: 'The Sun, Moon and rising sign are already open. The other planets in signs and houses, and all aspects, come with Premium.',
+    premiumOpis: 'The Sun, Moon and rising sign are already open. The other planets and the links between them come with Premium.',
     premiumDugme: 'Unlock the whole chart',
     nijeUcitano: 'The reading can’t load right now. Check your internet connection.',
     /** "Conjunction – Struggle", as in the astrologer’s text. */

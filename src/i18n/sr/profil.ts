@@ -43,7 +43,7 @@ export const profil = {
     aktivan: 'Aktivan',
     upravljajPretplatom: 'Upravljaj pretplatom',
     otkljucajPremium: 'Otključaj Premium',
-    otkljucajPremiumIspod: 'Svi tranziti, ceo tekst i drugi dani',
+    otkljucajPremiumIspod: 'Ceo tekst dana, sutra i natalna karta',
     vratiKupovine: 'Vrati kupovine',
     josNijeMoguceNaslov: 'Još nije moguće',
     josNijeMoguceTekst: 'Kupovina u aplikaciji još nije uključena.',
@@ -73,14 +73,14 @@ export const profil = {
 
   /** `app/premium.tsx` — paywall. */
   premium: {
-    naslov: 'Otvori sva tumačenja',
-    podnaslov: 'Svi tvoji tranziti, teme perioda i pogled na sutra i prekosutra.',
+    naslov: 'Cela slika tvog dana',
+    podnaslov: 'Ceo dnevni tekst, sutra i prekosutra, i cela tvoja karta.',
     natalnaNaslov: 'Natalna karta',
-    natalnaTekst: 'Tumačenje svake planete po znaku i kući i svih aspekata.',
-    tranzitiNaslov: 'Tranziti',
-    tranzitiTekst: 'Svi tranziti dana sa celim tumačenjem — i za sutra i prekosutra.',
+    natalnaTekst: 'Svaka planeta po znaku i kući, i veze među njima.',
+    tranzitiNaslov: 'Ceo tekst dana',
+    tranzitiTekst: 'Šta se dešava, na šta da paziš i šta da probaš. Za danas, sutra i prekosutra.',
     ljudiNaslov: 'Tvoji ljudi',
-    ljudiTekst: (n: number) => `Karte i tranziti do ${n} ${mnozina(n, ['bliske osobe', 'bliske osobe', 'bliskih osoba'])}.`,
+    ljudiTekst: (n: number) => `Karta i dnevni tekstovi za partnera, dete ili prijatelja. Do ${n} osoba.`,
     /** Naslov kartice paketa (veliko slovo) i period uz cenu (malo). */
     godisnjeNaslov: 'Godišnje',
     godisnje: 'godišnje',

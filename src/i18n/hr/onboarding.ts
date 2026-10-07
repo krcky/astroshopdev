@@ -12,7 +12,8 @@ export const onboarding: Recnik['onboarding'] = {
   welcome: {
     /** Ispod imena; dva razmaka sa obje strane tocke su namjerna. */
     podnaslov: 'Est. 2004  ·  Belgrade',
-    napraviNalog: 'Izradi račun',
+    izracunajKartu: 'Izračunaj moju kartu',
+    obecanje: 'Horoskop koji piše pravi astrolog, a ne algoritam.',
     vecImamNalog: 'Već imam račun',
   },
 
@@ -45,6 +46,9 @@ export const onboarding: Recnik['onboarding'] = {
     nazadNaMesto: 'Natrag na mjesto rođenja',
     greskaCuvanja: 'Karta nije spremljena — nismo uspjeli doći do servera. Provjeri internet pa ponovno pritisni Nastavi.',
     izvorPozicija: 'Položaje računamo iz podataka o kretanju planeta, za tvoj točan trenutak i mjesto rođenja.',
+    astrologOpisuje: 'Kako astrolog opisuje tvoju kartu',
+    sacuvajKartu: 'Spremi moju kartu',
+    zasNalog: 'Račun čuva kartu i kad promijeniš mobitel.',
     /** Opis slike planeta za citac zaslona. */
     vladajucaPlaneta: (planeta) => `Vladajući planet: ${planeta}`,
     vladarZnaka: (planeta) => `Vladar tvog znaka: ${planeta}`,

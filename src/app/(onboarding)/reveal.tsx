@@ -10,7 +10,8 @@ import { useAuthStore } from '@/store/auth';
 import { useDraft } from '@/store/draft';
 import { completeSignup, routeAfterSignup } from '@/lib/signup';
 import { placeFields, resolveProfile } from '@/store/profile';
-import { traitsForSign } from '@/lib/traits';
+import { natalPodnaslov, type TackaPodnaslova } from '@/lib/natal-podnaslovi';
+import { moonSignForUnknownTime } from '@/lib/natal-keys';
 import { signRulers } from '@/lib/rulers';
 import type { ZodiacSign } from '@/lib/zodiac';
 
@@ -95,7 +96,17 @@ export default function Reveal() {
   const sun = resolved.chart.planets.find((p) => p.key === 'sun')!;
   const moon = resolved.chart.planets.find((p) => p.key === 'moon')!;
   const asc = resolved.chart.ascendantSign.sign;
-  const traits = traitsForSign(sun.position.sign.key);
+  // Reci astrologa (podnaslovi besplatnih tumacenja) umesto privremenih osobina iz `traits.ts`.
+  // Mesec bez vremena rodjenja: fraza samo kad je znak siguran (radije priznati nego pogadjati, pravilo 4).
+  const mesecSiguran = !resolved.timeUnknown || moonSignForUnknownTime(resolved.utc).certain;
+  const fraze: { tacka: TackaPodnaslova; uloga: string; fraza: string }[] = [
+    { tacka: 'sun' as const, uloga: rv.sunce, znak: sun.position.sign, ima: true },
+    { tacka: 'moon' as const, uloga: rv.mesec, znak: moon.position.sign, ima: mesecSiguran },
+    { tacka: 'ascendant' as const, uloga: rv.podznak, znak: asc, ima: !resolved.timeUnknown },
+  ].flatMap(({ tacka, uloga, znak, ima }) => {
+    const fraza = ima ? natalPodnaslov(tacka, znak.key) : null;
+    return fraza ? [{ tacka, uloga, fraza }] : [];
+  });
   // Vladajuca planeta (Ivan, 29.9.2026): TRADICIONALNI vladar Ascendenta, isto kao
   // "vladar" svuda u aplikaciji (`lib/rulers.ts`). Bez vremena rodjenja Ascendenta
   // nema (pravilo 5) — tada vladar SUNCEVOG znaka, i natpis to kaze.
@@ -105,10 +116,11 @@ export default function Reveal() {
   return (
     <OnboardingStep
       exit={{ kind: 'back', onPress: () => router.back() }}
+      // Bez naloga: zasto nalog (Ivan, 2.10.2026, opcija A); sa nalogom ostaje iskaz odakle racunamo.
       note={greska
         ? rv.greskaCuvanja
-        : rv.izvorPozicija}
-      primary={{ label: t.opste.nastavi, onPress: nastavi, ucitava: cuva, disabled: cuva }}>
+        : user ? rv.izvorPozicija : rv.zasNalog}
+      primary={{ label: rv.sacuvajKartu, onPress: nastavi, ucitava: cuva, disabled: cuva }}>
 
       <View className="items-center">
         <Image source={PLANETA[vladar.key]} style={{ width: 200, height: 200 }}
@@ -124,11 +136,19 @@ export default function Reveal() {
           <Placement uloga={rv.podznak} znak={resolved.timeUnknown ? null : asc} />
         </View>
 
-        <View className="mt-10 items-center">
-          {traits.map((osobina) => (
-            <Text key={osobina} variant="display" className="py-1 text-center text-3xl">{osobina}</Text>
-          ))}
-        </View>
+        {fraze.length > 0 && (
+          <View className="mt-9 items-center">
+            <Text variant="muted" className="text-center">{rv.astrologOpisuje}</Text>
+            <View className="mt-5 items-center gap-4">
+              {fraze.map((f) => (
+                <View key={f.tacka} className="items-center" accessible accessibilityLabel={`${f.uloga}: ${f.fraza}`}>
+                  <Text variant="oznaka">{f.uloga}</Text>
+                  <Text variant="display" className="mt-1 text-center text-2xl">{f.fraza}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         {resolved.timeUnknown && (
           <Text variant="muted" className="mt-8 px-4 text-center text-xs">

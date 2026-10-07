@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { ElementIkona } from '@/components/element-ikona';
 import { ZnakIkona, ELEMENT_BOJA } from '@/components/znak-ikona';
+import { OcenaTackice } from '@/components/ocena-oblasti';
 import { SLIKA as SLIKA_PLANETE, skalaSlike } from '@/components/planete-par';
 import { PricaPozadina } from '@/components/prica/pozadina';
 import { INDIGO, LILA, SIVA, type Nijansa } from '@/components/prica/boje';
@@ -19,7 +20,7 @@ import type { OkvirSlike } from '@/components/prica/slajdovi';
 import { IkonaOsnove } from '@/components/prica-znaka/ikona-osnove';
 import { Sazvezdje } from '@/components/prica-znaka/sazvezdje';
 import { SLIKE_ZNAKA, SRCE, TORBA, type Slika } from '@/components/prica-znaka/slike-znaka';
-import { NATPIS_SAZVEZDJA, NATPISI, sunceU, velicinaNaslova, type PricaZnaka, type SlikaZnaka } from '@/lib/prica-znaka';
+import { NATPIS_SAZVEZDJA, NATPISI, sunceU, velicinaNaslova, type DanasUPrici, type PricaZnaka, type SlikaZnaka } from '@/lib/prica-znaka';
 import { SAZVEZDJA } from '@/lib/sazvezdja';
 import type { Element } from '@/lib/zodiac';
 import { cn } from '@/lib/utils';
@@ -27,7 +28,7 @@ import { tezina } from '@/theme/tipografija';
 import { neutral } from '@/theme/tokens';
 
 /**
- * PRICA O ZNAKU — devet slika (pravilo 25). Svaka se crta i u prici i kao KARTICA ZA DELJENJE
+ * PRICA O ZNAKU — devet slika (pravilo 25; u onboardingu sedam + "A sta je danas?"). Svaka se crta i u prici i kao KARTICA ZA DELJENJE
  * (360 × 640, `kartica.tsx`) — ISTA komponenta u manjoj razmeri (`s`), pa su pokreti isti, istim
  * redom i vremenima (uslov za video, `sat.tsx`). Na kartici je prvo lice ("Moje sazvežđe"), bez
  * dugmadi i bez stepena Sunca (uz ime znaka bi odao dan rodjenja).
@@ -41,6 +42,8 @@ export type SlikaZnakaProps = {
   kartica?: boolean;
   /** Prica u onboardingu: bez dugmadi na poslednjoj slici — dole je "Nastavi" (`plejer.tsx`). */
   uvod?: boolean;
+  /** Sadrzaj slike "A sta je danas?" (samo onboarding, `danasUPrici`); bez njega slika ostaje prazna. */
+  danas?: DanasUPrici | null;
   onPodeli?: () => void;
   onProcitaj?: () => void;
 };
@@ -559,6 +562,48 @@ function SlikaVladar({ p, okvir, kartica, uvod, onPodeli, onProcitaj }: SlikaZna
   );
 }
 
+/* ------------------------------------------------------------------------- *
+ * 10 · A sta je danas? — SAMO u onboardingu (Ivan, 2.10.2026): danasnji tekst "Tvog dana" u kratkoj
+ * verziji, poslednja slika pred "Nastavi" i paywall. Nema kartice za deljenje ni videa.
+ * ------------------------------------------------------------------------- */
+
+function SlikaDanas({ okvir, kartica, danas }: SlikaZnakaProps) {
+  const t = useT();
+  const s = razmera(okvir, kartica);
+  const T = tipovi(s);
+  if (!danas) return <View style={{ flex: 1, backgroundColor: SIVA }} />;
+  const sirina = okvir.sirina - 2 * (kartica ? 22 : 24);
+  const vel = velicinaNaslova(danas.naslov, sirina, 34 * s, 24 * s, 3);
+  const tekst = { fontSize: 14.5 * s, lineHeight: 20 * s };
+  return (
+    <View style={{ flex: 1, backgroundColor: SIVA }}>
+      <Pozadina nijansa="lila" okvir={okvir} kartica={kartica} />
+      <View style={[sadrzaj(okvir, kartica), { justifyContent: 'center' }]}>
+        <Pojava kasni={300}>
+          <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{t.prica.znak.danasNaslov}</Text>
+        </Pojava>
+        <View style={{ marginTop: 10 * s }}>
+          <Reci tekst={danas.naslov} kasni={450} className={DISP} style={T.naslov(vel)} />
+        </View>
+        <View style={{ marginTop: 20 * s, gap: 14 * s }}>
+          {danas.redovi.map((r, i) => (
+            <Pojava key={r.oznaka} kasni={1300 + i * 350}>
+              <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{r.oznaka}</Text>
+              <Text className={tezina('reading')} style={[tekst, { marginTop: 3 * s }]}>{r.tekst}</Text>
+            </Pojava>
+          ))}
+          {danas.ljubav && (
+            <Pojava kasni={1300 + danas.redovi.length * 350} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 * s }}>
+              <Text className={OZN} style={[T.oznaka, { color: MUTNO }]}>{danas.ljubav.ime}</Text>
+              <OcenaTackice ocena={danas.ljubav.ocena} />
+            </Pojava>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export const SLIKE_PRICE_ZNAKA: Record<SlikaZnaka, (props: SlikaZnakaProps) => React.ReactElement> = {
   sazvezdje: SlikaSazvezdje,
   naslovna: SlikaNaslovna,
@@ -569,4 +614,5 @@ export const SLIKE_PRICE_ZNAKA: Record<SlikaZnaka, (props: SlikaZnakaProps) => R
   osnove: SlikaOsnove,
   stvari: SlikaStvari,
   vladar: SlikaVladar,
+  danas: SlikaDanas,
 };

@@ -16,7 +16,8 @@ export const onboarding = {
   welcome: {
     /** Ispod imena; dva razmaka sa obe strane tacke su namerna. */
     podnaslov: 'Est. 2004  ·  Belgrade',
-    napraviNalog: 'Napravi nalog',
+    izracunajKartu: 'Izračunaj moju kartu',
+    obecanje: 'Horoskop koji piše pravi astrolog, ne algoritam.',
     vecImamNalog: 'Već imam nalog',
   },
 
@@ -54,6 +55,9 @@ export const onboarding = {
     nazadNaMesto: 'Nazad na mesto rođenja',
     greskaCuvanja: 'Karta nije sačuvana — nismo uspeli da stignemo do servera. Proveri internet pa pritisni Nastavi ponovo.',
     izvorPozicija: 'Pozicije računamo iz podataka o kretanju planeta, za tvoj tačan trenutak i mesto rođenja.',
+    astrologOpisuje: 'Kako astrolog opisuje tvoju kartu',
+    sacuvajKartu: 'Sačuvaj moju kartu',
+    zasNalog: 'Nalog čuva kartu i kad promeniš telefon.',
     /** Opis slike planete za citac ekrana. */
     vladajucaPlaneta: (planeta: string) => `Vladajuća planeta: ${planeta}`,
     /** Bez vremena rodjenja: vladar Suncevog znaka. */

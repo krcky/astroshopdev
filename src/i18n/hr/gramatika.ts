@@ -8,6 +8,7 @@ export const gramatika: Recnik['gramatika'] = {
   dana: (n) => `${n} ${mnozina(n, ['dan', 'dana', 'dana'])}`,
   meseci: (n) => `${n} ${mnozina(n, ['mjesec', 'mjeseca', 'mjeseci'])}`,
   tranzita: (n) => mnozina(n, ['tranzit', 'tranzita', 'tranzita']),
+  teksta: (n) => mnozina(n, ['tekst', 'teksta', 'tekstova']),
   veliko: (x) => x.charAt(0).toLocaleUpperCase('hr') + x.slice(1),
   locale: 'hr-HR',
 };

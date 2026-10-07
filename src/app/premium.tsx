@@ -119,17 +119,11 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
 
         {/* Kao list gap 16 (do 1.10.2026 20) — peta stavka (astrolog) mora da stane bez skrola. */}
         <View className={uOnboardingu ? 'mt-7 gap-5' : 'mt-6 gap-4'}>
+          {/* Ko pise (B7 iz UX recenzije, Ivan 1.10.2026): najveca razlika od drugih aplikacija. */}
           <Stavka
-            slika={
-              <Image
-                source={require('../../assets/images/natalna-karta-objasnjenje.png')}
-                style={{ width: ILUSTRACIJA, height: ILUSTRACIJA * (1520 / 1774) }}
-                resizeMode="contain"
-                accessible={false}
-              />
-            }
-            naslov={tp.natalnaNaslov}
-            tekst={tp.natalnaTekst}
+            slika={<AstrologSlika velicina={52} />}
+            naslov={tp.pisteAstrologNaslov}
+            tekst={tp.pisteAstrologTekst(ASTROLOG.ime)}
           />
           <Stavka
             slika={
@@ -145,6 +139,18 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
             tekst={tp.tranzitiTekst}
           />
           {/* "Teme perioda" izbacena iz liste (Ivan, 1.10.2026). */}
+          <Stavka
+            slika={
+              <Image
+                source={require('../../assets/images/natalna-karta-objasnjenje.png')}
+                style={{ width: ILUSTRACIJA, height: ILUSTRACIJA * (1520 / 1774) }}
+                resizeMode="contain"
+                accessible={false}
+              />
+            }
+            naslov={tp.natalnaNaslov}
+            tekst={tp.natalnaTekst}
+          />
           {/* Druge osobe (29.9.2026): besplatno jedna, uz Premium do `PREMIUM.osobe`. */}
           <Stavka
             slika={
@@ -160,12 +166,6 @@ export function PaywallEkran({ uOnboardingu = false }: { uOnboardingu?: boolean 
             }
             naslov={tp.ljudiNaslov}
             tekst={tp.ljudiTekst(PREMIUM_GRANICE.osobe)}
-          />
-          {/* Ko pise (B7 iz UX recenzije, Ivan 1.10.2026): najveca razlika od drugih aplikacija. */}
-          <Stavka
-            slika={<AstrologSlika velicina={52} />}
-            naslov={tp.pisteAstrologNaslov}
-            tekst={tp.pisteAstrologTekst(ASTROLOG.ime)}
           />
         </View>
 

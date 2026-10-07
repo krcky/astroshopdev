@@ -31,15 +31,17 @@ export default function Welcome() {
             <KrugLoga size={125} />
             {/* Ime i podnaslov po Ivanu (29.9.2026); pre toga "Astroshop" / "Horoskop koji je stvarno tvoj". */}
             <Text variant="display" className="mt-5 text-5xl">{t.opste.imeAplikacije}</Text>
+            {/* Obecanje u jednoj recenici (Ivan, 2.10.2026, opcija A) — pre "Est. 2004": prvo sta dobijas, pa ko stoji iza. */}
+            <Text variant="body" className="mt-3 max-w-[250px] text-center">{t.onboarding.welcome.obecanje}</Text>
             <Text variant="label" className="mt-3">{t.onboarding.welcome.podnaslov}</Text>
           </View>
 
           <View className="mt-12">
             {/* Istaknuto crno dugme (preliv, sjaj, senka), isto kao "Saznaj više" na
-                pocetnoj (Ivan, 29.9.2026). Natpis "Napravi nalog", a tok ostaje: prvo
+                pocetnoj (Ivan, 29.9.2026). Natpis "Izracunaj moju kartu" (2.10.2026; "Napravi nalog" je obecavao nalog a sledi izbor datuma), a tok ostaje: prvo
                 podaci o rodjenju i velika trojka, nalog posle (pravilo 14). */}
             <Button size="lg" istaknuto onPress={start}>
-              <Text>{t.onboarding.welcome.napraviNalog}</Text>
+              <Text>{t.onboarding.welcome.izracunajKartu}</Text>
             </Button>
             <Pressable
               onPress={() => router.push('/account')}

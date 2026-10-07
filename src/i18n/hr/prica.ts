@@ -141,6 +141,7 @@ export const prica: Recnik['prica'] = {
     hrana: 'Hrana',
     zivotinja: 'Životinja',
     vladarZnaka: 'Vladar znaka',
+    danasNaslov: 'A što je danas?',
     podeliSvojZnak: 'Podijeli svoj znak',
   },
 

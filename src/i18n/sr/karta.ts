@@ -153,7 +153,7 @@ export const karta = {
     kucaBezVremena: 'U kojoj je kući planeta zavisi od tačnog vremena rođenja. Kad ga uneseš, ovde će biti i tumačenje kuće.',
     premiumNaslov: 'Tvoja cela karta',
     premiumNaslovOsoba: 'Cela karta ove osobe',
-    premiumOpis: 'Sunce, Mesec i podznak su već otvoreni. Ostale planete u znakovima i kućama i svi aspekti su uz Premium.',
+    premiumOpis: 'Sunce, Mesec i podznak su već otvoreni. Ostale planete i veze među njima su uz Premium.',
     premiumDugme: 'Otključaj celu kartu',
     nijeUcitano: 'Tumačenje trenutno ne može da se učita. Proveri vezu sa internetom.',
     /** "Konjunkcija – Borba", kao u tekstu astrologa. */

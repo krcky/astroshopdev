@@ -117,9 +117,9 @@ export const danas = {
     nemaNaKarti: 'Danas nema tranzita na ovu kartu.',
     nemaTvojih: 'Danas nema tvojih tranzita.',
     /** "Još 5 tranzita danas" — `tranzita` je rec uz broj (`gramatika.tranzita`). */
-    josDanas: (n: number, tranzita: string) => `Još ${n} ${tranzita} danas`,
-    zakljucaniOpis: 'Najjači su otvoreni na vrhu liste. I ostali utiču na tvoj dan, i svaki ima svoje celo tumačenje.',
-    otkljucajSve: 'Otključaj sve tranzite',
+    josDanas: (n: number, teksta: string) => `Još ${n} ${teksta} danas`,
+    zakljucaniOpis: 'Najjači su otvoreni. I ostali utiču na tvoj dan i svaki ima svoje tumačenje.',
+    otkljucajSve: 'Otključaj sve',
     otvaraCeoTekst: 'Otvara ceo tekst tranzita',
   },
 
@@ -180,7 +180,7 @@ export const danas = {
     pitajOpis: (astrolog: string, oOsobi: boolean) =>
       `${astrolog} vidi ${oOsobi ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, obično za 2–3 radna dana.`,
     postaviPitanje: 'Postavi pitanje',
-    kratkaVerzija: 'Ovo je kratka verzija. U celoj su oblasti života na koje tranzit deluje, dugoročni efekti i konkretni saveti.',
+    kratkaVerzija: 'Ovo je kratka verzija. U celoj piše šta se dešava, koliko traje i šta možeš da uradiš.',
     otkljucajCeo: 'Otključaj ceo tekst',
   },
 

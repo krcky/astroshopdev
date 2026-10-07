@@ -27,6 +27,8 @@ const IZUZETI: RegExp[] = [
   /^lib\/traits\.ts$/,
   /^lib\/cities\.ts$/,
   /^lib\/simbolika\.ts$/,
+  // podnaslovi astrologa iz korpusa (reveal u onboardingu), po jeziku: `scripts/korpus/natal-podnaslovi.py`
+  /^lib\/natal-podnaslovi-podaci\.ts$/,
 ];
 
 const SRPSKO = /[čćšžđČĆŠŽĐ]/;

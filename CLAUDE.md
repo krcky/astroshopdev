@@ -118,7 +118,9 @@ src/
     pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
     osobe.ts         druge osobe: odnosi, granica, ko je otvoren (cist racun); osobe-api.ts = server + `useKarta`
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
-    traits.ts        osobine po znaku — PRIVREMENO, ceka astrologa
+    traits.ts        osobine po znaku — vise se NE PRIKAZUJE (reveal koristi podnaslove astrologa); ostaje jer ga cita `scripts/korpus/odgovor.py`
+    natal-podnaslovi.ts  podnaslov astrologa ("Kralj Zodijaka") za Sunce/Mesec/Ascendent u znaku — ekran sa velikom trojkom;
+                     `-podaci.ts` = GENERISANO (`scripts/korpus/natal-podnaslovi.py`: sr iz `files/natal-texts.csv`, hr/bs/en iz prevoda)
     horoscope.ts     composer                   <- ovde ulazi korpus
     supabase.ts      klijent
     sync.ts          profil <-> server
@@ -463,7 +465,8 @@ isto kao probne cene — razvoj, build iz Xcode-a sa `.env`, EAS development/pre
 Menja samo prikaz kroz `useEntitlement` — zato ekrani ne citaju `s.entitlement` direktno. Duge tekstove
 i dalje salje samo server, a kes tekstova ide po PRAVOM stanju. Pravi Premium je i dalje poklon. Zakljucano crta `components/zakljucano.tsx`
 (indigo katanac `PREMIUM`, `PremiumKartica`, `ZakljucaniRedovi`) i sve vodi na `/premium`.
-PAYWALL (`app/premium.tsx`): cetiri stavke sa nasim ilustracijama, dva paketa (godisnje
+PAYWALL (`app/premium.tsx`): cetiri stavke sa nasim ilustracijama, REDOM: astrolog, ceo tekst dana, natalna karta,
+tvoji ljudi (Ivan, 2.10.2026, opcija A — vidi pravilo 26); dva paketa (godisnje
 izabrano, "Uštedi N%" se RACUNA iz cena), jedno crno dugme, pa Uslovi / Vrati kupovine /
 Privatnost i recenica o automatskom obnavljanju (Apple). Cena i proba SAMO iz prodavnice
 (`usePaketiPremium`); u `__DEV__` probni paketi, u buildu bez cene paketi se ne crtaju.
@@ -799,8 +802,21 @@ preko imena). Na strani osobe Sunce i dalje otvara tumacenje.
 U ONBOARDINGU (Ivan, 1.10.2026): ova prica, UMESTO dnevne, po pravilima iz pravila 23 ("U ONBOARDINGU"): bez
 zaglavlja, X, deljenja i povlacenja; na slici "vladar" umesto "Podeli svoj znak" / "Pročitaj" jedno "Nastavi" (plejer)
 i red "Nova priča stiže svakog dana, na početnoj." -> obavestenja. Bez karte posle 2,5 s dalje.
+KRACA OD PRICE IZ TABA "TI" (Ivan, 2.10.2026): u uvodu BEZ slika "osnove znaka" i "kamen, boja, biljka…" (ostaju u tabu
+"Ti"), a na kraju jedna slika "A šta je danas?" (`SLIKE_ZNAKA_UVOD`, `SlikaDanas`): naslov danasnjeg teksta "Tvog dana",
+pozitivni efekat / izazov / savet iz kratke verzije i ocena Ljubavi — poslednji utisak pred paywall je ono sto se placa.
+Podaci iz `usePricaDana` (isti kao pocetna); prica saceka tekstove do 3 s, pa sastav slika ZAMRZNE (broj slika ne
+skace usred price), a bez ijednog reda teksta slike nema. Nema kartice ni videa (uvod nema deljenja). Trajanje 37—44 s
+(sa slikama 7 i 8 bilo bi 45—53 s); `check:prica-znaka`, delovi 9 i 10. Pregled: `/dev-prica-znaka?slika=danas&uredjaj=se`.
+REVEAL (`(onboarding)/reveal.tsx`, 2.10.2026): ispod trojke tri podnaslova astrologa (`natal-podnaslovi.ts`) umesto privremenih
+osobina; Mesec bez vremena rodjenja dobija frazu samo kad je znak siguran, podznak bez vremena je nema (pravilo 4).
 
 **26. Tekst za korisnika ide ISKLJUCIVO kroz recnik (Ivan, 1.10.2026 — prvi korak prevoda).**
+GLAS (Ivan, 2.10.2026, "opcija A — prijatelj koji zna"): topao, direktan, "ti", kratke recenice, bez uzvika i laskanja; dugme je glagol
+("Izračunaj moju kartu", "Sačuvaj moju kartu"), a zaglavlje paywalla ishod, ne funkcija ("Cela slika tvog dana"). Reci "tranzit"
+nema u paywallu ni u zakljucanim karticama dok nije objasnjena. Opis i pregled glasova: `docs/PREVOD.md`, "Glas (srpski)". OTVORENO:
+stavka "Piše astrolog" ostaje bez broja ("oko 1.500 tumačenja") i bez "nijedno nije generisano" dok Boban ne potvrdi; korpus je pisan na
+"Vi" (506 od 508 natalnih), UI na "ti" — odluka o glasu korpusa nije pala.
 Planirani jezici: hrvatski, bosanski, slovenacki, makedonski, engleski. Sav tekst koji korisnik vidi je u
 `src/i18n/sr/`; ekran ga cita kroz `useT()` (`t.profil.naslov`), `lib/` i store kroz `tr()` U TRENUTKU
 poziva. NIKAD preveden tekst u konstanti na nivou modula — modul se izvrsi pre nego sto se jezik postavi;
@@ -891,7 +907,7 @@ npm run panel:build       panel za objavu -> panel/dist
 - [x] SMTP (SendGrid) + `{{ .Token }}` u sablonu **Magic Link** — dok je "Confirm
       email" iskljucen, Supabase salje samo taj sablon, "Confirm signup" se ne koristi
 - [x] Turnstile — widget, `captchaToken` u oba poziva, provera upaljena u Supabase-u
-- [ ] Osobine po znaku od astrologa (`lib/traits.ts`) — 12 x 3 reda, mali posao
+- [x] Osobine po znaku od astrologa — zamenjene 2.10.2026 podnaslovima astrologa iz korpusa (36 besplatnih fraza, `natal-podnaslovi.ts`)
 - [x] ETL korpusa — .docx fajlovi parsirani (`scripts/korpus/parse_docx.py`),
       tekstovi u `transit_texts`. Pokrivenost: `python3 scripts/korpus/izvestaj.py`.
       Duge verzije stigle 27.9.2026 (i Mesec, ASC i MC) — 593/597. Uvezeno 27.9.2026:

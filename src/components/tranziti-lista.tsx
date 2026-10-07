@@ -106,7 +106,7 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
           />
           <PremiumKartica
             className="mt-10"
-            naslov={t.danas.tranziti.josDanas(zakljucani.length, t.gramatika.tranzita(zakljucani.length))}
+            naslov={t.danas.tranziti.josDanas(zakljucani.length, t.gramatika.teksta(zakljucani.length))}
             opis={t.danas.tranziti.zakljucaniOpis}
             dugme={t.danas.tranziti.otkljucajSve}
           />

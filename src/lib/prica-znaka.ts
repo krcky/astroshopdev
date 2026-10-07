@@ -12,15 +12,64 @@ import { datum } from '@/lib/horoscope';
 import type { NatalChart } from '@/lib/natal';
 import { moonSignForUnknownTime } from '@/lib/natal-keys';
 import { TRAJANJE_STALNO, trajanjeSlike } from '@/lib/prica';
+import type { PricaDana } from '@/lib/use-prica';
 import { ZNAK_OPIS, type ZnakOpis } from '@/lib/znak-opis-podaci';
 import { SIGNS, type Element, type ZodiacSign } from '@/lib/zodiac';
 
 export type SlikaZnaka =
-  | 'sazvezdje' | 'naslovna' | 'ukratko' | 'ljubav' | 'posao' | 'osvojiti' | 'osnove' | 'stvari' | 'vladar';
+  | 'sazvezdje' | 'naslovna' | 'ukratko' | 'ljubav' | 'posao' | 'osvojiti' | 'osnove' | 'stvari' | 'vladar'
+  | 'danas';
 
 export const SLIKE_ZNAKA: readonly SlikaZnaka[] = [
   'sazvezdje', 'naslovna', 'ukratko', 'ljubav', 'posao', 'osvojiti', 'osnove', 'stvari', 'vladar',
 ];
+
+/**
+ * PRICA U ONBOARDINGU (Ivan, 2.10.2026): kraca od price iz taba "Ti" — bez "osnova znaka" i "kamen, boja,
+ * biljka…" (ostaju u tabu "Ti"), a na kraju jedna slika "A sta je danas?": danasnji tekst "Tvog dana" u kratkoj
+ * verziji, da poslednji utisak pred paywall bude ono sto se placa, ne gravira. Slika `danas` ima podatke
+ * samo kad ih ima (`danasUPrici`); bez njih prica ide bez nje. Nema deljenja ni videa, pa nema ni kartice.
+ */
+export const SLIKE_ZNAKA_UVOD: readonly SlikaZnaka[] = [
+  'sazvezdje', 'naslovna', 'ukratko', 'ljubav', 'posao', 'osvojiti', 'vladar', 'danas',
+];
+
+/** Trajanje svake slike redom `slike` (ms): iz `p.trajanja` za slike znaka, `danas` iz sopstvenog trajanja. */
+export function trajanjaSlika(p: Pick<PricaZnaka, 'trajanja'>, slike: readonly SlikaZnaka[], danas: { trajanje: number } | null): number[] {
+  return slike.map((k) => (k === 'danas' ? danas?.trajanje ?? TRAJANJE_STALNO.savet : p.trajanja[SLIKE_ZNAKA.indexOf(k)]));
+}
+
+/** Sadrzaj slike "A sta je danas?" (samo onboarding): naslov teksta, tri reda iz kratke verzije, ocena Ljubavi. */
+export type DanasUPrici = {
+  naslov: string;
+  /** Pozitivni efekat, izazov, savet — red bez teksta se ne prikazuje. */
+  redovi: { oznaka: string; tekst: string }[];
+  ljubav: { ime: string; ocena: number } | null;
+  trajanje: number;
+};
+
+/**
+ * Slika "A sta je danas?" iz podataka dnevne price (`usePricaDana`) — iste izbore kao pocetna.
+ * `null` kad nema ni jednog reda teksta: naslov bez teksta bi bila slika bez vrednosti, a radije
+ * ide prica bez nje nego sa praznom.
+ */
+export function danasUPrici(dan: PricaDana | null): DanasUPrici | null {
+  if (!dan?.tvojDan) return null;
+  const t = tr().danas.tvojDan;
+  const redovi = [
+    { oznaka: t.efekat, tekst: dan.tvojDan.efekat },
+    { oznaka: t.pazi, tekst: dan.tvojDan.izazov },
+    { oznaka: t.savet, tekst: dan.savet?.tekst ?? '' },
+  ].filter((r) => r.tekst.trim());
+  if (redovi.length === 0) return null;
+  const ljubav = dan.ocene?.redovi.find((r) => r.key === 'ljubav');
+  return {
+    naslov: dan.tvojDan.naslov,
+    redovi,
+    ljubav: ljubav ? { ime: ljubav.name, ocena: ljubav.ocena } : null,
+    trajanje: trajanjeSlike([dan.tvojDan.naslov, ...redovi.map((r) => r.tekst)].join(' ')),
+  };
+}
 
 /** Tamne slike (indigo): zaglavlje, traka napretka i statusna traka su beli. */
 export function tamnaSlikaZnaka(k: SlikaZnaka): boolean {
@@ -202,6 +251,7 @@ export function pricaZnaka(znakKey: string, stepen: number | null, vladarZnaci: 
     osnove: [osnove, p.elementIme, kvalitet, opis.pol, polaritet, opis.izgled, opis.telo].join(' '),
     stvari: [t.stvariNaslov, opis.kamen, opis.boja, opis.biljka, opis.hrana, opis.zivotinja].join(' '),
     vladar: [vladarNaslov, p.vladarRecenica ?? ''].join(' '),
+    danas: null, // samo u onboardingu, trajanje po tekstu (`danasUPrici`); ne ulazi u `trajanja` ove price
   };
   const trajanja = SLIKE_ZNAKA.map((k) => (tekst[k] === null ? TRAJANJE_STALNO.naslovna : trajanjeSlike(tekst[k]!)));
   return { ...p, trajanja };

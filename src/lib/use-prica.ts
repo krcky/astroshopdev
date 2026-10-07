@@ -56,6 +56,9 @@ export type PricaDana = {
     momenat: string;
     naslov: string;
     sazetak: string;
+    /** Pozitivni efekat i izazov iz kratkog teksta (savet je u `savet`); prazno dok tekst ne stigne. */
+    efekat: string;
+    izazov: string;
   } | null;
   ocene: {
     redovi: { key: OblastKey; name: string; ocena: number; oznaka: string; juce: number | null }[];
@@ -141,6 +144,8 @@ export function usePricaDana(): PricaDana | null {
       momenat: momenatNatpis(pick.moment) ?? trajanjeTekst(trajanjeTranzita(pick, danas)).toLowerCase(),
       naslov: tdTekst?.title || t.imeTranzita(pick.transiting.name, pick.aspect.name, pick.natal.name),
       sazetak: tdTekst?.body ? prveRecenice(tdTekst.body) : '',
+      efekat: tdTekst?.positive ?? '',
+      izazov: tdTekst?.challenge ?? '',
     } : null;
 
     // --- ocene: u prici SVE cetiri i za besplatne, bez katanaca (Ivan, 30.9.2026) —

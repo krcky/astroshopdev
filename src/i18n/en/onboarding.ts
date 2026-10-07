@@ -13,7 +13,8 @@ export const onboarding: Recnik['onboarding'] = {
   welcome: {
     /** Under the name; the double spaces around the dot are intentional. */
     podnaslov: 'Est. 2004  ·  Belgrade',
-    napraviNalog: 'Create account',
+    izracunajKartu: 'Calculate my chart',
+    obecanje: 'A horoscope written by a real astrologer, not an algorithm.',
     vecImamNalog: 'I already have an account',
   },
 
@@ -46,6 +47,9 @@ export const onboarding: Recnik['onboarding'] = {
     nazadNaMesto: 'Back to place of birth',
     greskaCuvanja: "Your chart wasn’t saved — we couldn’t reach the server. Check your connection, then tap Continue again.",
     izvorPozicija: 'We calculate the positions from planetary motion data, for your exact moment and place of birth.',
+    astrologOpisuje: 'How the astrologer describes your chart',
+    sacuvajKartu: 'Save my chart',
+    zasNalog: 'Your account keeps the chart even if you change phones.',
     /** Screen-reader description of the planet image. */
     vladajucaPlaneta: (planeta: string) => `Ruling planet: ${planeta}`,
     /** Without a birth time: ruler of the Sun sign. */

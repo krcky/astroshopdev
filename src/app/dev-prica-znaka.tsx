@@ -8,7 +8,7 @@ import { KARTICA } from '@/components/prica/kartica';
 import { KarticaZnaka } from '@/components/prica-znaka/kartica';
 import { SLIKE_PRICE_ZNAKA } from '@/components/prica-znaka/slike';
 import type { OkvirSlike } from '@/components/prica/slajdovi';
-import { pricaZnaka, SLIKE_ZNAKA, type SlikaZnaka } from '@/lib/prica-znaka';
+import { pricaZnaka, SLIKE_ZNAKA, type DanasUPrici, type SlikaZnaka } from '@/lib/prica-znaka';
 import { SIGNS } from '@/lib/zodiac';
 import { cn } from '@/lib/utils';
 import { DEV_TOOLS_ENABLED } from '@/store/dev';
@@ -22,7 +22,8 @@ const SKALA = 0.5;
  * konacnom stanju (bez sata) — da se vidi da sve staje u 360 × 640 i u sigurnu zonu Instagrama.
  * Otvara se direktno: /dev-prica-znaka (ili ?znak=gemini). U release bildu vodi na pocetak.
  * `&slika=ljubav` = JEDNA slika preko celog ekrana, u okviru kao u plejeru i u konacnom stanju, sa
- * crvenim linijama na granicama okvira (`&uredjaj=se` emulira manji ekran). `?sve=se` (ili `?sve=1`
+ * crvenim linijama na granicama okvira (`&uredjaj=se` emulira manji ekran). `&slika=danas` = poslednja slika price u
+ * onboardingu ("A sta je danas?", sa prostorom za "Nastavi"), sa probnim tekstom srednje duzine. `?sve=se` (ili `?sve=1`
  * za pravi ekran) pusti svih 12 × 9 slika redom (`&od=64` od 64. slike), za snimak ekrana.
  */
 export default function DevPricaZnaka() {
@@ -33,6 +34,7 @@ export default function DevPricaZnaka() {
   const p = React.useMemo(() => pricaZnaka(znak, 14, ['gemini']), [znak]);
   if (!DEV_TOOLS_ENABLED) return <Redirect href="/" />;
   if (sve) return <SveSlike uredjaj={UREDJAJI[sve] ? sve : undefined} od={Math.max(0, Number(od ?? 1) - 1) || 0} />;
+  if (slika === 'danas') return <CelaSlika p={p} k="danas" uredjaj={uredjaj} />;
   if (slika && (SLIKE_ZNAKA as readonly string[]).includes(slika)) return <CelaSlika p={p} k={slika as SlikaZnaka} uredjaj={uredjaj} />;
   return (
     <ScrollView style={{ flex: 1, backgroundColor: neutral.grouped }} contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 24, paddingHorizontal: 12 }}>
@@ -57,6 +59,18 @@ export default function DevPricaZnaka() {
   );
 }
 
+/** Probni sadrzaj slike "A sta je danas?": rečenice dužine kao u kratkim tekstovima iz korpusa. */
+const DANAS_PROBA: DanasUPrici = {
+  naslov: 'Planovi koji donose uspeh',
+  redovi: [
+    { oznaka: 'Pozitivni efekat', tekst: 'Lakše donosiš odluke i ljudi te slušaju pažljivije nego inače.' },
+    { oznaka: 'Izazov', tekst: 'Veliki planovi mogu da izgledaju lakše nego što jesu, pa ne žuri sa obećanjima.' },
+    { oznaka: 'Savet', tekst: 'Zapiši šta ti je zaista važno, pa tek onda reci da.' },
+  ],
+  ljubav: { ime: 'Ljubav', ocena: 4 },
+  trajanje: 7000,
+};
+
 /** Ekrani za proveru: velicina i umeci (vrh, dno) — slika zavisi SAMO od okvira, pa je emulacija verna. */
 const UREDJAJI: Record<string, { w: number; h: number; vrh: number; dno: number }> = {
   se: { w: 375, h: 667, vrh: 20, dno: 0 },
@@ -75,13 +89,15 @@ function CelaSlika({ p, k, uredjaj, natpis }: { p: ReturnType<typeof pricaZnaka>
   const u = uredjaj ? UREDJAJI[uredjaj] : undefined;
   const W = u?.w ?? width;
   const H = u?.h ?? height;
-  const okvir: OkvirSlike = { vrh: (u?.vrh ?? insets.top) + 64, dno: (u?.dno ?? insets.bottom) + 76, sirina: W, visina: H, donjiUmetak: u?.dno ?? insets.bottom };
+  // Slika "danas" je poslednja u uvodu: plejer ostavlja mesto za "Nastavi" i red ispod njega (`UVOD_DUGME`).
+  const dnoUmetak = (u?.dno ?? insets.bottom) + (k === 'danas' ? 16 + 50 + 8 + 20 + 12 - 76 : 0);
+  const okvir: OkvirSlike = { vrh: (u?.vrh ?? insets.top) + 64, dno: dnoUmetak + 76, sirina: W, visina: H, donjiUmetak: u?.dno ?? insets.bottom };
   const skala = Math.min(1, width / W, height / H);
   const Slika = SLIKE_PRICE_ZNAKA[k];
   return (
     <View style={{ flex: 1, backgroundColor: '#222', alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ width: W, height: H, overflow: 'hidden', backgroundColor: neutral.grouped, transform: [{ scale: skala }] }}>
-        <Slika p={p} okvir={okvir} onPodeli={() => {}} onProcitaj={() => {}} />
+        <Slika p={p} okvir={okvir} uvod={k === 'danas' || undefined} danas={k === 'danas' ? DANAS_PROBA : undefined} onPodeli={() => {}} onProcitaj={() => {}} />
         <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: okvir.vrh, height: 1, backgroundColor: 'red' }} />
         <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: okvir.dno, height: 1, backgroundColor: 'red' }} />
       </View>

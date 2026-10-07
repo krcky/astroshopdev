@@ -126,9 +126,9 @@ export const danas: Recnik['danas'] = {
     nemaNaKarti: 'No transits to this chart today.',
     nemaTvojih: 'No transits for you today.',
     /** "5 more transits today" — `tranzita` is the word for the number (`gramatika.tranzita`). */
-    josDanas: (n: number, tranzita: string) => `${n} more ${tranzita} today`,
-    zakljucaniOpis: 'The strongest are open at the top of the list. The others shape your day too, and each has its own full reading.',
-    otkljucajSve: 'Unlock all transits',
+    josDanas: (n: number, teksta: string) => `${n} more ${teksta} today`,
+    zakljucaniOpis: 'The strongest are open. The others shape your day too, and each has its own reading.',
+    otkljucajSve: 'Unlock all',
     otvaraCeoTekst: 'Opens the full transit reading',
   },
 
@@ -187,7 +187,7 @@ export const danas: Recnik['danas'] = {
     pitajOpis: (astrolog, oOsobi) =>
       `${astrolog} sees ${oOsobi ? "this person’s chart" : 'your chart'} and answers with a voice message, in Serbian, usually within 2–3 business days.`,
     postaviPitanje: 'Ask a question',
-    kratkaVerzija: 'This is the short version. The full one covers the areas of life the transit touches, its long-term effects and practical tips.',
+    kratkaVerzija: 'This is the short version. The full one says what is happening, how long it lasts and what you can do.',
     otkljucajCeo: 'Unlock the full text',
   },
 

@@ -21,6 +21,7 @@ export const gramatika = {
   meseci: (n: number) => `${n} ${mnozina(n, ['mesec', 'meseca', 'meseci'])}`,
   /** Samo rec uz broj: "tranzit" / "tranzita". */
   tranzita: (n: number) => mnozina(n, ['tranzit', 'tranzita', 'tranzita']),
+  teksta: (n: number) => mnozina(n, ['tekst', 'teksta', 'tekstova']),
   /** Prvo slovo veliko, po pravilima jezika. */
   veliko: (x: string) => x.charAt(0).toLocaleUpperCase('sr') + x.slice(1),
   /** Oznaka jezika za `Intl` (cene, imena zemalja). */

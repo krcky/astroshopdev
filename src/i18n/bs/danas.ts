@@ -84,9 +84,9 @@ export const danas: Recnik['danas'] = {
   tranziti: {
     nemaNaKarti: 'Danas nema tranzita na ovu kartu.',
     nemaTvojih: 'Danas nema tvojih tranzita.',
-    josDanas: (n, tranzita) => `Još ${n} ${tranzita} danas`,
-    zakljucaniOpis: 'Najjači su otvoreni na vrhu liste. I ostali utiču na tvoj dan, i svaki ima svoje cijelo tumačenje.',
-    otkljucajSve: 'Otključaj sve tranzite',
+    josDanas: (n, teksta) => `Još ${n} ${teksta} danas`,
+    zakljucaniOpis: 'Najjači su otvoreni. I ostali utiču na tvoj dan i svaki ima svoje tumačenje.',
+    otkljucajSve: 'Otključaj sve',
     otvaraCeoTekst: 'Otvara cijeli tekst tranzita',
   },
 
@@ -133,7 +133,7 @@ export const danas: Recnik['danas'] = {
     pitajOpis: (astrolog, oOsobi) =>
       `${astrolog} vidi ${oOsobi ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, obično za 2–3 radna dana.`,
     postaviPitanje: 'Postavi pitanje',
-    kratkaVerzija: 'Ovo je kratka verzija. U cijeloj su oblasti života na koje tranzit djeluje, dugoročni efekti i konkretni savjeti.',
+    kratkaVerzija: 'Ovo je kratka verzija. U cijeloj piše šta se dešava, koliko traje i šta možeš uraditi.',
     otkljucajCeo: 'Otključaj cijeli tekst',
   },
 

@@ -41,7 +41,7 @@ export const profil: Recnik['profil'] = {
     aktivan: 'Active',
     upravljajPretplatom: 'Manage subscription',
     otkljucajPremium: 'Unlock Premium',
-    otkljucajPremiumIspod: 'All transits, full readings and other days',
+    otkljucajPremiumIspod: 'Full text of the day, tomorrow and your birth chart',
     vratiKupovine: 'Restore purchases',
     josNijeMoguceNaslov: 'Not available yet',
     josNijeMoguceTekst: 'In-app purchases are not turned on yet.',
@@ -69,14 +69,14 @@ export const profil: Recnik['profil'] = {
 
   /** `app/premium.tsx` — paywall. */
   premium: {
-    naslov: 'Unlock every reading',
-    podnaslov: 'All your transits, themes of the period and a look at the next two days.',
+    naslov: 'The full picture of your day',
+    podnaslov: 'The full text of your day, tomorrow and the day after, and your whole chart.',
     natalnaNaslov: 'Birth chart',
-    natalnaTekst: 'A reading of every planet by sign and house, and of every aspect.',
-    tranzitiNaslov: 'Transits',
-    tranzitiTekst: 'Every transit of the day with the full reading — for the next two days too.',
+    natalnaTekst: 'Every planet by sign and house, and the links between them.',
+    tranzitiNaslov: 'Full text of the day',
+    tranzitiTekst: 'What is happening, what to watch for and what to try. For today, tomorrow and the day after.',
     ljudiNaslov: 'Your people',
-    ljudiTekst: (n) => `Charts and transits for up to ${n} ${mnozina(n, 'person', 'people')} close to you.`,
+    ljudiTekst: (n) => `A chart and daily texts for a partner, child or friend. Up to ${n} people.`,
     /** Package card title (capitalized) and period next to the price (lowercase). */
     godisnjeNaslov: 'Yearly',
     godisnje: 'per year',

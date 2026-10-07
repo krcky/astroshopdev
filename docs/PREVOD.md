@@ -60,6 +60,24 @@ razmakom i velikim slovom, za ručni pregled.
   kanal obaveštenja u Kotlinu i Swift modulima. Za njih Expo ima `locales` u `app.json`.
 - Mejl sa kodom (Supabase šablon, jedan za sve) i panel astrologa (ostaje srpski).
 
+## Glas (srpski) — opcija A, 2.10.2026
+
+Izabrano: **prijatelj koji zna**. Topao i direktan, "ti", kratke rečenice, objašnjava umesto da glumi. Bez uzvika, bez
+laskanja, bez obećanja ishoda ("tumači, ne proriče").
+
+- Dugme kaže šta će se desiti: "Izračunaj moju kartu" (welcome), "Sačuvaj moju kartu" (reveal), "Otključaj ceo tekst",
+  "Otključaj sve".
+- Zaglavlje paywalla je ishod: "Cela slika tvog dana". Stavke: Piše astrolog, Ceo tekst dana, Natalna karta (ostaje taj
+  naziv), Tvoji ljudi.
+- Zaključano: "Ovo je kratka verzija. U celoj piše šta se dešava, koliko traje i šta možeš da uradiš." Reč "tranzit" se ne
+  koristi dok nije objašnjena; zaključani redovi se broje kao "teksta" (`gramatika.teksta`).
+- Odbačeno: B (urednički, tiši), C (razigran), D (Bobanov glas u prvom licu — samo uz njegov pristanak, i samo tamo gde
+  Boban zaista govori).
+- Isti glas u hr, bs, en, sl i mk (preveden 2.10.2026). Hr/bs: "račun", "mobitel" / "telefon".
+
+Otvoreno: broj "oko 1.500 tumačenja" i "nijedno nije generisano" (Boban potvrđuje); korpus je na "Vi" — i jedna fraza astrologa
+("Sa vama nikada nije dosadno") je u `natal-podnaslovi.py` prilagođena na "ti".
+
 ## Engleski (korak 2, 1.10.2026)
 
 `src/i18n/en/` je CEO rečnik (tip `Recnik`, ne dopuna) — TypeScript pada čim ključ fali ili funkcija ima

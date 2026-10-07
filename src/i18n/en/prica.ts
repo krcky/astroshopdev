@@ -165,6 +165,7 @@ export const prica: Recnik['prica'] = {
     zivotinja: 'Animal',
     /** Slide 9. */
     vladarZnaka: 'Ruling planet',
+    danasNaslov: 'And what about today?',
     /** Button on the last slide, and the share sheet title. */
     podeliSvojZnak: 'Share your sign',
   },

@@ -7,9 +7,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { VIDEO } from '../src/lib/prica';
 import {
-  datumiZnaka, LATINSKO_IME, NAJDUZA_RECENICA, NATPIS_SAZVEZDJA, NATPISI, POPUNA_SAZVEZDJA, pricaZnaka, SLIKE_ZNAKA, sunceU,
-  pricaZaKartu, tamnaSlikaZnaka, velicinaNaslova, vrhNatpisaSazvezdja,
+  danasUPrici, datumiZnaka, LATINSKO_IME, NAJDUZA_RECENICA, NATPIS_SAZVEZDJA, NATPISI, POPUNA_SAZVEZDJA, pricaZnaka, SLIKE_ZNAKA,
+  SLIKE_ZNAKA_UVOD, sunceU, pricaZaKartu, tamnaSlikaZnaka, trajanjaSlika, velicinaNaslova, vrhNatpisaSazvezdja,
 } from '../src/lib/prica-znaka';
+import type { PricaDana } from '../src/lib/use-prica';
+import { NATAL_PODNASLOVI } from '../src/lib/natal-podnaslovi-podaci';
+import { natalPodnaslov } from '../src/lib/natal-podnaslovi';
 import { cityByName } from '../src/lib/cities';
 import { resolveProfile, type Profile } from '../src/store/profile';
 import { IKONE_OSNOVA } from '../src/lib/ikone-osnova';
@@ -158,6 +161,48 @@ for (const f of FAJLOVI_VIDEA) {
   ok(jedna.length === 0 && bezOverflow.length === 0, `${f.replace('src/components/', '')}: bez ivice sa jedne strane, puna ivica uz overflow`,
     [jedna.length ? `jedna strana: ${jedna.join(', ')}` : '', bezOverflow.length ? `bez overflow: ${bezOverflow.join(', ')}` : ''].filter(Boolean).join('; '));
 }
+
+console.log('\n=== 9. Prica u onboardingu: kraca, sa slikom "A sta je danas?" (Ivan, 2.10.2026) ===');
+ok(SLIKE_ZNAKA_UVOD.length === 8 && !SLIKE_ZNAKA_UVOD.includes('osnove') && !SLIKE_ZNAKA_UVOD.includes('stvari'),
+  'uvod: 8 slika, bez "osnova znaka" i "kamen, boja…"');
+ok(SLIKE_ZNAKA_UVOD[SLIKE_ZNAKA_UVOD.length - 1] === 'danas' && SLIKE_ZNAKA_UVOD[SLIKE_ZNAKA_UVOD.length - 2] === 'vladar',
+  'uvod: "A sta je danas?" je poslednja, pred njom vladar');
+const lazniDan = (tekst: { efekat: string; izazov: string; savet: string }, ljubav = true): PricaDana => ({
+  tvojDan: { naslov: 'Planovi koji donose uspeh', efekat: tekst.efekat, izazov: tekst.izazov },
+  savet: tekst.savet ? { tekst: tekst.savet, ime: 'x', kljuc: 'k' } : null,
+  ocene: ljubav ? { redovi: [{ key: 'ljubav', name: 'Ljubav', ocena: 4, oznaka: 'Dobar dan', juce: 3 }], najbolja: null } : null,
+} as unknown as PricaDana);
+const puna = danasUPrici(lazniDan({ efekat: 'Lakše donosiš odluke.', izazov: 'Ne žuri sa obećanjima.', savet: 'Zapiši šta ti je važno.' }));
+ok(puna !== null && puna.redovi.length === 3 && puna.redovi.map((r) => r.tekst).join('|').startsWith('Lakše'),
+  'danas: tri reda redom efekat, izazov, savet');
+ok(puna !== null && puna.ljubav?.ocena === 4 && puna.ljubav.ime === 'Ljubav', 'danas: ocena Ljubavi');
+ok(puna !== null && puna.trajanje >= 4000 && puna.trajanje <= 8000, 'danas: trajanje 4—8 s po tekstu', String(puna?.trajanje));
+const dvaReda = danasUPrici(lazniDan({ efekat: 'Lakše donosiš odluke.', izazov: '', savet: 'Zapiši šta ti je važno.' }, false));
+ok(dvaReda !== null && dvaReda.redovi.length === 2 && dvaReda.ljubav === null, 'danas: red bez teksta i ocena bez podataka se ne prikazuju');
+ok(danasUPrici(lazniDan({ efekat: '', izazov: '', savet: '' })) === null && danasUPrici(null) === null,
+  'danas: bez ijednog reda teksta slike nema (prica ide bez nje, ne sa praznom)');
+for (const z of SIGNS) {
+  const p = pricaZnaka(z.key, 14);
+  const t = trajanjaSlika(p, SLIKE_ZNAKA_UVOD, puna);
+  const ukupno = t.reduce((a, b) => a + b, 0);
+  const iste = SLIKE_ZNAKA_UVOD.slice(0, 7).every((k, i) => t[i] === p.trajanja[SLIKE_ZNAKA.indexOf(k)]);
+  ok(t.length === 8 && iste && ukupno < p.trajanja.reduce((a, b) => a + b, 0) + 8000 && ukupno <= 45_000,
+    `${z.name}: uvod ${(ukupno / 1000).toFixed(1)} s (do 45 s), trajanja slika znaka ista kao u tabu "Ti"`);
+}
+
+console.log('\n=== 10. Podnaslovi astrologa na ekranu sa velikom trojkom (Ivan, 2.10.2026) ===');
+for (const jez of ['sr', 'hr', 'bs', 'en']) {
+  const prazno: string[] = [];
+  for (const tacka of ['sun', 'moon', 'ascendant'] as const) {
+    for (const z of SIGNS) if (!NATAL_PODNASLOVI[jez]?.[tacka]?.[z.key]?.trim()) prazno.push(`${tacka}.${z.key}`);
+  }
+  ok(prazno.length === 0, `${jez}: 36 fraza (Sunce, Mesec, Ascendent x 12 znakova)`, prazno.join(', '));
+}
+ok(natalPodnaslov('sun', 'leo') === 'Kralj Zodijaka' && natalPodnaslov('ascendant', 'aries') === 'Brzina kao vrlina', 'srpski: fraze astrologa po znaku');
+ok(natalPodnaslov('moon', 'nepoznat') === null, 'nepoznat znak: nema fraze (ne izmisljati)');
+const sveFraze = Object.values(NATAL_PODNASLOVI).flatMap((j) => Object.values(j).flatMap((m) => Object.values(m)));
+ok(sveFraze.every((f) => f.length <= 40), 'fraze su kratke (do 40 znakova), staju u jedan-dva reda', sveFraze.filter((f) => f.length > 40).join(' | '));
+ok(!sveFraze.some((f) => /\b(vama|vam|vas|vaš\w*)\b/i.test(f)), 'nijedna fraza ne obraca sa "Vi" (UI je na "ti")');
 
 console.log(greske ? `\n${greske} provera pala.` : '\nSve provere prosle.');
 // Izlaz odmah: `store/profile` posle uvoza pokusa da pise u AsyncStorage, koga u Node-u nema (kao check-osobe).

@@ -113,7 +113,7 @@ export const karta: Recnik['karta'] = {
     kucaBezVremena: 'U kojoj je kući planeta, zavisi od tačnog vremena rođenja. Kad ga uneseš, ovdje će biti i tumačenje kuće.',
     premiumNaslov: 'Tvoja cijela karta',
     premiumNaslovOsoba: 'Cijela karta ove osobe',
-    premiumOpis: 'Sunce, Mjesec i podznak su već otvoreni. Ostale planete u znacima i kućama i svi aspekti su uz Premium.',
+    premiumOpis: 'Sunce, Mjesec i podznak su već otvoreni. Ostale planete i veze među njima su uz Premium.',
     premiumDugme: 'Otključaj cijelu kartu',
     nijeUcitano: 'Tumačenje se trenutno ne može učitati. Provjeri vezu sa internetom.',
     simbolikaAspekta: (aspekt, tema) => `${gramatika.veliko(aspekt)} – ${tema}`,

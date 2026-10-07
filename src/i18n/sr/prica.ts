@@ -180,6 +180,7 @@ export const prica = {
     zivotinja: 'Životinja',
     /** Slika 9. */
     vladarZnaka: 'Vladar znaka',
+    danasNaslov: 'A šta je danas?',
     /** Dugme na poslednjoj slici, i naslov menija za deljenje. */
     podeliSvojZnak: 'Podeli svoj znak',
   },
