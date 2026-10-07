@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Animated, {
-  Easing, useAnimatedProps, useSharedValue, withDelay, withTiming, ZoomIn,
+  Easing, ReduceMotion, useAnimatedProps, useSharedValue, withDelay, withTiming, ZoomIn,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
@@ -121,7 +121,7 @@ export function Prsten({ puni, D = 91 }: { puni: boolean; D?: number }) {
   const O = 2 * Math.PI * r;
   const p = useSharedValue(puni ? 0 : 1);
   React.useEffect(() => {
-    if (puni) p.set(withDelay(300, withTiming(1, { duration: 1300, easing: Easing.bezier(0.65, 0, 0.25, 1) })));
+    if (puni) p.set(withDelay(300, withTiming(1, { duration: 1300, easing: Easing.bezier(0.65, 0, 0.25, 1), reduceMotion: ReduceMotion.Never })));
   }, [puni, p]);
   const props = useAnimatedProps(() => ({ strokeDashoffset: O * (1 - p.get()) }));
   return (
@@ -153,7 +153,7 @@ const PLAY = 'M3 1.9v8.2c0 .7.8 1.1 1.4.7l6.2-4.1c.5-.3.5-1.1 0-1.4L4.4 1.2C3.8.
 /** Balon ispod planete, kao beleska na Instagramu: dve tackice pa balon sa "▶ Priča dana" (ili `natpis`). */
 export function Balon({ animiraj, natpis }: { animiraj: boolean; natpis?: string }) {
   const t = useT();
-  const ulaz = (kasni: number) => (animiraj ? ZoomIn.delay(kasni).duration(420).easing(Easing.out(Easing.back(1.8))) : undefined);
+  const ulaz = (kasni: number) => (animiraj ? ZoomIn.delay(kasni).duration(420).easing(Easing.out(Easing.back(1.8))).reduceMotion(ReduceMotion.Never) : undefined);
   return (
     <View style={{ alignItems: 'center' }} pointerEvents="none">
       <Animated.View entering={ulaz(600)} className="rounded-pill bg-background" style={{ width: 5, height: 5, marginLeft: -12, ...shadow.soft }} />

@@ -44,6 +44,8 @@ import { neutral } from '@/theme/tokens';
  *  - Traka napretka tece na UI niti (`useFrameCallback`), NE preko `withTiming`:
  *    uz "Smanji pokrete" `withTiming` odmah skoci na kraj i prica bi proletela
  *    (tako je Wrapped 2021 preskakao slajdove).
+ *  - POKRETI SE CRTAJU I UZ "Smanji pokrete" (Ivan, 7.10.2026: na probnom telefonu su slike bile
+ *    samo smena bez animacije) — svaki `withTiming` nosi `ReduceMotion.Never`.
  *  - Uz "Smanji pokrete" i uz VoiceOver prica NE ide sama dalje — samo dodirom
  *    (WCAG 2.2.2, Apple "Reduced Motion").
  *  - Staje kad aplikacija ode u pozadinu, kad se otvori meni za deljenje i kad
@@ -200,8 +202,8 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
   }, [pauzaJs]));
 
   // --- ulaz i zatvaranje
-  const ulaz = useSharedValue(bezPokreta ? 1 : 0);
-  React.useEffect(() => { ulaz.set(withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic) })); }, [ulaz]);
+  const ulaz = useSharedValue(0);
+  React.useEffect(() => { ulaz.set(withTiming(1, { duration: 280, easing: Easing.out(Easing.cubic), reduceMotion: ReduceMotion.Never })); }, [ulaz]);
   const pomak = useSharedValue(0);
   const korenStil = useAnimatedStyle(() => {
     const d = pomak.get();
@@ -215,12 +217,12 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
     };
   });
   const zatvoriAnimirano = React.useCallback(() => {
-    pomak.set(withTiming(H, { duration: 240, easing: Easing.in(Easing.cubic) }, (g) => { if (g) scheduleOnRN(zatvori); }));
+    pomak.set(withTiming(H, { duration: 240, easing: Easing.in(Easing.cubic), reduceMotion: ReduceMotion.Never }, (g) => { if (g) scheduleOnRN(zatvori); }));
   }, [pomak, H]);
 
   // --- dodir: responder (vidi komentar gore)
   const pocetak = React.useRef<{ x: number; y: number; t: ReturnType<typeof setTimeout> | null; drzi: boolean; vuce: boolean } | null>(null);
-  const hromStil = useAnimatedStyle(() => ({ opacity: withTiming(drzi.get() ? 0 : 1, { duration: 200 }) }));
+  const hromStil = useAnimatedStyle(() => ({ opacity: withTiming(drzi.get() ? 0 : 1, { duration: 200, reduceMotion: ReduceMotion.Never }) }));
   const naDodir = {
     onStartShouldSetResponder: () => true,
     onMoveShouldSetResponder: () => true,
@@ -250,7 +252,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
       if (s.vuce) {
         const dy = e.nativeEvent.pageY - s.y;
         if (dy > 110) { zatvoriAnimirano(); return; }
-        pomak.set(withTiming(0, { duration: 220 }));
+        pomak.set(withTiming(0, { duration: 220, reduceMotion: ReduceMotion.Never }));
         vuce.set(0);
         return;
       }
@@ -264,7 +266,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
       pocetak.current = null;
       if (s?.t) clearTimeout(s.t);
       drzi.set(0);
-      if (s?.vuce) { pomak.set(withTiming(0, { duration: 220 })); vuce.set(0); }
+      if (s?.vuce) { pomak.set(withTiming(0, { duration: 220, reduceMotion: ReduceMotion.Never })); vuce.set(0); }
     },
   };
 
@@ -351,7 +353,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
               onGotovo={() => setSlojevi((sv) => sv.slice(Math.max(0, sv.findIndex((sl) => sl.id === s.id))))}
               zIndex={j}>
               {/* Svaka slika ima svoj sat od trenutka kad se pojavi (`sat.tsx`); drzanje ga zaustavi. */}
-              <SatKojiTece tece={tece} pokret={!bezPokreta}>
+              <SatKojiTece tece={tece} pokret>
                 <Slika
                   p={p}
                   okvir={okvirZa(s.idx)}
@@ -412,7 +414,7 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
           NE "Počinjemo": to obecava aplikaciju, a iza dugmeta su jos dva koraka. */}
       {uvod && i === n - 1 && (
         <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16 }, hromStil]}>
-          <Animated.View entering={FadeInDown.delay(bezPokreta ? 0 : 700).duration(500)} style={{ gap: 8 }}>
+          <Animated.View entering={FadeInDown.delay(700).duration(500).reduceMotion(ReduceMotion.Never)} style={{ gap: 8 }}>
             <Button variant={tamno ? 'soft' : 'default'} onPress={onDalje}>
               <Text>{t.opste.nastavi}</Text>
             </Button>
@@ -453,26 +455,23 @@ function Traka({ j, indeks, napredak, tamno, samaIde }: {
 /**
  * Prelaz: nova slika se otkriva krugom koji se siri iz mesta dodira (iz verzije B).
  * Krug je obican `View` sa `overflow: hidden` i zaobljenjem, a slika u njemu stoji
- * u mestu (pomera se suprotno krugu). Uz "Smanji pokrete" samo pretapanje.
+ * u mestu (pomera se suprotno krugu). I uz "Smanji pokrete" (Ivan, 7.10.2026).
  */
 function Otkrivanje({ x, y, animiraj, onGotovo, zIndex, children }: {
   x: number; y: number; animiraj: boolean; onGotovo: () => void; zIndex: number; children: React.ReactNode;
 }) {
   const { width: W, height: H } = useWindowDimensions();
-  const bezPokreta = useReducedMotion();
   const R = Math.hypot(Math.max(x, W - x), Math.max(y, H - y)) + 2;
-  const r = useSharedValue(animiraj && !bezPokreta ? 0 : R);
-  const o = useSharedValue(animiraj && bezPokreta ? 0 : 1);
+  const r = useSharedValue(animiraj ? 0 : R);
   React.useEffect(() => {
     if (!animiraj) return;
     const gotovo = (g?: boolean) => { 'worklet'; if (g) scheduleOnRN(onGotovo); };
-    if (bezPokreta) o.set(withTiming(1, { duration: 300, reduceMotion: ReduceMotion.Never }, gotovo));
-    else r.set(withTiming(R, { duration: 750, easing: Easing.bezier(0.7, 0, 0.2, 1), reduceMotion: ReduceMotion.Never }, gotovo));
+    r.set(withTiming(R, { duration: 750, easing: Easing.bezier(0.7, 0, 0.2, 1), reduceMotion: ReduceMotion.Never }, gotovo));
     // Jednom, pri montiranju.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const krug = useAnimatedStyle(() => ({
-    left: x - r.get(), top: y - r.get(), width: 2 * r.get(), height: 2 * r.get(), borderRadius: r.get(), opacity: o.get(),
+    left: x - r.get(), top: y - r.get(), width: 2 * r.get(), height: 2 * r.get(), borderRadius: r.get(),
   }));
   const unutra = useAnimatedStyle(() => ({ left: r.get() - x, top: r.get() - y }));
   return (
