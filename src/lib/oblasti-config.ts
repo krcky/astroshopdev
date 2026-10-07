@@ -12,7 +12,15 @@ import { tr } from '@/i18n/jezik';
 import type { PlanetKey } from '@/lib/astro';
 import type { Tone } from '@/lib/tone';
 
-export type OblastKey = 'ljubav' | 'zdravlje' | 'karijera' | 'kuca';
+/**
+ * Tab "Tranziti" deli listu na KRATKOTRAJNE i DUGOTRAJNE (Ivan, 7.10.2026). Podela je po
+ * planeti, ne po preostalim danima: kartica ne sme da prelazi iz grupe u grupu kako dan prolazi.
+ * Spore planete (Jupiter—Pluton) drze tranzit nedeljama, mesecima ili godinama; brze
+ * (Mesec—Mars) danima. PREDLOG, ceka astrologa.
+ */
+export const SPORE_PLANETE: readonly PlanetKey[] = ['jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+
+export type OblastKey ='ljubav' | 'zdravlje' | 'karijera' | 'kuca';
 
 export type OblastDef = {
   key: OblastKey;

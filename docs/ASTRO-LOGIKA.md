@@ -272,6 +272,8 @@ orbis „Tvog dana", pa su falili spori tranziti na 1–3°, npr. Pluton opozici
 traje, ton. Važnost = jačina iz poglavlja 11. Bez oblasti i bez ocena — ocene su
 samo na početnoj (kartica na slajdu „Danas ukratko"). ✅
 
+**Dve grupe (7.10.2026, Ivan):** lista je podeljena na **Kratkotrajne** (tranzitna planeta Mesec—Mars; dani i nedelje) i **Dugotrajne** (Jupiter—Pluton; nedelje, meseci, godine), kratkotrajni prvi. Podela je po planeti (`SPORE_PLANETE` u `lib/oblasti-config.ts`), ne po preostalim danima, da kartica ne bi prelazila iz grupe u grupu kako dan prolazi. Unutar grupe ostaje redosled po važnosti; granica za besplatne (prva 3) računa se po važnosti pre podele. PREDLOG, čeka astrologa.
+
 **Besplatni (od 29.9.2026):** ista lista, isti redosled. Prva **3** tranzita imaju karticu (naslov, kratak tekst na dodir), ostali se vide samo po imenu i trajanju, pod katancem. Do 29.9.2026 besplatni je imao stari prikaz sa svim kratkim tekstovima.
 
 ## 5c. Šta je besplatno, a šta uz Premium (29.9.2026)

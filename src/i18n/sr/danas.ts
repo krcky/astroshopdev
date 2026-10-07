@@ -118,6 +118,9 @@ export const danas = {
     nemaTvojih: 'Danas nema tvojih tranzita.',
     /** "Još 5 tranzita danas" — `tranzita` je rec uz broj (`gramatika.tranzita`). */
     josDanas: (n: number, teksta: string) => `Još ${n} ${teksta} danas`,
+    /** Naslovi dve grupe na tabu "Tranziti": brze planete (Sunce—Mars) i spore (Jupiter—Pluton). */
+    kratkotrajni: 'Kratkotrajni',
+    dugotrajni: 'Dugotrajni',
     zakljucaniOpis: 'Najjači su otvoreni. I ostali utiču na tvoj dan i svaki ima svoje tumačenje.',
     otkljucajSve: 'Otključaj sve',
     otvaraCeoTekst: 'Otvara ceo tekst tranzita',

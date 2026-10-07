@@ -13,6 +13,7 @@ import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { imaAspekt } from '@/components/aspekt-ikona';
 import { TonOznaka } from '@/components/ton';
 import { tekstReda, trajanjeTekst, trajanjeTranzita, type OblastiDana, type TranzitRed } from '@/lib/oblasti';
+import { SPORE_PLANETE } from '@/lib/oblasti-config';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { TONE_LABEL, type Tone } from '@/lib/tone';
 import { cn } from '@/lib/utils';
@@ -66,6 +67,15 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
   const otvoreni = besplatno === undefined ? rez.poVaznosti : rez.poVaznosti.slice(0, besplatno);
   const zakljucani = rez.poVaznosti.slice(otvoreni.length);
 
+  const grupe = React.useMemo(() => {
+    const dugo = otvoreni.filter((x) => SPORE_PLANETE.includes(x.red.transiting.key));
+    const kratko = otvoreni.filter((x) => !SPORE_PLANETE.includes(x.red.transiting.key));
+    return [
+      { naslov: t.danas.tranziti.kratkotrajni, redovi: kratko },
+      { naslov: t.danas.tranziti.dugotrajni, redovi: dugo },
+    ].filter((g) => g.redovi.length > 0).map((g, i) => ({ ...g, prva: i === 0 }));
+  }, [otvoreni, t]);
+
   const naslov = (key: string) => duge.get(key)?.title || kratke.get(key)?.title || '';
 
   // Oznaka za proveru: tranzit bez naslova tumacenja, kad su tekstovi stigli.
@@ -85,12 +95,16 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
         <Text variant="body">{osobaId ? t.danas.tranziti.nemaNaKarti : t.danas.tranziti.nemaTvojih}</Text>
       )}
 
-      <View className="gap-3">
-        {otvoreni.map((x) => (
-          <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={loading}
-            trajanje={trajanja.get(x.red.key) ?? ''} osobaId={osobaId} />
-        ))}
-      </View>
+      {/* Dve grupe (Ivan, 7.10.2026): brze planete pa spore; unutra ostaje redosled po vaznosti. */}
+      {grupe.map((g) => (
+        <View key={g.naslov} className={cn('gap-3', g.prva ? '' : 'mt-8')}>
+          <Text variant="label">{g.naslov}</Text>
+          {g.redovi.map((x) => (
+            <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={loading}
+              trajanje={trajanja.get(x.red.key) ?? ''} osobaId={osobaId} />
+          ))}
+        </View>
+      ))}
 
       {/* Besplatni (Ivan, 29.9.2026): ostali tranziti po imenu, pod katancem — vidi se
           da postoje, ne i sta pisu. */}

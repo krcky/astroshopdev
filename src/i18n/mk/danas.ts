@@ -108,6 +108,9 @@ export const danas: Recnik['danas'] = {
     nemaNaKarti: 'Денес нема транзити на оваа карта.',
     nemaTvojih: 'Денес немаш транзити.',
     josDanas: (n, teksta) => `Уште ${n} ${teksta} денес`,
+    /** Naslovi dve grupe na tabu "Tranziti": brze planete (Sunce—Mars) i spore (Jupiter—Pluton). */
+    kratkotrajni: 'Краткотрајни',
+    dugotrajni: 'Долготрајни',
     zakljucaniOpis: 'Најсилните се отворени. И другите влијаат на твојот ден и секој има свое толкување.',
     otkljucajSve: 'Отклучи ги сите',
     otvaraCeoTekst: 'Го отвора целото толкување на транзитот',

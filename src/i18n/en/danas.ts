@@ -127,6 +127,9 @@ export const danas: Recnik['danas'] = {
     nemaTvojih: 'No transits for you today.',
     /** "5 more transits today" — `tranzita` is the word for the number (`gramatika.tranzita`). */
     josDanas: (n: number, teksta: string) => `${n} more ${teksta} today`,
+    /** Naslovi dve grupe na tabu "Tranziti": brze planete (Sunce—Mars) i spore (Jupiter—Pluton). */
+    kratkotrajni: 'Short-term',
+    dugotrajni: 'Long-term',
     zakljucaniOpis: 'The strongest are open. The others shape your day too, and each has its own reading.',
     otkljucajSve: 'Unlock all',
     otvaraCeoTekst: 'Opens the full transit reading',
