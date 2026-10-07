@@ -40,7 +40,7 @@ IZVORI = {
     'lunar': DESK / 'Lunarni kalendar' / 'lunar-texts.csv',
 }
 IZLAZ_IME = {'transit': 'transit-texts.csv', 'natal': 'natal-texts.csv', 'lunar': 'lunar-texts.csv'}
-JEZICI = ('hr', 'bs', 'en')
+JEZICI = ('hr', 'bs', 'en', 'sl', 'mk')
 PREVODI = {
     'transit': ['title', 'body', 'positive', 'challenge', 'advice', 'sections'],
     'natal': ['title', 'subtitle', 'body'],
@@ -93,6 +93,18 @@ EN_NAZIVI = rec(r'ascendent|Neptun|Pluton|Uran|Merkur|Venera|Jarac|Vodolija|Stre
 # zato MORAJU biti uvek isti. Iz pojmovnika (rad/pojmovnik-osnova.json, "naslovi").
 
 
+# Slovenacki nema ć ni đ; reci ispod su srpske, ne slovenacke (prosireno iz scripts/check-prevod.ts).
+SL_SLOVA = re.compile(r'[ćđĆĐ]')
+SL_NIJE = rec(r'nije|šta|što|ovde|ovdje|uvek|uvijek|takođe|između|možete|ako|ili|koji|koja|koje|kada|zbog|'
+              r'osećaj\w*|posao|ljubav\w*|veoma|međutim')
+# Namerno IZOSTAVLJENO jer je i slovenacki: vaš/vaša, biti, bilo, treba, mesec (= mesec u godini), mnogo, sa- kao deo reci.
+# Makedonski je cirilica: srpska latinicna slova i srpska cirilicna ћ/ђ ne smeju; latinica samo za imena i skracenice.
+MK_SRPSKO = re.compile(r'[čćšžđČĆŠŽĐћђЋЂ]')
+MK_LATINICA = re.compile(r'[A-Za-z]{3,}')
+MK_SME = {'astro', 'shop', 'asc', 'dna', 'sms', 'gps', 'wifi', 'detox', 'spa', 'instagram', 'facebook', 'google', 'app', 'store',
+          'play', 'iphone', 'android', 'feng', 'shui', 'yoga', 'reiki', 'vip', 'pin', 'usb', 'led', 'www', 'com', 'tik', 'tok'}
+
+
 def ucitaj_osnovu():
     p = RAD / 'pojmovnik-osnova.json'
     return json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
@@ -143,6 +155,22 @@ def proveri_tekst(jezik, polje, s, t):
         for m in rx.finditer(t):
             g.append(f'{polje}: nije {jezik} "{m.group(0)}"')
             break
+    if jezik == 'sl':
+        m = SL_SLOVA.search(t)
+        if m:
+            g.append(f'{polje}: slovo koje slovenacki nema "{t[max(0, m.start() - 15):m.end() + 15]}"')
+        m = SL_NIJE.search(t)
+        if m:
+            g.append(f'{polje}: nije slovenacki "{m.group(0)}"')
+    if jezik == 'mk':
+        m = MK_SRPSKO.search(t)
+        if m:
+            g.append(f'{polje}: srpsko slovo "{t[max(0, m.start() - 15):m.end() + 15]}"')
+        lat = [w for w in MK_LATINICA.findall(t) if w.lower() not in MK_SME]
+        if not re.search(r'[а-шѓќѕјљњџ]', t.lower()):
+            g.append(f'{polje}: nema cirilice')
+        elif len(lat) > max(2, len(t.split()) // 60):
+            g.append(f'{polje}: latinica u makedonskom tekstu: {", ".join(lat[:5])}')
     if jezik == 'en':
         m = EN_SRPSKO.search(t)
         if m:

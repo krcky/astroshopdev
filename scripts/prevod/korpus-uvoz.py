@@ -57,7 +57,7 @@ def upit(sql):
 
 
 def main(argv):
-    if len(argv) < 2 or argv[1] not in ('hr', 'bs', 'en'):
+    if len(argv) < 2 or argv[1] not in ('hr', 'bs', 'en', 'sl', 'mk'):
         print(__doc__)
         return 2
     j = argv[1]
