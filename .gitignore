@@ -66,3 +66,9 @@ __pycache__/
 # UX review: snimci ekrana za recenziju (veliki, ne idu u repo)
 docs/ux-review/
 docs/ux-review-beleske-sa-kontekstom.md
+
+# Izvozi za lekturu i astrologa — samo lokalno (pravilo 7: tekstovi ne idu u repo)
+Prevod-Astro-Shop.xlsx
+Prevod-izvoz/
+Recenice-oblasti-za-astrologa.xlsx
+~$*
