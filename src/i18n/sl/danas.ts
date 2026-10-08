@@ -118,6 +118,8 @@ export const danas: Recnik['danas'] = {
   tvojDan: {
     oznaka: 'Tvoj dan',
     zastoOvajTekst: 'Zakaj ravno to besedilo?',
+    /** Oznaka iznad naslova teksta na kartici "Tvoj dan" (8.10.2026). */
+    temaDana: 'Tema dneva',
     saznajVise: 'Izvedi več',
     efekat: 'Pozitiven učinek',
     pazi: 'Izziv',

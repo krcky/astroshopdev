@@ -138,6 +138,8 @@ export const danas = {
     /** Verzal oznaka iznad naslova, uz datum. */
     oznaka: 'Tvoj dan',
     zastoOvajTekst: 'Zašto baš ovaj tekst?',
+    /** Oznaka iznad naslova teksta na kartici "Tvoj dan" (8.10.2026). */
+    temaDana: 'Tema dana',
     saznajVise: 'Saznaj više',
     /** Oznake tri stavke iz teksta. */
     efekat: 'Pozitivni efekat',

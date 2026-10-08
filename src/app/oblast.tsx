@@ -19,8 +19,11 @@ import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { usePremium } from '@/store/auth';
 import { useT } from '@/i18n';
 import { brand } from '@/theme/tokens';
-import { OBLAST_BOJA } from '@/components/oblast-ikona';
-import { punjenje } from '@/components/krug-zivota';
+import { IKONA_OBLASTI } from '@/components/krug-zivota';
+import { OBLAST_BOJA, OblastIkona } from '@/components/oblast-ikona';
+import { NaslovSekcije } from '@/components/naslov-sekcije';
+import { NaslovCeleReci } from '@/components/naslov-cele-reci';
+import { TumacenjeTekst } from '@/components/tumacenje-tekst';
 
 /** Najvise tranzita u listi — ostali su samo broj ("još 4 tranzita u ovoj oblasti"). */
 const NAJVISE = 4;
@@ -74,49 +77,37 @@ export default function OblastList() {
 
   return (
     <SheetScroll siva>
-      <Text variant="naslovLista">{t.krug.oblasti[kljuc]}</Text>
-      <View className="mt-3 flex-row items-center gap-2 self-start rounded-pill bg-white px-3 py-1.5">
-        <View className="rounded-pill" style={{ width: 10, height: 10, backgroundColor: punjenje(oblast.ocena) }} />
-        <Text variant="chip" style={{ color: brand.indigo }}>{t.krug.stanja[oblast.stanje]}</Text>
-        <OcenaTackice ocena={oblast.ocena} />
+      {/* Ikonica oblasti gore levo, stanje i tackice gore DESNO (bez obojenog kruga), naslov ispod (Ivan, 8.10.2026). */}
+      <View className="flex-row items-start justify-between gap-3">
+        <OblastIkona oblast={IKONA_OBLASTI[kljuc]} size={56} />
+        <View className="mt-2 flex-row items-center gap-2 rounded-pill bg-white px-3 py-1.5">
+          <Text variant="chip" style={{ color: brand.indigo }}>{t.krug.stanja[oblast.stanje]}</Text>
+          <OcenaTackice ocena={oblast.ocena} />
+        </View>
       </View>
+      <NaslovCeleReci size={32} lineHeight={38} min={22} className="mt-3">{t.krug.oblasti[kljuc]}</NaslovCeleReci>
 
       {!otvorena ? (
         <PremiumKartica className="mt-10" naslov={t.krug.oblasti[kljuc]} opis={t.krug.zakljucanList} izLista />
       ) : (
         <>
-          <View className={`${CARD_SURFACE} mt-6 p-4`}>
-            <Text variant="oznaka">{t.krug.danas}</Text>
-            <Text variant="default" className="mt-1.5 text-[17px] leading-[24px]">{recenica ?? neutralnaRecenica(kljuc) ?? t.krug.nemaUticaja}</Text>
+          {/* Danas i Ove nedelje BEZ kartice (Ivan, 8.10.2026), naslovi kao podnaslovi u listu tumacenja tranzita; tekst isti
+              kao ostatak teksta u tumacenju (`TumacenjeTekst`), ne kao velika prva recenica. */}
+          <View className="mt-8">
+            <NaslovSekcije>{t.krug.danas}</NaslovSekcije>
+            <TumacenjeTekst tekst={recenica ?? neutralnaRecenica(kljuc) ?? t.krug.nemaUticaja} />
           </View>
-
           {nedelja && (
-            <View className={`${CARD_SURFACE} mt-3 p-4`}>
-              <Text variant="oznaka">{t.krug.nedelja}</Text>
-              <Text variant="default" className="mt-1.5 text-[17px] leading-[24px]">{nedelja}</Text>
-            </View>
-          )}
-
-          {tranziti.length > 0 && (
-            <View className="mt-8 gap-3">
-              <Text variant="label">{t.krug.stavkeNaslov}</Text>
-              {otvoreni.map((x) => (
-                <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={l1 || l2}
-                  trajanje={trajanjeTekst(trajanjeTranzita(x.red, date))} />
-              ))}
-              {zakljucani.length > 0 && (
-                <ZakljucaniRedovi
-                  redovi={zakljucani.map((z) => ({ key: z.red.key, naslov: tekstReda(z.red, '').veci, ispod: trajanjeTekst(trajanjeTranzita(z.red, date)) }))}
-                />
-              )}
-              {ostalo > 0 && <Text variant="caption">{t.krug.josTranzita(ostalo, t.gramatika.tranzita(ostalo))}</Text>}
+            <View className="mt-7">
+              <NaslovSekcije>{t.krug.nedelja}</NaslovSekcije>
+              <TumacenjeTekst tekst={nedelja} />
             </View>
           )}
 
           {sedam ? (
-            <View className="mt-8">
-              <Text variant="label">{t.krug.sedamDana}</Text>
-              <View className={`${CARD_SURFACE} mt-3 p-4`}>
+            <View className="mt-7">
+              <NaslovSekcije>{t.krug.sedamDana}</NaslovSekcije>
+              <View className={`${CARD_SURFACE} p-4`}>
                 <View className="flex-row items-end justify-between" style={{ height: 78 }}>
                   {sedam.map((v, i) => (
                     <View key={i} className="items-center" style={{ flex: 1 }}>
@@ -133,8 +124,25 @@ export default function OblastList() {
               </View>
             </View>
           ) : (
-            <PremiumKartica className="mt-10" naslov={t.krug.sedamDana} opis={t.krug.zakljucanoUPremium} izLista />
+            <PremiumKartica className="mt-7" naslov={t.krug.sedamDana} opis={t.krug.zakljucanoUPremium} izLista />
           )}
+
+          {tranziti.length > 0 && (
+            <View className="mt-7 gap-3">
+              <NaslovSekcije>{t.krug.stavkeNaslov}</NaslovSekcije>
+              {otvoreni.map((x) => (
+                <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={l1 || l2}
+                  trajanje={trajanjeTekst(trajanjeTranzita(x.red, date))} />
+              ))}
+              {zakljucani.length > 0 && (
+                <ZakljucaniRedovi
+                  redovi={zakljucani.map((z) => ({ key: z.red.key, naslov: tekstReda(z.red, '').veci, ispod: trajanjeTekst(trajanjeTranzita(z.red, date)) }))}
+                />
+              )}
+              {ostalo > 0 && <Text variant="caption">{t.krug.josTranzita(ostalo, t.gramatika.tranzita(ostalo))}</Text>}
+            </View>
+          )}
+
         </>
       )}
     </SheetScroll>

@@ -124,6 +124,8 @@ export const danas: Recnik['danas'] = {
   tvojDan: {
     oznaka: 'Твојот ден',
     zastoOvajTekst: 'Зошто токму овој текст?',
+    /** Oznaka iznad naslova teksta na kartici "Tvoj dan" (8.10.2026). */
+    temaDana: 'Тема на денот',
     saznajVise: 'Дознај повеќе',
     efekat: 'Позитивен ефект',
     pazi: 'Предизвик',

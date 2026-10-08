@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Pressable, View } from 'react-native';
+import { useFocusEffect, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   Easing, ReduceMotion, useAnimatedProps, useReducedMotion, useSharedValue, withDelay, withTiming, ZoomIn,
@@ -76,9 +77,6 @@ export const punjenje = (ocena: number) => {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${PALETA.alfa[Math.min(5, Math.max(1, ocena))]})`;
 };
 
-/** Prvo otvaranje u ovoj sesiji pokazuje punjenje; posle toga krug stoji gotov (tab se ponovo montira). */
-let vecPokazano = false;
-
 /** Isecak (prsten izmedju `r0` i `r1`) oko ugla `c`, u stepenima. */
 function isecak(c: number, pola: number, r0: number, r1: number, k: number): string {
   const t = (r: number, deg: number) => {
@@ -119,6 +117,19 @@ const KRAJ_PUNJENJA = [0, 0.05, 0.09, 0.14, 0.2, 0.28];
 const POCETAK_PUNJENJA = [0, 0.7, 0.78, 0.86, 0.93, 1];
 
 const AG = Animated.createAnimatedComponent(G);
+
+/** Trajanje pojavljivanja sive staze pri otvaranju kruga (ms). */
+const STAZA_MS = 550;
+
+/** Siva staza se POJAVLJUJE: raste od sredine, pre punjenja isecaka (Ivan, 8.10.2026). */
+function StazaRaste({ napredak, cx, children }: { napredak: SharedValue<number>; cx: number; children: React.ReactNode }) {
+  const props = useAnimatedProps(() => {
+    const e0 = Math.min(1, Math.max(0, (napredak.get() * UKUPNO) / STAZA_MS));
+    const e = 1 - Math.pow(1 - e0, 3);
+    return { transform: [{ translateX: cx }, { translateY: cx }, { scale: Math.max(0.001, e) }, { translateX: -cx }, { translateY: -cx }] };
+  });
+  return <AG animatedProps={props}>{children}</AG>;
+}
 
 /**
  * Obojeni deo isecka kao PRELIV (Ivan, 8.10.2026: "bez ravne linije"): pun uz rupu u sredini, sve providniji ka
@@ -177,7 +188,7 @@ function Katanac({ k }: { k: number }) {
  * Porodica = kuca, Partner = srce, Licni razvoj = biljka, Finansije = novcici, Zabava = tuta sa konfetama,
  * Prijateljstvo = dva oblacica.
  */
-const IKONA_OBLASTI: Record<KrugKey, IkonaOblasti> = {
+export const IKONA_OBLASTI: Record<KrugKey, IkonaOblasti> = {
   karijera: 'karijera', zdravlje: 'zdravlje', porodica: 'kuca', partner: 'ljubav', licni_razvoj: 'basta',
   finansije: 'finansije', zabava: 'zabava', prijateljstvo: 'prijateljstvo',
 };
@@ -228,12 +239,34 @@ export function KrugZivota({ rez, izabrana, onIzbor, otkljucane }: {
   const stazaId = `krug-staza-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const k = D / S;
   const bezPokreta = useReducedMotion();
-  const [animiraj] = React.useState(() => !vecPokazano && !bezPokreta);
+  // Animacija se pusta SVAKI put kad se tab "Danas" pojavi (Ivan, 8.10.2026; do tada samo prvi put u sesiji): pri montiranju,
+  // i pri svakom povratku na tab (tab ostaje montiran, pa se krug ponovo pokrece — `ciklus` ponovo montira plocice).
+  const animiraj = !bezPokreta;
   const napredak = useSharedValue(animiraj ? 0 : 1);
+  const [ciklus, setCiklus] = React.useState(0);
+  const prviFokus = React.useRef(true);
   React.useEffect(() => {
-    vecPokazano = true;
     if (animiraj) napredak.set(withDelay(250, withTiming(1, { duration: UKUPNO, easing: Easing.linear, reduceMotion: ReduceMotion.Never })));
   }, [animiraj, napredak]);
+  // Animacija samo kad se TAB "Danas" pojavi (prelazak sa drugog taba) — NE kad se zatvori list ili prica koji su ga prekrili
+  // (Ivan, 8.10.2026). Pri odlasku proverimo da li je preko tabova list/modal (koren navigacije vise nije "(tabs)").
+  const navigation = useNavigation();
+  const prekriven = React.useRef(false);
+  useFocusEffect(React.useCallback(() => {
+    if (prviFokus.current) { prviFokus.current = false; }
+    else if (prekriven.current) { prekriven.current = false; }
+    else if (animiraj) {
+      napredak.set(0);
+      napredak.set(withDelay(250, withTiming(1, { duration: UKUPNO, easing: Easing.linear, reduceMotion: ReduceMotion.Never })));
+      setCiklus((c) => c + 1);
+    }
+    return () => {
+      let koren = navigation;
+      while (koren.getParent()) koren = koren.getParent()!;
+      const stanje = koren.getState();
+      prekriven.current = !!stanje && stanje.routes[stanje.index]?.name !== '(tabs)';
+    };
+  }, [animiraj, napredak, navigation]));
 
   const otvorena = (key: KrugKey) => !otkljucane || otkljucane.includes(key);
   const izaberi = (key: KrugKey) => {
@@ -253,10 +286,12 @@ export function KrugZivota({ rez, izabrana, onIzbor, otkljucane }: {
                 <Stop offset={1} stopColor={PALETA.stazaSpolja} />
               </RadialGradient>
             </Defs>
-            {rez.oblasti.map((o, i) => (
-              <Path key={`s-${o.def.key}`} d={isecak(i * 45 - 90, POLA_UGLA, RI, RO, k)} fill={`url(#${stazaId})`}
-                onPress={() => izaberi(o.def.key)} />
-            ))}
+            <StazaRaste napredak={napredak} cx={D / 2}>
+              {rez.oblasti.map((o, i) => (
+                <Path key={`s-${o.def.key}`} d={isecak(i * 45 - 90, POLA_UGLA, RI, RO, k)} fill={`url(#${stazaId})`}
+                  onPress={() => izaberi(o.def.key)} />
+              ))}
+            </StazaRaste>
             {rez.oblasti.map((o, i) => {
               // Izabrani isecak: INDIGO preliv preko celog isecka (pun uz rupu, providan uz ivicu kruga).
               const sel = o.def.key === izabrana;
@@ -285,7 +320,7 @@ export function KrugZivota({ rez, izabrana, onIzbor, otkljucane }: {
             const y = (CX + RC * Math.sin(a)) * k;
             return (
               <Plocica
-                key={o.def.key}
+                key={`${o.def.key}-${ciklus}`}
                 kljuc={o.def.key}
                 naziv={t.krug.oblasti[o.def.key]}
                 stanje={t.krug.stanja[o.stanje]}

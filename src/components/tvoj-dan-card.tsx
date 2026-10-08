@@ -41,7 +41,7 @@ export const OZNAKA_12 = 'text-[12px] leading-[16px]';
  * natalna (deo tvoje karte koji je pogodjen), kao znak na Mesecu. Mere iste kao tamo.
  */
 // 80 (Ivan, 30.9.2026: manja; do tada 96) — ista kao u prstenu price danas (`prica/ulaz.tsx`).
-const PLANETA = 80;
+const PLANETA = 68;
 const BEDZ = 28;
 /**
  * Planete sa prstenovima: koliki deo slike je TELO (izmereno, `planete-par.tsx`)
@@ -107,7 +107,10 @@ export function TvojDanCard({ pick, date, isToday }: {
   // Bez kartice (Ivan, 28.9.2026): stoji direktno na sivoj pozadini pocetne,
   // kao prvi slajd karusela.
   return (
-    <View>
+    // CELO U JEDNOJ KARTICI (Ivan, 8.10.2026): oznaka "Tema dana", naslov (manji), sazetak i "Saznaj vise", pa ispod LINIJE
+    // Pozitivni efekat / Izazov / Savet — redovi su u istoj kartici, odvojeni linijama od ivice do ivice.
+    <View className={cn(CARD_SURFACE, 'p-4')}>
+      <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.temaDana}</Text>
       {/* Datum i naslov su jedna celina, planeta desno centrirana u odnosu na njih;
           sazetak ispod ide preko cele sirine (Ivan, 29.9.2026). */}
       <View className="flex-row items-center gap-4">
@@ -120,13 +123,13 @@ export function TvojDanCard({ pick, date, isToday }: {
           {/* Dok tekst ne stigne — traka, ne racunato ime: ime bi na promeni dana
               bljesnulo pre naslova teksta (Ivan, 28.9.2026). */}
           {loading && !duga?.title && !kratka?.title ? (
-            <TextPlaceholder lines={0} title="display" className="mt-3" />
+            <TextPlaceholder lines={0} title="display" className="mt-2" />
           ) : (
             // Dugme (i) odmah posle POSLEDNJEG SLOVA naslova (Ivan, 28.9.2026) — ugradjeno
             // u tekst, pa prati prelom u drugi red. Otvara list "Zašto baš ovaj
             // tekst" (`app/tvoj-dan-info.tsx`). Nerazdvojni razmak: ikonica se ne odvaja
             // od poslednje reci u novi red.
-            <Text variant="display" className="mt-3">
+            <Text variant="display" className="mt-2 text-[25px] leading-[31px]">
               {naslov}{'\u00A0'}
               <Pressable
                 // `day`: izabrani dan, da trajanje u listu bude za taj dan, ne za danas.
@@ -194,9 +197,9 @@ function Odeljci({ stavke }: { stavke: { key: OdeljakKljuc; oznaka: string; s: S
   return (
     // Linija od ivice do ivice kartice: kartica bez bocnog razmaka, red ga nosi sam.
     // Samo tekst, bez ikonica (Ivan, 29.9.2026).
-    <View className={cn(CARD_SURFACE, 'mt-8 overflow-hidden py-1')}>
+    <View className="-mx-4 -mb-4 mt-5 border-t border-border">
       {stavke.map((x, i) => (
-        <View key={x.key} className={cn('flex-row items-center gap-3 px-4 py-3', i > 0 && 'border-t border-border')}>
+        <View key={x.key} className={cn('flex-row items-center gap-3 px-4 py-3.5', i > 0 && 'border-t border-border')}>
           <View className="flex-1">
             {/* Oznaka u lila boji ikonica i strelica (Ivan, 29.9.2026: "da budu ljubicasti"). */}
             <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.key] ?? OBLAST_BOJA }}>{x.oznaka}</Text>

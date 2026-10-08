@@ -147,6 +147,8 @@ export const danas: Recnik['danas'] = {
     /** Uppercase label above the title, next to the date. */
     oznaka: 'Your day',
     zastoOvajTekst: 'Why this reading?',
+    /** Oznaka iznad naslova teksta na kartici "Tvoj dan" (8.10.2026). */
+    temaDana: 'Theme of the day',
     saznajVise: 'Learn more',
     /** Labels of the three items from the text. */
     efekat: 'Positive effect',

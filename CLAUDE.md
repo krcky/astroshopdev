@@ -55,6 +55,7 @@ src/
     osoba-uredi.tsx  izmena druge osobe: TABELA svih podataka + brisanje; red otvara `rodjenje-polje`
     rodjenje-polje.tsx LIST odozdo sa JEDNIM podatkom o rodjenju (?polje=…; `&osoba=` za drugu osobu, bez = svoj)
     email.tsx        promena emaila (list sa "Nalog"): nova adresa -> kod sa mejla
+    oblast.tsx       list oblasti kruga zivota (?k=&day=) — "Saznaj više" sa kartice ispod kruga; SIV list (kartice tranzita)
     nova-osoba/      nova osoba KORAK PO KORAK, kao onboarding: ime, ko ti je, datum, vreme, mesto, pregled
     nalog.tsx        list sa profila: email, PODACI O RODJENJU (tabela), BRISANJE NALOGA (namerno korak dalje od profila)
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
@@ -84,6 +85,8 @@ src/
     moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca; kad se VRTI (`vrti`), okrece se samo tekstura `pun.png`, a senka `senka-NN.png` stoji — Ivan, 7.10.2026)
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
+    krug-zivota.tsx      KRUG ZIVOTA na pocetnoj: osam isecaka sa ikonicom, nazivom i tackicama, punjenje po oceni, logo u sredini (pravilo 18d)
+    oblast-kartica.tsx   kartica ispod kruga: izabrana oblast, stanje, tackice, recenica za danas, "Saznaj više"
     turnstile.tsx        CAPTCHA kapija pred slanje koda
     prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon);
                          sat.tsx = SAT SLIKE (svi pokreti), video-radionica / video-traka / platno-videa = VIDEO;
@@ -116,6 +119,8 @@ src/
     znak-oblici.ts   oblici i boje ikonica znakova — deli ih panel
     uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
     pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
+    krug-config.ts   osam oblasti kruga zivota (kuce, planete), stanja, prozor od 3 dana — za astrologa
+    krug.ts          krug zivota: ocena oblasti, stanje (prosek 3 dana), 7 dana (cist racun); use-krug.ts = podaci; krug-tekst.ts = recenica za danas (PRIVREMENO)
     osobe.ts         druge osobe: odnosi, granica, ko je otvoren (cist racun); osobe-api.ts = server + `useKarta`
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — vise se NE PRIKAZUJE (reveal koristi podnaslove astrologa); ostaje jer ga cita `scripts/korpus/odgovor.py`
@@ -444,7 +449,7 @@ upisuje i tamo, u istom commitu — inace astrolog proverava zastarelo stanje.
 **18b. Premium tab "Tranziti" = lista po VAZNOSTI; ocene oblasti SAMO na pocetnoj (28.9.2026).**
 Tab "Tranziti" (`components/tranziti-lista.tsx`): svi tranziti dana, najjaci prvi, svaki u
 svojoj kartici — BEZ oblasti i BEZ ocena (Ivan: "to je ok za homepage"). Ocena 1—5 po oblasti
-je samo na pocetnoj: 4 reda bez linija, u ISTOJ kartici iznad "Ide ti / Koci te" ("Danas ukratko", tab "Danas" na pocetnoj).
+je bila samo na pocetnoj: 4 reda bez linija, u ISTOJ kartici iznad "Ide ti / Koci te" ("Danas ukratko"). OD 8.10.2026 pocetna ima KRUG ZIVOTA umesto toga (pravilo 18d); ova cetiri reda i "Ide ti / Koci te" su u prici i na kartici za deljenje.
 POCETNA NEMA KARUSEL (Ivan, 29.9.2026): stakleni tabovi Danas / Mesec / Promene / Teme
 (`KapsuleRed tabovi`), izabran lila; sadrzaj taba ulazi bez providnosti (staklo). Racun `lib/oblasti.ts` (`poVaznosti` za listu,
 `oblasti` za ocene), SVE vrednosti za astrologa u `lib/oblasti-config.ts`. Oba ekrana idu
@@ -517,6 +522,31 @@ Hero-a i bez Meseca, po orbisu; tranzit bez teksta se preskace. Testovi: deo 9b.
 
 **19. Bez interneta aplikacija radi sa onim sto je vec stiglo (29.9.2026).**
 Racun je ionako lokalan. Tri stvari su zavisile od mreze i sad imaju rezervu:
+**18d. Krug zivota na pocetnoj (Ivan, 8.10.2026; varijanta A sa prototipa).**
+Na tabu "Danas" pocetne: KRUG ZIVOTA (naslov "Tvoj zivot danas" + datum iznad njega), ispod kartica izabrane oblasti, pa "Tvoj dan". "Danas ukratko" (ocene
+cetiri oblasti i "Ide ti / Koci te") je SKLONJENO sa pocetne — `OBLASTI` i `pickBrief` ostaju za pricu i karticu za deljenje, koje se NE menjaju.
+Osam oblasti (`lib/krug-config.ts`: Karijera, Finansije, Zdravlje, Porodica, Partner, Licni razvoj, Zabava, Prijateljstvo; pokrivaju svih 12 kuca).
+U svakom isecaku, DIREKTNO NA NJEMU (bez staklene plocice i bez reci stanja, Ivan, 8.10.2026): IKONICA oblasti (3D, `assets/images/ikone/`, `IKONA_OBLASTI`;
+faktori velicine `RAZMERA_IKONE`), naziv i TACKICE; na izabranom (indigo) isecku beli, na ostalima tamni. Zakljucana oblast: beli krug sa katancem DOLE DESNO
+uz ikonicu, malo preko nje. Staza je RADIJALNI PRELIV (tamnija uz rupu, svetlija ka ivici); krug je iste sirine kao kartica ispod, BEZ obruba.
+Tamni indigo krug (`TAMAN_KRUG`) je probao i ODBIJEN, kao i boje po stanju (plava/roze znace "ide ti"/"koci te"); boja po oblasti nikad.
+PUNJENJE isecka je preliv bez ravne linije, svetla lila (`OBLAST_BOJA`): pun uz rupu, sve providniji ka kraju; duzina je DANASNJA ocena, a jacina raste sa
+ocenom (`POCETAK_PUNJENJA`, `KRAJ_PUNJENJA`). IZABRANI isecak je INDIGO preliv preko celog isecka (`KRAJ_IZABRANOG`). Razmaci izmedju isecaka su IZNAD punjenja.
+STANJE (Pritisak / Oprez / Mirno / Raste / Procvat) = prosek ocene za 3 dana (juce, danas, sutra), TACKICE = danasnja ocena (`lib/krug.ts`); stanje se vidi na
+kartici ispod kruga i u listu oblasti (ne na isecku). Besplatno `BESPLATNO.krug` = Partner i Zdravlje potpuno otvoreni; stanje i tackice vide svi za svih osam.
+ANIMACIJA otvaranja (staza raste, punjenje isecak po isecak, plocice iskacu): pri prvom prikazu, pri povratku sa drugog TABA i pri povratku na "Tvoj dan"; NE kad
+se zatvori list ili prica koji su prekrili tab (provera: koren navigacije nije "(tabs)"). Uz "Smanji pokrete" nema animacije.
+U SREDINI: KRUG LOGA (`KrugLoga stalno`) koji se vrti STALNO (ne staje posle mirovanja — izuzetak od pravila 17; uz "Smanji pokrete" i ustedu baterije stoji);
+logo u zaglavlju POCETNE se ne animira (`Logo mirno`). Rupa u sredini je boje pozadine strane. ULAZ U DNEVNU PRICU je STAKLENO DUGME "Priča dana" PRVO U REDU TABOVA
+(pravilo 23).
+KARTICA ispod kruga ("Danas" + "Saznaj više") i LIST `/oblast` ("Saznaj više"): ikonica gore levo, stanje + tackice gore desno, naslov (`NaslovCeleReci` 32 kao u
+tumacenju tranzita), pa "Danas", "Ove nedelje", "Narednih 7 dana" (Premium; besplatni vide katanac), "Šta utiče" — sve `NaslovSekcije`, tekst `TumacenjeTekst`.
+REC ZA DANAS I OVE NEDELJE je PRIVREMENO PREDLOG iz tabele za astrologa (`Recenice-oblasti-za-astrologa.xlsx`, 144 + 8 neutralnih; `i18n/sr/krug-recenice.ts`, samo
+srpski, po planeti U TRANZITU x oblasti x tonu); drugi jezici i dalje kratki tekst najjaceg tranzita (`lib/krug-tekst.ts`). Spisak kuca i planeta po oblasti CEKA
+ASTROLOGA. Vracanje: `git checkout pocetna-pre-tocka-zivota -- 'src/app/(tabs)/home'` (+ `tvoj-dan-card.tsx`). Opis: `docs/ASTRO-LOGIKA.md`, pogl. 12.
+"TVOJ DAN" na pocetnoj je CELO U JEDNOJ KARTICI: oznaka "Tema dana", naslov, sazetak i "Saznaj više", pa ispod linije Pozitivni efekat / Izazov / Savet.
+Provereno u simulatoru (iPhone 17, iOS 26) i napravljen Release build za iPhone 15; Android i brzina animacija na telefonu nisu.
+
 SESIJA — `useAuthListener` cita sacuvanu sesiju sa diska ODMAH; `getSession()` bez
 mreze ~25 s ponavlja obnovu tokena i onda vrati `null`, pa je kapija slala korisnika
 na welcome. Greska MREZE (`isAuthRetryableFetchError`) sesiju ne brise; brise je samo
@@ -636,10 +666,11 @@ REDOSLED SQL-a: schema -> pokloni -> osobe -> pitanja (pitanja.sql pamti `osoba_
 Za SVE korisnike, i besplatni vidi SVE: u prici nema katanaca, ni na ocenama — sve cetiri (Ivan, 30.9.2026;
 izuzetak od 18c, na pocetnoj besplatni i dalje vidi samo Ljubav). Tekstovi su za besplatne ionako kratki
 (pravilo 8). Dizajn je verzija C sa prototipa (Ivan izabrao 30.9.2026).
-ULAZ (`components/prica/ulaz.tsx`): prsten oko planete "Tvog dana" na pocetnoj — preliv svetla ljubicasta ->
+OD 8.10.2026 ULAZ JE STAKLENO DUGME "Priča dana" PRVO U REDU TABOVA pocetne (`PricaDugme` u `components/prica/ulaz.tsx`), sa preliv-obrisom dok danasnja prica nije OTVORENA; u sredini kruga je ilustracija vladara znaka Sunca (pravilo 18d). Planeta "Tvog dana" vise nema prsten ni balon. Ostalo ovde (prsten, punjenje) vazi isto.
+ULAZ (`components/prica/ulaz.tsx`, do 8.10.2026): prsten oko planete "Tvog dana" na pocetnoj — preliv svetla ljubicasta ->
 indigo DIJAGONALNO preko celog kruga (bez pocetka i kraja, kao Instagram), ISPOD Saturnovih/Uranovih
 prstenova, 2—3 pt od okruglih planeta. Puni se od vrha u smeru kazaljke SAMO dok danasnja prica nije
-pogledana (= stigao do poslednje slike, `store/prica-log.ts`); posle stoji mirno do sutra. Ispod planete
+pogledana (= OTVORENA; od 8.10.2026 ne mora do kraja, `store/prica-log.ts`); posle stoji mirno do sutra. Ispod planete
 animiran balon "▶ Priča dana" (dve tackice pa balon, kao beleska na Instagramu) — umesto natpisa. Balon
 prelazi preko donjeg dela planete, ali je ISPOD male (natalne) planete i pomeren ulevo da ona ne pokrije
 natpis; slojevi: planeta -> balon -> mala planeta (Ivan, 30.9.2026). Planeta je 80 pt (do tada 96), ista i za
@@ -926,6 +957,7 @@ npm run panel:build       panel za objavu -> panel/dist
       izbor mesta posmatranja. Bez tumacenja — prikazuje
       se samo ono sto se racuna. Lokacija je grad iz profila, bez `expo-location`:
       razlika izmedju dva grada u Srbiji se na ekranu ni ne vidi, a sistemska
+npm run check:krug        krug zivota: osam oblasti, 12 kuca pokriveno, stanje iz proseka 3 dana, bez vremena rodjenja
       dozvola bi trazila razlog i objasnjenje u prodavnici. Grad se moze promeniti
       rucno (`/sky-place`, `store/sky-place.ts`) — kroz ISTU pretragu kao onboarding,
       ali u zasebnom store-u: mesto rodjenja se menja jedino na listu "Nalog", jer od njega
