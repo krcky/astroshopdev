@@ -132,7 +132,12 @@ const PRELAZ_IZNAD = 12;
 const IZNAD_PRELIVA_BLEDI = 24;
 
 /** Element koji `Screen` crta iznad preliva — gde je u sadrzaju i koliko je velik. */
-type Podignuto = { element: React.ReactNode; x: number; y: number; w: number; h: number };
+type Podignuto = {
+  element: React.ReactNode;
+  /** Plutajuce stvari preko elementa (popover sa tocka) — vidi `IznadPreliva`. Prima dodir. */
+  povrsina?: React.ReactNode;
+  x: number; y: number; w: number; h: number;
+};
 
 /**
  * ANDROID: JEDAN PRIMERAK (Ivan, 1.10.2026: "zasto uopste imamo dupli krug"). Na iOS-u primerak
@@ -338,6 +343,9 @@ export function Screen({
     opacity: JEDAN_PRIMERAK ? 1 : interpolate(pomeraj.value, [0, IZNAD_PRELIVA_BLEDI], [1, 0], Extrapolation.CLAMP),
     transform: [{ translateY: -pomeraj.value }],
   }));
+  // Sloj 3c (popover preko podignutog): samo pomeranje sa skrolom, BEZ providnosti — staklo
+  // se kvari ispod roditelja sa alpha < 1 (vidi `ui/kapsule.tsx`).
+  const povrsinaStil = useAnimatedStyle(() => ({ transform: [{ translateY: -pomeraj.value }] }));
   // Gornja ivica sloja 3b. iOS: ivica trake (iznad nje sadrzaj ide pod zamucenje). Android:
   // ne nize od samog elementa — krug je `-mt-3`, pa bi mu ivica trake odsekla vrh vec u miru;
   // tu jedini primerak nestaje dok klizi (traka je iste boje kao pozadina, ivica joj se ne vidi).
@@ -421,6 +429,23 @@ export function Screen({
         </View>
       )}
 
+      {/* 3c. plutajuce preko podignutog (popover sa tocka): u istom okviru kao 3b i pomereno za skrol,
+          ali SA dodirom i za citac ekrana. Sloj propusta dodir (`box-none`) sem na samu karticu. */}
+      {podignuto?.povrsina && (
+        <View
+          pointerEvents="box-none"
+          style={{ position: 'absolute', top: vrhPodignutog, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+          <Animated.View
+            pointerEvents="box-none"
+            style={[
+              { position: 'absolute', left: podignuto.x, top: podignuto.y - vrhPodignutog, width: podignuto.w, height: podignuto.h },
+              povrsinaStil,
+            ]}>
+            {podignuto.povrsina}
+          </Animated.View>
+        </View>
+      )}
+
       {/* 4. natpis */}
       <View
         // `box-none` — sama traka ne hvata dodir (ispod nje klizi lista), ali
@@ -470,8 +495,20 @@ export function Screen({
  * ANDROID (`JEDAN_PRIMERAK`, 1.10.2026): primerka u sadrzaju NEMA — tamo je samo prazno mesto
  * velicine `velicina`, a element se crta jednom, u sloju 3b. Bez `velicina` ostaju oba primerka.
  */
-export function IznadPreliva({ podignuto, velicina, className, children }: {
+export function IznadPreliva({ podignuto, povrsina, velicina, onDodir, className, children }: {
   podignuto: React.ReactNode;
+  /**
+   * Plutajuca kartica preko elementa (8.10.2026: detalji izabranog sa tocka, staklo). Crta se
+   * u sloju 3c iznad preliva, u koordinatama elementa (0..velicina), pa moze da se pozicionira
+   * kod dodirnutog mesta; bez preliva ide odmah preko elementa.
+   */
+  povrsina?: React.ReactNode;
+  /**
+   * Dodir na element (8.10.2026): tacka u koordinatama elementa (0..velicina). Providan sloj
+   * stoji u SADRZAJU, u skrolu — pa lista i dalje klizi sa prsta koji je pao na krug, a gornji
+   * primerak (sloj 3b, `pointerEvents="none"`) samo prikazuje isto stanje.
+   */
+  onDodir?: (x: number, y: number) => void;
   /** Stalna velicina elementa (tocak: `size` x `size`) — za prazno mesto na Androidu. */
   velicina?: { w: number; h: number };
   className?: string;
@@ -484,14 +521,27 @@ export function IznadPreliva({ podignuto, velicina, className, children }: {
 
   React.useLayoutEffect(() => {
     if (!postavi || !omot || !unutra) return;
-    postavi({ element: podignuto, x: omot.x + unutra.x, y: omot.y + unutra.y, w: unutra.width, h: unutra.height });
-  }, [postavi, omot, unutra, podignuto]);
+    postavi({ element: podignuto, povrsina, x: omot.x + unutra.x, y: omot.y + unutra.y, w: unutra.width, h: unutra.height });
+  }, [postavi, omot, unutra, podignuto, povrsina]);
   React.useLayoutEffect(() => (postavi ? () => postavi(null) : undefined), [postavi]);
 
   return (
     <View className={className} onLayout={postavi ? (e) => setOmot(e.nativeEvent.layout) : undefined}>
       <View onLayout={postavi ? (e) => setUnutra(e.nativeEvent.layout) : undefined}>
         {samoGore ? <View style={{ width: velicina!.w, height: velicina!.h }} /> : podignuto}
+        {onDodir && (
+          // Za citac ekrana krug nema stavke (lista ispod ima sve to), pa sloj nije dugme.
+          <Pressable
+            accessible={false}
+            importantForAccessibility="no"
+            style={StyleSheet.absoluteFill}
+            onPress={(e) => onDodir(e.nativeEvent.locationX, e.nativeEvent.locationY)}
+          />
+        )}
+        {/* Bez preliva nema sloja 3c: kartica stoji odmah preko elementa. */}
+        {!postavi && povrsina ? (
+          <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>{povrsina}</View>
+        ) : null}
       </View>
       {children}
     </View>

@@ -15,12 +15,18 @@ export const OBLAST_BOJA = '#B39DDB';
  * `files/<oblast>.png`, smanjene na 144 px u `assets/images/ikone/`. Zamenile su
  * ravne SVG ikonice (`files/*-active.svg`).
  */
-const SLIKE: Record<LunarArea, number> = {
+/** Dodatne ikonice za krug zivota (Ivan, 8.10.2026): Finansije, Zabava, Prijateljstvo. */
+export type IkonaOblasti = LunarArea | 'finansije' | 'zabava' | 'prijateljstvo';
+
+const SLIKE: Record<IkonaOblasti, number> = {
   ljubav: require('../../assets/images/ikone/ljubav.png'),
   zdravlje: require('../../assets/images/ikone/zdravlje.png'),
   karijera: require('../../assets/images/ikone/karijera.png'),
   kuca: require('../../assets/images/ikone/kuca.png'),
   basta: require('../../assets/images/ikone/basta.png'),
+  finansije: require('../../assets/images/ikone/finansije.png'),
+  zabava: require('../../assets/images/ikone/zabava.png'),
+  prijateljstvo: require('../../assets/images/ikone/prijateljstvo.png'),
 };
 
 /** Neizabrana oblast (tab na ekranu Mesec, kapsula na kartici) — slika se ne boji, nego prigusi. */
@@ -31,7 +37,7 @@ const NEAKTIVNA = 0.4;
  * `size`, slika zadrzava razmeru. `aktivna={false}` je prigusena.
  */
 export function OblastIkona({ oblast, size = 20, aktivna = true }: {
-  oblast: LunarArea;
+  oblast: IkonaOblasti;
   size?: number;
   aktivna?: boolean;
 }) {

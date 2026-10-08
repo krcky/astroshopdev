@@ -6,13 +6,11 @@ import { Info } from 'lucide-react-native';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { Planeta, skalaSlike } from '@/components/planete-par';
 import { Okret } from '@/components/okret';
-import { UlazUPricu } from '@/components/prica/ulaz';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { formatDatumKratko } from '@/lib/horoscope';
 import type { NatalChart } from '@/lib/natal';
 import { useTransitTexts } from '@/lib/transit-texts';
 import { prveRecenice, stavkaZaPrikaz, triOdeljka, type Stavka } from '@/lib/tumacenje';
@@ -114,10 +112,7 @@ export function TvojDanCard({ pick, date, isToday }: {
           sazetak ispod ide preko cele sirine (Ivan, 29.9.2026). */}
       <View className="flex-row items-center gap-4">
         <View className="flex-1">
-          {/* 1. Datum izabranog dana (Ivan, 28.9.2026). */}
-          {/* `oznaka`, ali 12pt — datum i Efekat/Pazi/Savet (Ivan, 28.9.2026). */}
-          {/* "TVOJ DAN · UTO, 29. SEP 2026" — ista tacka i razmaci kao "Mesec danas · 91%" (Ivan, 29.9.2026). */}
-          <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.oznaka}{'\u00A0\u00A0·\u00A0\u00A0'}{formatDatumKratko(date)}</Text>
+          {/* Oznaka "TVOJ DAN · datum" je sklonjena (Ivan, 8.10.2026); naslov i datum stoje iznad kruga zivota. */}
 
           {/* 2. Naslov teksta — najveca klasa u sistemu (`display`, Ivan 28.9.2026).
               TON je sklonjen za sada (Ivan, 28.9.2026: "dodacemo ga posle"); racun je u
@@ -152,19 +147,16 @@ export function TvojDanCard({ pick, date, isToday }: {
 
         </View>
 
-        {/* Tranzitna planeta, natalna dole desno. DANAS je planeta ulaz u dnevnu pricu:
-            prsten oko nje i balon "Priča dana" ispod (Ivan, 30.9.2026; `components/prica/ulaz.tsx`). */}
-        {isToday ? (
-          <UlazUPricu tranzitna={pick.transiting} natalna={pick.natal} datum={date} />
-        ) : (
-          <View
-            accessible
-            accessibilityRole="image"
-            accessibilityLabel={ime}
-            className="items-center">
-            <PlanetaSaBedzom tranzitna={pick.transiting} natalna={pick.natal} />
-          </View>
-        )}
+        {/* Tranzitna planeta, natalna dole desno. Ulaz u dnevnu pricu vise NIJE ovde nego u sredini
+            kruga zivota na pocetnoj (Ivan, 8.10.2026; `components/krug-zivota.tsx`, `UlazUKrug`).
+            Raniji prsten oko planete i balon: `UlazUPricu` (`components/prica/ulaz.tsx`), tag `pocetna-pre-tocka-zivota`. */}
+        <View
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel={ime}
+          className="items-center">
+          <PlanetaSaBedzom tranzitna={pick.transiting} natalna={pick.natal} />
+        </View>
       </View>
 
       {/* 5. Sazetak — preko cele sirine, ispod celine datum + naslov + planeta. */}

@@ -18,6 +18,8 @@ import { SlikaProfila } from '@/components/slika-profila';
 import { PREMIUM, otvoriPremium } from '@/components/zakljucano';
 import { signOut, useAuthStore, useEntitlement } from '@/store/auth';
 import { PREKIDAC_PRODUCT_ID, PROBNI_BUILD, useDevStore } from '@/store/dev';
+import { usePricaLog } from '@/store/prica-log';
+import { dayKey } from '@/lib/transits';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { imaSvojuSliku, ukloniSliku, usePromeniSliku, type IshodSlike } from '@/lib/slika-profila';
 import { formatDatum } from '@/lib/horoscope';
@@ -259,6 +261,7 @@ export default function ProfileSheet() {
             {premiumRucno !== null && (
               <ListRow title={tp.vratiNaServer} chevron={false} onPress={() => setPremiumRucno(null)} />
             )}
+            <ListRow title={tp.pricaNepogledana} chevron={false} onPress={() => usePricaLog.getState().ponisti(dayKey(new Date()))} />
           </Group>
         </>
       )}

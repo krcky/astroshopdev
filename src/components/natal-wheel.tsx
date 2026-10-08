@@ -12,9 +12,10 @@ import { SIGNS, norm360, signFromLongitude } from '@/lib/zodiac';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
 import {
-  chartAngle, degreeTickPaths, levaTacka, naOsi, oseKarte, polar, spreadAngles,
-  LABEL as NUM, LABEL_SEP, WHEEL_R as R,
+  chartAngle, degreeTickPaths, isecakPutanja, levaTacka, naOsi, oseKarte, pogodiTocak, polar, ugloviSimbola,
+  LABEL as NUM, WHEEL_R as R, type Pogodak,
 } from '@/lib/wheel';
+import { brand } from '@/theme/tokens';
 
 /* Poluprecnici i velicine ispisa stoje u `lib/wheel.ts` — proverava ih
    `npm run check:sky`, sekcija 10. Boje, crtice i linije aspekata su u
@@ -77,6 +78,59 @@ function stepenMinut(longitude: number): { deg: number; min: string } {
   return { deg: p.deg, min: String(p.min).padStart(2, '0') };
 }
 
+/** Telo i izvedene tacke u istom nizu kao na prstenu — jedini izvor za crtez i za pogodak. */
+function simboliTocka(chart: NatalChart, points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[]): Simbol[] {
+  return [
+    ...chart.planets.map((p) => ({ key: p.key, glyph: p.glyph, longitude: p.longitude, retrograde: p.retrograde })),
+    ...(points ?? []).map((t) => ({ ...t, izvedena: true })),
+  ];
+}
+
+/**
+ * Sta je dodir na (`x`, `y`) pogodio na tocku — planetu, kucu, znak ili ugao. Ista
+ * geometrija kao crtez (`ugloviSimbola`), pa se dodir poklapa sa onim sto se vidi.
+ */
+export function pogodiNatalniTocak(x: number, y: number, o: {
+  chart: NatalChart;
+  size: number;
+  points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[];
+  bezKuca?: boolean;
+}): Pogodak | null {
+  const leva = levaTacka(o.chart.houses.ascendant, !!o.bezKuca);
+  const degrees = o.size >= DEGREES_MIN_SIZE;
+  const simboli = simboliTocka(o.chart, o.points);
+  const uglovi = ugloviSimbola(simboli.map((s) => s.longitude), leva, degrees);
+  return pogodiTocak(x, y, {
+    size: o.size,
+    leva,
+    planete: simboli.map((s, i) => ({ key: s.key, ugao: uglovi[i] })),
+    degrees,
+    kuspide: o.bezKuca ? null : o.chart.houses.cusps,
+    ascendant: o.chart.houses.ascendant,
+    midheaven: o.chart.houses.midheaven,
+  });
+}
+
+/**
+ * Gde je simbol planete na krugu velicine `size` — tacka u pt od gornjeg levog ugla kruga
+ * (isto kao dodir). Za kartu koja se otvara kod izabrane planete, i kad je izabrana kapsulom.
+ */
+export function polozajSimbola(key: string, o: {
+  chart: NatalChart;
+  size: number;
+  points?: { key: string; glyph: string; longitude: number; retrograde?: boolean }[];
+  bezKuca?: boolean;
+}): { x: number; y: number } | null {
+  const leva = levaTacka(o.chart.houses.ascendant, !!o.bezKuca);
+  const degrees = o.size >= DEGREES_MIN_SIZE;
+  const simboli = simboliTocka(o.chart, o.points);
+  const i = simboli.findIndex((s) => s.key === key);
+  if (i < 0) return null;
+  const uglovi = ugloviSimbola(simboli.map((s) => s.longitude), leva, degrees);
+  const q = polar(CENTAR, CENTAR, degrees ? R.planetUp : R.planet, uglovi[i]);
+  return { x: ((q.x + OKVIR) * o.size) / VIEW, y: ((q.y + OKVIR) * o.size) / VIEW };
+}
+
 type Props = {
   chart: NatalChart;
   size?: number;
@@ -104,9 +158,17 @@ type Props = {
    * tada 0° Ovna (`levaTacka`).
    */
   bezKuca?: boolean;
+  /**
+   * Izabrano dodirom (8.10.2026): planeta ostaje jaka sa svojim aspektima, ostalo bledi;
+   * kuca i znak dobiju obojen isecak; ugao deblju osu. `null` = nista, crtez kao i do tada.
+   */
+  izbor?: Pogodak | null;
 };
 
-export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false }: Props) {
+/** Boja isticanja — indigo iz brenda, providan, da ostane vidljivo sve ispod. */
+const ISTAKNUTO = brand.indigo;
+
+export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false, izbor = null }: Props) {
   const rec = useT();
   const cx = CENTAR;
   const cy = CENTAR;
@@ -120,15 +182,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   /** Za vec izracunat ugao (posle razmicanja). */
   const atAngle = (deg: number, r: number) => polar(cx, cy, r, deg);
 
-  const simboli = React.useMemo<Simbol[]>(
-    () => [
-      ...chart.planets.map((p) => ({
-        key: p.key, glyph: p.glyph, longitude: p.longitude, retrograde: p.retrograde,
-      })),
-      ...(points ?? []).map((t) => ({ ...t, izvedena: true })),
-    ],
-    [chart, points]
-  );
+  const simboli = React.useMemo<Simbol[]>(() => simboliTocka(chart, points), [chart, points]);
 
   // Razmaknute pozicije simbola. Sa vise od deset simbola razmak mora da se
   // smanji, inace relaksacija gurne ceo klaster u stranu.
@@ -137,10 +191,9 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
   // ispod njega je sirok 25,5 jedinica, sto na poluprecniku 102 trazi 14,4°.
   // Uzeto je 15° za rezervu. Cena je da simbol stoji dalje od svog stvarnog
   // stepena — zato crtica koja vodi do prstena postaje obavezna, a ne ukras.
-  const minSep = degrees ? LABEL_SEP : (simboli.length > 11 ? 8.5 : 9.5);
   const symbolAngles = React.useMemo(
-    () => spreadAngles(simboli.map((s) => angleOf(s.longitude)), minSep),
-    [simboli, minSep, leva]
+    () => ugloviSimbola(simboli.map((s) => s.longitude), leva, degrees),
+    [simboli, degrees, leva]
   );
 
   const ticks = React.useMemo(
@@ -157,6 +210,7 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
     () => (showAspects ? findAspects(chart.planets) : []),
     [chart, showAspects]
   );
+  const izabranaPlaneta = izbor?.tip === 'planeta' ? izbor.key : null;
 
   return (
     <Svg width={size} height={size} viewBox={`${-OKVIR} ${-OKVIR} ${VIEW} ${VIEW}`}>
@@ -165,6 +219,18 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           Polje aspekata nema svoj krug — ivicu pokazuju tacke planeta. */}
       <Circle cx={cx} cy={cy} r={R.outer} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
       <Circle cx={cx} cy={cy} r={R.zodiacIn} stroke={COLORS.line} strokeWidth={1} fill="none" />
+
+      {/* --- izabrana kuca ili znak: obojen isecak, ispod svih linija i simbola --- */}
+      {izbor?.tip === 'kuca' && !bezKuca && (
+        <Path
+          d={isecakPutanja(cx, cy, R.hub, R.zodiacIn, chart.houses.cusps[izbor.broj - 1],
+            norm360(chart.houses.cusps[izbor.broj % 12] - chart.houses.cusps[izbor.broj - 1]), leva)}
+          fill={ISTAKNUTO} fillOpacity={0.12} />
+      )}
+      {izbor?.tip === 'znak' && (
+        <Path d={isecakPutanja(cx, cy, R.zodiacIn, R.outer, izbor.indeks * 30, 30, leva)}
+              fill={ISTAKNUTO} fillOpacity={0.18} />
+      )}
 
       {/* --- crtice za stepene --- */}
       <G>
@@ -213,7 +279,10 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           {ose.map((lon, i) => {
             const a = at(lon, R.hub);
             const b = at(lon, R.zodiacIn);
-            return <Line key={`o${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ink} strokeWidth={1.4} />;
+            // ose su ASC, IC, DSC, MC: izabrani ugao istice obe svoje polovine
+            const istaknuta = izbor?.tip === 'ugao' && (izbor.key === 'ascendant' ? i % 2 === 0 : i % 2 === 1);
+            return <Line key={`o${i}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                         stroke={istaknuta ? ISTAKNUTO : COLORS.ink} strokeWidth={istaknuta ? 2.6 : 1.4} />;
           })}
           <Circle cx={cx} cy={cy} r={R.hub} stroke={COLORS.line} strokeWidth={1} fill={COLORS.disk} />
         </G>
@@ -225,14 +294,17 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           const st = ASPECT_STYLE[a.aspect.key];
           const p1 = at(a.a.longitude, R.houseRing);
           const p2 = at(a.b.longitude, R.houseRing);
+          // Izabrana planeta: njeni aspekti jaci, tudji skoro nestanu.
+          const njen = izabranaPlaneta !== null && (a.a.key === izabranaPlaneta || a.b.key === izabranaPlaneta);
+          const tudj = izabranaPlaneta !== null && !njen;
           return (
             <Line
               key={`a${i}`}
               x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
               stroke={st.color}
-              strokeWidth={st.width}
+              strokeWidth={njen ? st.width + 0.7 : st.width}
               strokeDasharray={st.dash}
-              opacity={0.65 + 0.35 * (1 - a.orb / a.aspect.orb)}
+              opacity={tudj ? 0.1 : njen ? 1 : 0.65 + 0.35 * (1 - a.orb / a.aspect.orb)}
             />
           );
         })}
@@ -280,7 +352,11 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
           // Izvedene tacke nemaju aspekte (pravilo 16), pa ni tacku.
           const tacka = showAspects && !p.izvedena ? at(p.longitude, R.houseRing) : null;
           return (
-            <G key={p.key}>
+            <G key={p.key} opacity={izabranaPlaneta !== null && izabranaPlaneta !== p.key ? 0.3 : 1}>
+              {izabranaPlaneta === p.key && (
+                <Circle cx={pos.x} cy={pos.y} r={15} fill={ISTAKNUTO} fillOpacity={0.12}
+                        stroke={ISTAKNUTO} strokeWidth={1.2} />
+              )}
               <Line x1={trueOuter.x} y1={trueOuter.y} x2={trueInner.x} y2={trueInner.y}
                     stroke={boja} strokeWidth={p.izvedena ? 0.9 : 1.2} />
               <Line x1={trueInner.x} y1={trueInner.y} x2={leadFrom.x} y2={leadFrom.y}
@@ -358,9 +434,11 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
             const a = at(lon, R.outer);
             const b = at(lon, R.outer + 7);
             const t = at(lon, R.outer + 16);
+            const izabran = izbor?.tip === 'ugao' && izbor.key === (label === rec.karta.asc ? 'ascendant' : 'midheaven');
             return (
               <G key={label}>
-                <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ugao} strokeWidth={1.5} />
+                {izabran && <Circle cx={t.x} cy={t.y} r={13} fill={ISTAKNUTO} fillOpacity={0.14} />}
+                <Line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS.ugao} strokeWidth={izabran ? 2.4 : 1.5} />
                 <SvgText x={t.x} y={t.y + 3.5} fontSize={9.5} fontFamily={fontUloge('tockUgao')}
                          fill={COLORS.ugao} textAnchor="middle">
                   {label}

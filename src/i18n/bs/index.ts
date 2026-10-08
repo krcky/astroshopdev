@@ -13,5 +13,6 @@ import { opste } from './opste';
 import { pitaj } from './pitaj';
 import { prica } from './prica';
 import { profil } from './profil';
+import { krug } from './krug';
 
-export const bs: Recnik = { opste, gramatika, datum, nebo, onboarding, profil, pitaj, prica, danas, karta };
+export const bs: Recnik = { opste, gramatika, datum, nebo, onboarding, profil, pitaj, prica, danas, karta, krug };

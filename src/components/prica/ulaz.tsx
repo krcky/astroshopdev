@@ -2,19 +2,24 @@ import * as React from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Animated, {
-  Easing, ReduceMotion, useAnimatedProps, useSharedValue, withDelay, withTiming, ZoomIn,
+  Easing, ReduceMotion, useAnimatedProps, useFrameCallback, useReducedMotion, useSharedValue, withDelay, withTiming, ZoomIn,
 } from 'react-native-reanimated';
-import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
 import { Text } from '@/components/ui/text';
 import { useT } from '@/i18n';
 import { Okret } from '@/components/okret';
+import { ZnakIkona } from '@/components/znak-ikona';
+import type { Element } from '@/lib/zodiac';
 import { Planeta, SLIKA, skalaSlike } from '@/components/planete-par';
 import { INDIGO, PRSTEN_PRELIV } from '@/components/prica/boje';
 import { dayKey } from '@/lib/transits';
 import { useAuthStore } from '@/store/auth';
 import { usePricaPogledana } from '@/store/prica-log';
-import { shadow } from '@/theme/tokens';
+import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
+import { neutral, shadow, size } from '@/theme/tokens';
+import { OKVIR_DUGMETA } from '@/components/ui/button';
 import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
 
@@ -166,5 +171,153 @@ export function Balon({ animiraj, natpis }: { animiraj: boolean; natpis?: string
         <Text className={cn('text-[13px] leading-[17px]', tezina('dugme'))}>{natpis ?? t.prica.ulaz.pricaDana}</Text>
       </Animated.View>
     </View>
+  );
+}
+
+/**
+ * ULAZ U DNEVNU PRICU U SREDINI KRUGA ZIVOTA (Ivan, 8.10.2026): prsten oko velikog znaka Sunca, desno
+ * dole manji znak podznaka (Ascendenta), ispod balon "Priča dana". Isto ponasanje kao `UlazUPricu`:
+ * dok danasnja prica nije pogledana prsten se puni i balon iskace pri svakom fokusu pocetne; posle
+ * stoje mirno do sutra. Dodir bilo gde u okviru otvara `/prica`.
+ *
+ * Mere su u pikselima, vec pomnozene razmerom kruga (`k`); `cx`, `cy` su sredina kruga u njegovom
+ * okviru. Okvir je `SIRINA_KRUG` sirok i visok koliko prsten + balon.
+ */
+export function UlazUKrug({ sunce, podznak, datum, k, cx, cy }: {
+  sunce: { key: string; element: Element; name: string };
+  podznak: { key: string; element: Element; name: string } | null;
+  datum: Date;
+  k: number;
+  cx: number;
+  cy: number;
+}) {
+  const t = useT();
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+  const pogledana = usePricaPogledana(userId, dayKey(datum));
+  const [ciklus, setCiklus] = React.useState(0);
+  useFocusEffect(React.useCallback(() => {
+    if (!pogledana) setCiklus((c) => c + 1);
+  }, [pogledana]));
+
+  const D = 57 * k;
+  const znak = 44 * k;
+  const bedz = 21 * k;
+  const SIRINA_OKVIRA = 120;
+  const visina = D;
+  return (
+    <Pressable
+      onPress={() => router.push('/prica')}
+      accessibilityRole="button"
+      accessibilityLabel={t.prica.ulaz.pricaDana}
+      accessibilityHint={t.prica.ulaz.hint}
+      style={{ position: 'absolute', left: cx - SIRINA_OKVIRA / 2, top: cy - D / 2, width: SIRINA_OKVIRA, height: visina }}
+      className="active:opacity-80">
+      <View pointerEvents="none" style={{ position: 'absolute', left: (SIRINA_OKVIRA - D) / 2, top: 0, width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
+        <Prsten key={pogledana ? 'miran' : `puni-${ciklus}`} puni={!pogledana} D={D} />
+        <ZnakIkona znak={sunce.key} element={sunce.element} size={znak} accessibilityLabel={t.krug.znakSunca(sunce.name)} />
+      </View>
+      {podznak && (
+        <View
+          pointerEvents="none"
+          className="absolute items-center justify-center rounded-pill bg-white"
+          style={{ left: SIRINA_OKVIRA / 2 + 33 * k - (bedz + 4 * k) / 2, top: D / 2 + 16 * k - (bedz + 4 * k) / 2, width: bedz + 4 * k, height: bedz + 4 * k }}>
+          <ZnakIkona znak={podznak.key} element={podznak.element} size={bedz} accessibilityLabel={t.krug.podznak(podznak.name)} />
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * DUGME "PRICA DANA" (Ivan, 8.10.2026) — PRVO u redu tabova pocetne (ispred "Tvoj dan"), staklena kapsula
+ * kao tabovi, ali nije tab: dodir otvara `/prica`. Dok danasnja prica nije pogledana, oko kapsule je
+ * preliv-obris (svetla ljubicasta -> indigo, kao nekadasnji prsten); posle pogleda obris nestaje.
+ * Meri se `onLayout`, pa obris prati sirinu natpisa u svakom jeziku.
+ */
+export function PricaDugme({ datum }: { datum: Date }) {
+  const t = useT();
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+  const pogledana = usePricaPogledana(userId, dayKey(datum));
+  const [m, setM] = React.useState({ w: 0, h: 0 });
+  const kapsula = { height: size.chip, borderRadius: size.chip / 2, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, paddingHorizontal: 16 };
+  const OBRIS = 2;
+  /** Obris je SPOLJA: staklo ga ne sece (bez `overflow: hidden`), a razmak do stakla je 0,5 pt; `VAN` = prostor za crtez oko stakla. */
+  const VAN = OBRIS + 2;
+  // Obris je DETE stakla (kao sadrzaj): `isInteractive` povecava staklo zajedno sa decom pri dodiru, pa obris raste s njim.
+  const sadrzaj = (
+    <>
+      <Svg width={12} height={12} viewBox="0 0 12 12"><Path d={PLAY} fill={INDIGO} /></Svg>
+      <Text variant="chip" numberOfLines={1}>{t.prica.ulaz.pricaDana}</Text>
+      {/* Meri se SAM sloj obrisa (ne `Pressable`): sirina stakla je razlomljena, pa je spoljna mera odsecala 1 px zdesna. */}
+      <View pointerEvents="none" onLayout={(e) => setM({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
+        style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }}>
+      {!pogledana && m.w > 0 && <ObrisKojiTece w={m.w} h={m.h} van={VAN} obris={OBRIS} />}
+      </View>
+    </>
+  );
+  return (
+    <Pressable
+      onPress={() => router.push('/prica')}
+      accessibilityRole="button"
+      accessibilityLabel={t.prica.ulaz.pricaDana}
+      accessibilityHint={t.prica.ulaz.hint}>
+      {isLiquidGlassAvailable() ? (
+        <GlassView glassEffectStyle="regular" colorScheme="light" isInteractive style={kapsula}>{sadrzaj}</GlassView>
+      ) : (
+        <View style={[kapsula, { backgroundColor: neutral.white }, OKVIR_DUGMETA]}>{sadrzaj}</View>
+      )}
+    </Pressable>
+  );
+}
+
+const ARect = Animated.createAnimatedComponent(Rect);
+/** Jedan krug obrisa traje 3,2 s; svetli luk je trecina obima. */
+const OBRIS_KRUG_MS = 3200;
+const LUK = 0.34;
+
+/**
+ * Preliv-obris oko dugmeta "Priča dana" (Ivan, 8.10.2026: da se pomera): blag stalni obris u prelivu, a po njemu tece
+ * jaci luk (trecina obima) u krug. Ukrasni pokret koji traje, pa po pravilu 17: samo na ekranu u fokusu, staje 20 s
+ * posle poslednjeg dodira (`useBudnost`), uz "Smanji pokrete" i u ustedi baterije stoji (obris miruje, bez luka koji tece).
+ * Crta se u SVG-u PREKO stakla, kao dete stakla — raste sa dugmetom pri dodiru.
+ */
+function ObrisKojiTece({ w, h, van, obris }: { w: number; h: number; van: number; obris: number }) {
+  const id = `prica-dugme-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const budan = useBudnost((s) => s.budan);
+  const usteda = useUstedaBaterije();
+  const bezPokreta = useReducedMotion();
+  const miruje = usteda || bezPokreta;
+  const napredak = useSharedValue(0);
+  const kadar = useFrameCallback((f) => {
+    napredak.set((napredak.get() + (f.timeSincePreviousFrame ?? 0) / OBRIS_KRUG_MS) % 1);
+  }, false);
+  useFocusEffect(React.useCallback(() => {
+    probudi();
+    if (miruje || !budan) return;
+    kadar.setActive(true);
+    return () => kadar.setActive(false);
+  }, [miruje, budan, kadar]));
+
+  const rw = w + 2 * (obris - 0.5);
+  const rh = h + 2 * (obris - 0.5);
+  const obim = 2 * (rw - rh) + Math.PI * rh;
+  const luk = obim * LUK;
+  const props = useAnimatedProps(() => ({ strokeDashoffset: -napredak.get() * obim }));
+  const x = van - obris + 0.5;
+  return (
+    <Svg width={w + 2 * van} height={h + 2 * van} pointerEvents="none" style={{ position: 'absolute', left: -van, top: -van }}>
+      <Defs>
+        <LinearGradient id={id} x1="0" y1="1" x2="1" y2="0">
+          <Stop offset="0" stopColor={PRSTEN_PRELIV[0]} />
+          <Stop offset="0.45" stopColor={PRSTEN_PRELIV[1]} />
+          <Stop offset="1" stopColor={PRSTEN_PRELIV[2]} />
+        </LinearGradient>
+      </Defs>
+      <Rect x={x} y={x} width={rw} height={rh} rx={rh / 2} fill="none" stroke={`url(#${id})`} strokeWidth={obris} opacity={miruje ? 1 : 0.4} />
+      {!miruje && (
+        <ARect x={x} y={x} width={rw} height={rh} rx={rh / 2} fill="none" stroke={`url(#${id})`} strokeWidth={obris}
+          strokeLinecap="round" strokeDasharray={[luk, obim - luk]} animatedProps={props} />
+      )}
+    </Svg>
   );
 }

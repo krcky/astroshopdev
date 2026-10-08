@@ -4,7 +4,11 @@ import { Redirect, router, useFocusEffect } from 'expo-router';
 import { CalendarDays, MapPin } from 'lucide-react-native';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
-import { NatalWheel } from '@/components/natal-wheel';
+import * as Haptics from 'expo-haptics';
+
+import { NatalWheel, pogodiNatalniTocak, polozajSimbola } from '@/components/natal-wheel';
+import { TockPopover } from '@/components/tocak-popover';
+import { istiPogodak, type Pogodak } from '@/lib/wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { IznadPreliva, Screen } from '@/components/screen';
@@ -58,6 +62,10 @@ export default function Sky() {
   const setIzabran = useSkyTimeStore((s) => s.setIzabran);
   const izaberiDan = useSkyTimeStore((s) => s.izaberiDan);
   const now = izabran ?? sada;
+  // Izabrano dodirom na tocak (8.10.2026); ostaje dok se vreme pomera, pa se vidi sta se menja.
+  const [izbor, setIzbor] = React.useState<Pogodak | null>(null);
+  // Gde je kartica sa detaljima (na krugu, pt).
+  const [sidro, setSidro] = React.useState<{ x: number; y: number } | null>(null);
 
   // Osvezavanje ide SAMO dok je ekran u fokusu i dok se gleda sadasnjost.
   // Tabovi ostaju montirani i kad se sa njih ode, pa bi obican `useEffect`
@@ -117,6 +125,17 @@ export default function Sky() {
   // (tesnoca x tezina tela), sto je redosled za izbor teksta, ne za citanje.
   const aspects = [...sky.aspects].sort((x, y) => x.orb - y.orb);
   const wheelSize = Math.min(width - 16, 430);
+  const izaberi = (p: Pogodak | null, tacka?: { x: number; y: number }) => {
+    if (!p) { setIzbor(null); setSidro(null); return; }
+    setIzbor(p);
+    setSidro((p.tip === 'planeta' ? polozajSimbola(p.key, { chart, size: wheelSize, points }) : null) ?? tacka ?? sidro);
+  };
+  const dodirTocka = (x: number, y: number) => {
+    const p = pogodiNatalniTocak(x, y, { chart, size: wheelSize, points });
+    const novi = p && !istiPogodak(p, izbor) ? p : null;
+    if (novi) Haptics.selectionAsync().catch(() => {});
+    izaberi(novi, { x, y });
+  };
 
   return (
     <Screen label={tn.naslov} padded={false} tint="pink" right={<ProfileButton />}>
@@ -125,7 +144,11 @@ export default function Sky() {
       <IznadPreliva
         className="-mt-3 items-center"
         velicina={{ w: wheelSize, h: wheelSize }}
-        podignuto={<NatalWheel chart={chart} size={wheelSize} points={points} />}>
+        onDodir={dodirTocka}
+        povrsina={izbor && sidro ? (
+          <TockPopover izbor={izbor} sidro={sidro} okvir={wheelSize} chart={chart} points={points} onIzbor={(p) => izaberi(p)} />
+        ) : undefined}
+        podignuto={<NatalWheel chart={chart} size={wheelSize} points={points} izbor={izbor} />}>
         {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
             linija, pa je legenda ispod liste uklonjena. */}
         <TockInfo velicina={wheelSize} onPress={() => router.push('/nebo-info')}

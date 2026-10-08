@@ -50,6 +50,7 @@ export const profil: Recnik['profil'] = {
     rucno: 'Ročno, samo na tem telefonu',
     prekidacOpis: 'Testno stikalo: uporabnik z naročnino',
     vratiNaServer: 'Vrni na stanje s strežnika',
+    pricaNepogledana: 'Zgodba dneva: označi kot negledano',
     jezik: 'Jezik',
     jezikIspod: 'Besedila astrologa so zaenkrat samo v srbščini.',
     nalogIspod: 'E-pošta in rojstni podatki',

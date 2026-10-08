@@ -3,6 +3,8 @@
  * da bi mogla da se testira u obicnom Node-u.
  */
 
+import { CENTAR, OKVIR, VIEW } from '@/lib/tocak-stil';
+
 const DEG = Math.PI / 180;
 
 /**
@@ -234,4 +236,121 @@ export function labelBlockWidth(digits = 2): number {
 /** Rastojanje izmedju dva susedna bloka na poluprecniku `r`, razmaknuta `sep` stepeni. */
 export function chordAt(r: number, sep: number): number {
   return 2 * r * Math.sin((sep * Math.PI) / 360);
+}
+
+/* ------------------------------------------------------------------------- *
+ * Dodir na tocak (8.10.2026): sta je korisnik pogodio.
+ * ------------------------------------------------------------------------- */
+
+/** Ono sto se na tocku moze izabrati dodirom. */
+export type Pogodak =
+  | { tip: 'planeta'; key: string }
+  | { tip: 'kuca'; broj: number }
+  | { tip: 'znak'; indeks: number }
+  | { tip: 'ugao'; key: 'ascendant' | 'midheaven' };
+
+/** Isti pogodak (za `===` u izboru): isti tip i ista vrednost. */
+export function istiPogodak(a: Pogodak | null, b: Pogodak | null): boolean {
+  if (!a || !b || a.tip !== b.tip) return false;
+  switch (a.tip) {
+    case 'planeta': return a.key === (b as typeof a).key;
+    case 'kuca': return a.broj === (b as typeof a).broj;
+    case 'znak': return a.indeks === (b as typeof a).indeks;
+    case 'ugao': return a.key === (b as typeof a).key;
+  }
+}
+
+/**
+ * Uglovi simbola na prstenu planeta posle razmicanja — jedno mesto za crtez i za
+ * pogodak, da se dodir uvek poklopi sa onim sto se vidi. `leva` je `levaTacka`.
+ */
+export function ugloviSimbola(longitudes: number[], leva: number, degrees: boolean): number[] {
+  const minSep = degrees ? LABEL_SEP : (longitudes.length > 11 ? 8.5 : 9.5);
+  return spreadAngles(longitudes.map((l) => chartAngle(l, leva)), minSep);
+}
+
+/**
+ * Isecak prstena (ili kruga, `r0` = 0) izmedju dva poluprecnika, od longitude
+ * `pocetak` za `raspon` stepeni — za isticanje kuce ili znaka. Longituda raste
+ * suprotno od kazaljke, pa je prvi luk `sweep = 0`, a povratni 1.
+ */
+export function isecakPutanja(
+  cx: number, cy: number, r0: number, r1: number, pocetak: number, raspon: number, leva: number
+): string {
+  const a0 = chartAngle(pocetak, leva);
+  const a1 = a0 + raspon;
+  const f = (p: { x: number; y: number }) => `${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+  const velik = raspon > 180 ? 1 : 0;
+  const p0 = polar(cx, cy, r1, a0);
+  const p1 = polar(cx, cy, r1, a1);
+  const p2 = polar(cx, cy, r0, a1);
+  const p3 = polar(cx, cy, r0, a0);
+  const unutra = r0 > 0 ? `L${f(p2)}A${r0} ${r0} 0 ${velik} 1 ${f(p3)}` : `L${f(polar(cx, cy, 0, a0))}`;
+  return `M${f(p0)}A${r1} ${r1} 0 ${velik} 0 ${f(p1)}${unutra}Z`;
+}
+
+/** Unutar kog poluprecnika planeta moze da se pogodi (donja granica: ispod su kuce). */
+const PLANETE_OD = WHEEL_R.houseRing + 4;
+/** Koliko ugaone tolerancije ima planeta; bez stepena su simboli blize, pa je i taj prozor uzi. */
+const TOLERANCIJA = { stepeni: LABEL_SEP / 2 + 0.5, bez: 5.5 };
+/** Natpis ASC / MC van kruga: poluprecnik sredine i koliko daleko od nje se jos pogadja. */
+const UGAO_NATPIS_R = WHEEL_R.outer + 16;
+const UGAO_NATPIS_DOSEG = 17;
+
+/**
+ * Sta je pogodjeno dodirom na (`x`, `y`) — tacke unutar tocka velicine `size`.
+ *
+ * Redosled: natpis ugla van kruga, prsten znakova, planeta (najblizi simbol po
+ * UGLU, jer su simboli razmaknuti bas po uglu), pa kuca. Prazno mesto na prstenu
+ * planeta pada na kucu ispod njega; mali krug u sredini i sve van tocka su `null`.
+ *
+ * `kuspide` je `null` kad tocak nema kuce (nepoznato vreme rodjenja): tada nema
+ * ni kuca ni uglova, a znakovi i planete rade kao i inace.
+ */
+export function pogodiTocak(x: number, y: number, o: {
+  size: number;
+  leva: number;
+  planete: { key: string; ugao: number }[];
+  degrees: boolean;
+  kuspide: number[] | null;
+  ascendant: number;
+  midheaven: number;
+}): Pogodak | null {
+  const k = VIEW / o.size;
+  const dx = x * k - OKVIR - CENTAR;
+  const dy = y * k - OKVIR - CENTAR;
+  const r = Math.hypot(dx, dy);
+  const ugao = Math.atan2(-dy, dx) / DEG;
+  const norm = (a: number) => ((a % 360) + 360) % 360;
+  const lon = norm(o.leva + (ugao - 180));
+
+  if (r > WHEEL_R.outer) {
+    if (!o.kuspide) return null;
+    for (const [key, l] of [['ascendant', o.ascendant], ['midheaven', o.midheaven]] as const) {
+      const t = polar(CENTAR, CENTAR, UGAO_NATPIS_R, chartAngle(l, o.leva));
+      if (Math.hypot(dx + CENTAR - t.x, dy + CENTAR - t.y) <= UGAO_NATPIS_DOSEG) return { tip: 'ugao', key };
+    }
+    return null;
+  }
+  if (r >= WHEEL_R.zodiacIn) return { tip: 'znak', indeks: Math.floor(lon / 30) % 12 };
+
+  if (r >= PLANETE_OD) {
+    const tol = o.degrees ? TOLERANCIJA.stepeni : TOLERANCIJA.bez;
+    let naj: { key: string; razlika: number } | null = null;
+    for (const p of o.planete) {
+      const razlika = Math.abs(((norm(ugao) - norm(p.ugao) + 540) % 360) - 180);
+      if (razlika <= tol && (!naj || razlika < naj.razlika)) naj = { key: p.key, razlika };
+    }
+    if (naj) return { tip: 'planeta', key: naj.key };
+  }
+
+  if (r >= WHEEL_R.hub && o.kuspide) {
+    const n = o.kuspide.length;
+    for (let i = 0; i < n; i++) {
+      const od = o.kuspide[i];
+      const raspon = norm(o.kuspide[(i + 1) % n] - od);
+      if (norm(lon - od) < raspon) return { tip: 'kuca', broj: i + 1 };
+    }
+  }
+  return null;
 }

@@ -57,6 +57,7 @@ export const profil = {
     rucno: 'Ručno, samo na ovom telefonu',
     prekidacOpis: 'Test prekidač: plaćeni korisnik',
     vratiNaServer: 'Vrati na stanje sa servera',
+    pricaNepogledana: 'Priča dana: vrati na nepogledanu',
     /** Izbor jezika (za sada samo u probnom buildu — tekstovi astrologa su jos samo na srpskom). */
     jezik: 'Jezik',
     jezikIspod: 'Tekstovi astrologa su za sada samo na srpskom.',

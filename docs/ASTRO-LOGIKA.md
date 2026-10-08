@@ -273,6 +273,7 @@ traje, ton. Važnost = jačina iz poglavlja 11. Bez oblasti i bez ocena — ocen
 samo na početnoj (kartica na slajdu „Danas ukratko"). ✅
 
 **Dve grupe (7.10.2026, Ivan):** lista je podeljena na **Kratkotrajne** (tranzitna planeta Mesec—Mars; dani i nedelje) i **Dugotrajne** (Jupiter—Pluton; nedelje, meseci, godine), kratkotrajni prvi. Podela je po planeti (`SPORE_PLANETE` u `lib/oblasti-config.ts`), ne po preostalim danima, da kartica ne bi prelazila iz grupe u grupu kako dan prolazi. Unutar grupe ostaje redosled po važnosti; granica za besplatne (prva 3) računa se po važnosti pre podele. PREDLOG, čeka astrologa.
+Besplatni (8.10.2026): zaključani redovi stoje u svojoj grupi, ispod otvorenih kartica te grupe. Veći red je naslov tumačenja (kao na kartici), ispod njega ime tranzita i „Traje još N"; bez naslova u korpusu ostaje ime.
 
 **Besplatni (od 29.9.2026):** ista lista, isti redosled. Prva **3** tranzita imaju karticu (naslov, kratak tekst na dodir), ostali se vide samo po imenu i trajanju, pod katancem. Do 29.9.2026 besplatni je imao stari prikaz sa svim kratkim tekstovima.
 
@@ -283,8 +284,9 @@ Besplatni i Premium vide **iste ekrane**; Premium otključava dubinu. Sve granic
 | Mesto | Besplatno | Premium |
 |---|---|---|
 | „Tvoj dan" | isti izbor, kratak tekst | ceo tekst |
-| Ocene oblasti | na početnoj samo Ljubav, ostale pod katancem; u priči dana sve četiri | sve četiri |
-| Ide ti / Koči te, Mesec danas, Promene na nebu | sve | sve |
+| Krug života (od 8.10.2026, poglavlje 12) | stanje i tačkice za svih osam oblasti; rečenica za danas, list oblasti i tranziti u njemu samo za Partner i Zdravlje, ostalih šest pod katancem | sve, plus narednih 7 dana i ceo tranzit |
+| Ocene četiri oblasti (poglavlje 11) | samo u priči dana (sve četiri, bez katanaca) | isto |
+| Mesec danas, Promene na nebu | sve | sve |
 | Tema perioda | prvi spori tranzit | svi |
 | Tab „Tranziti" | prva 3, ostali po imenu | svi |
 | Drugi dani (juče, sutra…) | ne | da |
@@ -478,3 +480,44 @@ Do 29.9.2026 ceo tekst je merio orbisom „Tvog dana" (1,5°) i pokazivao drugi 
 
 Provere: `npm run check:oblasti`. Pregled sa test kartom: `/dev-tranziti` (samo dev).
 
+## 12. Krug života: osam oblasti sa stanjem (od 8.10.2026) ⏳
+
+Zamenjuje na početnoj („Danas") kartu „Danas ukratko": četiri reda ocena i „Ide ti / Koči te" su sklonjeni sa početne (priča dana i kartica
+za deljenje ih i dalje imaju, jer ih računa isti kod iz poglavlja 11). **Sve vrednosti su u `src/lib/krug-config.ts`**, račun u `src/lib/krug.ts`.
+Sve je predlog i čeka potvrdu astrologa.
+
+**Izgled:** pravi krug podeljen na osam isečaka, u svakom staklena pločica sa oblašću, rečju stanja i tačkicama. Podloga kruga je svetla (tamni indigo je probano i odbijeno). Isečak se puni od sredine ka ivici srazmerno današnjoj oceni (1–5), JEDNOM bojom: svetla lila, jača što je ocena veća.
+Stanje kaže REČ na pločici, ne boja (boje po stanju — plava, roze — probane su i odbijene; po oblasti nikad, jer plava i roze već znače „ide ti" i „koči te"). U sredini je veliki znak Sunca
+sa prstenom priče dana (bez balona), desno dole manji znak podznaka (Asc); bez vremena rođenja podznaka nema (pravilo 5). Punjenje je preliv bez ravne linije: pun uz rupu u sredini, providan na kraju (dužina preliva je ocena). Izabrani isečak je indigo preliv preko celog isečka, pločica na njemu je belo staklo. Dodir na pločicu ili isečak bira oblast; ispod kruga
+je kartica sa stanjem, tačkicama i rečenicom za danas, a „Saznaj više" otvara list oblasti (stanje, „Šta utiče" sa tranzitima oblasti i, za Premium, ocena za narednih 7 dana).
+
+**Oblasti i veza** (redosled je i redosled na krugu, od vrha u smeru kazaljke). Veza se računa kao u poglavlju 11 (kuća 1,0, slabija kuća 0,5, planeta 0,5):
+
+| Oblast | Kuće | Slabije kuće | Planete oblasti |
+|---|---|---|---|
+| Karijera | 10 | 6 | Saturn, Jupiter, MC |
+| Finansije | 2 | 8 | Venera, Jupiter |
+| Zdravlje | 1, 6 | | Sunce, Mars, Asc |
+| Porodica | 4 | | Mesec, Saturn |
+| Partner | 7 | | Venera, Mesec, Mars |
+| Lični razvoj | 9, 12 | | Jupiter, Neptun |
+| Zabava | 5 | | Venera, Sunce |
+| Prijateljstvo | 3, 11 | | Merkur, Uran |
+
+Pokrivene su sve 12 kuća (kuća 8 samo kao slabija veza Finansija). **Pitanja za astrologa:** da li je 2. kuća u Finansijama ili u Karijeri; da li 8. kuća uvlači
+tranzite o emocijama u Finansije (Pluton–Mesec); gde ide 5. kuća (romansa) — sada je u Zabavi, pa je „Partner" bez nje; da li je Lični razvoj dovoljno različit od
+Zabave i Prijateljstva; naziv „Zdravlje" ili „Telo i energija" (zdravstveni saveti, Apple).
+
+**Ocena i stanje:** ocena oblasti za jedan dan je ista kao u poglavlju 11 (3 + zbir doprinosa, 1–5, simetrično zaokruženo). **Tačkice su današnja
+ocena.** **Stanje** je prosek ocena za tri dana (juče, danas, sutra), simetrično zaokružen oko 3: 1 Pritisak, 2 Oprez, 3 Mirno, 4 Raste, 5 Procvat. Prozor od tri dana
+je izabran merenjem: sa dnevnom ocenom se oblast menja svaka ~3 dana (stanje bi skakalo), sa prozorom od 3 dana otprilike jednom u 4 dana, a bar jedna od osam
+oblasti se menja u 79% dana (sa 7 dana bi bilo 60%, a stanje bi stajalo nedelju i po).
+
+**Rečenica za danas — PRIVREMENO:** kratka rečenica astrologa o NAJJAČEM tranzitu oblasti (`positive` za povoljan, `challenge` za izazovan; mešoviti i Mlad/Pun Mesec se
+preskaču); `src/lib/krug-tekst.ts`. Tekst tranzita je pisan za tranzit uopšte, ne za oblast, pa ume da ne pogodi temu (Finansije dobiju rečenicu o emocijama). Zato je
+pripremljena tabela `Recenice-oblasti-za-astrologa.xlsx` (144 rečenice planeta × oblast × ton + 8 neutralnih + reči stanja); kad stignu, menja se samo `recenicaOblasti`.
+
+**Merenje (simulacija na 24 karte, godinu dana):** sa kućama i planetama oblast nije neutralna 56–73% dana; samo sa kućama Porodica, Partner i Zabava stoje na 3 više od
+60% dana (po 240–280 dana zaredom isti tekst), a bez vremena rođenja ostaju na 3 cele godine — planete drže oblast živom.
+
+Besplatni: `BESPLATNO.krug` = Partner i Zdravlje (potpuno otvoreni), ostale oblasti pokazuju stanje i tačkice, a ostalo je pod katancem. Provere: `npm run check:krug`.

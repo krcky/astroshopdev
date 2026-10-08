@@ -100,6 +100,17 @@ export const karta: Recnik['karta'] = {
       `${naslov ? `${naslov}. ` : ''}${ime}${zakljucan ? '. Locked' : ''}. Reading`,
   },
 
+  /** `components/tocak-kartica.tsx` — Item picked by tapping the wheel ("You" and Sky). */
+  tockDodir: {
+    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida). */
+    pocinjeU: 'Starts in',
+    uOvojKuci: 'In this house',
+    uOvomZnaku: 'Planets in this sign',
+    prazno: 'No planets',
+    procitaj: 'Read',
+    zatvori: 'Close',
+  },
+
   /** `app/(tabs)/sky/index.tsx` — "The sky right now". */
   nebo: {
     naslov: 'The sky right now',

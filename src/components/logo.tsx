@@ -114,11 +114,13 @@ export function LogoKrug({ ref, size, onSpreman }: {
  * mirovanja, na 120 Hz). Vraca `pusti` za `onLayout` (iOS, vidi gore) — pusta samo
  * kad krug sme da se vrti, inace bi krenuo i krug skrivenog taba.
  */
-function useKrugKojiMiruje(krug: React.RefObject<LottieView | null>) {
-  const budan = useBudnost((s) => s.budan);
+function useKrugKojiMiruje(krug: React.RefObject<LottieView | null>, { mirno = false, stalno = false }: { mirno?: boolean; stalno?: boolean } = {}) {
+  const budanZaPokret = useBudnost((s) => s.budan);
+  // `stalno`: vrti se i kad korisnik miruje (krug u sredini kruga zivota, Ivan, 8.10.2026). `mirno`: nikad se ne vrti (logo u zaglavlju pocetne).
+  const budan = budanZaPokret || stalno;
   const usteda = useUstedaBaterije();
   const bezPokreta = useReducedMotion();
-  const miruje = usteda || bezPokreta;
+  const miruje = usteda || bezPokreta || mirno;
   const sme = React.useRef(false);
 
   // Svaki put kad ekran dodje u fokus (promena taba, povratak sa drugog ekrana)
@@ -152,9 +154,16 @@ function useKrugKojiMiruje(krug: React.RefObject<LottieView | null>) {
  * zaglavlje (`Logo`) i dobrodoslica, iznad naslova (Ivan, 29.9.2026). Ukras je —
  * ime cita natpis pored ili ispod njega.
  */
-export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: string }) {
+export function KrugLoga({ size = LOGO_SIZE, color, mirno = false, stalno = false }: {
+  size?: number;
+  color?: string;
+  /** Ne vrti se nikad (logo u zaglavlju pocetne — Ivan, 8.10.2026: animira se samo veliki krug u sredini). */
+  mirno?: boolean;
+  /** Vrti se STALNO, ne staje posle mirovanja (veliki krug u sredini kruga zivota). Uz "Smanji pokrete" i ustedu baterije i dalje stoji. */
+  stalno?: boolean;
+}) {
   const krug = React.useRef<LottieView>(null);
-  const pusti = useKrugKojiMiruje(krug);
+  const pusti = useKrugKojiMiruje(krug, { mirno, stalno });
 
   return (
     // Omotac nosi skrivanje od citaca ekrana — LottieView ta svojstva ne prima.
@@ -179,13 +188,13 @@ export function KrugLoga({ size = LOGO_SIZE, color }: { size?: number; color?: s
  * Ivan 26.9.2026); bez nje krug je brend indigo (`KRUG_INDIGO`). Ide kroz Lottie
  * `colorFilters` po imenu sloja, pa JSON ostaje jedan.
  */
-export function Logo({ title: naslov, full = false, color }: { title?: string; full?: boolean; color?: string }) {
+export function Logo({ title: naslov, full = false, color, mirno = false }: { title?: string; full?: boolean; color?: string; mirno?: boolean }) {
   const t = useT();
   const title = naslov ?? t.opste.imeAplikacije;
   // Pun logo ima svoj Lottie; krug sam (`KrugLoga`) vodi svoje okretanje. Kuka je
   // ovde bezuslovna (pravilo kuka), a bez punog loga ref je prazan pa ne radi nista.
   const krug = React.useRef<LottieView>(null);
-  const pusti = useKrugKojiMiruje(krug);
+  const pusti = useKrugKojiMiruje(krug, { mirno });
 
   if (full) {
     return (
@@ -216,7 +225,7 @@ export function Logo({ title: naslov, full = false, color }: { title?: string; f
       style={{ gap: GAP, transform: [{ translateY: -5 }] }}
       accessibilityRole="header"
       accessibilityLabel={title}>
-      <KrugLoga color={color} />
+      <KrugLoga color={color} mirno={mirno} />
       <Text className={cn('text-[24px] leading-[30px] tracking-[-0.3px]', tezina('naslovStrane'))} numberOfLines={1}>{title}</Text>
     </View>
   );

@@ -7,11 +7,10 @@ import type { NativeStackHeaderItem } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Screen, VRH_ANDROID } from '@/components/screen';
 import { KapsuleRed } from '@/components/ui/kapsule';
-import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
+import { PricaDugme } from '@/components/prica/ulaz';
 import { GlassBubble } from '@/components/ui/glass-button';
-import { CARD_SURFACE } from '@/components/ui/card';
-import { buildPersonalDaily, formatDate, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
-import { Calendar, Check, ChevronRight, Lock, Minus, Plus, UserRound } from 'lucide-react-native';
+import { buildPersonalDaily, formatDate, formatDatumKratko, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
+import { Calendar, Check, Lock, UserRound } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerBar, neutral, shadow, size, space } from '@/theme/tokens';
 import { Logo } from '@/components/logo';
@@ -26,15 +25,18 @@ import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { OZNAKA_12, TvojDanCard } from '@/components/tvoj-dan-card';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { PromenaNaNebu } from '@/components/promena-na-nebu';
-import { OceneOblasti } from '@/components/ocena-oblasti';
+import { KrugZivota } from '@/components/krug-zivota';
+import { OblastKartica } from '@/components/oblast-kartica';
 import { KarticaTranzita } from '@/components/tranziti-lista';
 import { chartRulers, rulerRole } from '@/lib/rulers';
 import { transitTone } from '@/lib/tone';
 import { trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
 import type { NatalChart } from '@/lib/natal';
-import { useOblastiDana } from '@/lib/use-oblasti';
+import { useKrug } from '@/lib/use-krug';
+import { recenicaOblasti } from '@/lib/krug-tekst';
+import { KRUG, type KrugKey } from '@/lib/krug-config';
 import { useDanas } from '@/store/danas';
-import { pickBrief, type Transit } from '@/lib/transits';
+import { dayKey, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
@@ -101,45 +103,64 @@ export default function Home() {
       : null),
     [resolved, date, tvojDanLog, today]
   );
-  // "Danas ukratko" izostavlja tranzit iz "Tvog dana".
-  const brief = React.useMemo(
-    () => (daily ? pickBrief(daily.entries.map((e) => e.transit), tvojDan?.contentKey ?? null) : null),
-    [daily, tvojDan]
-  );
-  // Ocene oblasti — isti `useOblastiDana` kao lista na tabu "Tranziti".
-  // Besplatni vidi ocenu samo za `BESPLATNO.oblasti`, ostale pod katancem.
-  const oblasti = useOblastiDana(resolved, date);
+  // KRUG ZIVOTA (Ivan, 8.10.2026): osam oblasti, stanje iz proseka tri dana, tackice su danasnje.
+  // Zamenjuje "Danas ukratko" (ocene cetiri oblasti i "Ide ti / Koci te"). Besplatni: potpuno otvorene
+  // su oblasti iz `BESPLATNO.krug`, ostale imaju katanac (stanje i tackice vide svi).
+  const { rez: krug } = useKrug(resolved, date);
+  const [izabranaOblast, setIzabranaOblast] = React.useState<KrugKey>(BESPLATNO.krug[0] ?? KRUG[0].key);
+  // Recenice za danas: kratki tekst najjaceg tranzita svake oblasti (`lib/krug-tekst.ts`, privremeno).
+  const krugKljucevi = React.useMemo(() => {
+    const k = new Set<string>();
+    for (const o of krug?.oblasti ?? []) {
+      for (const s of o.stavke.slice(0, 3)) if (s.red.kind === 'tranzit') k.add(s.red.key);
+    }
+    return [...k];
+  }, [krug]);
+  const { texts: krugTekstovi } = useTransitTexts(krugKljucevi);
 
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved || !daily) return <Redirect href="/" />;
 
-  // Grupe sazetka se racunaju ovde, ne u kartici: karusel mora unapred da zna
-  // da li kartica uopste ima sta da pokaze.
-  const b = brief ?? daily.brief;
-  const briefGroups = {
-    ide: saTekstom(b.ide, texts, 'positive'),
-    koci: saTekstom(b.koci, texts, 'challenge'),
-  };
-
-  // Ukratko — ide ti / koci te. Sta ulazi bira `pickBrief`. Iznad sazetka zbijena
-  // kartica sa ocenama oblasti (Ivan, 28.9.2026 — umesto zasebnog slajda "Oblasti danas").
-  // Bez naslova iznad kartice: "Danas ukratko" je U kartici, istim pismom kao "Ide ti".
-  const ukratko = briefGroups.ide.length > 0 || briefGroups.koci.length > 0 || oblasti ? (
-    <Brief
-      {...briefGroups}
-      naslov={offset === 0 ? p.danasUkratko : p.ukratko}
-      vrh={oblasti ? <OceneOblasti rez={oblasti} bare otkljucane={premium ? undefined : BESPLATNO.oblasti} /> : null}
-    />
-  ) : null;
-
   // Sadrzaj svakog taba — redosled isti kao nekadasnji slajdovi karusela.
   // Tab bez sadrzaja kaze to recenicom; tabovi se ne sklanjaju (red bi skakao).
   const sadrzaj: Record<TabPocetne, React.ReactNode> = {
-    // "Tvoj dan" (`lib/tvoj-dan.ts`), a ispod njega "Danas ukratko".
-    danas: tvojDan || ukratko ? (
+    // Krug zivota (`components/krug-zivota.tsx`), ispod njega kartica izabrane oblasti, pa "Tvoj dan"
+    // (`lib/tvoj-dan.ts`). Prica dana je u sredini kruga, ne vise oko planete "Tvog dana".
+    danas: krug || tvojDan ? (
       <View>
-        {tvojDan && <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} aktivan={tab === 'danas'} />}
-        {ukratko && <View className={tvojDan ? 'mt-3' : undefined}>{ukratko}</View>}
+        {krug && (
+          <>
+            {/* Naslov i datum iznad kruga, ISTIM pismom kao ranije "Tvoj dan · datum" (Ivan, 8.10.2026). */}
+            <Text variant="oznaka" className={cn(OZNAKA_12, 'mb-4')}>
+              {offset === 0 ? t.krug.naslov : t.krug.naslovDrugiDan}{'\u00A0\u00A0·\u00A0\u00A0'}{formatDatumKratko(date)}
+            </Text>
+            <KrugZivota
+              rez={krug}
+              izabrana={izabranaOblast}
+              onIzbor={setIzabranaOblast}
+              otkljucane={premium ? undefined : BESPLATNO.krug}
+            />
+            {(() => {
+              const o = krug.oblasti.find((x) => x.def.key === izabranaOblast) ?? krug.oblasti[0];
+              return (
+                // Kartica malo ULAZI preko donje ivice kruga (Ivan, 8.10.2026); plocica je ~20 pt iznad ivice, pa je ne pokriva.
+                <View className="mt-3">
+                  <OblastKartica
+                    oblast={o}
+                    otvorena={premium || BESPLATNO.krug.includes(o.def.key)}
+                    recenica={recenicaOblasti(o, krugTekstovi)}
+                    onSaznaj={() => router.push({ pathname: '/oblast', params: { k: o.def.key, day: dayKey(date) } })}
+                  />
+                </View>
+              );
+            })()}
+          </>
+        )}
+        {tvojDan && (
+          <View className={krug ? 'mt-3' : undefined}>
+            <TvojDanCard pick={tvojDan} date={date} isToday={offset === 0} chart={resolved.chart} aktivan={tab === 'danas'} />
+          </View>
+        )}
       </View>
     ) : <Prazno>{p.nemaTranzitaDana}</Prazno>,
     // Lunarni kalendar je besplatan za sve.
@@ -167,7 +188,7 @@ export default function Home() {
     <View style={{ flex: 1 }}>
     {/* Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`. */}
     <Screen
-      label={<Logo />}
+      label={<Logo mirno />}
       // Gore desno: dan-meni i profil. Na iOS-u su to NATIVE stavke trake
       // (`unstable_headerRightItems` dole): UIMenu sa zamucenjem na dodir,
       // Liquid Glass dugmad (Ivan, 26.9.2026). Android nema tu traku, pa dobija
@@ -273,7 +294,7 @@ export default function Home() {
           nijansom preliva (Ivan, 30.9.2026 — podignute iznad preliva, cisto bele, probane
           istog dana i vracene: "ipak da budu providni"). */}
       <View className="pt-4">
-        <KapsuleRed tabovi stavke={tabovi(t)} izabrana={tab} onIzbor={izaberiTab} />
+        <KapsuleRed tabovi pocetak={<PricaDugme datum={date} />} stavke={tabovi(t)} izabrana={tab} onIzbor={izaberiTab} />
       </View>
       <Animated.View key={tab} entering={ODOZDO} className="pt-7">
         {sadrzaj[tab]}
@@ -400,93 +421,6 @@ function DayMenu({ today, offset, onChange, zakljucan, opis }: {
   );
 }
 
-
-/**
- * Do tri reda koja IMAJU tekst; tranziti bez teksta se preskacu, ne izmisljaju.
- * Ako nijedan nema tekst a kandidata ima, vracaju se prva tri BEZ recenice —
- * grupa tada pokazuje sta je napeto (ili skladno) i priznaje da tumacenja nema,
- * umesto da nestane sa ekrana.
- */
-function saTekstom(list: Transit[], texts: Texts, polje: 'positive' | 'challenge') {
-  const out: { t: Transit; recenica: string | null }[] = [];
-  for (const t of list) {
-    const recenica = texts.get(t.contentKey)?.[polje];
-    if (recenica) out.push({ t, recenica });
-    if (out.length === 3) break;
-  }
-  if (out.length === 0) return list.slice(0, 3).map((t) => ({ t, recenica: null }));
-  return out;
-}
-
-type Redovi = { t: Transit; recenica: string | null }[];
-
-function Brief({ ide, koci, vrh = null, naslov }: { ide: Redovi; koci: Redovi; vrh?: React.ReactNode; naslov?: string }) {
-  const t = useT();
-  // Dve grupe jedna ispod druge, razdvojene linijom od ivice do ivice: "ide ti" sa
-  // plusom, "koci te" sa minusom; samo recenice, bez imena tranzita (Ivan, 26.9.2026).
-  // Boje ikona su Ivanove — jedino mesto boje na kartici, ikona je mala.
-  // Svaki red je za sebe dodir i vodi na tumacenje tog tranzita; strelica to kaze.
-  // Naslov "Danas ukratko" je U PRVOJ kartici, istim pismom kao "Ide ti" (`h3`) —
-  // Ivan, 29.9.2026; ranije sitna oznaka iznad kartica. Kartice su razmaknute 12pt,
-  // isto kao od kartice "Tvog dana" iznad.
-  const zaglavlje = naslov ? <Text variant="h3" className="px-4 pt-4" accessibilityRole="header">{naslov}</Text> : null;
-  return (
-    <View>
-      {!!vrh && (
-        <View className={CARD_SURFACE}>
-          {zaglavlje}
-          {/* Ocene imaju svoj gornji razmak (14pt); ispod naslova je dovoljno 10, kao u "Ide ti". */}
-          <View className={zaglavlje ? '-mt-1' : undefined}>{vrh}</View>
-        </View>
-      )}
-      {ide.length > 0 && (
-        <View className={cn(CARD_SURFACE, !!vrh && 'mt-3')}>
-          {!vrh && zaglavlje}
-          <Grupa naslov={t.danas.pocetna.ideTi} ikona={<Plus size={16} color={PLUS} strokeWidth={3} />} redovi={ide} />
-        </View>
-      )}
-      {koci.length > 0 && (
-        <View className={cn(CARD_SURFACE, (!!vrh || ide.length > 0) && 'mt-3')}>
-          {!vrh && ide.length === 0 && zaglavlje}
-          <Grupa naslov={t.danas.pocetna.kociTe} ikona={<Minus size={16} color={MINUS} strokeWidth={3} />} redovi={koci} />
-        </View>
-      )}
-    </View>
-  );
-}
-
-// Iste boje nosi i ton na tabu "Tranziti" (`components/ton.tsx`).
-const PLUS = PLUS_BOJA;
-const MINUS = MINUS_BOJA;
-
-// Zbijeno (Ivan, 28.9.2026): manji okvir i razmak medju redovima.
-function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: Redovi }) {
-  const { imeNatalni } = useT().danas.tranzit;
-  return (
-    <View className="px-4 py-4">
-      <View className="mb-1 flex-row items-center gap-1.5">
-        {ikona}
-        <Text variant="h3">{naslov}</Text>
-      </View>
-      {redovi.map(({ t, recenica }) => (
-        <Pressable
-          key={t.contentKey}
-          onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
-          accessibilityRole="button"
-          accessibilityLabel={`${recenica ?? ''} ${imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}`.trim()}
-          className="flex-row items-center gap-3 py-1.5 active:opacity-60">
-          {recenica ? (
-            <Text variant="default" className="flex-1">{recenica}</Text>
-          ) : (
-            // Bez teksta ostaje samo ime tranzita, sivo — jedino sto se o njemu zna.
-            <Text variant="muted" className="flex-1">{imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}</Text>
-          )}
-          <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} />
-        </Pressable>
-      ))}
-    </View>
-  );
-}
 
 /**
  * Promene na nebu: do tri planete, svaka sa prvim sledecim dogadjajem —

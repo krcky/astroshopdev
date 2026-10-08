@@ -10,6 +10,7 @@
  * (pravilo 8) — ne sakrivaju se ovde.
  */
 import type { OblastKey } from '@/lib/oblasti-config';
+import type { KrugKey } from '@/lib/krug-config';
 
 export const BESPLATNO = {
   /** Tab "Tranziti": prvih N kartica; ostali su zakljucani redovi sa imenom. */
@@ -18,6 +19,11 @@ export const BESPLATNO = {
   temaPerioda: 1,
   /** Ocene oblasti na "Danas ukratko": ocena se vidi samo za ove, ostale su pod katancem. */
   oblasti: ['ljubav'] as readonly OblastKey[],
+  /**
+   * KRUG ZIVOTA na pocetnoj (Ivan, 8.10.2026): stanje i tackice vide SVI za svih osam oblasti;
+   * recenica za danas, list oblasti i tranziti u njemu samo za ove dve. Ostale: katanac na plocici.
+   */
+  krug: ['partner', 'zdravlje'] as readonly KrugKey[],
   /**
    * Dan-meni (juce, sutra, ±2 dana) — besplatni otvara samo danas. Kalendar ipak
    * vidi: ostali dani stoje u meniju sa katancem i vode na paywall (Ivan, 29.9.2026).

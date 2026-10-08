@@ -172,10 +172,10 @@ function Plejer({ p, uvod, onDalje }: { p: PricaDana; uvod: boolean; onDalje: ()
     ceka.set(0);
   }, [n, W, H, napredak, trajanje, indeks, ceka, p.trajanja, slike]);
 
-  // Poslednja slika = prica pogledana.
+  // Pogledana = OTVORENA (Ivan, 8.10.2026: "kliknuo da pogledam", ne "odgledao do kraja"); do tada poslednja slika.
   React.useEffect(() => {
-    if (i === n - 1 && userId) oznaci(userId, p.dan);
-  }, [i, n, userId, oznaci, p.dan]);
+    if (userId) oznaci(userId, p.dan);
+  }, [userId, oznaci, p.dan]);
 
   const krajSlike = React.useCallback(() => { idi(tekuca.current + 1); }, [idi]);
 

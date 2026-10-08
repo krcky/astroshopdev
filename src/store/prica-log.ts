@@ -1,5 +1,5 @@
 /**
- * Dnevnik dnevne price: koji dan je prica POGLEDANA (korisnik je stigao do poslednje slike).
+ * Dnevnik dnevne price: koji dan je prica POGLEDANA (korisnik je OTVORIO pricu; od 8.10.2026 ne mora da je odgleda do kraja).
  *
  * Od toga zavisi ulaz na pocetnoj (`components/prica/ulaz.tsx`): dok prica nije
  * pogledana, prsten se puni i balon iskace svaki put kad se pocetna otvori; posle
@@ -19,9 +19,11 @@ const KEEP_DAYS = 7;
 
 type State = {
   userId: string | null;
-  /** dan (`dayKey`) -> pogledana */
+  /** dan (`dayKey`) -> pogledana (otvorena) */
   pogledano: Record<string, true>;
   oznaci: (userId: string, day: string) => void;
+  /** Samo za probni build (profil, Test): vrati dan na nepogledan. */
+  ponisti: (day: string) => void;
   clear: () => void;
 };
 
@@ -38,6 +40,10 @@ export const usePricaLog = create<State>()(
         for (const d of Object.keys(prev)) if (daysBetween(d, today) <= KEEP_DAYS) next[d] = true;
         next[day] = true;
         set({ userId, pogledano: next });
+      },
+      ponisti: (day) => {
+        const { [day]: _, ...ostalo } = get().pogledano;
+        set({ pogledano: ostalo });
       },
       clear: () => set({ userId: null, pogledano: {} }),
     }),

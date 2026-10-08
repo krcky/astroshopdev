@@ -66,6 +66,17 @@ export const karta: Recnik['karta'] = {
       `${naslov ? `${naslov}. ` : ''}${ime}${zakljucan ? '. Zaključano' : ''}. Tumačenje`,
   },
 
+  /** `components/tocak-kartica.tsx` — Točka odabrana dodirom na krug. */
+  tockDodir: {
+    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida). */
+    pocinjeU: 'Počinje u',
+    uOvojKuci: 'U ovoj kući',
+    uOvomZnaku: 'Planeti u ovom znaku',
+    prazno: 'Nema planeta',
+    procitaj: 'Pročitaj',
+    zatvori: 'Zatvori',
+  },
+
   nebo: {
     naslov: 'Trenutačno na nebu',
     infoA11y: 'Što je trenutačno nebo?',

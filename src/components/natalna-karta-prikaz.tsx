@@ -3,8 +3,12 @@ import { Pressable, useWindowDimensions, View } from 'react-native';
 import { ChevronDown, ChevronRight, ChevronUp, Lock } from 'lucide-react-native';
 import { router } from 'expo-router';
 
-import { NatalWheel } from '@/components/natal-wheel';
+import * as Haptics from 'expo-haptics';
+
+import { NatalWheel, pogodiNatalniTocak, polozajSimbola } from '@/components/natal-wheel';
 import { IznadPreliva } from '@/components/screen';
+import { TockPopover } from '@/components/tocak-popover';
+import { istiPogodak, type Pogodak } from '@/lib/wheel';
 import { Text } from '@/components/ui/text';
 
 import { cn } from '@/lib/utils';
@@ -76,6 +80,10 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   const zakljucan = (k: string) => !premium && !isFreeNatalKey(k);
   // Rasklopljena planeta; Sunce je otvoreno na ulazu, kao na sajtu.
   const [otvorena, setOtvorena] = React.useState<string | null>('sun');
+  // Izabrano dodirom na tocak (8.10.2026). Planeta je i rasklopljen red ispod — vidi `dodirTocka`.
+  const [izbor, setIzbor] = React.useState<Pogodak | null>(null);
+  // Gde je kartica sa detaljima (na krugu, pt); `null` = izbor je samo istaknut, bez kartice (iz liste).
+  const [sidro, setSidro] = React.useState<{ x: number; y: number } | null>(null);
   const mesecZnak = React.useMemo<MoonSign | null>(() => {
     if (resolved.timeUnknown) return moonSignForUnknownTime(resolved.utc);
     const m = resolved.chart.planets.find((x) => x.key === 'moon');
@@ -93,7 +101,24 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   const b = profile.birth;
   const t = profile.time;
   const wheelSize = Math.min(width - 16, 430);
+
+  // Dodir na tocak: izabrano se istice na krugu, a detalji su u staklenoj kartici kod dodirnutog
+  // mesta (`TockPopover`); dodir na isto ili na prazno skida izbor. Planeta sa kruga rasklopi
+  // svoj red u listi, a red iz liste samo ISTICE planetu na krugu (kartica bez dodira ne iskace).
+  const sidroPlanete = (key: string) => polozajSimbola(key, { chart, size: wheelSize, bezKuca: timeUnknown });
+  const izaberi = (p: Pogodak | null, tacka?: { x: number; y: number }) => {
+    if (!p) { setIzbor(null); setSidro(null); return; }
+    setIzbor(p);
+    setSidro((p.tip === 'planeta' ? sidroPlanete(p.key) : null) ?? tacka ?? sidro);
+    if (p.tip === 'planeta' && chart.planets.some((x2) => x2.key === p.key)) setOtvorena(p.key);
+  };
   const sunce = chart.planets.find((x) => x.key === 'sun')!;
+  const dodirTocka = (x: number, y: number) => {
+    const p = pogodiNatalniTocak(x, y, { chart, size: wheelSize, bezKuca: timeUnknown });
+    const novi = p && !istiPogodak(p, izbor) ? p : null;
+    if (novi) Haptics.selectionAsync().catch(() => {});
+    izaberi(novi, { x, y });
+  };
 
   return (
     <>
@@ -111,7 +136,19 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           className="-mt-3 items-center"
           // Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5).
           velicina={{ w: wheelSize, h: wheelSize }}
-          podignuto={<NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} />}>
+          onDodir={dodirTocka}
+          povrsina={izbor && sidro ? (
+            <TockPopover
+              izbor={izbor}
+              sidro={sidro}
+              okvir={wheelSize}
+              chart={chart}
+              bezKuca={timeUnknown}
+              onIzbor={(p) => izaberi(p)}
+              onProcitaj={(tema) => otvori(tema)}
+            />
+          ) : undefined}
+          podignuto={<NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} izbor={izbor} />}>
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}
           <TockInfo velicina={wheelSize} onPress={() => router.push('/natalna-karta-info')}
@@ -182,7 +219,13 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
                   planeta={p}
                   topic={topic}
                   otvoren={otvorena === p.key}
-                  onToggle={() => setOtvorena(otvorena === p.key ? null : p.key)}
+                  onToggle={() => {
+                    const otvaram = otvorena !== p.key;
+                    setOtvorena(otvaram ? p.key : null);
+                    // Rasklopljen red = ta planeta je istaknuta i na krugu.
+                    if (otvaram) { setIzbor({ tip: 'planeta', key: p.key }); setSidro(null); }
+                    else if (izbor?.tip === 'planeta' && izbor.key === p.key) { setIzbor(null); setSidro(null); }
+                  }}
                   naslovi={naslovi}
                   zakljucan={zakljucan}
                   otvori={otvori}

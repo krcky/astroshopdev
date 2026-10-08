@@ -159,6 +159,9 @@ export default function RootLayout() {
                   {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice
                       nazad (Ivan, 29.9.2026). SIVA pozadina: na njemu su bele kartice. */}
                   <Stack.Screen name="moon" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  {/* List oblasti kruga zivota (Ivan, 8.10.2026): "Saznaj više" sa kartice ispod kruga na pocetnoj.
+                      SIV, jer su na njemu bele kartice tranzita (pravilo 17). */}
+                  <Stack.Screen name="oblast" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
                   {/* Dnevna prica (Ivan, 30.9.2026): preko celog ekrana, PROVIDNA — pri povlacenju
                       nadole ispod se vidi pocetna. Ulaz i zatvaranje animira sama (`app/prica.tsx`). */}
                   <Stack.Screen

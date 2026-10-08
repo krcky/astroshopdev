@@ -55,6 +55,7 @@ export const profil: Recnik['profil'] = {
     rucno: 'Manual, on this phone only',
     prekidacOpis: 'Test switch: paid user',
     vratiNaServer: 'Reset to server state',
+    pricaNepogledana: 'Daily story: mark as unseen',
     jezik: 'Language',
     jezikIspod: 'Astrologer readings are only in Serbian for now.',
     nalogIspod: 'Email and birth details',

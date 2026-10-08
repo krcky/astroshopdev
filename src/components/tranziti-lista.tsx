@@ -67,16 +67,17 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
   const otvoreni = besplatno === undefined ? rez.poVaznosti : rez.poVaznosti.slice(0, besplatno);
   const zakljucani = rez.poVaznosti.slice(otvoreni.length);
 
-  const grupe = React.useMemo(() => {
-    const dugo = otvoreni.filter((x) => SPORE_PLANETE.includes(x.red.transiting.key));
-    const kratko = otvoreni.filter((x) => !SPORE_PLANETE.includes(x.red.transiting.key));
-    return [
-      { naslov: t.danas.tranziti.kratkotrajni, redovi: kratko },
-      { naslov: t.danas.tranziti.dugotrajni, redovi: dugo },
-    ].filter((g) => g.redovi.length > 0).map((g, i) => ({ ...g, prva: i === 0 }));
-  }, [otvoreni, t]);
-
   const naslov = (key: string) => duge.get(key)?.title || kratke.get(key)?.title || '';
+
+  // Dve grupe (Ivan, 7.10.2026): brze planete pa spore. Besplatni: zakljucani redovi stoje
+  // u SVOJOJ grupi, ispod otvorenih kartica te grupe (do tada svi dole, pod dugotrajnim).
+  const grupe = React.useMemo(() => {
+    const spora = (x: { red: TranzitRed }) => SPORE_PLANETE.includes(x.red.transiting.key);
+    return [
+      { naslov: t.danas.tranziti.kratkotrajni, otvoreni: otvoreni.filter((x) => !spora(x)), zakljucani: zakljucani.filter((x) => !spora(x)) },
+      { naslov: t.danas.tranziti.dugotrajni, otvoreni: otvoreni.filter(spora), zakljucani: zakljucani.filter(spora) },
+    ].filter((g) => g.otvoreni.length + g.zakljucani.length > 0).map((g, i) => ({ ...g, prva: i === 0 }));
+  }, [otvoreni, zakljucani, t]);
 
   // Oznaka za proveru: tranzit bez naslova tumacenja, kad su tekstovi stigli.
   React.useEffect(() => {
@@ -99,32 +100,33 @@ export function TranzitiLista({ rez, date, onZaProveru, besplatno, osobaId }: {
       {grupe.map((g) => (
         <View key={g.naslov} className={cn('gap-3', g.prva ? '' : 'mt-8')}>
           <Text variant="label">{g.naslov}</Text>
-          {g.redovi.map((x) => (
+          {g.otvoreni.map((x) => (
             <KarticaTranzita key={x.red.key} red={x.red} ton={x.ton} naslov={naslov(x.red.key)} loading={loading}
               trajanje={trajanja.get(x.red.key) ?? ''} osobaId={osobaId} />
           ))}
+          {/* Besplatni (Ivan, 29.9.2026): ostali tranziti pod katancem — vidi se da postoje.
+              Veci red je naslov tumacenja (kao na kartici), ispod ime tranzita i koliko jos
+              traje (Ivan, 8.10.2026); bez naslova ostaje ime. */}
+          <ZakljucaniRedovi
+            redovi={g.zakljucani.map((z) => {
+              const tekst = tekstReda(z.red, naslov(z.red.key));
+              return {
+                key: z.red.key,
+                naslov: tekst.veci,
+                ispod: [tekst.manji, trajanja.get(z.red.key)].filter(Boolean).join(' · '),
+              };
+            })}
+          />
         </View>
       ))}
 
-      {/* Besplatni (Ivan, 29.9.2026): ostali tranziti po imenu, pod katancem — vidi se
-          da postoje, ne i sta pisu. */}
       {zakljucani.length > 0 && (
-        <>
-          <ZakljucaniRedovi
-            className="mt-3"
-            redovi={zakljucani.map((z) => ({
-              key: z.red.key,
-              naslov: tekstReda(z.red, '').veci,
-              ispod: trajanja.get(z.red.key),
-            }))}
-          />
-          <PremiumKartica
-            className="mt-10"
-            naslov={t.danas.tranziti.josDanas(zakljucani.length, t.gramatika.teksta(zakljucani.length))}
-            opis={t.danas.tranziti.zakljucaniOpis}
-            dugme={t.danas.tranziti.otkljucajSve}
-          />
-        </>
+        <PremiumKartica
+          className="mt-10"
+          naslov={t.danas.tranziti.josDanas(zakljucani.length, t.gramatika.teksta(zakljucani.length))}
+          opis={t.danas.tranziti.zakljucaniOpis}
+          dugme={t.danas.tranziti.otkljucajSve}
+        />
       )}
     </View>
   );

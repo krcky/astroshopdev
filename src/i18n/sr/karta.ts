@@ -93,6 +93,17 @@ export const karta = {
       `${naslov ? `${naslov}. ` : ''}${ime}${zakljucan ? '. Zaključano' : ''}. Tumačenje`,
   },
 
+  /** `components/tocak-kartica.tsx` — Tačka izabrana dodirom na krug ('Ti' i Nebo). */
+  tockDodir: {
+    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida). */
+    pocinjeU: 'Počinje u',
+    uOvojKuci: 'U ovoj kući',
+    uOvomZnaku: 'Planete u ovom znaku',
+    prazno: 'Nema planeta',
+    procitaj: 'Pročitaj',
+    zatvori: 'Zatvori',
+  },
+
   /** `app/(tabs)/sky/index.tsx` — "Trenutno na nebu". */
   nebo: {
     naslov: 'Trenutno na nebu',

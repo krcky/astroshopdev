@@ -221,7 +221,7 @@ export function lunacijaDana(chart: NatalChart, date: Date, timeUnknown: boolean
 }
 
 /** Jacina veze reda sa oblascu (0 = nema veze). Najveca od svih pogodaka. */
-export function vezaSaOblascu(red: Red, oblast: OblastDef): number {
+export function vezaSaOblascu(red: Red, oblast: Pick<OblastDef, 'houses' | 'weakHouses' | 'points'>): number {
   const kuca = (h: number | null) =>
     h === null ? 0 : oblast.houses.includes(h) ? VEZA.kuca : oblast.weakHouses.includes(h) ? VEZA.slabaKuca : 0;
   if (red.kind === 'lunacija') return kuca(red.house);

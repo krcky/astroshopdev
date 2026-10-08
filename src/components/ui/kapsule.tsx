@@ -14,7 +14,7 @@ import { tezina } from '@/theme/tipografija';
  * Efekat / Pazi / Savet na "Tvom danu" (Ivan, 28.9.2026). Vodoravni skrol, da
  * duzi nazivi i Dynamic Type ne lome red. Kartica oko reda ima `p-4`.
  */
-export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false, tabovi = false, naStrani = false, pravoStaklo = naStrani }: {
+export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false, tabovi = false, pocetak, naStrani = false, pravoStaklo = naStrani }: {
   stavke: { key: K; label: string; icon?: React.ReactNode }[];
   izabrana: K;
   onIzbor: (k: K) => void;
@@ -37,6 +37,8 @@ export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVid
   naStrani?: boolean;
   /** Pravo staklo i U KARTICI, izabrana svetlo lila (tab "Mesec" na pocetnoj, Ivan 29.9.2026). */
   pravoStaklo?: boolean;
+  /** Tabovi: element PRE kapsula (npr. dugme Prica dana), u istoj grupi stakla; red je vodoravno skrolabilan. */
+  pocetak?: React.ReactNode;
 }) {
   if (tabovi) {
     // PRAVO STAKLO (Ivan, 29.9.2026: "izgleda kao lazni glass"): neizabrane BEZ sive
@@ -46,10 +48,18 @@ export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVid
     const red = stavke.map((s) => (
       <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} cisto indigo />
     ));
-    return isLiquidGlassAvailable() ? (
-      <GlassContainer spacing={8} accessibilityRole="tablist" style={{ flexDirection: 'row', gap: 8 }}>{red}</GlassContainer>
-    ) : (
-      <View accessibilityRole="tablist" className="flex-row gap-2">{red}</View>
+    const sve = <>{pocetak}{red}</>;
+    // Red je vodoravno skrolabilan (sa dugmetom ispred ne staje u sirinu telefona); skrol ide do ivica ekrana
+    // i NE SECE (`overflow: visible`) — staklo pri dodiru raste, kao kod `naStrani`.
+    return (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} accessibilityRole="tablist" style={{ overflow: 'visible' }}
+        className="-mx-5" contentContainerClassName="px-5">
+        {isLiquidGlassAvailable() ? (
+          <GlassContainer spacing={8} style={{ flexDirection: 'row', gap: 8 }}>{sve}</GlassContainer>
+        ) : (
+          <View className="flex-row gap-2">{sve}</View>
+        )}
+      </ScrollView>
     );
   }
   if (sveVidljive) {
