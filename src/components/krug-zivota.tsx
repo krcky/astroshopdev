@@ -108,13 +108,13 @@ const KRAJ_IZABRANOG = 0.7;
  * Providnost na KRAJU obicnog punjenja po oceni (Ivan, 8.10.2026: "za 5 tackica ne deluje bas tako"): do tada 0 za sve,
  * pa je preliv pri oceni 5 iscezavao pred ivicom. Sad se sto veca ocena, to se preliv jace vidi do kraja.
  */
-const KRAJ_PUNJENJA = [0, 0.05, 0.09, 0.14, 0.2, 0.28];
+const KRAJ_PUNJENJA = [0, 0.03, 0.06, 0.09, 0.13, 0.18];
 
 /**
  * Providnost na POCETKU punjenja (uz rupu) po oceni (Ivan, 8.10.2026: veca ocena jace, mala slabije, ali ne mnogo):
  * do tada 0,92 za sve. Ocena 5 je pun, ocena 1 oko tri cetvrtine.
  */
-const POCETAK_PUNJENJA = [0, 0.7, 0.78, 0.86, 0.93, 1];
+const POCETAK_PUNJENJA = [0, 0.5, 0.56, 0.62, 0.68, 0.74];
 
 const AG = Animated.createAnimatedComponent(G);
 
