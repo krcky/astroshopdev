@@ -15,7 +15,7 @@ export const krug: Recnik['krug'] = {
     zabava: 'Забава',
     prijateljstvo: 'Пријателство',
   },
-  stanja: { pritisak: 'Притисок', oprez: 'Претпазливост', mirno: 'Мирно', raste: 'Расте', procvat: 'Процут' },
+  stanja: { pritisak: 'Напорно', oprez: 'Претпазливо', mirno: 'Избалансирано', raste: 'Поволно', procvat: 'Одлично' },
   danas: 'Денес',
   nedelja: 'Оваа недела',
   saznajVise: 'Дознај повеќе',

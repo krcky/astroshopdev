@@ -107,7 +107,7 @@ export default function Home() {
   // Zamenjuje "Danas ukratko" (ocene cetiri oblasti i "Ide ti / Koci te"). Besplatni: potpuno otvorene
   // su oblasti iz `BESPLATNO.krug`, ostale imaju katanac (stanje i tackice vide svi).
   const { rez: krug } = useKrug(resolved, date);
-  const [izabranaOblast, setIzabranaOblast] = React.useState<KrugKey>(BESPLATNO.krug[0] ?? KRUG[0].key);
+  const [izabranaOblast, setIzabranaOblast] = React.useState<KrugKey | null>(null);
   // Recenice za danas: kratki tekst najjaceg tranzita svake oblasti (`lib/krug-tekst.ts`, privremeno).
   const krugKljucevi = React.useMemo(() => {
     const k = new Set<string>();
@@ -130,30 +130,27 @@ export default function Home() {
       <View>
         {krug && (
           <>
-            {/* Naslov i datum iznad kruga, ISTIM pismom kao ranije "Tvoj dan · datum" (Ivan, 8.10.2026). */}
-            <Text variant="oznaka" className={cn(OZNAKA_12, 'mb-4')}>
-              {offset === 0 ? t.krug.naslov : t.krug.naslovDrugiDan}{'\u00A0\u00A0·\u00A0\u00A0'}{formatDatumKratko(date)}
+            {/* Datum sitnim slovima, ispod njega naslov krupnim crnim ali manjim nego na tabu Mesec (Ivan, 12.10.2026). */}
+            <Text variant="oznaka" className={OZNAKA_12}>{formatDatumKratko(date)}</Text>
+            <Text variant="display" className="mb-4 mt-1" accessibilityRole="header">
+              {offset === 0 ? t.krug.naslov : t.krug.naslovDrugiDan}
             </Text>
+            {/* Nista nije izabrano dok se ne dodirne; detalji su u staklenoj kartici uz isecak (Ivan, 12.10.2026). */}
             <KrugZivota
               rez={krug}
               izabrana={izabranaOblast}
               onIzbor={setIzabranaOblast}
               otkljucane={premium ? undefined : BESPLATNO.krug}
+              detalj={(o) => (
+                <OblastKartica
+                  oblast={o}
+                  otvorena={premium || BESPLATNO.krug.includes(o.def.key)}
+                  recenica={recenicaOblasti(o, krugTekstovi)}
+                  onSaznaj={() => router.push({ pathname: '/oblast', params: { k: o.def.key, day: dayKey(date) } })}
+                  onZatvori={() => setIzabranaOblast(null)}
+                />
+              )}
             />
-            {(() => {
-              const o = krug.oblasti.find((x) => x.def.key === izabranaOblast) ?? krug.oblasti[0];
-              return (
-                // Kartica malo ULAZI preko donje ivice kruga (Ivan, 8.10.2026); plocica je ~20 pt iznad ivice, pa je ne pokriva.
-                <View className="mt-3">
-                  <OblastKartica
-                    oblast={o}
-                    otvorena={premium || BESPLATNO.krug.includes(o.def.key)}
-                    recenica={recenicaOblasti(o, krugTekstovi)}
-                    onSaznaj={() => router.push({ pathname: '/oblast', params: { k: o.def.key, day: dayKey(date) } })}
-                  />
-                </View>
-              );
-            })()}
           </>
         )}
         {tvojDan && (

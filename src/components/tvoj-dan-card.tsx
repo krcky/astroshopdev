@@ -4,8 +4,6 @@ import { router } from 'expo-router';
 import { Info } from 'lucide-react-native';
 
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
-import { Planeta, skalaSlike } from '@/components/planete-par';
-import { Okret } from '@/components/okret';
 import { Text } from '@/components/ui/text';
 import { TextPlaceholder } from '@/components/ui/text-placeholder';
 import { Button } from '@/components/ui/button';
@@ -34,26 +32,6 @@ type OdeljakKljuc = 'efekat' | 'pazi' | 'savet';
 const ODELJAK_BOJA: Partial<Record<OdeljakKljuc, string>> = { efekat: PLUS_BOJA, pazi: MINUS_BOJA };
 /** Varijanta `oznaka` je 11/15; na ovoj kartici datum i oznake odeljaka idu 12/16 (Ivan, 28.9.2026). */
 export const OZNAKA_12 = 'text-[12px] leading-[16px]';
-
-/**
- * Planete desno od naslova — isti raspored kao Mesec na slajdu "Mesec danas"
- * (Ivan, 29.9.2026): VELIKA je tranzitna (ona pravi dogadjaj), MALA dole desno je
- * natalna (deo tvoje karte koji je pogodjen), kao znak na Mesecu. Mere iste kao tamo.
- */
-// 80 (Ivan, 30.9.2026: manja; do tada 96) — ista kao u prstenu price danas (`prica/ulaz.tsx`).
-const PLANETA = 68;
-const BEDZ = 28;
-/**
- * Planete sa prstenovima: koliki deo slike je TELO (izmereno, `planete-par.tsx`)
- * i koliko telo treba da bude kao udeo `PLANETA` — vece nego ranije, ali ne kao
- * ostale (Ivan, 29.9.2026, za oba).
- */
-const PRSTEN: Record<string, { telo: number; cilj: number }> = {
-  saturn: { telo: 0.4, cilj: 0.65 },
-  uranus: { telo: 0.6, cilj: 0.82 },
-};
-/** Koliko prstenovi smeju da izadju van okvira sa svake strane (razmak do naslova je 16). */
-const PRSTEN_VAN = 16;
 
 /**
  * "Tvoj dan" — Premium kartica sa najvaznijim tranzitom dana.
@@ -113,8 +91,8 @@ export function TvojDanCard({ pick, date, isToday }: {
       <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.temaDana}</Text>
       {/* Datum i naslov su jedna celina, planeta desno centrirana u odnosu na njih;
           sazetak ispod ide preko cele sirine (Ivan, 29.9.2026). */}
-      <View className="flex-row items-center gap-4">
-        <View className="flex-1">
+      <View>
+        <View>
           {/* Oznaka "TVOJ DAN · datum" je sklonjena (Ivan, 8.10.2026); naslov i datum stoje iznad kruga zivota. */}
 
           {/* 2. Naslov teksta — najveca klasa u sistemu (`display`, Ivan 28.9.2026).
@@ -148,17 +126,6 @@ export function TvojDanCard({ pick, date, isToday }: {
             </Text>
           )}
 
-        </View>
-
-        {/* Tranzitna planeta, natalna dole desno. Ulaz u dnevnu pricu vise NIJE ovde nego u sredini
-            kruga zivota na pocetnoj (Ivan, 8.10.2026; `components/krug-zivota.tsx`, `UlazUKrug`).
-            Raniji prsten oko planete i balon: `UlazUPricu` (`components/prica/ulaz.tsx`), tag `pocetna-pre-tocka-zivota`. */}
-        <View
-          accessible
-          accessibilityRole="image"
-          accessibilityLabel={ime}
-          className="items-center">
-          <PlanetaSaBedzom tranzitna={pick.transiting} natalna={pick.natal} />
         </View>
       </View>
 
@@ -209,49 +176,6 @@ function Odeljci({ stavke }: { stavke: { key: OdeljakKljuc; oznaka: string; s: S
           </View>
         </View>
       ))}
-    </View>
-  );
-}
-
-/**
- * Velika tranzitna planeta + natalna u krugu dole desno. Saturn i Uran imaju
- * prstenove siroke 1,5 precnika, pa bi na 96 telo ispalo sitno. Ivan, 29.9.2026:
- * "veci, ne skroz isti po visini kao ostale" — telo ~2/3 ostalih, a okvir se za
- * njih prosiri toliko da prstenovi izadju najvise `PRSTEN_VAN` u razmak do naslova
- * i u marginu ekrana. U bedzu slika staje u krug.
- */
-function PlanetaSaBedzom({ tranzitna, natalna }: {
-  tranzitna: { key: string; glyph: string };
-  natalna: { key: string; glyph: string };
-}) {
-  const skala = skalaSlike(tranzitna.key);
-  const p = PRSTEN[tranzitna.key];
-  // Precnik koji `Planeta` dobija; slika je `skala` puta sira, telo je `p.telo` slike.
-  const velika = p ? (PLANETA * p.cilj) / (p.telo * skala) : PLANETA;
-  const sirina = Math.max(PLANETA, velika * skala - 2 * PRSTEN_VAN);
-  const mala = BEDZ / skalaSlike(natalna.key);
-  // Bedz se kaci na TELO, ne na ugao okvira: kod Saturna i Urana je okvir siri i
-  // telo manje, pa bi ugao ostao daleko od planete (Ivan, 29.9.2026). Centar bedza
-  // je 0,75 poluprecnika tela dole desno od centra — kod obicne planete (80) to je
-  // tacno mesto na kom je bio i stoji znak na Mesecu.
-  const r = (p ? PLANETA * p.cilj : PLANETA) / 2;
-  const spolja = BEDZ + 4; // sa sivim obodom (`p-[2px]`)
-  const levo = sirina / 2 + r * 0.75 - spolja / 2;
-  const gore = PLANETA / 2 + r * 0.75 - spolja / 2;
-  return (
-    <View style={{ width: sirina, height: PLANETA }} className="items-center justify-center">
-      {/* Planeta se polako okrece kao Mesec (Ivan, 30.9.2026) — osim onih sa prstenom
-          (Saturn, Uran): okrenut prsten izgleda kao da se planeta prevrce. */}
-      {p
-        ? <Planeta t={tranzitna} size={velika} />
-        : <Okret><Planeta t={tranzitna} size={velika} /></Okret>}
-      <View
-        style={{ left: levo, top: gore }}
-        className="absolute items-center justify-center rounded-pill bg-grouped p-[2px]">
-        <View style={{ width: BEDZ, height: BEDZ }} className="items-center justify-center">
-          <Planeta t={natalna} size={mala} />
-        </View>
-      </View>
     </View>
   );
 }

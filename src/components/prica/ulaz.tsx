@@ -266,6 +266,17 @@ export function PricaDugme({ datum }: { datum: Date }) {
       ) : (
         <View style={[kapsula, { backgroundColor: neutral.white }, OKVIR_DUGMETA]}>{sadrzaj}</View>
       )}
+      {/* Nepogledana prica: indigo krug sa brojem 1 u gornjem desnom uglu (Ivan, 12.10.2026) — da se vidi da prica postoji. */}
+      {!pogledana && (
+        <View
+          pointerEvents="none"
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden
+          className="absolute items-center justify-center rounded-pill"
+          style={{ top: -6, right: -4, minWidth: 18, height: 18, backgroundColor: INDIGO }}>
+          <Text className={cn('text-[11px] leading-[14px] text-white', tezina('dugme'))}>1</Text>
+        </View>
+      )}
     </Pressable>
   );
 }

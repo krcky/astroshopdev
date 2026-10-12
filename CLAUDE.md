@@ -81,12 +81,14 @@ src/
     polje-za-kod.tsx     sest cifara koda sa mejla (`DUZINA_KODA`) — prijava (`code.tsx`) i promena emaila
     izbor-odnosa.tsx     "Ko ti je" (redovi sa kvacicom) — korak nove osobe i list izmene
     karta-lista.tsx      redovi ispod tocka (trojka, planeta, aspekt) i "i" uz tocak — ZAJEDNICKI za "Ti" i "Nebo"
+    staklo-povrsina.tsx  sistemsko staklo (SwiftUI glassEffect) za SADRZAJ: kartica preko kruga; rezerva van iOS-a 26
+    tocak-popover.tsx    STAKLENA kartica PREKO tocka, kod dodirnutog mesta (planeta, kuca, znak, ugao) — "Ti" i "Nebo" (8.10.2026)
     info-list.tsx        delovi listova sa objasnjenjem tocka (odeljak, stavka, aspekti) — oba "i" lista
     moon-disc.tsx        Mesec u trenutnoj fazi — jedna od 30 slika (`assets/images/mesec/`, pravi ih `scripts/mesec-faze.ts` iz punog Meseca; kad se VRTI (`vrti`), okrece se samo tekstura `pun.png`, a senka `senka-NN.png` stoji — Ivan, 7.10.2026)
+    krug-zivota.tsx      KRUG ZIVOTA na pocetnoj: osam isecaka sa ikonicom, nazivom, recju stanja i tackicama, punjenje po oceni, logo u sredini (pravilo 18d)
+    oblast-kartica.tsx   kartica ispod kruga: izabrana oblast, stanje, tackice, recenica za danas, "Saznaj više"
     celestial-orb.tsx    proceduralno nebesko telo (onboarding)
     uvod.tsx             uvodna animacija pri pokretanju — krug se vrti, pa se otvori (pravilo 20)
-    krug-zivota.tsx      KRUG ZIVOTA na pocetnoj: osam isecaka sa ikonicom, nazivom i tackicama, punjenje po oceni, logo u sredini (pravilo 18d)
-    oblast-kartica.tsx   kartica ispod kruga: izabrana oblast, stanje, tackice, recenica za danas, "Saznaj više"
     turnstile.tsx        CAPTCHA kapija pred slanje koda
     prica/               dnevna prica: slajdovi, crtezi, kartica za deljenje (1080x1920), ulaz (prsten + balon);
                          sat.tsx = SAT SLIKE (svi pokreti), video-radionica / video-traka / platno-videa = VIDEO;
@@ -117,10 +119,10 @@ src/
     wheel.ts         geometrija tocka (cista, bez RN uvoza)
     tocak-stil.ts    izgled tocka (boje, crtice, aspekti) — deli ga panel
     znak-oblici.ts   oblici i boje ikonica znakova — deli ih panel
-    uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
-    pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
     krug-config.ts   osam oblasti kruga zivota (kuce, planete), stanja, prozor od 3 dana — za astrologa
     krug.ts          krug zivota: ocena oblasti, stanje (prosek 3 dana), 7 dana (cist racun); use-krug.ts = podaci; krug-tekst.ts = recenica za danas (PRIVREMENO)
+    uvod.ts          uvod: vremena, vrtenje, prozor (cist racun)
+    pristup.ts       STA BESPLATNI VIDI — sve granice na jednom mestu (pravilo 18c)
     osobe.ts         druge osobe: odnosi, granica, ko je otvoren (cist racun); osobe-api.ts = server + `useKarta`
     cities.ts        ugradjena lista gradova + predlozi (najveci u Srbiji)
     traits.ts        osobine po znaku — vise se NE PRIKAZUJE (reveal koristi podnaslove astrologa); ostaje jer ga cita `scripts/korpus/odgovor.py`
@@ -363,7 +365,56 @@ ostaje za klizanje pod traku, a podignuti izbledi posle 24 pt klizanja. Mora bit
 direktno dete sadrzaja `Screen`-a (meri se `onLayout`). NA ANDROIDU KRUG JE JEDAN (Ivan,
 1.10.2026: "zasto uopste imamo dupli krug"): traka tamo ne muti, pa primerka u sadrzaju nema —
 samo prazno mesto (`velicina`), a krug iz sloja 3b klizi i nestaje na ivici trake (`JEDAN_PRIMERAK`).
-Dva SVG tocka su usporavala prelazak na "Ti" i "Nebo" (kadrovi 130—200 ms). TABOVI POCETNE ostaju ISPOD preliva,
+Dva SVG tocka su usporavala prelazak na "Ti" i "Nebo" (kadrovi 130—200 ms). NA iOS-u OSTAJU DVA PRIMERKA:
+probano 8.10.2026 sa jednim (provereno na iPhone-u) — krug se na ivici trake SECE pravom linijom umesto da
+prodje ispod zamucenja kao ostatak strane (Ivan: "lose je"); ne ponavljati. DODIR NA TOCAK (Ivan, 8.10.2026, "Ti" i "Nebo"): dodir na planetu, kucu, znak na prstenu ili natpis ASC/MC ih
+IZABERE — izabrana planeta ostaje jaka sa svojim aspektima, ostalo bledi; kuca i znak dobiju obojen isecak; ugao
+debelu osu. Detalji su u STAKLENOJ kartici (`TockPopover`) koja plovi PREKO kruga kod dodirnutog mesta (ispod
+tacke kad je u gornjoj polovini kruga, inace iznad; sitni simboli, Ivan: "smanjiti dosta") — ne jedna kartica
+ispod kruga. Podaci, aspekti i planete kao kapsule koje premestaju izbor; KARTICA KUCE kaze gde pocinje (znak u LOKATIVU: "Počinje u Devici", `tk.pocinjeU`, kroz `nebo.uZnaku`) i VLADARA KUCE (tradicionalni vladar znaka na kuspidi, `signRulers`) sa kucom u kojoj je on (Ivan, 8.10.2026); "Pročitaj" samo na "Ti" (Nebo ne
+tumaci); dodir na isto ili na prazno skida izbor. Na "Ti" planeta sa kruga rasklopi svoj red u listi, a red
+iz liste samo ISTICE planetu (kartica tada ne iskace, `sidro = null`). Dodir hvata providni `Pressable` u
+`IznadPreliva` (`onDodir`), u SADRZAJU — u skrolu, pa lista i dalje klizi sa prsta koji je pao na krug.
+Kartica ide kroz `IznadPreliva povrsina` u POSEBAN sloj 3c u `Screen` (iznad preliva i podignutog kruga, sa
+dodirom i za citac ekrana, pomeren za skrol, BEZ providnosti — alpha roditelja kvari staklo); gornji primerak
+kruga (3b) je i dalje `pointerEvents="none"`. Izbor zivi u ekranu i ide u OBA primerka kruga kroz `podignuto`.
+Sta je pogodjeno racuna `pogodiTocak` u `lib/wheel.ts` (cist racun, `check:sky`, deo 12): ugao simbola je
+ISTI izvor kao crtez (`ugloviSimbola`), simbol se bira po UGLU najblizeg, bez vremena rodjenja nema kuca ni uglova.
+Staklo je SISTEMSKO — SwiftUI `.glassEffect` kroz `StakloPovrsina` (`staklo-povrsina.ios.tsx`, @expo/ui; Ivan, 8.10.2026:
+"original glass, a ne fake"), ne `GlassView`; sadrzaj je RN preko stakla (bez `RNHostView`). Samo iOS 26; drugde bela kartica
+sa tankom ivicom. Provereno u simulatoru (iPhone 17) na "Ti";
+Android i pravi telefon jos nisu — tamo je krug jedan (u sloju 3b), dodir je na praznom mestu u sadrzaju.
+ZUM STEZANJEM (Ivan, 8.10.2026; "dvostruki dodir niko nece znati"): dva prsta stezu krug do 2,5x, jedan prst ga pomera
+dok je zumirano (inace skrol strane ostaje slobodan; sa uvecanog kruga strana se ne skroluje), `ZumVrati` u uglu vraca.
+VERZIJA 2 (Ivan izabrao 8.10.2026 posle V3—V7): krug se crta CEO i UVECAN (`sr` = ZUM_MAX) pri PRVOM stezanju i vise
+se ne crta iznova — zum i POMERANJE su samo transformacija na UI niti (cista racunica `lib/wheel.ts`: `primeniPokret`,
+`ekranUKrug`, `check:sky` deo 13, vraca bas transformaciju koja ce biti upisana, pa nema skoka). Ponovno crtanje samo pri
+prvom stezanju (1 -> `sr`) i pri povratku na pun krug; `NatalWheel` je `memo`. Hook `useTockZum` + `ZumOkvir` u
+`components/tocak-zum.tsx`; `gest` ide u `IznadPreliva` na isti providni sloj kao dodir. Dodir i sidro kartice prolaze
+kroz `uKrug` / `naEkran`; dodir se ODBIJA dok traje gest i 350 ms posle (`gestTraje`). Okvir se UVLACI (`UVLACENJE`: 20 pt
+odozgo ispod hedera, 24 pt odozdo iznad imena), dobija belu podlogu, zaobljene uglove i senku — sadrzaj ispod se NE
+pomera; dodir u uvucenom pojasu ne bira nista. Okvir se pojavljuje odmah (bez tween-a).
+CENA V2: pri prvom zumu se veliki krug crta na KRAJU stezanja, pa se na tren moze videti kako se crta (Ivan: "bljesne").
+ISTORIJA (ne ponavljati): V1 isecen `viewBox` posle svakog pokreta = prazne ivice pri pomeranju; V3 veliki montiran na
+POCETKU stezanja = seckanje (crtanje SVG-a te velicine blokira glavnu nit); V4—V7 veliki + mali sloj, veliki crtan
+unapred u praznom hodu = prvi zum dobar, ali na svakom sledecem bljesak manjeg kruga ispod. Tokom V4—V7 nadjene i
+ZADRZANE popravke koje nisu vezane za crtanje: (1) pomeranje se upisuje samo kad je USPESNO zavrseno (`onEnd(_, uspesno)`;
+`onEnd` se zove i pri otkazivanju, a `upisi` vraca privremenu transformaciju na nulu = jedan kadar starog stanja), (2)
+stezanje na pocetku UPISE pomak koji je pomeranje vec napravilo (inace ga prvo azuriranje prepise i krug "poskoci"),
+(3) pomeranje i okretanje se aktiviraju RUCNO uz proveru `s`, pa se objekat gesta ne sklapa iznova pri promeni zuma.
+Alat za trazenje bljeska od jednog kadra: snimak telefona + Swift skripta koja trazi kadar razlicit od OBA suseda.
+OKRETANJE KRUGA PRSTOM (SAMO "Nebo", Ivan, 8.10.2026): jedan prst koji krene sa PRSTENA (zodijak i planete, van polja
+aspekata) vodi krug kao kolo; polje aspekata i sve van kruga i dalje klizi sa stranom. Krug je ukljesten na ascendent,
+pa je okretanje u stvari VREME: u smeru kazaljke = napred. Ascendent se NE krece ravnomerno (u Beogradu 11—28°/h),
+pa se vreme ne racuna po 15° na sat nego se trazi trenutak u kome je ascendent tamo gde ga prst vodi
+(`vremeZaOkret` u `lib/sky.ts`, bisekcija u zvezdanom danu; `check:sky` deo 14) — krug prati prst. Gest je rucno
+aktiviran Pan u `useTockZum` (`okretanje`): hvata samo dodir sa prstena i tek posle 8 pt pomeranja, pa obican dodir
+ostaje izbor; dok je zumirano ga nema (jedan prst tada pomera uvecan krug). Vreme se upisuje u `store/sky-time`
+najvise na 40 ms (krug se ponovo crta pri svakom), klik (haptik) na svaki sat; izabrana planeta vuce karticu za sobom.
+Na "Ti" okretanja nema (natalna karta je zamrznuta). Provereno u simulatoru (cetvrt kruga = ascendent iz Device u
+Strelca); pravi prst i brzina crtanja na telefonu jos ne.
+Sledece po planu: tranziti preko natalnog.
+TABOVI POCETNE ostaju ISPOD preliva,
 providni (Ivan, 30.9.2026: podignuti iznad preliva, cisto beli, probani na Androidu i vraceni).
 
 ZAMUCENJE IDE PREKO `animatedProps`, NE PREKO RN-ovog `Animated`. Pali se tek
@@ -479,6 +530,43 @@ Bez polja za promo kod (pravilo 8). Indigo (`PREMIUM`) samo na izabranom paketu 
 Tekst za besplatne je KRATKA verzija — dugu ionako salje samo server (pravilo 8).
 Tabela: `docs/ASTRO-LOGIKA.md`, poglavlje 5c.
 
+**18d. Krug zivota na pocetnoj (Ivan, 8.10.2026; varijanta A sa prototipa).**
+VERZIJE POCETNE: v1 = tag `pocetna-pre-tocka-zivota` (pre kruga zivota, tabovi sa "Danas ukratko"; i tag `pocetna-v1` na istom commitu), v2 = tag
+`pocetna-v2` (krug zivota sa staklenom karticom, okretanjem i ulaznim okretom, 12.10.2026). Povratak: `git checkout pocetna-v2 -- 'src/app/(tabs)/home'
+src/components/krug-zivota.tsx src/components/oblast-kartica.tsx src/components/tvoj-dan-card.tsx src/components/prica/ulaz.tsx`.
+IZMENE 12.10.2026 (Ivan): (1) NISTA NIJE IZABRANO dok se isecak ne dodirne (`izabrana` je `null`); dodir na izabrani ga skida. (2) Detalji
+oblasti su STAKLENA kartica uz isecak (`KarticaOblasti` u `krug-zivota.tsx`, sadrzaj `OblastKartica`), kao `TockPopover` — vise NEMA kartice
+ispod kruga. (3) KRUG SE VRTI PRSTOM (`okretanje`, Pan sa rucnom aktivacijom): okrece samo pokret ALONG kruga (tangenta), pokret ka/od
+sredine pusta skrol strane; zamah (`withDecay`); plocice ostaju uspravne, kartica prati. SVG se okrece kao jedan `Animated.View`. Provereno u
+simulatoru; pravi prst i skrol na telefonu ne. (4) Iznad kruga: datum sitnim slovima, pa "Tvoj život danas" (`display` 32, crno, kao na tabu Mesec); ulazni okret kruga `ULAZNI_OKRET`. (5) Dugme "Priča
+dana" ima indigo krug sa brojem 1 gore desno dok danasnja prica nije otvorena.
+Na tabu "Danas" pocetne: KRUG ZIVOTA (naslov "Tvoj zivot danas" + datum iznad njega), ispod kartica izabrane oblasti, pa "Tvoj dan". "Danas ukratko" (ocene
+cetiri oblasti i "Ide ti / Koci te") je SKLONJENO sa pocetne — `OBLASTI` i `pickBrief` ostaju za pricu i karticu za deljenje, koje se NE menjaju.
+Osam oblasti (`lib/krug-config.ts`: Karijera, Finansije, Zdravlje, Porodica, Partner, Licni razvoj, Zabava, Prijateljstvo; pokrivaju svih 12 kuca).
+IZGLED (vraceno 12.10.2026 na raniji krug, Ivan; natalni stil "verzija 11" je sacuvan u tagu `tocak-zivota-v11`, vracanje:
+`git cat-file blob tocak-zivota-v11^{} > src/components/krug-zivota.tsx`): osam isecaka, u svakom DIREKTNO NA NJEMU (bez staklenih plocica i bez kruzica):
+IKONICA oblasti (3D, `assets/images/ikone/`, `IKONA_OBLASTI`; faktori velicine `RAZMERA_IKONE`), NAZIV, REC STANJA i PET TACKICA; na izabranom (indigo) isecku
+beli, na ostalima tamni. Zakljucana oblast: beli krug sa katancem DOLE DESNO uz ikonicu. Staza je RADIJALNI PRELIV (tamnija uz rupu, svetlija ka ivici); krug je
+iste sirine kao kartica ispod, BEZ obruba. PUNJENJE isecka je preliv bez ravne linije, svetla lila (`OBLAST_BOJA`): pun uz rupu, sve providniji ka kraju; duzina je
+DANASNJA ocena, a jacina raste sa ocenom (`POCETAK_PUNJENJA`, `KRAJ_PUNJENJA`). IZABRANI isecak je INDIGO preliv preko celog isecka (`KRAJ_IZABRANOG`). Razmaci
+izmedju isecaka su IZNAD punjenja. Raniji izgled pre ikonica je u tagu `tocak-zivota-v1`; tamni indigo krug i boje po stanju su odbijeni (plava/roze znace
+"ide ti"/"koci te"; boja po oblasti nikad).
+STANJE (Zahtevno / Oprezno / Uravnoteženo / Povoljno / Sjajno; do 8.10.2026 Pritisak … Procvat — "Pritisak" zvuci medicinski uz Zdravlje) = prosek ocene za 3
+dana (juce, danas, sutra), TACKICE = danasnja ocena (`lib/krug.ts`); stanje se vidi na isecku, na kartici ispod kruga i u listu oblasti.
+Besplatno `BESPLATNO.krug` = Partner i Zdravlje potpuno otvoreni; stanje i tackice vide svi za svih osam.
+ANIMACIJA otvaranja (siva staza raste od sredine, punjenje isecak po isecak, plocice iskacu): pri prvom prikazu, pri povratku sa drugog TABA i pri povratku na "Tvoj dan"; NE kad
+se zatvori list ili prica koji su prekrili tab (provera: koren navigacije nije "(tabs)"). Uz "Smanji pokrete" nema animacije.
+U SREDINI: KRUG LOGA (`KrugLoga stalno`) koji se vrti STALNO (ne staje posle mirovanja — izuzetak od pravila 17; uz "Smanji pokrete" i ustedu baterije stoji);
+logo u zaglavlju POCETNE se ne animira (`Logo mirno`). Rupa u sredini je boje pozadine strane. ULAZ U DNEVNU PRICU je STAKLENO DUGME "Priča dana" PRVO U REDU TABOVA
+(pravilo 23).
+KARTICA ispod kruga ("Danas" + "Saznaj više") i LIST `/oblast` ("Saznaj više"): ikonica gore levo, stanje + tackice gore desno, naslov (`NaslovCeleReci` 32 kao u
+tumacenju tranzita), pa "Danas", "Ove nedelje", "Narednih 7 dana" (Premium; besplatni vide katanac), "Šta utiče" — sve `NaslovSekcije`, tekst `TumacenjeTekst`.
+REC ZA DANAS I OVE NEDELJE je PRIVREMENO PREDLOG iz tabele za astrologa (`Recenice-oblasti-za-astrologa.xlsx`, 144 + 8 neutralnih; `i18n/sr/krug-recenice.ts`, samo
+srpski, po planeti U TRANZITU x oblasti x tonu); drugi jezici i dalje kratki tekst najjaceg tranzita (`lib/krug-tekst.ts`). Spisak kuca i planeta po oblasti CEKA
+ASTROLOGA. Vracanje: `git checkout pocetna-pre-tocka-zivota -- 'src/app/(tabs)/home'` (+ `tvoj-dan-card.tsx`). Opis: `docs/ASTRO-LOGIKA.md`, pogl. 12.
+"TVOJ DAN" na pocetnoj je CELO U JEDNOJ KARTICI: oznaka "Tema dana", naslov, sazetak i "Saznaj više", pa ispod linije Pozitivni efekat / Izazov / Savet.
+Provereno u simulatoru (iPhone 17, iOS 26) i napravljen Release build za iPhone 15; Android i brzina animacija na telefonu nisu.
+
 **18. Tranzit dana: "Tvoj dan" po SKORU, za sve (od 29.9.2026; Hero je arhiva).**
 PREMIUM (od 27.9.2026, Ivan; od 29.9.2026 i besplatni, sa kratkim tekstom): `lib/tvoj-dan.ts`, pravila iz `docs/tvoj_dan_simulacija.py`
 (isti izbor 20/20 dana). Svoji orbisi (1,5°, Uran—Pluton 1°, Mesec 0) — VAZE SAMO za izbor i
@@ -522,31 +610,6 @@ Hero-a i bez Meseca, po orbisu; tranzit bez teksta se preskace. Testovi: deo 9b.
 
 **19. Bez interneta aplikacija radi sa onim sto je vec stiglo (29.9.2026).**
 Racun je ionako lokalan. Tri stvari su zavisile od mreze i sad imaju rezervu:
-**18d. Krug zivota na pocetnoj (Ivan, 8.10.2026; varijanta A sa prototipa).**
-Na tabu "Danas" pocetne: KRUG ZIVOTA (naslov "Tvoj zivot danas" + datum iznad njega), ispod kartica izabrane oblasti, pa "Tvoj dan". "Danas ukratko" (ocene
-cetiri oblasti i "Ide ti / Koci te") je SKLONJENO sa pocetne — `OBLASTI` i `pickBrief` ostaju za pricu i karticu za deljenje, koje se NE menjaju.
-Osam oblasti (`lib/krug-config.ts`: Karijera, Finansije, Zdravlje, Porodica, Partner, Licni razvoj, Zabava, Prijateljstvo; pokrivaju svih 12 kuca).
-U svakom isecaku, DIREKTNO NA NJEMU (bez staklene plocice i bez reci stanja, Ivan, 8.10.2026): IKONICA oblasti (3D, `assets/images/ikone/`, `IKONA_OBLASTI`;
-faktori velicine `RAZMERA_IKONE`), naziv i TACKICE; na izabranom (indigo) isecku beli, na ostalima tamni. Zakljucana oblast: beli krug sa katancem DOLE DESNO
-uz ikonicu, malo preko nje. Staza je RADIJALNI PRELIV (tamnija uz rupu, svetlija ka ivici); krug je iste sirine kao kartica ispod, BEZ obruba.
-Tamni indigo krug (`TAMAN_KRUG`) je probao i ODBIJEN, kao i boje po stanju (plava/roze znace "ide ti"/"koci te"); boja po oblasti nikad.
-PUNJENJE isecka je preliv bez ravne linije, svetla lila (`OBLAST_BOJA`): pun uz rupu, sve providniji ka kraju; duzina je DANASNJA ocena, a jacina raste sa
-ocenom (`POCETAK_PUNJENJA`, `KRAJ_PUNJENJA`). IZABRANI isecak je INDIGO preliv preko celog isecka (`KRAJ_IZABRANOG`). Razmaci izmedju isecaka su IZNAD punjenja.
-STANJE (Pritisak / Oprez / Mirno / Raste / Procvat) = prosek ocene za 3 dana (juce, danas, sutra), TACKICE = danasnja ocena (`lib/krug.ts`); stanje se vidi na
-kartici ispod kruga i u listu oblasti (ne na isecku). Besplatno `BESPLATNO.krug` = Partner i Zdravlje potpuno otvoreni; stanje i tackice vide svi za svih osam.
-ANIMACIJA otvaranja (staza raste, punjenje isecak po isecak, plocice iskacu): pri prvom prikazu, pri povratku sa drugog TABA i pri povratku na "Tvoj dan"; NE kad
-se zatvori list ili prica koji su prekrili tab (provera: koren navigacije nije "(tabs)"). Uz "Smanji pokrete" nema animacije.
-U SREDINI: KRUG LOGA (`KrugLoga stalno`) koji se vrti STALNO (ne staje posle mirovanja — izuzetak od pravila 17; uz "Smanji pokrete" i ustedu baterije stoji);
-logo u zaglavlju POCETNE se ne animira (`Logo mirno`). Rupa u sredini je boje pozadine strane. ULAZ U DNEVNU PRICU je STAKLENO DUGME "Priča dana" PRVO U REDU TABOVA
-(pravilo 23).
-KARTICA ispod kruga ("Danas" + "Saznaj više") i LIST `/oblast` ("Saznaj više"): ikonica gore levo, stanje + tackice gore desno, naslov (`NaslovCeleReci` 32 kao u
-tumacenju tranzita), pa "Danas", "Ove nedelje", "Narednih 7 dana" (Premium; besplatni vide katanac), "Šta utiče" — sve `NaslovSekcije`, tekst `TumacenjeTekst`.
-REC ZA DANAS I OVE NEDELJE je PRIVREMENO PREDLOG iz tabele za astrologa (`Recenice-oblasti-za-astrologa.xlsx`, 144 + 8 neutralnih; `i18n/sr/krug-recenice.ts`, samo
-srpski, po planeti U TRANZITU x oblasti x tonu); drugi jezici i dalje kratki tekst najjaceg tranzita (`lib/krug-tekst.ts`). Spisak kuca i planeta po oblasti CEKA
-ASTROLOGA. Vracanje: `git checkout pocetna-pre-tocka-zivota -- 'src/app/(tabs)/home'` (+ `tvoj-dan-card.tsx`). Opis: `docs/ASTRO-LOGIKA.md`, pogl. 12.
-"TVOJ DAN" na pocetnoj je CELO U JEDNOJ KARTICI: oznaka "Tema dana", naslov, sazetak i "Saznaj više", pa ispod linije Pozitivni efekat / Izazov / Savet.
-Provereno u simulatoru (iPhone 17, iOS 26) i napravljen Release build za iPhone 15; Android i brzina animacija na telefonu nisu.
-
 SESIJA — `useAuthListener` cita sacuvanu sesiju sa diska ODMAH; `getSession()` bez
 mreze ~25 s ponavlja obnovu tokena i onda vrati `null`, pa je kapija slala korisnika
 na welcome. Greska MREZE (`isAuthRetryableFetchError`) sesiju ne brise; brise je samo
@@ -914,6 +977,7 @@ npm run check:cities      predlozi gradova + da se pretraga nije suzila
 npm run check:lunarni-kalendar mreza meseca, glavne faze po danima, pomeranje dana (ekran Mesec)
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
 npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
+npm run check:krug        krug zivota: osam oblasti, 12 kuca pokriveno, stanje iz proseka 3 dana, bez vremena rodjenja
 npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor
 npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpisi
 npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)
@@ -957,7 +1021,6 @@ npm run panel:build       panel za objavu -> panel/dist
       izbor mesta posmatranja. Bez tumacenja — prikazuje
       se samo ono sto se racuna. Lokacija je grad iz profila, bez `expo-location`:
       razlika izmedju dva grada u Srbiji se na ekranu ni ne vidi, a sistemska
-npm run check:krug        krug zivota: osam oblasti, 12 kuca pokriveno, stanje iz proseka 3 dana, bez vremena rodjenja
       dozvola bi trazila razlog i objasnjenje u prodavnici. Grad se moze promeniti
       rucno (`/sky-place`, `store/sky-place.ts`) — kroz ISTU pretragu kao onboarding,
       ali u zasebnom store-u: mesto rodjenja se menja jedino na listu "Nalog", jer od njega

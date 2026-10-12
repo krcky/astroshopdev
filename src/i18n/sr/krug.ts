@@ -17,7 +17,7 @@ export const krug = {
     prijateljstvo: 'Prijateljstvo',
   },
   /** Stanje oblasti iz proseka ocene za tri dana (`lib/krug.ts`). */
-  stanja: { pritisak: 'Pritisak', oprez: 'Oprez', mirno: 'Mirno', raste: 'Raste', procvat: 'Procvat' },
+  stanja: { pritisak: 'Zahtevno', oprez: 'Oprezno', mirno: 'Uravnoteženo', raste: 'Povoljno', procvat: 'Sjajno' },
   danas: 'Danas',
   nedelja: 'Ove nedelje',
   saznajVise: 'Saznaj više',
