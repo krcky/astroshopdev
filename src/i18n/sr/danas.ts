@@ -184,6 +184,10 @@ export const danas = {
     pitajNaslov: 'Pitaj astrologa o ovom tranzitu',
     pitajOpis: (astrolog: string, oOsobi: boolean) =>
       `${astrolog} vidi ${oOsobi ? 'kartu ove osobe' : 'tvoju kartu'} i odgovara glasovnom porukom, obično za 2–3 radna dana.`,
+    /** Kartica na dnu pocetne (v4): pitanje astrologu uopste, ne o tranzitu. */
+    pitajPocetnaNaslov: 'Pitaj astrologa',
+    pitajPocetnaOpis: (astrolog: string) =>
+      `${astrolog} vidi tvoju kartu i odgovara glasovnom porukom, obično za 2–3 radna dana. Pitaj o danu, o ljubavi, o poslu — o čemu god.`,
     postaviPitanje: 'Postavi pitanje',
     kratkaVerzija: 'Ovo je kratka verzija. U celoj piše šta se dešava, koliko traje i šta možeš da uradiš.',
     otkljucajCeo: 'Otključaj ceo tekst',

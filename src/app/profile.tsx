@@ -269,7 +269,7 @@ export default function ProfileSheet() {
               subtitle="Dodir menja verziju"
               chevron={false}
               trailing={<VrednostReda>{`v${pocetnaVerzija}`}</VrednostReda>}
-              onPress={() => setPocetnaVerzija(pocetnaVerzija === 3 ? 1 : ((pocetnaVerzija + 1) as 2 | 3))}
+              onPress={() => setPocetnaVerzija(pocetnaVerzija === 4 ? 1 : ((pocetnaVerzija + 1) as 2 | 3 | 4))}
             />
             <ListRow title={tp.pricaNepogledana} chevron={false} onPress={() => usePricaLog.getState().ponisti(dayKey(new Date()))} />
           </Group>

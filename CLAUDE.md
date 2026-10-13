@@ -535,6 +535,7 @@ PROBNI PREKIDAC VERZIJA (13.10.2026): sve tri verzije su u aplikaciji — `compo
 `app/(tabs)/home/index.tsx` je samo birac po `useDevStore().pocetnaVerzija` (profil -> Test -> "Pocetna strana", dodir menja v1/v2/v3). Samo u probnom
 buildu (`PROBNI_BUILD`); production uvek v3. Kad se odluci koja ostaje: obrisati ostale fajlove i birac. v3 = vodoravne kartice oblasti
 (`oblasti-kartice.tsx`, sa strelicom gore/dole), "Tema dana" sa ilustracijom dole desno (`tvoj-dan-card.tsx`), "Ide ti / Koci te" sa v1.
+V4 (13.10.2026): kao v3, ali "Tema dana" nema ilustraciju nego animirane planete tranzita (`planeta-ziva.tsx`: tranzitna + znak aspekta + natalna, tekstura klizi ispod nepomicne senke, 9 s po prolazu; Saturn i Uran stoje) i kartica "Pitaj astrologa" na dnu (`pocetna/v4.tsx`, `pocetna/tvoj-dan-card-v4.tsx`). Prekidac u profilu ima v1—v4, production uvek v4. Tag `pocetna-v4`.
 VERZIJE POCETNE: v1 = tag `pocetna-pre-tocka-zivota` (pre kruga zivota, tabovi sa "Danas ukratko"; i tag `pocetna-v1` na istom commitu), v2 = tag
 `pocetna-v2` (krug zivota sa staklenom karticom, okretanjem i ulaznim okretom, 12.10.2026). Povratak: `git checkout pocetna-v2 -- 'src/app/(tabs)/home'
 src/components/krug-zivota.tsx src/components/oblast-kartica.tsx src/components/tvoj-dan-card.tsx src/components/prica/ulaz.tsx`.

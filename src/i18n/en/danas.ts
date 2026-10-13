@@ -191,6 +191,10 @@ export const danas: Recnik['danas'] = {
     pitajNaslov: 'Ask an astrologer about this transit',
     pitajOpis: (astrolog, oOsobi) =>
       `${astrolog} sees ${oOsobi ? "this person’s chart" : 'your chart'} and answers with a voice message, in Serbian, usually within 2–3 business days.`,
+    /** Kartica na dnu pocetne (v4): pitanje astrologu uopste, ne o tranzitu. */
+    pitajPocetnaNaslov: 'Ask an astrologer',
+    pitajPocetnaOpis: (astrolog) =>
+      `${astrolog} sees your chart and answers with a voice message, in Serbian, usually within 2–3 business days. Ask about your day, love, work — anything.`,
     postaviPitanje: 'Ask a question',
     kratkaVerzija: 'This is the short version. The full one says what is happening, how long it lasts and what you can do.',
     otkljucajCeo: 'Unlock the full text',

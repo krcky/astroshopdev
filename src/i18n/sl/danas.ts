@@ -155,6 +155,10 @@ export const danas: Recnik['danas'] = {
     pitajNaslov: 'Vprašaj astrologa o tem tranzitu',
     pitajOpis: (astrolog, oOsobi) =>
       `${astrolog} vidi ${oOsobi ? 'karto te osebe' : 'tvojo karto'} in odgovori z glasovnim sporočilom v srbščini, običajno v 2–3 delovnih dneh.`,
+    /** Kartica na dnu pocetne (v4): pitanje astrologu uopste, ne o tranzitu. */
+    pitajPocetnaNaslov: 'Vprašaj astrologa',
+    pitajPocetnaOpis: (astrolog) =>
+      `${astrolog} vidi tvojo karto in odgovori z glasovnim sporočilom v srbščini, običajno v 2–3 delovnih dneh. Vprašaj o dnevu, ljubezni, službi — karkoli.`,
     postaviPitanje: 'Postavi vprašanje',
     kratkaVerzija: 'To je kratka različica. V celotni piše, kaj se dogaja, kako dolgo traja in kaj lahko storiš.',
     otkljucajCeo: 'Odkleni celotno besedilo',
