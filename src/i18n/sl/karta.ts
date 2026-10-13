@@ -57,6 +57,31 @@ export const karta: Recnik['karta'] = {
     ugaoA11y: (ime, z) => `${ime} ${nebo.uZnaku(z)}. Razlaga`,
   },
 
+  v2: {
+    planeteNaslov: 'Planeti v karti',
+    /** Stakleni tabovi ispod kartice za kupovinu: kartice planeta ili lista aspekata. */
+    tabPlanete: 'Planeti',
+    tabAspekti: 'Aspekti',
+    procitaj: 'Preberi celotno razlago',
+    otkljucajTumacenje: 'Odkleni celotno razlago',
+    sviAspekti: (n) => `Vsi aspekti (${n})`,
+    karticaA11y: (ime, gde, podnaslov, zakljucano) =>
+      `${ime}, ${gde}${podnaslov ? `. ${podnaslov}` : ''}${zakljucano ? '. Zaklenjeno' : '. Razlaga'}`,
+    ctaNaslov: 'Tvoja karta, prebrana do konca',
+    ctaOpis: 'Razlaga vsakega planeta, hiše in aspekta, zate in še za eno osebo. Kupiš enkrat in ostane tvoje.',
+    ctaDugme: (cena) => (cena ? `Odkleni za vedno · ${cena}` : 'Odkleni za vedno'),
+    listNaslov: 'Preberi svojo celotno karto',
+    listOpis: 'Izberi, kako želiš brati astrologove razlage.',
+    samoKarta: 'Samo rojstna karta',
+    samoKartaIspod: 'Enkrat, za vedno · tvoja in še ena karta',
+    premium: 'Premium',
+    premiumIspod: 'Karta, celotno besedilo dneva in več oseb · letno',
+    stavke: ['Vsi planeti v znamenju in hiši', 'Vsi aspekti, z razlago astrologa', 'Ostane tvoje tudi brez naročnine'],
+    kupiKartu: 'Kupi rojstno karto',
+    pogledajPremium: 'Poglej Premium',
+    napomena: 'Enkraten nakup.\nNe obnavlja se in ne prekliče naročnine, če jo imaš.',
+  },
+
   lista: {
     tackaA11y: (ime, deg, min, znak, retro, kuca) =>
       `${ime}, ${deg}° ${min}' ${vZnamenju(znak)}${retro ? ', retrogradno' : ''}${kuca ? `, ${kuca}. hiša` : ''}`,

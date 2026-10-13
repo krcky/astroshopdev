@@ -95,6 +95,7 @@ export default function TransitDetail() {
                 tranzitna={{ key: tranzit.transiting.key, glyph: tranzit.transiting.glyph, vladar: tranzit.ruler === 'transiting' }}
                 natalna={{ key: tranzit.natal.key, glyph: tranzit.natal.glyph, vladar: tranzit.ruler === 'natal' }}
                 width={120}
+                ziva
               />
             )}
           </View>

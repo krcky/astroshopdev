@@ -15,7 +15,9 @@ import { tezina } from '@/theme/tipografija';
  * duzi nazivi i Dynamic Type ne lome red. Kartica oko reda ima `p-4`.
  */
 export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVidljive = false, tabovi = false, pocetak, naStrani = false, pravoStaklo = naStrani }: {
-  stavke: { key: K; label: string; icon?: React.ReactNode }[];
+  /** `broj` = brojac u kruzicu iza natpisa (tabovi; npr. broj aspekata na natalnoj karti). */
+  /** `znacka` = kruzic sa brojem u GORNJEM DESNOM UGLU, malo van kapsule — "novo" na tabovima pocetne; 0 ili bez = nema. */
+  stavke: { key: K; label: string; icon?: React.ReactNode; broj?: number; znacka?: number }[];
   izabrana: K;
   onIzbor: (k: K) => void;
   /**
@@ -46,7 +48,7 @@ export function KapsuleRed<K extends string>({ stavke, izabrana, onIzbor, sveVid
     // sistemska dugmad u traci. `GlassContainer` ih vodi kao jednu grupu stakla
     // (zajednicko prelamanje i spajanje pri dodiru), kao susedne stavke trake.
     const red = stavke.map((s) => (
-      <Kapsula key={s.key} label={s.label} icon={s.icon} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} cisto indigo />
+      <Kapsula key={s.key} label={s.label} icon={s.icon} broj={s.broj} znacka={s.znacka} selected={s.key === izabrana} onPress={() => onIzbor(s.key)} cisto indigo />
     ));
     const sve = <>{pocetak}{red}</>;
     // Red je vodoravno skrolabilan (sa dugmetom ispred ne staje u sirinu telefona); skrol ide do ivica ekrana
@@ -147,8 +149,8 @@ function hexAlpha(hex: string, a: number) {
  * sloj iza sadrzaja, i senka/obod oko njega — kapsula ostane siva ili bela.
  * Bez stakla (iOS 18, Android, veb): siva ispuna, izabrana ista lila.
  */
-function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = false, indigo = false }: {
-  label: string; icon?: React.ReactNode; selected: boolean; onPress: () => void; uspravna?: boolean;
+function Kapsula({ label, icon, broj, znacka, selected, onPress, uspravna = false, cisto = false, indigo = false }: {
+  label: string; icon?: React.ReactNode; broj?: number; znacka?: number; selected: boolean; onPress: () => void; uspravna?: boolean;
   /** Neizabrana bez sive nijanse — cisto staklo (tabovi na prelivu). */
   cisto?: boolean;
   /** Izabrana u INDIGU iz loga (`brand.indigo`), beli natpis — tabovi pocetne (Ivan, 29.9.2026). */
@@ -167,8 +169,24 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = fal
       ) : (
         <Text variant="chip" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={beo ? { color: neutral.white } : undefined} className={cn(selected && tezina('chipIzabran'))}>{label}</Text>
       )}
+      {/* Brojac u kruzicu (Ivan, 13.10.2026): lila sa belim brojem; na izabranoj indigo kapsuli beo sa indigo brojem. */}
+      {broj !== undefined && (
+        <View className="items-center justify-center rounded-full"
+          style={{ minWidth: 20, height: 20, paddingHorizontal: 5, marginRight: -4, backgroundColor: beo ? neutral.white : OBLAST_BOJA }}>
+          <Text variant="caption" className="font-bold" style={{ fontSize: 11, lineHeight: 20, color: beo ? brand.indigo : neutral.white }}>{broj}</Text>
+        </View>
+      )}
     </>
   );
+  // "Novo" (Ivan, 13.10.2026): ista znacka kao na kartici "Prica dana" (`oblasti-kartice.tsx`) — svetlo ljubicasta,
+  // beo broj, viri van ugla. VAN stakla (staklo sece sadrzaj), kao brat u `Pressable`-u.
+  const ugao = znacka ? (
+    <View pointerEvents="none" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden
+      className="absolute items-center justify-center rounded-pill"
+      style={{ top: -7, right: -5, minWidth: 22, height: 22, paddingHorizontal: 5, backgroundColor: OBLAST_BOJA }}>
+      <Text className={cn('text-[13px] leading-[16px] text-white', tezina('dugme'))}>{znacka}</Text>
+    </View>
+  ) : null;
   if (!isLiquidGlassAvailable()) {
     return (
       <Pressable
@@ -184,6 +202,7 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = fal
           !selected && !ANDROID && 'bg-fill',
         )}>
         {sadrzaj}
+        {ugao}
       </Pressable>
     );
   }
@@ -200,6 +219,7 @@ function Kapsula({ label, icon, selected, onPress, uspravna = false, cisto = fal
         style={uspravna ? USPRAVNA : KAPSULA}>
         {sadrzaj}
       </GlassView>
+      {ugao}
     </Pressable>
   );
 }

@@ -109,7 +109,7 @@ export const pitaj = {
     oKome: 'O kome je pitanje',
     /** Izbor "o sebi" u redu "O kome je pitanje". */
     ja: 'Ja',
-    oNamaDvoma: 'Pitanje je o nama dvoma — pošalji i moju kartu',
+    oNamaDvoma: 'O nama dvoma',
     primerJa: 'Npr. Razmišljam da promenim posao ove jeseni. Šta moja karta kaže o tom periodu?',
     primerOdnos: 'Npr. Kako da se bolje razumemo kad se ne slažemo?',
     primerOsoba: 'Npr. Na šta da obratim pažnju ove jeseni? Šta kaže karta ove osobe?',

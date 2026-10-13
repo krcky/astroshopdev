@@ -103,7 +103,7 @@ export const pitaj: Recnik['pitaj'] = {
     oKome: 'Who is the question about',
     /** The "about me" choice. */
     ja: 'Me',
-    oNamaDvoma: 'The question is about the two of us — send my chart too',
+    oNamaDvoma: 'About the two of us',
     primerJa: 'E.g. I’m thinking of changing jobs this fall. What does my chart say about that period?',
     primerOdnos: 'E.g. How can we understand each other better when we disagree?',
     primerOsoba: 'E.g. What should I pay attention to this fall? What does this person’s chart say?',

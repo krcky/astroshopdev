@@ -1,0 +1,9640 @@
+{
+ "slucajevi": [
+  {
+   "unix": -622834200,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 258.165655668,
+     "brzina": 14.274406311,
+     "kuca": 7,
+     "znak": "sagittarius",
+     "deg": 18,
+     "min": 9
+    },
+    {
+     "key": "sun",
+     "lon": 16.875367378,
+     "brzina": 0.983019468,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 16,
+     "min": 52
+    },
+    {
+     "key": "mercury",
+     "lon": 27.632130342,
+     "brzina": 1.99098776,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 27,
+     "min": 37
+    },
+    {
+     "key": "venus",
+     "lon": 330.604254461,
+     "brzina": 0.952010951,
+     "kuca": 10,
+     "znak": "pisces",
+     "deg": 0,
+     "min": 36
+    },
+    {
+     "key": "mars",
+     "lon": 176.473765378,
+     "brzina": -0.32208796,
+     "kuca": 5,
+     "znak": "virgo",
+     "deg": 26,
+     "min": 28
+    },
+    {
+     "key": "jupiter",
+     "lon": 328.456946696,
+     "brzina": 0.195913847,
+     "kuca": 10,
+     "znak": "aquarius",
+     "deg": 28,
+     "min": 27
+    },
+    {
+     "key": "saturn",
+     "lon": 163.782433412,
+     "brzina": -0.059497535,
+     "kuca": 5,
+     "znak": "virgo",
+     "deg": 13,
+     "min": 46
+    },
+    {
+     "key": "uranus",
+     "lon": 91.295904887,
+     "brzina": 0.024948609,
+     "kuca": 2,
+     "znak": "cancer",
+     "deg": 1,
+     "min": 17
+    },
+    {
+     "key": "neptune",
+     "lon": 195.965237663,
+     "brzina": -0.027465624,
+     "kuca": 5,
+     "znak": "libra",
+     "deg": 15,
+     "min": 57
+    },
+    {
+     "key": "pluto",
+     "lon": 135.869986328,
+     "brzina": -0.009339923,
+     "kuca": 4,
+     "znak": "leo",
+     "deg": 15,
+     "min": 52
+    }
+   ],
+   "obliquity": 23.44837918,
+   "ramc": 312.927438108,
+   "asc": 67.914593281,
+   "mc": 310.47536581,
+   "kuspide": [
+    67.914593281,
+    89.951966444,
+    109.255108042,
+    130.47536581,
+    158.486001472,
+    199.546539331,
+    247.914593281,
+    269.951966444,
+    289.255108042,
+    310.47536581,
+    338.486001472,
+    19.546539331
+   ],
+   "fellBack": false,
+   "cvor": 7.410846682,
+   "cvorBrzina": -0.014760816,
+   "lilit": 39.56877855,
+   "sreca": 309.204881572,
+   "faza": 241.284604239,
+   "aspekti": [
+    {
+     "key": "moon.trine.sun",
+     "orb": 1.29028829
+    },
+    {
+     "key": "sun.opposition.neptune",
+     "orb": 0.910129715
+    },
+    {
+     "key": "sun.trine.pluto",
+     "orb": 1.005381049
+    },
+    {
+     "key": "mercury.sextile.jupiter",
+     "orb": 0.824816354
+    },
+    {
+     "key": "venus.trine.uranus",
+     "orb": 0.691650426
+    },
+    {
+     "key": "venus.conjunction.jupiter",
+     "orb": 2.147307765
+    },
+    {
+     "key": "moon.trine.pluto",
+     "orb": 2.29566934
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.095251334
+    },
+    {
+     "key": "moon.sextile.neptune",
+     "orb": 2.200418005
+    },
+    {
+     "key": "jupiter.trine.uranus",
+     "orb": 2.838958191
+    },
+    {
+     "key": "moon.square.saturn",
+     "orb": 4.383222255
+    },
+    {
+     "key": "mercury.sextile.venus",
+     "orb": 2.972124119
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 4.822139508
+    },
+    {
+     "key": "mercury.sextile.uranus",
+     "orb": 3.663774545
+    }
+   ],
+   "razmaknuto": [
+    369.515793163,
+    128.225504873,
+    138.982267837,
+    89.307084191,
+    287.823902874,
+    79.807084191,
+    275.132570908,
+    202.646042382,
+    307.315375158,
+    247.220123823
+   ]
+  },
+  {
+   "unix": -303722400,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 325.043463776,
+     "brzina": 13.613731851,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 25,
+     "min": 2
+    },
+    {
+     "key": "sun",
+     "lon": 56.756115652,
+     "brzina": 0.962902382,
+     "kuca": 8,
+     "znak": "taurus",
+     "deg": 26,
+     "min": 45
+    },
+    {
+     "key": "mercury",
+     "lon": 56.82627874,
+     "brzina": 2.188556916,
+     "kuca": 8,
+     "znak": "taurus",
+     "deg": 26,
+     "min": 49
+    },
+    {
+     "key": "venus",
+     "lon": 47.029038002,
+     "brzina": 1.228005749,
+     "kuca": 7,
+     "znak": "taurus",
+     "deg": 17,
+     "min": 1
+    },
+    {
+     "key": "mars",
+     "lon": 4.862262237,
+     "brzina": 0.759110151,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 4,
+     "min": 51
+    },
+    {
+     "key": "jupiter",
+     "lon": 272.464238669,
+     "brzina": -0.081669209,
+     "kuca": 3,
+     "znak": "capricorn",
+     "deg": 2,
+     "min": 27
+    },
+    {
+     "key": "saturn",
+     "lon": 288.104817727,
+     "brzina": -0.031871453,
+     "kuca": 3,
+     "znak": "capricorn",
+     "deg": 18,
+     "min": 6
+    },
+    {
+     "key": "uranus",
+     "lon": 137.175393054,
+     "brzina": 0.020861482,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 17,
+     "min": 10
+    },
+    {
+     "key": "neptune",
+     "lon": 217.249552884,
+     "brzina": -0.025277951,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 7,
+     "min": 14
+    },
+    {
+     "key": "pluto",
+     "lon": 153.590584647,
+     "brzina": 0.001415232,
+     "kuca": 11,
+     "znak": "virgo",
+     "deg": 3,
+     "min": 35
+    }
+   ],
+   "obliquity": 23.441828208,
+   "ramc": 121.673336576,
+   "asc": 205.126192344,
+   "mc": 119.511941578,
+   "kuspide": [
+    205.126192344,
+    233.015496046,
+    264.938071798,
+    299.511941578,
+    332.741247988,
+    1.463560056,
+    25.126192344,
+    53.015496046,
+    84.938071798,
+    119.511941578,
+    152.741247988,
+    181.463560056
+   ],
+   "fellBack": false,
+   "cvor": 172.453665976,
+   "cvorBrzina": -0.003056095,
+   "lilit": 91.030122978,
+   "sreca": 113.413540468,
+   "faza": 268.281722097,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 0.070163089
+    },
+    {
+     "key": "moon.square.sun",
+     "orb": 1.712651876
+    },
+    {
+     "key": "moon.square.mercury",
+     "orb": 1.782814964
+    },
+    {
+     "key": "venus.square.uranus",
+     "orb": 0.146355052
+    },
+    {
+     "key": "venus.trine.saturn",
+     "orb": 1.075779725
+    },
+    {
+     "key": "mars.square.jupiter",
+     "orb": 2.398023569
+    },
+    {
+     "key": "jupiter.trine.pluto",
+     "orb": 1.126345978
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 3.658968237
+    },
+    {
+     "key": "moon.opposition.uranus",
+     "orb": 7.868070721
+    }
+   ],
+   "razmaknuto": [
+    298.974287741,
+    390.686939616,
+    400.186939616,
+    380.959861967,
+    338.793086202,
+    246.395062634,
+    262.035641692,
+    111.106217019,
+    191.180376849,
+    127.521408612
+   ]
+  },
+  {
+   "unix": 15303000,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 17.204598251,
+     "brzina": 13.557296364,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 17,
+     "min": 12
+    },
+    {
+     "key": "sun",
+     "lon": 95.051386598,
+     "brzina": 0.953678521,
+     "kuca": 9,
+     "znak": "cancer",
+     "deg": 5,
+     "min": 3
+    },
+    {
+     "key": "mercury",
+     "lon": 83.470671048,
+     "brzina": 2.033144472,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 23,
+     "min": 28
+    },
+    {
+     "key": "venus",
+     "lon": 132.186262958,
+     "brzina": 1.167780387,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 12,
+     "min": 11
+    },
+    {
+     "key": "mars",
+     "lon": 106.297689808,
+     "brzina": 0.650992222,
+     "kuca": 9,
+     "znak": "cancer",
+     "deg": 16,
+     "min": 17
+    },
+    {
+     "key": "jupiter",
+     "lon": 206.091341118,
+     "brzina": 0.01181951,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 26,
+     "min": 5
+    },
+    {
+     "key": "saturn",
+     "lon": 48.722147782,
+     "brzina": 0.101733941,
+     "kuca": 7,
+     "znak": "taurus",
+     "deg": 18,
+     "min": 43
+    },
+    {
+     "key": "uranus",
+     "lon": 184.750705874,
+     "brzina": 0.013173815,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 4,
+     "min": 45
+    },
+    {
+     "key": "neptune",
+     "lon": 238.597838578,
+     "brzina": -0.020376704,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 28,
+     "min": 35
+    },
+    {
+     "key": "pluto",
+     "lon": 174.807479108,
+     "brzina": 0.011772503,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 24,
+     "min": 48
+    }
+   ],
+   "obliquity": 23.445302857,
+   "ramc": 108.516696602,
+   "asc": 207.778272455,
+   "mc": 107.080546607,
+   "kuspide": [
+    207.778272455,
+    240.222495381,
+    264.608900666,
+    287.080546607,
+    312.060886816,
+    344.563321996,
+    27.778272455,
+    60.222495381,
+    84.608900666,
+    107.080546607,
+    132.060886816,
+    164.563321996
+   ],
+   "fellBack": false,
+   "cvor": 334.784383211,
+   "cvorBrzina": -0.024925376,
+   "lilit": 142.379857223,
+   "sreca": 129.931484108,
+   "faza": 282.147612514,
+   "aspekti": [
+    {
+     "key": "moon.square.mars",
+     "orb": 0.906908443
+    },
+    {
+     "key": "sun.square.uranus",
+     "orb": 0.300680724
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 1.33680806
+    },
+    {
+     "key": "mercury.trine.jupiter",
+     "orb": 2.62067007
+    },
+    {
+     "key": "mars.sextile.saturn",
+     "orb": 2.424457974
+    },
+    {
+     "key": "moon.trine.venus",
+     "orb": 5.018335293
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 3.790359471
+    }
+   ],
+   "razmaknuto": [
+    349.426325796,
+    427.273114144,
+    415.692398593,
+    464.407990503,
+    438.519417354,
+    538.313068663,
+    380.943875327,
+    516.972433419,
+    570.819566123,
+    507.029206653
+   ]
+  },
+  {
+   "unix": 332078400,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 86.180771537,
+     "brzina": 13.572139282,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 26,
+     "min": 10
+    },
+    {
+     "key": "sun",
+     "lon": 108.361934543,
+     "brzina": 0.953920651,
+     "kuca": 10,
+     "znak": "cancer",
+     "deg": 18,
+     "min": 21
+    },
+    {
+     "key": "mercury",
+     "lon": 110.410789292,
+     "brzina": -0.643042049,
+     "kuca": 10,
+     "znak": "cancer",
+     "deg": 20,
+     "min": 24
+    },
+    {
+     "key": "venus",
+     "lon": 76.303408111,
+     "brzina": 0.144009127,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 16,
+     "min": 18
+    },
+    {
+     "key": "mars",
+     "lon": 179.861199083,
+     "brzina": 0.556925853,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 29,
+     "min": 51
+    },
+    {
+     "key": "jupiter",
+     "lon": 157.626161457,
+     "brzina": 0.173877654,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 7,
+     "min": 37
+    },
+    {
+     "key": "saturn",
+     "lon": 172.151177513,
+     "brzina": 0.076380987,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 22,
+     "min": 9
+    },
+    {
+     "key": "uranus",
+     "lon": 231.665748561,
+     "brzina": -0.016342872,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 21,
+     "min": 39
+    },
+    {
+     "key": "neptune",
+     "lon": 260.568261143,
+     "brzina": -0.023008765,
+     "kuca": 3,
+     "znak": "sagittarius",
+     "deg": 20,
+     "min": 34
+    },
+    {
+     "key": "pluto",
+     "lon": 199.006777995,
+     "brzina": 0.006710033,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 19,
+     "min": 0
+    }
+   ],
+   "obliquity": 23.439644944,
+   "ramc": 127.518003949,
+   "asc": 198.691407101,
+   "mc": 125.163356041,
+   "kuspide": [
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120,
+    150
+   ],
+   "fellBack": true,
+   "cvor": 140.510068311,
+   "cvorBrzina": -0.080764845,
+   "lilit": 190.82824822,
+   "sreca": 176.510244094,
+   "faza": 337.813236391,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 2.048854748
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 0.644843451
+    },
+    {
+     "key": "mercury.trine.uranus",
+     "orb": 1.254959269
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 1.404011297
+    },
+    {
+     "key": "saturn.sextile.uranus",
+     "orb": 0.485428953
+    },
+    {
+     "key": "mercury.sextile.saturn",
+     "orb": 1.740388222
+    },
+    {
+     "key": "saturn.square.neptune",
+     "orb": 1.58291637
+    },
+    {
+     "key": "moon.square.mars",
+     "orb": 3.680427546
+    },
+    {
+     "key": "venus.trine.pluto",
+     "orb": 2.703369884
+    },
+    {
+     "key": "sun.trine.uranus",
+     "orb": 3.303814017
+    },
+    {
+     "key": "venus.opposition.neptune",
+     "orb": 4.264853032
+    },
+    {
+     "key": "moon.square.saturn",
+     "orb": 4.029594023
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.561483149
+    },
+    {
+     "key": "moon.opposition.neptune",
+     "orb": 5.612510393
+    },
+    {
+     "key": "sun.sextile.saturn",
+     "orb": 3.78924297
+    },
+    {
+     "key": "mars.conjunction.saturn",
+     "orb": 7.710021569
+    },
+    {
+     "key": "venus.square.saturn",
+     "orb": 5.847769402
+    }
+   ],
+   "razmaknuto": [
+    66.565252068,
+    88.746415075,
+    98.246415075,
+    56.687888642,
+    162.035658045,
+    138.010641988,
+    152.535658045,
+    212.050229092,
+    240.952741675,
+    179.391258526
+   ]
+  },
+  {
+   "unix": 651190200,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 152.589624846,
+     "brzina": 13.361210775,
+     "kuca": 7,
+     "znak": "virgo",
+     "deg": 2,
+     "min": 35
+    },
+    {
+     "key": "sun",
+     "lon": 147.623658595,
+     "brzina": 0.963301175,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 27,
+     "min": 37
+    },
+    {
+     "key": "mercury",
+     "lon": 172.597420731,
+     "brzina": 0.38208835,
+     "kuca": 8,
+     "znak": "virgo",
+     "deg": 22,
+     "min": 35
+    },
+    {
+     "key": "venus",
+     "lon": 128.563195175,
+     "brzina": 1.225198712,
+     "kuca": 6,
+     "znak": "leo",
+     "deg": 8,
+     "min": 33
+    },
+    {
+     "key": "mars",
+     "lon": 54.444691832,
+     "brzina": 0.550868876,
+     "kuca": 4,
+     "znak": "taurus",
+     "deg": 24,
+     "min": 26
+    },
+    {
+     "key": "jupiter",
+     "lon": 120.552459035,
+     "brzina": 0.210491157,
+     "kuca": 6,
+     "znak": "leo",
+     "deg": 0,
+     "min": 33
+    },
+    {
+     "key": "saturn",
+     "lon": 289.57383973,
+     "brzina": -0.04956916,
+     "kuca": 12,
+     "znak": "capricorn",
+     "deg": 19,
+     "min": 34
+    },
+    {
+     "key": "uranus",
+     "lon": 275.852069079,
+     "brzina": -0.019669875,
+     "kuca": 11,
+     "znak": "capricorn",
+     "deg": 5,
+     "min": 51
+    },
+    {
+     "key": "neptune",
+     "lon": 282.095921467,
+     "brzina": -0.016758724,
+     "kuca": 12,
+     "znak": "capricorn",
+     "deg": 12,
+     "min": 5
+    },
+    {
+     "key": "pluto",
+     "lon": 225.159476603,
+     "brzina": 0.014723234,
+     "kuca": 9,
+     "znak": "scorpio",
+     "deg": 15,
+     "min": 9
+    }
+   ],
+   "obliquity": 23.442099324,
+   "ramc": 223.014535091,
+   "asc": 310.619654058,
+   "mc": 225.480750674,
+   "kuspide": [
+    310.619654058,
+    341.602067586,
+    14.133870061,
+    45.480750674,
+    74.368131604,
+    102.019734478,
+    130.619654058,
+    161.602067586,
+    194.133870061,
+    225.480750674,
+    254.368131604,
+    282.019734478
+   ],
+   "fellBack": false,
+   "cvor": 307.25994098,
+   "cvorBrzina": -0.031520352,
+   "lilit": 242.28896467,
+   "sreca": 315.585620309,
+   "faza": 4.960338085,
+   "aspekti": [
+    {
+     "key": "mercury.trine.mars",
+     "orb": 1.847271101
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 3.178966763
+    },
+    {
+     "key": "moon.conjunction.sun",
+     "orb": 4.965966251
+    },
+    {
+     "key": "mercury.trine.saturn",
+     "orb": 3.023581002
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 3.262444233
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 4.870852102
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 3.063555136
+    },
+    {
+     "key": "uranus.conjunction.neptune",
+     "orb": 6.243852388
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.477918262
+    }
+   ],
+   "razmaknuto": [
+    385.04823708,
+    375.54823708,
+    400.521999216,
+    357.977037521,
+    282.369270317,
+    348.477037521,
+    522.776647564,
+    503.776647564,
+    513.276647564,
+    453.084055088
+   ]
+  },
+  {
+   "unix": 967969200,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 224.362555362,
+     "brzina": 12.72598754,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 14,
+     "min": 21
+    },
+    {
+     "key": "sun",
+     "lon": 161.134734988,
+     "brzina": 0.969041119,
+     "kuca": 11,
+     "znak": "virgo",
+     "deg": 11,
+     "min": 8
+    },
+    {
+     "key": "mercury",
+     "lon": 172.230206941,
+     "brzina": 1.735678948,
+     "kuca": 11,
+     "znak": "virgo",
+     "deg": 22,
+     "min": 13
+    },
+    {
+     "key": "venus",
+     "lon": 183.923949666,
+     "brzina": 1.22683209,
+     "kuca": 11,
+     "znak": "libra",
+     "deg": 3,
+     "min": 55
+    },
+    {
+     "key": "mars",
+     "lon": 141.347712553,
+     "brzina": 0.635311084,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 21,
+     "min": 20
+    },
+    {
+     "key": "jupiter",
+     "lon": 70.119066767,
+     "brzina": 0.082041393,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 10,
+     "min": 7
+    },
+    {
+     "key": "saturn",
+     "lon": 60.905692753,
+     "brzina": 0.015958032,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 0,
+     "min": 54
+    },
+    {
+     "key": "uranus",
+     "lon": 317.953654703,
+     "brzina": -0.035490988,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 17,
+     "min": 57
+    },
+    {
+     "key": "neptune",
+     "lon": 304.252416964,
+     "brzina": -0.020211485,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 4,
+     "min": 15
+    },
+    {
+     "key": "pluto",
+     "lon": 250.201875299,
+     "brzina": 0.007565025,
+     "kuca": 2,
+     "znak": "sagittarius",
+     "deg": 10,
+     "min": 12
+    }
+   ],
+   "obliquity": 23.438388615,
+   "ramc": 128.238587477,
+   "asc": 209.015725623,
+   "mc": 125.866673278,
+   "kuspide": [
+    209.015725623,
+    236.840144465,
+    269.754972394,
+    305.866673278,
+    339.359669966,
+    6.97325902,
+    29.015725623,
+    56.840144465,
+    89.754972394,
+    125.866673278,
+    159.359669966,
+    186.97325902
+   ],
+   "fellBack": false,
+   "cvor": 113.461118076,
+   "cvorBrzina": -0.068821157,
+   "lilit": 290.741575636,
+   "sreca": 272.243545997,
+   "faza": 63.22217605,
+   "aspekti": [
+    {
+     "key": "sun.square.jupiter",
+     "orb": 1.015668221
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 0.932859689
+    },
+    {
+     "key": "venus.trine.neptune",
+     "orb": 0.328467299
+    },
+    {
+     "key": "jupiter.opposition.pluto",
+     "orb": 0.082808532
+    },
+    {
+     "key": "venus.trine.saturn",
+     "orb": 3.018256913
+    },
+    {
+     "key": "mars.opposition.uranus",
+     "orb": 3.39405785
+    },
+    {
+     "key": "moon.square.uranus",
+     "orb": 3.591099341
+    },
+    {
+     "key": "saturn.trine.neptune",
+     "orb": 3.346724212
+    },
+    {
+     "key": "moon.sextile.sun",
+     "orb": 3.227820374
+    },
+    {
+     "key": "jupiter.trine.neptune",
+     "orb": 5.866649803
+    }
+   ],
+   "razmaknuto": [
+    195.318167141,
+    132.090346767,
+    143.185818719,
+    154.879561444,
+    112.303324332,
+    41.361304531,
+    31.861304531,
+    288.909266482,
+    275.208028743,
+    221.157487078
+   ]
+  },
+  {
+   "unix": 1286994600,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 277.514371119,
+     "brzina": 12.486962533,
+     "kuca": 9,
+     "znak": "capricorn",
+     "deg": 7,
+     "min": 30
+    },
+    {
+     "key": "sun",
+     "lon": 200.317480183,
+     "brzina": 0.990448799,
+     "kuca": 6,
+     "znak": "libra",
+     "deg": 20,
+     "min": 19
+    },
+    {
+     "key": "mercury",
+     "lon": 197.952143887,
+     "brzina": 1.728753223,
+     "kuca": 6,
+     "znak": "libra",
+     "deg": 17,
+     "min": 57
+    },
+    {
+     "key": "venus",
+     "lon": 222.633333263,
+     "brzina": -0.228714509,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 12,
+     "min": 37
+    },
+    {
+     "key": "mars",
+     "lon": 229.720146311,
+     "brzina": 0.700882417,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 19,
+     "min": 43
+    },
+    {
+     "key": "jupiter",
+     "lon": 355.596463355,
+     "brzina": -0.10840109,
+     "kuca": 12,
+     "znak": "pisces",
+     "deg": 25,
+     "min": 35
+    },
+    {
+     "key": "saturn",
+     "lon": 189.309529092,
+     "brzina": 0.121927949,
+     "kuca": 6,
+     "znak": "libra",
+     "deg": 9,
+     "min": 18
+    },
+    {
+     "key": "uranus",
+     "lon": 357.751645393,
+     "brzina": -0.035931345,
+     "kuca": 12,
+     "znak": "pisces",
+     "deg": 27,
+     "min": 45
+    },
+    {
+     "key": "neptune",
+     "lon": 326.083722944,
+     "brzina": -0.012935985,
+     "kuca": 11,
+     "znak": "aquarius",
+     "deg": 26,
+     "min": 5
+    },
+    {
+     "key": "pluto",
+     "lon": 273.01648936,
+     "brzina": 0.015396166,
+     "kuca": 9,
+     "znak": "capricorn",
+     "deg": 3,
+     "min": 0
+    }
+   ],
+   "obliquity": 23.438276776,
+   "ramc": 296.007167687,
+   "asc": 42.065852564,
+   "mc": 294.114789365,
+   "kuspide": [
+    42.065852564,
+    71.06049831,
+    92.952033873,
+    114.114789365,
+    139.16397559,
+    174.232688124,
+    222.065852564,
+    251.06049831,
+    272.952033873,
+    294.114789365,
+    319.16397559,
+    354.232688124
+   ],
+   "fellBack": false,
+   "cvor": 275.978084599,
+   "cvorBrzina": 0.00119811,
+   "lilit": 342.090463802,
+   "sreca": 324.868961629,
+   "faza": 77.191184992,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 2.365336296
+    },
+    {
+     "key": "moon.square.saturn",
+     "orb": 1.795157974
+    },
+    {
+     "key": "jupiter.conjunction.uranus",
+     "orb": 2.155182037
+    },
+    {
+     "key": "moon.conjunction.pluto",
+     "orb": 4.497881759
+    },
+    {
+     "key": "venus.conjunction.mars",
+     "orb": 7.086813048
+    },
+    {
+     "key": "uranus.square.pluto",
+     "orb": 5.264843967
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 5.766242761
+    },
+    {
+     "key": "mars.trine.jupiter",
+     "orb": 5.876317044
+    }
+   ],
+   "razmaknuto": [
+    418.089681068,
+    343.882720801,
+    334.382720801,
+    358.206524972,
+    367.706524972,
+    491.169655064,
+    324.882720801,
+    500.669655064,
+    461.656914652,
+    408.589681068
+   ]
+  },
+  {
+   "unix": 1606106400,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 342.661601231,
+     "brzina": 12.179966193,
+     "kuca": 11,
+     "znak": "pisces",
+     "deg": 12,
+     "min": 39
+    },
+    {
+     "key": "sun",
+     "lon": 241.347401961,
+     "brzina": 1.010766981,
+     "kuca": 8,
+     "znak": "sagittarius",
+     "deg": 1,
+     "min": 20
+    },
+    {
+     "key": "mercury",
+     "lon": 226.643356392,
+     "brzina": 1.524338155,
+     "kuca": 8,
+     "znak": "scorpio",
+     "deg": 16,
+     "min": 38
+    },
+    {
+     "key": "venus",
+     "lon": 212.025765313,
+     "brzina": 1.237737522,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 2,
+     "min": 1
+    },
+    {
+     "key": "mars",
+     "lon": 15.784786016,
+     "brzina": 0.120916849,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 15,
+     "min": 47
+    },
+    {
+     "key": "jupiter",
+     "lon": 294.663815834,
+     "brzina": 0.184249598,
+     "kuca": 10,
+     "znak": "capricorn",
+     "deg": 24,
+     "min": 39
+    },
+    {
+     "key": "saturn",
+     "lon": 297.729233821,
+     "brzina": 0.08256474,
+     "kuca": 10,
+     "znak": "capricorn",
+     "deg": 27,
+     "min": 43
+    },
+    {
+     "key": "uranus",
+     "lon": 37.790583261,
+     "brzina": -0.036605736,
+     "kuca": 1,
+     "znak": "taurus",
+     "deg": 7,
+     "min": 47
+    },
+    {
+     "key": "neptune",
+     "lon": 348.17666147,
+     "brzina": -0.003204379,
+     "kuca": 12,
+     "znak": "pisces",
+     "deg": 18,
+     "min": 10
+    },
+    {
+     "key": "pluto",
+     "lon": 293.07838377,
+     "brzina": 0.022947873,
+     "kuca": 10,
+     "znak": "capricorn",
+     "deg": 23,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.436917063,
+   "ramc": 283.824882387,
+   "asc": 11.660654578,
+   "mc": 282.72301133,
+   "kuspide": [
+    11.660654578,
+    39.486429175,
+    70.210242803,
+    102.72301133,
+    135.133497389,
+    165.265023091,
+    191.660654578,
+    219.486429175,
+    250.210242803,
+    282.72301133,
+    315.133497389,
+    345.265023091
+   ],
+   "fellBack": false,
+   "cvor": 80.121241377,
+   "cvorBrzina": -0.016483165,
+   "lilit": 33.550547018,
+   "sreca": 112.974853848,
+   "faza": 101.308435449,
+   "aspekti": [
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 1.533305078
+    },
+    {
+     "key": "jupiter.conjunction.pluto",
+     "orb": 1.585432063
+    },
+    {
+     "key": "jupiter.conjunction.saturn",
+     "orb": 3.065417987
+    },
+    {
+     "key": "moon.trine.mercury",
+     "orb": 3.981755161
+    },
+    {
+     "key": "moon.conjunction.neptune",
+     "orb": 5.51506024
+    },
+    {
+     "key": "saturn.conjunction.pluto",
+     "orb": 4.650850051
+    },
+    {
+     "key": "venus.square.saturn",
+     "orb": 4.296531492
+    },
+    {
+     "key": "venus.opposition.uranus",
+     "orb": 5.764817948
+    },
+    {
+     "key": "sun.sextile.saturn",
+     "orb": 3.61816814
+    }
+   ],
+   "razmaknuto": [
+    148.376080888,
+    47.061881618,
+    32.35783605,
+    17.740244971,
+    181.499265673,
+    108.292863428,
+    117.792863428,
+    203.505062919,
+    157.876080888,
+    98.792863428
+   ]
+  },
+  {
+   "unix": 1922799000,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 38.367937005,
+     "brzina": 12.006121573,
+     "kuca": 10,
+     "znak": "taurus",
+     "deg": 8,
+     "min": 22
+    },
+    {
+     "key": "sun",
+     "lon": 254.522510797,
+     "brzina": 1.014890833,
+     "kuca": 5,
+     "znak": "sagittarius",
+     "deg": 14,
+     "min": 31
+    },
+    {
+     "key": "mercury",
+     "lon": 271.841566989,
+     "brzina": -0.131769172,
+     "kuca": 6,
+     "znak": "capricorn",
+     "deg": 1,
+     "min": 50
+    },
+    {
+     "key": "venus",
+     "lon": 266.235066089,
+     "brzina": 1.254430681,
+     "kuca": 5,
+     "znak": "sagittarius",
+     "deg": 26,
+     "min": 14
+    },
+    {
+     "key": "mars",
+     "lon": 188.73118175,
+     "brzina": 0.561275541,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 8,
+     "min": 43
+    },
+    {
+     "key": "jupiter",
+     "lon": 249.779878813,
+     "brzina": 0.224067983,
+     "kuca": 5,
+     "znak": "sagittarius",
+     "deg": 9,
+     "min": 46
+    },
+    {
+     "key": "saturn",
+     "lon": 64.715326667,
+     "brzina": -0.080132523,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 42
+    },
+    {
+     "key": "uranus",
+     "lon": 81.12452594,
+     "brzina": -0.042295762,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 21,
+     "min": 7
+    },
+    {
+     "key": "neptune",
+     "lon": 10.641929241,
+     "brzina": -0.008482079,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 10,
+     "min": 38
+    },
+    {
+     "key": "pluto",
+     "lon": 310.118122039,
+     "brzina": 0.019769468,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 10,
+     "min": 7
+    }
+   ],
+   "obliquity": 23.434139059,
+   "ramc": 316.894430327,
+   "asc": 121.374404947,
+   "mc": 314.429746181,
+   "kuspide": [
+    120,
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90
+   ],
+   "fellBack": true,
+   "cvor": 247.344103291,
+   "cvorBrzina": 0.01199406,
+   "lilit": 81.891126651,
+   "sreca": 337.528978739,
+   "faza": 143.839651488,
+   "aspekti": [
+    {
+     "key": "mars.sextile.jupiter",
+     "orb": 1.048697063
+    },
+    {
+     "key": "moon.square.pluto",
+     "orb": 1.750185034
+    },
+    {
+     "key": "mars.trine.pluto",
+     "orb": 1.386940289
+    },
+    {
+     "key": "jupiter.sextile.pluto",
+     "orb": 0.338243226
+    },
+    {
+     "key": "mars.opposition.neptune",
+     "orb": 1.910747491
+    },
+    {
+     "key": "jupiter.trine.neptune",
+     "orb": 0.862050428
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.523807202
+    },
+    {
+     "key": "sun.conjunction.jupiter",
+     "orb": 4.742631984
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 3.880581556
+    },
+    {
+     "key": "mercury.conjunction.venus",
+     "orb": 5.6065009
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 4.015855083
+    },
+    {
+     "key": "jupiter.opposition.saturn",
+     "orb": 5.064552146
+    },
+    {
+     "key": "venus.opposition.uranus",
+     "orb": 5.110540149
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 6.602015143
+    },
+    {
+     "key": "saturn.trine.pluto",
+     "orb": 5.402795372
+    }
+   ],
+   "razmaknuto": [
+    455.619482802,
+    316.53142461,
+    335.53142461,
+    326.03142461,
+    245.982727547,
+    307.03142461,
+    481.966872464,
+    498.376071737,
+    427.893475037,
+    367.369667836
+   ]
+  },
+  {
+   "unix": 2210284800,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 321.416920275,
+     "brzina": 14.638617585,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 21,
+     "min": 25
+    },
+    {
+     "key": "sun",
+     "lon": 295.444699288,
+     "brzina": 1.018853527,
+     "kuca": 6,
+     "znak": "capricorn",
+     "deg": 25,
+     "min": 26
+    },
+    {
+     "key": "mercury",
+     "lon": 302.315735905,
+     "brzina": 1.687601396,
+     "kuca": 6,
+     "znak": "aquarius",
+     "deg": 2,
+     "min": 18
+    },
+    {
+     "key": "venus",
+     "lon": 262.133158614,
+     "brzina": 1.230628756,
+     "kuca": 5,
+     "znak": "sagittarius",
+     "deg": 22,
+     "min": 7
+    },
+    {
+     "key": "mars",
+     "lon": 96.946630761,
+     "brzina": -0.311009119,
+     "kuca": 12,
+     "znak": "cancer",
+     "deg": 6,
+     "min": 56
+    },
+    {
+     "key": "jupiter",
+     "lon": 181.841427588,
+     "brzina": 0.000984578,
+     "kuca": 2,
+     "znak": "libra",
+     "deg": 1,
+     "min": 50
+    },
+    {
+     "key": "saturn",
+     "lon": 191.99723091,
+     "brzina": 0.008929724,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 11,
+     "min": 59
+    },
+    {
+     "key": "uranus",
+     "lon": 121.627935959,
+     "brzina": -0.043326865,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 1,
+     "min": 37
+    },
+    {
+     "key": "neptune",
+     "lon": 30.814208565,
+     "brzina": 0.002917649,
+     "kuca": 9,
+     "znak": "taurus",
+     "deg": 0,
+     "min": 48
+    },
+    {
+     "key": "pluto",
+     "lon": 324.405055661,
+     "brzina": 0.026122632,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 24,
+     "min": 24
+    }
+   ],
+   "obliquity": 23.434840113,
+   "ramc": 36.588980338,
+   "asc": 124.198826741,
+   "mc": 38.976602454,
+   "kuspide": [
+    124.198826741,
+    154.715772139,
+    187.178683608,
+    218.976602454,
+    248.311866502,
+    276.001986711,
+    304.198826741,
+    334.715772139,
+    7.178683608,
+    38.976602454,
+    68.311866502,
+    96.001986711
+   ],
+   "fellBack": false,
+   "cvor": 72.163552888,
+   "cvorBrzina": -0.119404492,
+   "lilit": 92.572543081,
+   "sreca": 98.226605753,
+   "faza": 25.966432618,
+   "aspekti": [
+    {
+     "key": "moon.sextile.venus",
+     "orb": 0.716238339
+    },
+    {
+     "key": "mercury.trine.jupiter",
+     "orb": 0.474308317
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 0.687799946
+    },
+    {
+     "key": "jupiter.sextile.uranus",
+     "orb": 0.213491629
+    },
+    {
+     "key": "mercury.square.neptune",
+     "orb": 1.501527339
+    },
+    {
+     "key": "moon.conjunction.pluto",
+     "orb": 2.988135386
+    },
+    {
+     "key": "uranus.square.neptune",
+     "orb": 0.813727393
+    },
+    {
+     "key": "venus.sextile.pluto",
+     "orb": 2.271897047
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 6.183236671
+    },
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 6.871036617
+    },
+    {
+     "key": "mars.square.saturn",
+     "orb": 5.050600149
+    },
+    {
+     "key": "mars.square.jupiter",
+     "orb": 5.105203173
+    },
+    {
+     "key": "sun.square.neptune",
+     "orb": 5.369509278
+    }
+   ],
+   "razmaknuto": [
+    376.304010735,
+    350.331789747,
+    359.831789747,
+    317.020249073,
+    511.83372122,
+    596.728518047,
+    606.884321369,
+    536.515026418,
+    445.701299025,
+    385.804010735
+   ]
+  },
+  {
+   "unix": 2529483000,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 43.221158066,
+     "brzina": 13.400553564,
+     "kuca": 12,
+     "znak": "taurus",
+     "deg": 13,
+     "min": 13
+    },
+    {
+     "key": "sun",
+     "lon": 338.0006376,
+     "brzina": 1.005422701,
+     "kuca": 10,
+     "znak": "pisces",
+     "deg": 8,
+     "min": 0
+    },
+    {
+     "key": "mercury",
+     "lon": 332.23108302,
+     "brzina": 1.790015976,
+     "kuca": 10,
+     "znak": "pisces",
+     "deg": 2,
+     "min": 13
+    },
+    {
+     "key": "venus",
+     "lon": 352.018534078,
+     "brzina": 1.246818258,
+     "kuca": 10,
+     "znak": "pisces",
+     "deg": 22,
+     "min": 1
+    },
+    {
+     "key": "mars",
+     "lon": 263.280564142,
+     "brzina": 0.620815567,
+     "kuca": 6,
+     "znak": "sagittarius",
+     "deg": 23,
+     "min": 16
+    },
+    {
+     "key": "jupiter",
+     "lon": 115.081186405,
+     "brzina": -0.068720054,
+     "kuca": 2,
+     "znak": "cancer",
+     "deg": 25,
+     "min": 4
+    },
+    {
+     "key": "saturn",
+     "lon": 304.100593112,
+     "brzina": 0.105387075,
+     "kuca": 9,
+     "znak": "aquarius",
+     "deg": 4,
+     "min": 6
+    },
+    {
+     "key": "uranus",
+     "lon": 169.17234913,
+     "brzina": -0.04264512,
+     "kuca": 4,
+     "znak": "virgo",
+     "deg": 19,
+     "min": 10
+    },
+    {
+     "key": "neptune",
+     "lon": 53.486496333,
+     "brzina": 0.013992394,
+     "kuca": 12,
+     "znak": "taurus",
+     "deg": 23,
+     "min": 29
+    },
+    {
+     "key": "pluto",
+     "lon": 338.874559977,
+     "brzina": 0.027471914,
+     "kuca": 10,
+     "znak": "pisces",
+     "deg": 8,
+     "min": 52
+    }
+   ],
+   "obliquity": 23.43141379,
+   "ramc": 329.426655156,
+   "asc": 85.248168527,
+   "mc": 327.223897281,
+   "kuspide": [
+    85.248168527,
+    104.508858795,
+    123.887203308,
+    147.223897281,
+    179.270402171,
+    222.626716204,
+    265.248168527,
+    284.508858795,
+    303.887203308,
+    327.223897281,
+    359.270402171,
+    42.626716204
+   ],
+   "fellBack": false,
+   "cvor": 234.118574234,
+   "cvorBrzina": -0.017378825,
+   "lilit": 144.143422668,
+   "sreca": 150.468688992,
+   "faza": 65.214770519,
+   "aspekti": [
+    {
+     "key": "venus.square.mars",
+     "orb": 1.262030064
+    },
+    {
+     "key": "sun.conjunction.pluto",
+     "orb": 0.873922378
+    },
+    {
+     "key": "venus.opposition.uranus",
+     "orb": 2.846184948
+    },
+    {
+     "key": "venus.sextile.neptune",
+     "orb": 1.467962255
+    },
+    {
+     "key": "venus.trine.jupiter",
+     "orb": 3.062652327
+    },
+    {
+     "key": "jupiter.sextile.neptune",
+     "orb": 1.594690072
+    },
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 5.76955458
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 4.108215012
+    },
+    {
+     "key": "uranus.trine.neptune",
+     "orb": 4.314147203
+    },
+    {
+     "key": "mercury.conjunction.pluto",
+     "orb": 6.643476957
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 5.951191064
+    }
+   ],
+   "razmaknuto": [
+    495.493037799,
+    434.002962753,
+    424.502962753,
+    453.002962753,
+    355.552443875,
+    567.353066138,
+    396.372472845,
+    621.444228863,
+    505.758376066,
+    443.502962753
+   ]
+  },
+  {
+   "unix": 2846089200,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 86.439192312,
+     "brzina": 13.189425778,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 26,
+     "min": 26
+    },
+    {
+     "key": "sun",
+     "lon": 350.022919798,
+     "brzina": 0.999292188,
+     "kuca": 5,
+     "znak": "pisces",
+     "deg": 20,
+     "min": 1
+    },
+    {
+     "key": "mercury",
+     "lon": 322.992671853,
+     "brzina": 0.773497524,
+     "kuca": 5,
+     "znak": "aquarius",
+     "deg": 22,
+     "min": 59
+    },
+    {
+     "key": "venus",
+     "lon": 36.218381013,
+     "brzina": 1.015058506,
+     "kuca": 7,
+     "znak": "taurus",
+     "deg": 6,
+     "min": 13
+    },
+    {
+     "key": "mars",
+     "lon": 355.976444569,
+     "brzina": 0.781606686,
+     "kuca": 6,
+     "znak": "pisces",
+     "deg": 25,
+     "min": 58
+    },
+    {
+     "key": "jupiter",
+     "lon": 55.482790504,
+     "brzina": 0.157278743,
+     "kuca": 8,
+     "znak": "taurus",
+     "deg": 25,
+     "min": 28
+    },
+    {
+     "key": "saturn",
+     "lon": 58.107849374,
+     "brzina": 0.07356463,
+     "kuca": 8,
+     "znak": "taurus",
+     "deg": 28,
+     "min": 6
+    },
+    {
+     "key": "uranus",
+     "lon": 217.922867834,
+     "brzina": -0.023749052,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 7,
+     "min": 55
+    },
+    {
+     "key": "neptune",
+     "lon": 75.834000828,
+     "brzina": 0.00811052,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 15,
+     "min": 50
+    },
+    {
+     "key": "pluto",
+     "lon": 351.320680828,
+     "brzina": 0.026181627,
+     "kuca": 6,
+     "znak": "pisces",
+     "deg": 21,
+     "min": 19
+    }
+   ],
+   "obliquity": 23.433499025,
+   "ramc": 109.582531901,
+   "asc": 195.566865559,
+   "mc": 108.076673253,
+   "kuspide": [
+    195.566865559,
+    222.810411568,
+    254.055287513,
+    288.076673253,
+    321.402368749,
+    350.894759135,
+    15.566865559,
+    42.810411568,
+    74.055287513,
+    108.076673253,
+    141.402368749,
+    170.894759135
+   ],
+   "fellBack": false,
+   "cvor": 39.476946286,
+   "cvorBrzina": -0.014208262,
+   "lilit": 192.372011001,
+   "sreca": 99.150593045,
+   "faza": 96.410540945,
+   "aspekti": [
+    {
+     "key": "moon.square.mars",
+     "orb": 0.462747743
+    },
+    {
+     "key": "mars.sextile.jupiter",
+     "orb": 0.493654065
+    },
+    {
+     "key": "sun.conjunction.pluto",
+     "orb": 1.297761029
+    },
+    {
+     "key": "venus.opposition.uranus",
+     "orb": 1.704486821
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.490118651
+    },
+    {
+     "key": "jupiter.conjunction.saturn",
+     "orb": 2.625058869
+    },
+    {
+     "key": "moon.trine.mercury",
+     "orb": 3.446520459
+    },
+    {
+     "key": "mars.sextile.saturn",
+     "orb": 2.131404804
+    },
+    {
+     "key": "mars.conjunction.pluto",
+     "orb": 4.655763742
+    },
+    {
+     "key": "sun.conjunction.mars",
+     "orb": 5.953524771
+    },
+    {
+     "key": "sun.square.neptune",
+     "orb": 4.18891897
+    },
+    {
+     "key": "mercury.square.saturn",
+     "orb": 5.11517752
+    },
+    {
+     "key": "moon.square.pluto",
+     "orb": 5.118511485
+    },
+    {
+     "key": "neptune.square.pluto",
+     "orb": 5.48668
+    }
+   ],
+   "razmaknuto": [
+    428.05996122,
+    331.643688706,
+    304.613440761,
+    377.839149921,
+    350.643688706,
+    397.103559412,
+    406.603559412,
+    199.543636742,
+    417.454769736,
+    341.143688706
+   ]
+  },
+  {
+   "unix": 1791849600,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 227.15966213,
+     "brzina": 12.392917911,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 17,
+     "min": 9
+    },
+    {
+     "key": "sun",
+     "lon": 199.675453394,
+     "brzina": 0.990123022,
+     "kuca": 10,
+     "znak": "libra",
+     "deg": 19,
+     "min": 40
+    },
+    {
+     "key": "mercury",
+     "lon": 224.667411148,
+     "brzina": 0.942665266,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 14,
+     "min": 40
+    },
+    {
+     "key": "venus",
+     "lon": 216.635447437,
+     "brzina": -0.386294805,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 6,
+     "min": 38
+    },
+    {
+     "key": "mars",
+     "lon": 128.529138829,
+     "brzina": 0.555744999,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 8,
+     "min": 31
+    },
+    {
+     "key": "jupiter",
+     "lon": 141.630454484,
+     "brzina": 0.159691087,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 21,
+     "min": 37
+    },
+    {
+     "key": "saturn",
+     "lon": 10.636032654,
+     "brzina": -0.077070679,
+     "kuca": 4,
+     "znak": "aries",
+     "deg": 10,
+     "min": 38
+    },
+    {
+     "key": "uranus",
+     "lon": 65.271081961,
+     "brzina": -0.025729532,
+     "kuca": 6,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 16
+    },
+    {
+     "key": "neptune",
+     "lon": 2.540743277,
+     "brzina": -0.026175955,
+     "kuca": 4,
+     "znak": "aries",
+     "deg": 2,
+     "min": 32
+    },
+    {
+     "key": "pluto",
+     "lon": 303.070538413,
+     "brzina": -0.001381011,
+     "kuca": 2,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.438049442,
+   "ramc": 172.781654554,
+   "asc": 278.692960271,
+   "mc": 172.140298035,
+   "kuspide": [
+    278.692960271,
+    300.091456624,
+    323.585684397,
+    352.140298035,
+    27.099155767,
+    64.734882306,
+    98.692960271,
+    120.091456624,
+    143.585684397,
+    172.140298035,
+    207.099155767,
+    244.734882306
+   ],
+   "fellBack": false,
+   "cvor": 328.535359175,
+   "cvorBrzina": -0.159052302,
+   "lilit": 273.046177434,
+   "sreca": 306.177169008,
+   "faza": 27.478503,
+   "aspekti": [
+    {
+     "key": "moon.conjunction.mercury",
+     "orb": 2.492250982
+    },
+    {
+     "key": "venus.square.mars",
+     "orb": 1.893691392
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 2.106893825
+    },
+    {
+     "key": "sun.sextile.jupiter",
+     "orb": 1.955001089
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.529795136
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 2.200543548
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 3.564909024
+    },
+    {
+     "key": "moon.square.jupiter",
+     "orb": 4.470792353
+    },
+    {
+     "key": "mars.opposition.pluto",
+     "orb": 5.458600416
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.730338684
+    },
+    {
+     "key": "mars.sextile.uranus",
+     "orb": 3.258056868
+    },
+    {
+     "key": "mars.trine.neptune",
+     "orb": 5.988395551
+    }
+   ],
+   "razmaknuto": [
+    495.807633943,
+    459.847639901,
+    486.307633943,
+    476.807633943,
+    388.701325335,
+    401.80264099,
+    272.212929784,
+    325.443268468,
+    262.712929784,
+    203.24272492
+   ]
+  },
+  {
+   "unix": 1791983580,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 246.199228708,
+     "brzina": 12.072951056,
+     "kuca": 1,
+     "znak": "sagittarius",
+     "deg": 6,
+     "min": 11
+    },
+    {
+     "key": "sun",
+     "lon": 201.211269356,
+     "brzina": 0.990946935,
+     "kuca": 11,
+     "znak": "libra",
+     "deg": 21,
+     "min": 12
+    },
+    {
+     "key": "mercury",
+     "lon": 226.087788082,
+     "brzina": 0.861270169,
+     "kuca": 12,
+     "znak": "scorpio",
+     "deg": 16,
+     "min": 5
+    },
+    {
+     "key": "venus",
+     "lon": 216.00816225,
+     "brzina": -0.439129414,
+     "kuca": 12,
+     "znak": "scorpio",
+     "deg": 6,
+     "min": 0
+    },
+    {
+     "key": "mars",
+     "lon": 129.38893591,
+     "brzina": 0.551931149,
+     "kuca": 9,
+     "znak": "leo",
+     "deg": 9,
+     "min": 23
+    },
+    {
+     "key": "jupiter",
+     "lon": 141.876644224,
+     "brzina": 0.156928866,
+     "kuca": 9,
+     "znak": "leo",
+     "deg": 21,
+     "min": 52
+    },
+    {
+     "key": "saturn",
+     "lon": 10.516854892,
+     "brzina": -0.07641032,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 10,
+     "min": 31
+    },
+    {
+     "key": "uranus",
+     "lon": 65.230641848,
+     "brzina": -0.026755357,
+     "kuca": 7,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 13
+    },
+    {
+     "key": "neptune",
+     "lon": 2.500318547,
+     "brzina": -0.025855135,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 2,
+     "min": 30
+    },
+    {
+     "key": "pluto",
+     "lon": 303.06879358,
+     "brzina": -0.00062657,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.43802288,
+   "ramc": 240.306096861,
+   "asc": 240.933004297,
+   "mc": 242.381518162,
+   "kuspide": [
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120,
+    150,
+    180,
+    210
+   ],
+   "fellBack": true,
+   "cvor": 328.302343848,
+   "cvorBrzina": -0.135774182,
+   "lilit": 273.218930029,
+   "sreca": 285.920963649,
+   "faza": 44.9822515,
+   "aspekti": [
+    {
+     "key": "sun.sextile.jupiter",
+     "orb": 0.665374869
+    },
+    {
+     "key": "moon.opposition.uranus",
+     "orb": 0.96858686
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 1.127918982
+    },
+    {
+     "key": "moon.trine.mars",
+     "orb": 3.189707201
+    },
+    {
+     "key": "venus.square.mars",
+     "orb": 3.380773659
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.568475033
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 2.93936867
+    },
+    {
+     "key": "moon.trine.neptune",
+     "orb": 3.698910162
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 2.161848269
+    },
+    {
+     "key": "moon.trine.saturn",
+     "orb": 4.317626184
+    },
+    {
+     "key": "moon.sextile.pluto",
+     "orb": 3.130435128
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.730323302
+    },
+    {
+     "key": "mars.opposition.pluto",
+     "orb": 6.32014233
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 5.788856142
+    }
+   ],
+   "razmaknuto": [
+    185.117878046,
+    140.129918694,
+    165.00643742,
+    154.926811588,
+    68.307585248,
+    80.795293562,
+    310.918967884,
+    364.149291186,
+    301.418967884,
+    241.987442918
+   ]
+  },
+  {
+   "unix": 1792117560,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 264.797415306,
+     "brzina": 11.870972253,
+     "kuca": 7,
+     "znak": "sagittarius",
+     "deg": 24,
+     "min": 47
+    },
+    {
+     "key": "sun",
+     "lon": 202.748340864,
+     "brzina": 0.991729109,
+     "kuca": 5,
+     "znak": "libra",
+     "deg": 22,
+     "min": 44
+    },
+    {
+     "key": "mercury",
+     "lon": 227.375512891,
+     "brzina": 0.767165119,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 17,
+     "min": 22
+    },
+    {
+     "key": "venus",
+     "lon": 215.301408244,
+     "brzina": -0.487011174,
+     "kuca": 5,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 18
+    },
+    {
+     "key": "mars",
+     "lon": 130.242772518,
+     "brzina": 0.548027765,
+     "kuca": 3,
+     "znak": "leo",
+     "deg": 10,
+     "min": 14
+    },
+    {
+     "key": "jupiter",
+     "lon": 142.118509703,
+     "brzina": 0.154087481,
+     "kuca": 3,
+     "znak": "leo",
+     "deg": 22,
+     "min": 7
+    },
+    {
+     "key": "saturn",
+     "lon": 10.398752188,
+     "brzina": -0.075654989,
+     "kuca": 10,
+     "znak": "aries",
+     "deg": 10,
+     "min": 23
+    },
+    {
+     "key": "uranus",
+     "lon": 65.188621483,
+     "brzina": -0.027762634,
+     "kuca": 12,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 11
+    },
+    {
+     "key": "neptune",
+     "lon": 2.460400683,
+     "brzina": -0.025518252,
+     "kuca": 10,
+     "znak": "aries",
+     "deg": 2,
+     "min": 27
+    },
+    {
+     "key": "pluto",
+     "lon": 303.068215701,
+     "brzina": 0.000120456,
+     "kuca": 8,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.438004026,
+   "ramc": 342.661462382,
+   "asc": 73.946408562,
+   "mc": 341.207615967,
+   "kuspide": [
+    73.946408562,
+    101.599422987,
+    130.195330076,
+    161.207615967,
+    193.752331076,
+    225.090314712,
+    253.946408562,
+    281.599422987,
+    310.195330076,
+    341.207615967,
+    13.752331076,
+    45.090314712
+   ],
+   "fellBack": false,
+   "cvor": 328.128106879,
+   "cvorBrzina": -0.085467913,
+   "lilit": 273.391682624,
+   "sreca": 11.89733412,
+   "faza": 62.043364674,
+   "aspekti": [
+    {
+     "key": "mars.trine.saturn",
+     "orb": 0.15597967
+    },
+    {
+     "key": "sun.sextile.jupiter",
+     "orb": 0.62983116
+    },
+    {
+     "key": "moon.sextile.sun",
+     "orb": 2.049074442
+    },
+    {
+     "key": "moon.trine.jupiter",
+     "orb": 2.678905603
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 2.233192543
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.607815018
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 2.120405782
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 4.742996812
+    },
+    {
+     "key": "venus.square.mars",
+     "orb": 4.941364274
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.7282208
+    },
+    {
+     "key": "mars.opposition.pluto",
+     "orb": 7.174556817
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.938351505
+    }
+   ],
+   "razmaknuto": [
+    370.694841895,
+    308.645767453,
+    333.27293948,
+    321.198834832,
+    236.140199107,
+    248.015936292,
+    477.857827272,
+    531.086048072,
+    468.357827272,
+    408.965642289
+   ]
+  },
+  {
+   "unix": 1792251540,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 283.167532746,
+     "brzina": 11.840872539,
+     "kuca": 10,
+     "znak": "capricorn",
+     "deg": 13,
+     "min": 10
+    },
+    {
+     "key": "sun",
+     "lon": 204.286605234,
+     "brzina": 0.992475432,
+     "kuca": 7,
+     "znak": "libra",
+     "deg": 24,
+     "min": 17
+    },
+    {
+     "key": "mercury",
+     "lon": 228.509729164,
+     "brzina": 0.658108539,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 18,
+     "min": 30
+    },
+    {
+     "key": "venus",
+     "lon": 214.523504502,
+     "brzina": -0.528725334,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 4,
+     "min": 31
+    },
+    {
+     "key": "mars",
+     "lon": 131.090507522,
+     "brzina": 0.544031821,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 11,
+     "min": 5
+    },
+    {
+     "key": "jupiter",
+     "lon": 142.355925907,
+     "brzina": 0.151164053,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 22,
+     "min": 21
+    },
+    {
+     "key": "saturn",
+     "lon": 10.281867392,
+     "brzina": -0.074811796,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 10,
+     "min": 16
+    },
+    {
+     "key": "uranus",
+     "lon": 65.145047076,
+     "brzina": -0.028754859,
+     "kuca": 2,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 8
+    },
+    {
+     "key": "neptune",
+     "lon": 2.421011206,
+     "brzina": -0.025170368,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 2,
+     "min": 25
+    },
+    {
+     "key": "pluto",
+     "lon": 303.068789874,
+     "brzina": 0.000855014,
+     "kuca": 11,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.437997837,
+   "ramc": 281.371034452,
+   "asc": 21.35551289,
+   "mc": 280.454402568,
+   "kuspide": [
+    21.35551289,
+    57.453709475,
+    80.562233459,
+    100.454402568,
+    122.170565339,
+    152.168385255,
+    201.35551289,
+    237.453709475,
+    260.562233459,
+    280.454402568,
+    302.170565339,
+    332.168385255
+   ],
+   "fellBack": false,
+   "cvor": 328.041214064,
+   "cvorBrzina": -0.027732303,
+   "lilit": 273.564435219,
+   "sreca": 100.236440402,
+   "faza": 78.875215964,
+   "aspekti": [
+    {
+     "key": "mars.trine.saturn",
+     "orb": 0.808640131
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 1.454714628
+    },
+    {
+     "key": "moon.square.saturn",
+     "orb": 2.885665355
+    },
+    {
+     "key": "sun.sextile.jupiter",
+     "orb": 1.930679327
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.647778669
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 2.076257202
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 3.846196742
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.724035871
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.860856186
+    }
+   ],
+   "razmaknuto": [
+    441.648105475,
+    362.767177963,
+    386.990301893,
+    373.004077231,
+    289.571080251,
+    300.836498636,
+    530.401583935,
+    583.625619805,
+    520.901583935,
+    461.549362603
+   ]
+  },
+  {
+   "unix": 1792385520,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 301.596187676,
+     "brzina": 12.015581575,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 1,
+     "min": 35
+    },
+    {
+     "key": "sun",
+     "lon": 205.826013698,
+     "brzina": 0.993200714,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 25,
+     "min": 49
+    },
+    {
+     "key": "mercury",
+     "lon": 229.465978967,
+     "brzina": 0.531646216,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 19,
+     "min": 27
+    },
+    {
+     "key": "venus",
+     "lon": 213.684641302,
+     "brzina": -0.563096435,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 3,
+     "min": 41
+    },
+    {
+     "key": "mars",
+     "lon": 131.931998537,
+     "brzina": 0.539946994,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 11,
+     "min": 55
+    },
+    {
+     "key": "jupiter",
+     "lon": 142.588766914,
+     "brzina": 0.148162575,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 22,
+     "min": 35
+    },
+    {
+     "key": "saturn",
+     "lon": 10.166335657,
+     "brzina": -0.073881378,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 10,
+     "min": 9
+    },
+    {
+     "key": "uranus",
+     "lon": 65.099942862,
+     "brzina": -0.029728856,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 5
+    },
+    {
+     "key": "neptune",
+     "lon": 2.38216729,
+     "brzina": -0.024809762,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 2,
+     "min": 22
+    },
+    {
+     "key": "pluto",
+     "lon": 303.070496946,
+     "brzina": 0.001578966,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.438002952,
+   "ramc": 96.982393577,
+   "asc": 185.557259953,
+   "mc": 96.411292902,
+   "kuspide": [
+    185.557259953,
+    212.087690801,
+    242.777147499,
+    276.411292902,
+    309.824570368,
+    339.935426465,
+    5.557259953,
+    32.087690801,
+    62.777147499,
+    96.411292902,
+    129.824570368,
+    159.935426465
+   ],
+   "fellBack": false,
+   "cvor": 328.031767586,
+   "cvorBrzina": 0.009956966,
+   "lilit": 273.737187813,
+   "sreca": 89.787085975,
+   "faza": 95.764460711,
+   "aspekti": [
+    {
+     "key": "moon.square.venus",
+     "orb": 2.088453626
+    },
+    {
+     "key": "moon.conjunction.pluto",
+     "orb": 1.47430927
+    },
+    {
+     "key": "moon.sextile.neptune",
+     "orb": 0.785979614
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 0.614144356
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 1.76566288
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 3.122787947
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.688329656
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 3.503755186
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 2.029445916
+    },
+    {
+     "key": "sun.sextile.jupiter",
+     "orb": 3.237246784
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.717775573
+    },
+    {
+     "key": "moon.square.sun",
+     "orb": 5.770173978
+    },
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 7.858627604
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.784168367
+    }
+   ],
+   "razmaknuto": [
+    294.900638247,
+    559.130464269,
+    582.770429538,
+    568.630464269,
+    485.236449108,
+    495.893217485,
+    365.186617861,
+    418.404393434,
+    355.686617861,
+    304.400638247
+   ]
+  },
+  {
+   "unix": 1792519500,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 320.407437391,
+     "brzina": 12.400287796,
+     "kuca": 5,
+     "znak": "aquarius",
+     "deg": 20,
+     "min": 24
+    },
+    {
+     "key": "sun",
+     "lon": 207.366544249,
+     "brzina": 0.993926036,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 27,
+     "min": 21
+    },
+    {
+     "key": "mercury",
+     "lon": 230.215959469,
+     "brzina": 0.385314536,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 12
+    },
+    {
+     "key": "venus",
+     "lon": 212.796781043,
+     "brzina": -0.589062478,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 2,
+     "min": 47
+    },
+    {
+     "key": "mars",
+     "lon": 132.76711206,
+     "brzina": 0.53578225,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 12,
+     "min": 46
+    },
+    {
+     "key": "jupiter",
+     "lon": 142.816916252,
+     "brzina": 0.145092553,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 22,
+     "min": 49
+    },
+    {
+     "key": "saturn",
+     "lon": 10.052294294,
+     "brzina": -0.072858978,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 10,
+     "min": 3
+    },
+    {
+     "key": "uranus",
+     "lon": 65.053341202,
+     "brzina": -0.030675978,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 3
+    },
+    {
+     "key": "neptune",
+     "lon": 2.343892036,
+     "brzina": -0.02442914,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 2,
+     "min": 20
+    },
+    {
+     "key": "pluto",
+     "lon": 303.073323952,
+     "brzina": 0.002299832,
+     "kuca": 5,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.438012363,
+   "ramc": 91.673926951,
+   "asc": 182.572651612,
+   "mc": 91.535881937,
+   "kuspide": [
+    182.572651612,
+    221.081856185,
+    248.577182941,
+    271.535881937,
+    294.722904032,
+    322.979385513,
+    2.572651612,
+    41.081856185,
+    68.577182941,
+    91.535881937,
+    114.722904032,
+    142.979385513
+   ],
+   "fellBack": false,
+   "cvor": 328.053089884,
+   "cvorBrzina": 0.0105394,
+   "lilit": 273.909940408,
+   "sreca": 69.531758471,
+   "faza": 113.035178135,
+   "aspekti": [
+    {
+     "key": "moon.square.mercury",
+     "orb": 0.191477922
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 0.276542909
+    },
+    {
+     "key": "moon.opposition.jupiter",
+     "orb": 2.409478862
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.600956783
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 2.714817766
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.729431916
+    },
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 5.430236793
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.98001725
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.709449166
+    },
+    {
+     "key": "moon.opposition.mars",
+     "orb": 7.640325331
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 5.706779702
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.708402258
+    }
+   ],
+   "razmaknuto": [
+    317.248649684,
+    564.207756542,
+    587.057171762,
+    573.707756542,
+    489.608324353,
+    499.658128545,
+    368.685104329,
+    421.894553495,
+    359.185104329,
+    299.914536245
+   ]
+  },
+  {
+   "unix": 1792653480,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 339.914546809,
+     "brzina": 12.961306693,
+     "kuca": 5,
+     "znak": "pisces",
+     "deg": 9,
+     "min": 54
+    },
+    {
+     "key": "sun",
+     "lon": 208.908208732,
+     "brzina": 0.994673301,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 28,
+     "min": 54
+    },
+    {
+     "key": "mercury",
+     "lon": 230.727696596,
+     "brzina": 0.217051255,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 43
+    },
+    {
+     "key": "venus",
+     "lon": 211.873441491,
+     "brzina": -0.605752462,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 1,
+     "min": 52
+    },
+    {
+     "key": "mars",
+     "lon": 133.595729348,
+     "brzina": 0.531546793,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 13,
+     "min": 35
+    },
+    {
+     "key": "jupiter",
+     "lon": 143.040273428,
+     "brzina": 0.141964693,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 23,
+     "min": 2
+    },
+    {
+     "key": "saturn",
+     "lon": 9.939889379,
+     "brzina": -0.071738199,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 9,
+     "min": 56
+    },
+    {
+     "key": "uranus",
+     "lon": 65.005289216,
+     "brzina": -0.031586071,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 5,
+     "min": 0
+    },
+    {
+     "key": "neptune",
+     "lon": 2.306221271,
+     "brzina": -0.02401956,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 2,
+     "min": 18
+    },
+    {
+     "key": "pluto",
+     "lon": 303.077271035,
+     "brzina": 0.003026829,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.438016839,
+   "ramc": 159.198334711,
+   "asc": 213.766360444,
+   "mc": 157.507438995,
+   "kuspide": [
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120,
+    150,
+    180
+   ],
+   "fellBack": true,
+   "cvor": 328.045104487,
+   "cvorBrzina": -0.026910543,
+   "lilit": 274.082693003,
+   "sreca": 344.772698522,
+   "faza": 131.000621235,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 2.96523276
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 1.203829544
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.312576832
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.771049764
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 3.655839969
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.92801818
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 4.169062304
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.699067945
+    },
+    {
+     "key": "moon.square.uranus",
+     "orb": 4.909257594
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.633668108
+    }
+   ],
+   "razmaknuto": [
+    305.30253086,
+    534.296192782,
+    556.115680647,
+    543.796192782,
+    458.983713399,
+    468.483713399,
+    337.194205322,
+    390.393273267,
+    327.694205322,
+    268.465255086
+   ]
+  },
+  {
+   "unix": 1792787460,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 0.352421748,
+     "brzina": 13.612773363,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 0,
+     "min": 21
+    },
+    {
+     "key": "sun",
+     "lon": 210.451050806,
+     "brzina": 0.995459072,
+     "kuca": 8,
+     "znak": "scorpio",
+     "deg": 0,
+     "min": 27
+    },
+    {
+     "key": "mercury",
+     "lon": 230.966489057,
+     "brzina": 0.025872089,
+     "kuca": 8,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 57
+    },
+    {
+     "key": "venus",
+     "lon": 210.929360534,
+     "brzina": -0.612558433,
+     "kuca": 8,
+     "znak": "scorpio",
+     "deg": 0,
+     "min": 55
+    },
+    {
+     "key": "mars",
+     "lon": 134.417743391,
+     "brzina": 0.527243637,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 14,
+     "min": 25
+    },
+    {
+     "key": "jupiter",
+     "lon": 143.258752996,
+     "brzina": 0.138785671,
+     "kuca": 6,
+     "znak": "leo",
+     "deg": 23,
+     "min": 15
+    },
+    {
+     "key": "saturn",
+     "lon": 9.829275887,
+     "brzina": -0.070515497,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 9,
+     "min": 49
+    },
+    {
+     "key": "uranus",
+     "lon": 64.955848565,
+     "brzina": -0.03245224,
+     "kuca": 3,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 57
+    },
+    {
+     "key": "neptune",
+     "lon": 2.269203587,
+     "brzina": -0.023575129,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 2,
+     "min": 16
+    },
+    {
+     "key": "pluto",
+     "lon": 303.082351548,
+     "brzina": 0.00376615,
+     "kuca": 11,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 4
+    }
+   ],
+   "obliquity": 23.43800944,
+   "ramc": 261.553629889,
+   "asc": 350.818979135,
+   "mc": 262.241670744,
+   "kuspide": [
+    350.818979135,
+    23.272146971,
+    53.910268706,
+    82.241670744,
+    109.943368812,
+    139.163199412,
+    170.818979135,
+    203.272146971,
+    233.910268706,
+    262.241670744,
+    289.943368812,
+    319.163199412
+   ],
+   "fellBack": false,
+   "cvor": 327.956398718,
+   "cvorBrzina": -0.089922479,
+   "lilit": 274.255445598,
+   "sreca": 140.720350078,
+   "faza": 149.895652099,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 0.478309729
+    },
+    {
+     "key": "moon.conjunction.neptune",
+     "orb": 1.916781839
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.292263939
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 2.631300742
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 2.152991013
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.81314796
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.873497018
+    },
+    {
+     "key": "moon.sextile.pluto",
+     "orb": 2.729929799
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 4.588467504
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.686644978
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.560072299
+    }
+   ],
+   "razmaknuto": [
+    186.854738144,
+    396.953367202,
+    417.468805453,
+    406.453367202,
+    320.920059787,
+    330.420059787,
+    205.854738144,
+    251.458164961,
+    196.354738144,
+    129.584667944
+   ]
+  },
+  {
+   "unix": 1792921440,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 21.793421033,
+     "brzina": 14.215750864,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 21,
+     "min": 47
+    },
+    {
+     "key": "sun",
+     "lon": 211.995135044,
+     "brzina": 0.996290203,
+     "kuca": 10,
+     "znak": "scorpio",
+     "deg": 1,
+     "min": 59
+    },
+    {
+     "key": "mercury",
+     "lon": 230.897060995,
+     "brzina": -0.187142096,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 53
+    },
+    {
+     "key": "venus",
+     "lon": 209.980056282,
+     "brzina": -0.60919175,
+     "kuca": 10,
+     "znak": "libra",
+     "deg": 29,
+     "min": 58
+    },
+    {
+     "key": "mars",
+     "lon": 135.233046446,
+     "brzina": 0.522864835,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 15,
+     "min": 13
+    },
+    {
+     "key": "jupiter",
+     "lon": 143.472276083,
+     "brzina": 0.135554494,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 23,
+     "min": 28
+    },
+    {
+     "key": "saturn",
+     "lon": 9.720611417,
+     "brzina": -0.06919314,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 9,
+     "min": 43
+    },
+    {
+     "key": "uranus",
+     "lon": 64.905088421,
+     "brzina": -0.033274045,
+     "kuca": 5,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 54
+    },
+    {
+     "key": "neptune",
+     "lon": 2.232893661,
+     "brzina": -0.023096155,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 2,
+     "min": 13
+    },
+    {
+     "key": "pluto",
+     "lon": 303.088585387,
+     "brzina": 0.004517774,
+     "kuca": 1,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 5
+    }
+   ],
+   "obliquity": 23.437988907,
+   "ramc": 200.263132065,
+   "asc": 265.27886555,
+   "mc": 201.918858454,
+   "kuspide": [
+    265.27886555,
+    304.477985536,
+    347.649346754,
+    21.918858454,
+    46.879949542,
+    66.78956214,
+    85.27886555,
+    124.477985536,
+    167.649346754,
+    201.918858454,
+    226.879949542,
+    246.78956214
+   ],
+   "fellBack": false,
+   "cvor": 327.767659448,
+   "cvorBrzina": -0.150012186,
+   "lilit": 274.428198193,
+   "sreca": 75.077151538,
+   "faza": 169.792564932,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 2.015078762
+    },
+    {
+     "key": "moon.trine.jupiter",
+     "orb": 1.67885505
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 1.093450343
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.575215088
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.855691726
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 3.108529105
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.816503034
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.67219476
+    },
+    {
+     "key": "mars.trine.saturn",
+     "orb": 5.512435029
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 5.664014549
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.487717756
+    }
+   ],
+   "razmaknuto": [
+    295.438758098,
+    493.125393348,
+    504.542398061,
+    483.625393348,
+    408.878383512,
+    418.378383512,
+    285.378230727,
+    338.550425487,
+    275.878230727,
+    216.733922453
+   ]
+  },
+  {
+   "unix": 1793055420,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 44.078581244,
+     "brzina": 14.614415404,
+     "kuca": 10,
+     "znak": "taurus",
+     "deg": 14,
+     "min": 4
+    },
+    {
+     "key": "sun",
+     "lon": 213.540530951,
+     "brzina": 0.997162937,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 3,
+     "min": 32
+    },
+    {
+     "key": "mercury",
+     "lon": 230.487413779,
+     "brzina": -0.417547023,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 29
+    },
+    {
+     "key": "venus",
+     "lon": 209.041312356,
+     "brzina": -0.595713723,
+     "kuca": 4,
+     "znak": "libra",
+     "deg": 29,
+     "min": 2
+    },
+    {
+     "key": "mars",
+     "lon": 136.041512114,
+     "brzina": 0.518390754,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 16,
+     "min": 2
+    },
+    {
+     "key": "jupiter",
+     "lon": 143.680757916,
+     "brzina": 0.132262238,
+     "kuca": 2,
+     "znak": "leo",
+     "deg": 23,
+     "min": 40
+    },
+    {
+     "key": "saturn",
+     "lon": 9.614046842,
+     "brzina": -0.067779124,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 9,
+     "min": 36
+    },
+    {
+     "key": "uranus",
+     "lon": 64.853075019,
+     "brzina": -0.034057547,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 51
+    },
+    {
+     "key": "neptune",
+     "lon": 2.197342212,
+     "brzina": -0.022589205,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 2,
+     "min": 11
+    },
+    {
+     "key": "pluto",
+     "lon": 303.095988914,
+     "brzina": 0.005275357,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 5
+    }
+   ],
+   "obliquity": 23.437960287,
+   "ramc": 15.874457838,
+   "asc": 121.510786416,
+   "mc": 17.220774529,
+   "kuspide": [
+    121.510786416,
+    141.820235499,
+    166.321583348,
+    197.220774529,
+    233.848358631,
+    270.291328008,
+    301.510786416,
+    321.820235499,
+    346.321583348,
+    17.220774529,
+    53.848358631,
+    90.291328008
+   ],
+   "fellBack": false,
+   "cvor": 327.50826487,
+   "cvorBrzina": -0.17671176,
+   "lilit": 274.600950787,
+   "sreca": 290.972736123,
+   "faza": 190.53232679,
+   "aspekti": [
+    {
+     "key": "sun.square.pluto",
+     "orb": 0.444542037
+    },
+    {
+     "key": "moon.square.mars",
+     "orb": 1.96293087
+    },
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 4.499218595
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 3.193344137
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.898646702
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.757086105
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 4.445901665
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 4.054676558
+    },
+    {
+     "key": "moon.opposition.mercury",
+     "orb": 6.408832535
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.655732807
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.416704629
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 7.639245802
+    }
+   ],
+   "razmaknuto": [
+    101.673311731,
+    276.136042843,
+    288.082144265,
+    266.636042843,
+    193.636242601,
+    203.136242601,
+    69.292072698,
+    122.447805505,
+    59.792072698,
+    0.6907194
+   ]
+  },
+  {
+   "unix": 1793189400,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 66.828471541,
+     "brzina": 14.711198248,
+     "kuca": 12,
+     "znak": "gemini",
+     "deg": 6,
+     "min": 49
+    },
+    {
+     "key": "sun",
+     "lon": 215.087297575,
+     "brzina": 0.998065627,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 5
+    },
+    {
+     "key": "mercury",
+     "lon": 229.714813574,
+     "brzina": -0.656056526,
+     "kuca": 5,
+     "znak": "scorpio",
+     "deg": 19,
+     "min": 42
+    },
+    {
+     "key": "venus",
+     "lon": 208.128632191,
+     "brzina": -0.572533861,
+     "kuca": 4,
+     "znak": "libra",
+     "deg": 28,
+     "min": 7
+    },
+    {
+     "key": "mars",
+     "lon": 136.842978781,
+     "brzina": 0.513793982,
+     "kuca": 2,
+     "znak": "leo",
+     "deg": 16,
+     "min": 50
+    },
+    {
+     "key": "jupiter",
+     "lon": 143.884096915,
+     "brzina": 0.128895372,
+     "kuca": 2,
+     "znak": "leo",
+     "deg": 23,
+     "min": 53
+    },
+    {
+     "key": "saturn",
+     "lon": 9.509718762,
+     "brzina": -0.066284071,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 9,
+     "min": 30
+    },
+    {
+     "key": "uranus",
+     "lon": 64.79986295,
+     "brzina": -0.034812111,
+     "kuca": 12,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 47
+    },
+    {
+     "key": "neptune",
+     "lon": 2.162587604,
+     "brzina": -0.022064039,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 2,
+     "min": 9
+    },
+    {
+     "key": "pluto",
+     "lon": 303.104566422,
+     "brzina": 0.00602924,
+     "kuca": 8,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 6
+    }
+   ],
+   "obliquity": 23.437932484,
+   "ramc": 10.566012741,
+   "asc": 84.264997063,
+   "mc": 11.491920061,
+   "kuspide": [
+    84.264997063,
+    118.800512825,
+    156.794212354,
+    191.491920061,
+    219.590158653,
+    242.814932784,
+    264.264997063,
+    298.800512825,
+    336.794212354,
+    11.491920061,
+    39.590158653,
+    62.814932784
+   ],
+   "fellBack": false,
+   "cvor": 327.244291594,
+   "cvorBrzina": -0.155412816,
+   "lilit": 274.773703382,
+   "sreca": 232.523823097,
+   "faza": 211.735447784,
+   "aspekti": [
+    {
+     "key": "moon.conjunction.uranus",
+     "orb": 2.028608592
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 1.982731153
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 2.871834794
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.941978817
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.695296528
+    },
+    {
+     "key": "moon.trine.pluto",
+     "orb": 3.72390512
+    },
+    {
+     "key": "moon.sextile.saturn",
+     "orb": 2.681247221
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 4.16928334
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.637275345
+    },
+    {
+     "key": "sun.conjunction.venus",
+     "orb": 6.958665384
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 4.975934231
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 7.041118134
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.347131158
+    }
+   ],
+   "razmaknuto": [
+    168.572418214,
+    311.901187455,
+    323.987368838,
+    302.401187455,
+    231.115534045,
+    240.615534045,
+    105.935142868,
+    159.072418214,
+    96.435142868,
+    37.377121686
+   ]
+  },
+  {
+   "unix": 1793323380,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 89.570491202,
+     "brzina": 14.524422321,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 29,
+     "min": 34
+    },
+    {
+     "key": "sun",
+     "lon": 216.635473719,
+     "brzina": 0.998983624,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 6,
+     "min": 38
+    },
+    {
+     "key": "mercury",
+     "lon": 228.574017828,
+     "brzina": -0.887303256,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 18,
+     "min": 34
+    },
+    {
+     "key": "venus",
+     "lon": 207.256713924,
+     "brzina": -0.540374565,
+     "kuca": 2,
+     "znak": "libra",
+     "deg": 27,
+     "min": 15
+    },
+    {
+     "key": "mars",
+     "lon": 137.637241023,
+     "brzina": 0.509046337,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 17,
+     "min": 38
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.082170267,
+     "brzina": 0.125441148,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 24,
+     "min": 4
+    },
+    {
+     "key": "saturn",
+     "lon": 9.4077478,
+     "brzina": -0.064716654,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 9,
+     "min": 24
+    },
+    {
+     "key": "uranus",
+     "lon": 64.745492524,
+     "brzina": -0.035545535,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 44
+    },
+    {
+     "key": "neptune",
+     "lon": 2.128653297,
+     "brzina": -0.021528926,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 2,
+     "min": 7
+    },
+    {
+     "key": "pluto",
+     "lon": 303.11430737,
+     "brzina": 0.006771084,
+     "kuca": 6,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 6
+    }
+   ],
+   "obliquity": 23.437913929,
+   "ramc": 78.090488552,
+   "asc": 174.020087609,
+   "mc": 79.048339644,
+   "kuspide": [
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120
+   ],
+   "fellBack": true,
+   "cvor": 327.045214331,
+   "cvorBrzina": -0.097207741,
+   "lilit": 274.946455976,
+   "sreca": 301.085070126,
+   "faza": 232.929288425,
+   "aspekti": [
+    {
+     "key": "mercury.square.mars",
+     "orb": 0.936776804
+    },
+    {
+     "key": "moon.trine.venus",
+     "orb": 2.313777278
+    },
+    {
+     "key": "moon.square.neptune",
+     "orb": 2.558162096
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 0.985654073
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.631185154
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 3.521166349
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 3.174543657
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.616839227
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 6.444929244
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 5.50815244
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.279094502
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 5.857593446
+    }
+   ],
+   "razmaknuto": [
+    455.010681946,
+    582.196904669,
+    594.014208573,
+    572.696904669,
+    503.077431768,
+    512.577431768,
+    377.068844042,
+    430.185683269,
+    367.568844042,
+    308.554498115
+   ]
+  },
+  {
+   "unix": 1793457360,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 111.917359564,
+     "brzina": 14.166705216,
+     "kuca": 7,
+     "znak": "cancer",
+     "deg": 21,
+     "min": 55
+    },
+    {
+     "key": "sun",
+     "lon": 218.185075914,
+     "brzina": 0.999903988,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 8,
+     "min": 11
+    },
+    {
+     "key": "mercury",
+     "lon": 227.086974078,
+     "brzina": -1.089692089,
+     "kuca": 11,
+     "znak": "scorpio",
+     "deg": 17,
+     "min": 5
+    },
+    {
+     "key": "venus",
+     "lon": 206.43899573,
+     "brzina": -0.50020792,
+     "kuca": 10,
+     "znak": "libra",
+     "deg": 26,
+     "min": 26
+    },
+    {
+     "key": "mars",
+     "lon": 138.424052375,
+     "brzina": 0.504126075,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 18,
+     "min": 25
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.274837969,
+     "brzina": 0.121892595,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 24,
+     "min": 16
+    },
+    {
+     "key": "saturn",
+     "lon": 9.308243827,
+     "brzina": -0.063079816,
+     "kuca": 4,
+     "znak": "aries",
+     "deg": 9,
+     "min": 18
+    },
+    {
+     "key": "uranus",
+     "lon": 64.68999464,
+     "brzina": -0.036259823,
+     "kuca": 6,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 41
+    },
+    {
+     "key": "neptune",
+     "lon": 2.095552476,
+     "brzina": -0.020986634,
+     "kuca": 4,
+     "znak": "aries",
+     "deg": 2,
+     "min": 5
+    },
+    {
+     "key": "pluto",
+     "lon": 303.125190727,
+     "brzina": 0.007497844,
+     "kuca": 2,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 7
+    }
+   ],
+   "obliquity": 23.437908481,
+   "ramc": 180.445867312,
+   "asc": 270.480953248,
+   "mc": 180.485961497,
+   "kuspide": [
+    270.480953248,
+    298.380001731,
+    328.296865146,
+    0.485961497,
+    32.658625327,
+    62.558260263,
+    90.480953248,
+    118.380001731,
+    148.296865146,
+    180.485961497,
+    212.658625327,
+    242.558260263
+   ],
+   "fellBack": false,
+   "cvor": 326.946182299,
+   "cvorBrzina": -0.032513993,
+   "lilit": 275.119208571,
+   "sreca": 164.213236898,
+   "faza": 253.726551574,
+   "aspekti": [
+    {
+     "key": "mercury.square.mars",
+     "orb": 1.337078298
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.164157762
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.029638251
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.564803913
+    },
+    {
+     "key": "moon.square.venus",
+     "orb": 4.521636166
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 5.850785593
+    },
+    {
+     "key": "moon.trine.mercury",
+     "orb": 4.830385486
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.594442164
+    },
+    {
+     "key": "sun.square.pluto",
+     "orb": 5.059885187
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.212691351
+    }
+   ],
+   "razmaknuto": [
+    380.782943827,
+    487.050660177,
+    496.550660177,
+    475.304579993,
+    407.289636638,
+    416.789636638,
+    280.461136739,
+    333.555578903,
+    270.961136739,
+    211.99077499
+   ]
+  },
+  {
+   "unix": 1793591340,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 133.673716928,
+     "brzina": 13.764937764,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 13,
+     "min": 40
+    },
+    {
+     "key": "sun",
+     "lon": 219.736102721,
+     "brzina": 1.000817972,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 9,
+     "min": 44
+    },
+    {
+     "key": "mercury",
+     "lon": 225.311695708,
+     "brzina": -1.23750585,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 15,
+     "min": 18
+    },
+    {
+     "key": "venus",
+     "lon": 205.687309462,
+     "brzina": -0.453175784,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 25,
+     "min": 41
+    },
+    {
+     "key": "mars",
+     "lon": 139.203138078,
+     "brzina": 0.499022288,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 19,
+     "min": 12
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.461953397,
+     "brzina": 0.118250839,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 24,
+     "min": 27
+    },
+    {
+     "key": "saturn",
+     "lon": 9.211315787,
+     "brzina": -0.061369727,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 9,
+     "min": 12
+    },
+    {
+     "key": "uranus",
+     "lon": 64.633400946,
+     "brzina": -0.036949688,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 38
+    },
+    {
+     "key": "neptune",
+     "lon": 2.063297663,
+     "brzina": -0.020433097,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 2,
+     "min": 3
+    },
+    {
+     "key": "pluto",
+     "lon": 303.137194276,
+     "brzina": 0.008213135,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 8
+    }
+   ],
+   "obliquity": 23.437913556,
+   "ramc": 119.155430085,
+   "asc": 202.155123206,
+   "mc": 117.104842588,
+   "kuspide": [
+    202.155123206,
+    229.379097106,
+    261.517972619,
+    297.104842588,
+    330.875404264,
+    359.284858973,
+    22.155123206,
+    49.379097106,
+    81.517972619,
+    117.104842588,
+    150.875404264,
+    179.284858973
+   ],
+   "fellBack": false,
+   "cvor": 326.929520281,
+   "cvorBrzina": 0.003154644,
+   "lilit": 275.291961166,
+   "sreca": 288.217508999,
+   "faza": 273.931879047,
+   "aspekti": [
+    {
+     "key": "moon.square.mercury",
+     "orb": 1.63797878
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.225356065
+    },
+    {
+     "key": "moon.square.sun",
+     "orb": 3.937614207
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.49620667
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.073896613
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 3.89144237
+    },
+    {
+     "key": "moon.conjunction.mars",
+     "orb": 5.52942115
+    },
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 5.575592987
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 5.258815319
+    },
+    {
+     "key": "moon.trine.saturn",
+     "orb": 4.462401141
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.570103283
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.148018124
+    }
+   ],
+   "razmaknuto": [
+    469.672720595,
+    555.735106388,
+    565.235106388,
+    541.686313129,
+    479.172720595,
+    488.672720595,
+    347.56230133,
+    400.632404613,
+    338.06230133,
+    279.136197943
+   ]
+  },
+  {
+   "unix": 1793725320,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 154.819652937,
+     "brzina": 13.3972878,
+     "kuca": 5,
+     "znak": "virgo",
+     "deg": 4,
+     "min": 49
+    },
+    {
+     "key": "sun",
+     "lon": 221.288541263,
+     "brzina": 1.001720432,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 11,
+     "min": 17
+    },
+    {
+     "key": "mercury",
+     "lon": 223.346321394,
+     "brzina": -1.305993122,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 13,
+     "min": 20
+    },
+    {
+     "key": "venus",
+     "lon": 205.011661438,
+     "brzina": -0.400506659,
+     "kuca": 6,
+     "znak": "libra",
+     "deg": 25,
+     "min": 0
+    },
+    {
+     "key": "mars",
+     "lon": 139.974212389,
+     "brzina": 0.493734829,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 19,
+     "min": 58
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.64337558,
+     "brzina": 0.114523758,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 24,
+     "min": 38
+    },
+    {
+     "key": "saturn",
+     "lon": 9.117081358,
+     "brzina": -0.059578064,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 9,
+     "min": 7
+    },
+    {
+     "key": "uranus",
+     "lon": 64.575754503,
+     "brzina": -0.037604504,
+     "kuca": 1,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 34
+    },
+    {
+     "key": "neptune",
+     "lon": 2.031910641,
+     "brzina": -0.019859406,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 2,
+     "min": 1
+    },
+    {
+     "key": "pluto",
+     "lon": 303.150304279,
+     "brzina": 0.008925286,
+     "kuca": 10,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 9
+    }
+   ],
+   "obliquity": 23.4379214,
+   "ramc": 294.766766192,
+   "asc": 40.276899736,
+   "mc": 292.942697155,
+   "kuspide": [
+    40.276899736,
+    69.776473816,
+    91.820285923,
+    112.942697155,
+    137.769257659,
+    172.446145404,
+    220.276899736,
+    249.776473816,
+    271.820285923,
+    292.942697155,
+    317.769257659,
+    352.446145404
+   ],
+   "fellBack": false,
+   "cvor": 326.929782,
+   "cvorBrzina": -0.011964979,
+   "lilit": 275.46471376,
+   "sreca": 333.808011409,
+   "faza": 293.525373449,
+   "aspekti": [
+    {
+     "key": "moon.square.uranus",
+     "orb": 0.243898434
+    },
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 2.057780131
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 0.368285857
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.425450224
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 4.669163192
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.118393638
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.543843862
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.085170717
+    }
+   ],
+   "razmaknuto": [
+    296.813068112,
+    359.127396986,
+    368.627396986,
+    342.850517161,
+    277.813068112,
+    287.313068112,
+    149.370766364,
+    202.414610226,
+    139.870766364,
+    80.989160002
+   ]
+  },
+  {
+   "unix": 1793859300,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 175.423678855,
+     "brzina": 13.081910408,
+     "kuca": 6,
+     "znak": "virgo",
+     "deg": 25,
+     "min": 25
+    },
+    {
+     "key": "sun",
+     "lon": 222.842371466,
+     "brzina": 1.002606947,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 12,
+     "min": 50
+    },
+    {
+     "key": "mercury",
+     "lon": 221.323957823,
+     "brzina": -1.27853239,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 11,
+     "min": 19
+    },
+    {
+     "key": "venus",
+     "lon": 204.420138798,
+     "brzina": -0.343441058,
+     "kuca": 7,
+     "znak": "libra",
+     "deg": 24,
+     "min": 25
+    },
+    {
+     "key": "mars",
+     "lon": 140.736993447,
+     "brzina": 0.488270127,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 20,
+     "min": 44
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.818977677,
+     "brzina": 0.110721748,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 24,
+     "min": 49
+    },
+    {
+     "key": "saturn",
+     "lon": 9.025671667,
+     "brzina": -0.0576966,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 9,
+     "min": 1
+    },
+    {
+     "key": "uranus",
+     "lon": 64.517115898,
+     "brzina": -0.03821278,
+     "kuca": 2,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 31
+    },
+    {
+     "key": "neptune",
+     "lon": 2.001427812,
+     "brzina": -0.019256211,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 2,
+     "min": 0
+    },
+    {
+     "key": "pluto",
+     "lon": 303.164520697,
+     "brzina": 0.009643039,
+     "kuca": 10,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 9
+    }
+   ],
+   "obliquity": 23.437922879,
+   "ramc": 289.458278424,
+   "asc": 16.39713945,
+   "mc": 287.960056118,
+   "kuspide": [
+    16.39713945,
+    44.438225849,
+    75.300141291,
+    107.960056118,
+    140.432813825,
+    170.385541364,
+    196.39713945,
+    224.438225849,
+    255.300141291,
+    287.960056118,
+    320.432813825,
+    350.385541364
+   ],
+   "fellBack": false,
+   "cvor": 326.869884521,
+   "cvorBrzina": -0.071242249,
+   "lilit": 275.637466354,
+   "sreca": 328.978446839,
+   "faza": 312.575566205,
+   "aspekti": [
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 1.518413644
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 0.398838878
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 4.08198423
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.352595201
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.163092885
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.515688086
+    },
+    {
+     "key": "moon.opposition.neptune",
+     "orb": 6.577748957
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.683145352
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 7.024243855
+    }
+   ],
+   "razmaknuto": [
+    337.439003577,
+    392.839282545,
+    383.339282545,
+    366.435463521,
+    302.752318169,
+    312.252318169,
+    173.516752534,
+    226.53244062,
+    164.016752534,
+    105.179845419
+   ]
+  },
+  {
+   "unix": 1793993280,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 195.55912246,
+     "brzina": 12.79925625,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 15,
+     "min": 33
+    },
+    {
+     "key": "sun",
+     "lon": 224.397565401,
+     "brzina": 1.003470602,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 14,
+     "min": 23
+    },
+    {
+     "key": "mercury",
+     "lon": 219.396475953,
+     "brzina": -1.152834615,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 9,
+     "min": 23
+    },
+    {
+     "key": "venus",
+     "lon": 203.918923964,
+     "brzina": -0.283172315,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 23,
+     "min": 55
+    },
+    {
+     "key": "mars",
+     "lon": 141.491210325,
+     "brzina": 0.482635096,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 21,
+     "min": 29
+    },
+    {
+     "key": "jupiter",
+     "lon": 144.988648189,
+     "brzina": 0.106852717,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 24,
+     "min": 59
+    },
+    {
+     "key": "saturn",
+     "lon": 8.937228529,
+     "brzina": -0.055721939,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 8,
+     "min": 56
+    },
+    {
+     "key": "uranus",
+     "lon": 64.457561932,
+     "brzina": -0.038767021,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 27
+    },
+    {
+     "key": "neptune",
+     "lon": 1.971898326,
+     "brzina": -0.01861839,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 1,
+     "min": 58
+    },
+    {
+     "key": "pluto",
+     "lon": 303.179855317,
+     "brzina": 0.010370975,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 10
+    }
+   ],
+   "obliquity": 23.437911946,
+   "ramc": 356.982681681,
+   "asc": 135.720606061,
+   "mc": 356.711910583,
+   "kuspide": [
+    120,
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90
+   ],
+   "fellBack": true,
+   "cvor": 326.698804747,
+   "cvorBrzina": -0.150111294,
+   "lilit": 275.810218949,
+   "sreca": 164.559049002,
+   "faza": 331.155813099,
+   "aspekti": [
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.069724226
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 3.497437865
+    },
+    {
+     "key": "sun.conjunction.mercury",
+     "orb": 5.001089448
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.277706615
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 2.427713639
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.207956991
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.485663606
+    },
+    {
+     "key": "moon.opposition.saturn",
+     "orb": 6.621893931
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.965330203
+    }
+   ],
+   "razmaknuto": [
+    598.4208823,
+    631.758235793,
+    622.258235793,
+    607.9208823,
+    544.352970165,
+    553.852970165,
+    414.333658167,
+    467.319321773,
+    404.833658167,
+    346.041615157
+   ]
+  },
+  {
+   "unix": 1794127260,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 215.26230973,
+     "brzina": 12.523997872,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 15
+    },
+    {
+     "key": "sun",
+     "lon": 225.954082352,
+     "brzina": 1.004300545,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 15,
+     "min": 57
+    },
+    {
+     "key": "mercury",
+     "lon": 217.710740006,
+     "brzina": -0.942600117,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 7,
+     "min": 42
+    },
+    {
+     "key": "venus",
+     "lon": 203.512391855,
+     "brzina": -0.220804362,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 23,
+     "min": 30
+    },
+    {
+     "key": "mars",
+     "lon": 142.236600838,
+     "brzina": 0.476832069,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 22,
+     "min": 14
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.152285041,
+     "brzina": 0.102918751,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 25,
+     "min": 9
+    },
+    {
+     "key": "saturn",
+     "lon": 8.851895223,
+     "brzina": -0.053658155,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 8,
+     "min": 51
+    },
+    {
+     "key": "uranus",
+     "lon": 64.397177561,
+     "brzina": -0.039266636,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 23
+    },
+    {
+     "key": "neptune",
+     "lon": 1.943375781,
+     "brzina": -0.01794773,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 1,
+     "min": 56
+    },
+    {
+     "key": "pluto",
+     "lon": 303.196323603,
+     "brzina": 0.011106913,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 11
+    }
+   ],
+   "obliquity": 23.437888595,
+   "ramc": 99.33799571,
+   "asc": 190.174750719,
+   "mc": 98.579502129,
+   "kuspide": [
+    190.174750719,
+    221.808093917,
+    250.937448971,
+    278.579502129,
+    306.922455497,
+    337.636534275,
+    10.174750719,
+    41.808093917,
+    70.937448971,
+    98.579502129,
+    126.922455497,
+    157.636534275
+   ],
+   "fellBack": false,
+   "cvor": 326.410940316,
+   "cvorBrzina": -0.216007509,
+   "lilit": 275.982971543,
+   "sreca": 200.866523341,
+   "faza": 349.302480884,
+   "aspekti": [
+    {
+     "key": "moon.conjunction.mercury",
+     "orb": 2.448430275
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 1.275791018
+    },
+    {
+     "key": "moon.square.pluto",
+     "orb": 2.065986127
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 2.915684204
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.639893186
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.200853958
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.252947822
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.45380178
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 4.514416402
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.908519442
+    }
+   ],
+   "razmaknuto": [
+    202.633999665,
+    221.633999665,
+    212.133999665,
+    190.884081791,
+    129.608290773,
+    139.108290773,
+    358.815065716,
+    411.768867496,
+    349.315065716,
+    290.568013539
+   ]
+  },
+  {
+   "unix": 1794261240,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 234.538766274,
+     "brzina": 12.251161513,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 24,
+     "min": 32
+    },
+    {
+     "key": "sun",
+     "lon": 227.511863158,
+     "brzina": 1.005083514,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 17,
+     "min": 30
+    },
+    {
+     "key": "mercury",
+     "lon": 216.385373659,
+     "brzina": -0.673404028,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 6,
+     "min": 23
+    },
+    {
+     "key": "venus",
+     "lon": 203.203264526,
+     "brzina": -0.157324115,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 23,
+     "min": 12
+    },
+    {
+     "key": "mars",
+     "lon": 142.972903059,
+     "brzina": 0.470857044,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 22,
+     "min": 58
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.30978609,
+     "brzina": 0.098916029,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 25,
+     "min": 18
+    },
+    {
+     "key": "saturn",
+     "lon": 8.769804878,
+     "brzina": -0.05151608,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 8,
+     "min": 46
+    },
+    {
+     "key": "uranus",
+     "lon": 64.336044989,
+     "brzina": -0.039717539,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 20
+    },
+    {
+     "key": "neptune",
+     "lon": 1.915907416,
+     "brzina": -0.017252332,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 1,
+     "min": 54
+    },
+    {
+     "key": "pluto",
+     "lon": 303.213934161,
+     "brzina": 0.011842567,
+     "kuca": 6,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 12
+    }
+   ],
+   "obliquity": 23.437858883,
+   "ramc": 38.047535479,
+   "asc": 140.657851766,
+   "mc": 40.464246681,
+   "kuspide": [
+    140.657851766,
+    161.462392399,
+    187.664660371,
+    220.464246681,
+    257.387413895,
+    291.799089229,
+    320.657851766,
+    341.462392399,
+    7.664660371,
+    40.464246681,
+    77.387413895,
+    111.799089229
+   ],
+   "fellBack": false,
+   "cvor": 326.049812724,
+   "cvorBrzina": -0.241087033,
+   "lilit": 276.155724138,
+   "sreca": 133.63094865,
+   "faza": 7.021154367,
+   "aspekti": [
+    {
+     "key": "venus.sextile.mars",
+     "orb": 0.230361466
+    },
+    {
+     "key": "moon.square.jupiter",
+     "orb": 0.771019816
+    },
+    {
+     "key": "moon.square.mars",
+     "orb": 1.565863214
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 2.336883031
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.106521564
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.122110829
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 3.171439498
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.298026745
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.420137573
+    },
+    {
+     "key": "moon.conjunction.sun",
+     "orb": 7.026903116
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 5.461039902
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.853897462
+    }
+   ],
+   "razmaknuto": [
+    275.125779752,
+    265.625779752,
+    254.499290253,
+    241.31718112,
+    181.086819654,
+    190.586819654,
+    409.529824011,
+    462.449961584,
+    400.029824011,
+    341.327850755
+   ]
+  },
+  {
+   "unix": 1794395220,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 253.402049887,
+     "brzina": 12.005782055,
+     "kuca": 11,
+     "znak": "sagittarius",
+     "deg": 13,
+     "min": 24
+    },
+    {
+     "key": "sun",
+     "lon": 229.070828414,
+     "brzina": 1.005807953,
+     "kuca": 10,
+     "znak": "scorpio",
+     "deg": 19,
+     "min": 4
+    },
+    {
+     "key": "mercury",
+     "lon": 215.496148656,
+     "brzina": -0.375125094,
+     "kuca": 9,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 29
+    },
+    {
+     "key": "venus",
+     "lon": 202.992802384,
+     "brzina": -0.093584975,
+     "kuca": 9,
+     "znak": "libra",
+     "deg": 22,
+     "min": 59
+    },
+    {
+     "key": "mars",
+     "lon": 143.699846202,
+     "brzina": 0.464701789,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 23,
+     "min": 41
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.461041311,
+     "brzina": 0.094837958,
+     "kuca": 8,
+     "znak": "leo",
+     "deg": 25,
+     "min": 27
+    },
+    {
+     "key": "saturn",
+     "lon": 8.691071678,
+     "brzina": -0.049309595,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 8,
+     "min": 41
+    },
+    {
+     "key": "uranus",
+     "lon": 64.274235135,
+     "brzina": -0.040128667,
+     "kuca": 5,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 16
+    },
+    {
+     "key": "neptune",
+     "lon": 1.889525947,
+     "brzina": -0.01654301,
+     "kuca": 2,
+     "znak": "aries",
+     "deg": 1,
+     "min": 53
+    },
+    {
+     "key": "pluto",
+     "lon": 303.232680894,
+     "brzina": 0.012567154,
+     "kuca": 1,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 13
+    }
+   ],
+   "obliquity": 23.437831984,
+   "ramc": 213.658903876,
+   "asc": 281.530253237,
+   "mc": 215.970732709,
+   "kuspide": [
+    281.530253237,
+    323.309391737,
+    4.545561617,
+    35.970732709,
+    59.793935196,
+    80.32244093,
+    101.530253237,
+    143.309391737,
+    184.545561617,
+    215.970732709,
+    239.793935196,
+    260.32244093
+   ],
+   "fellBack": false,
+   "cvor": 325.688737359,
+   "cvorBrzina": -0.21629559,
+   "lilit": 276.328476732,
+   "sreca": 305.86147471,
+   "faza": 24.325470761,
+   "aspekti": [
+    {
+     "key": "venus.sextile.mars",
+     "orb": 0.707043819
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 1.761195108
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 2.263467763
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 1.041554241
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.468238927
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.343154946
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 4.629017789
+    },
+    {
+     "key": "moon.trine.saturn",
+     "orb": 4.710978209
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.384709187
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.801545731
+    }
+   ],
+   "razmaknuto": [
+    150.828070734,
+    126.496849261,
+    112.922169503,
+    100.418823231,
+    41.12586705,
+    50.62586705,
+    268.815546794,
+    321.700255982,
+    259.315546794,
+    200.658701741
+   ]
+  },
+  {
+   "unix": 1794529200,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 271.918134659,
+     "brzina": 11.836001774,
+     "kuca": 11,
+     "znak": "capricorn",
+     "deg": 1,
+     "min": 55
+    },
+    {
+     "key": "sun",
+     "lon": 230.630883751,
+     "brzina": 1.006468943,
+     "kuca": 10,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 37
+    },
+    {
+     "key": "mercury",
+     "lon": 215.073318339,
+     "brzina": -0.074786294,
+     "kuca": 10,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 4
+    },
+    {
+     "key": "venus",
+     "lon": 202.881016298,
+     "brzina": -0.030298976,
+     "kuca": 9,
+     "znak": "libra",
+     "deg": 22,
+     "min": 52
+    },
+    {
+     "key": "mars",
+     "lon": 144.417146309,
+     "brzina": 0.458358406,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 24,
+     "min": 25
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.605930913,
+     "brzina": 0.090679861,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 25,
+     "min": 36
+    },
+    {
+     "key": "saturn",
+     "lon": 8.615788709,
+     "brzina": -0.047050709,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 8,
+     "min": 36
+    },
+    {
+     "key": "uranus",
+     "lon": 64.211805446,
+     "brzina": -0.040507168,
+     "kuca": 4,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 12
+    },
+    {
+     "key": "neptune",
+     "lon": 1.86424789,
+     "brzina": -0.015828454,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 1,
+     "min": 51
+    },
+    {
+     "key": "pluto",
+     "lon": 303.252541671,
+     "brzina": 0.013272232,
+     "kuca": 12,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 15
+    }
+   ],
+   "obliquity": 23.437815728,
+   "ramc": 208.3504903,
+   "asc": 308.604251931,
+   "mc": 210.459996528,
+   "kuspide": [
+    308.604251931,
+    331.321964108,
+    358.361166819,
+    30.459996528,
+    65.301245162,
+    98.70089156,
+    128.604251931,
+    151.321964108,
+    178.361166819,
+    210.459996528,
+    245.301245162,
+    278.70089156
+   ],
+   "fellBack": false,
+   "cvor": 325.398574154,
+   "cvorBrzina": -0.153126431,
+   "lilit": 276.501229326,
+   "sreca": 349.891502839,
+   "faza": 41.281498508,
+   "aspekti": [
+    {
+     "key": "moon.square.neptune",
+     "orb": 0.053886769
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 1.188784604
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 1.536130011
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 1.820776667
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.959263775
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 3.786262557
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.388293781
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.724914615
+    },
+    {
+     "key": "moon.sextile.mercury",
+     "orb": 3.15518368
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.347557556
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 4.975047161
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.751540819
+    }
+   ],
+   "razmaknuto": [
+    142.207915271,
+    100.920664363,
+    85.36309895,
+    73.170796909,
+    14.70692692,
+    24.20692692,
+    241.654028502,
+    294.501586058,
+    232.154028502,
+    173.542322283
+   ]
+  },
+  {
+   "unix": 1794663180,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 290.233990409,
+     "brzina": 11.798704518,
+     "kuca": 6,
+     "znak": "capricorn",
+     "deg": 20,
+     "min": 14
+    },
+    {
+     "key": "sun",
+     "lon": 232.191932214,
+     "brzina": 1.00707158,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 22,
+     "min": 11
+    },
+    {
+     "key": "mercury",
+     "lon": 215.108648531,
+     "brzina": 0.207628519,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 6
+    },
+    {
+     "key": "venus",
+     "lon": 202.866887637,
+     "brzina": 0.031962977,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 22,
+     "min": 52
+    },
+    {
+     "key": "mars",
+     "lon": 145.124509258,
+     "brzina": 0.451823718,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 25,
+     "min": 7
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.74433058,
+     "brzina": 0.086442845,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 25,
+     "min": 44
+    },
+    {
+     "key": "saturn",
+     "lon": 8.544033112,
+     "brzina": -0.044745777,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 8,
+     "min": 32
+    },
+    {
+     "key": "uranus",
+     "lon": 64.148804925,
+     "brzina": -0.040854606,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 8
+    },
+    {
+     "key": "neptune",
+     "lon": 1.840079082,
+     "brzina": -0.015111476,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 1,
+     "min": 50
+    },
+    {
+     "key": "pluto",
+     "lon": 303.273484166,
+     "brzina": 0.013955416,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 16
+    }
+   ],
+   "obliquity": 23.4378128,
+   "ramc": 275.874975824,
+   "asc": 147.337871346,
+   "mc": 275.393230619,
+   "kuspide": [
+    120,
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90
+   ],
+   "fellBack": true,
+   "cvor": 325.220418801,
+   "cvorBrzina": -0.077090765,
+   "lilit": 276.67398192,
+   "sreca": 89.29581315,
+   "faza": 58.036304342,
+   "aspekti": [
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 0.619821322
+    },
+    {
+     "key": "moon.sextile.sun",
+     "orb": 1.957941804
+    },
+    {
+     "key": "moon.square.venus",
+     "orb": 2.632897228
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 2.932577044
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 1.835164365
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 2.257621621
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.875320759
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 3.552398366
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.433405084
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.877442943
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.308725843
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.70395403
+    }
+   ],
+   "razmaknuto": [
+    321.728496599,
+    263.686438403,
+    246.603154721,
+    234.361393827,
+    176.619015447,
+    186.119015447,
+    402.834585271,
+    455.643311115,
+    393.334585271,
+    334.767990355
+   ]
+  },
+  {
+   "unix": 1794797160,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 308.583422146,
+     "brzina": 11.945173162,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 8,
+     "min": 35
+    },
+    {
+     "key": "sun",
+     "lon": 233.75389025,
+     "brzina": 1.007631021,
+     "kuca": 5,
+     "znak": "scorpio",
+     "deg": 23,
+     "min": 45
+    },
+    {
+     "key": "mercury",
+     "lon": 215.567152021,
+     "brzina": 0.460115046,
+     "kuca": 4,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 34
+    },
+    {
+     "key": "venus",
+     "lon": 202.948583556,
+     "brzina": 0.092762423,
+     "kuca": 4,
+     "znak": "libra",
+     "deg": 22,
+     "min": 56
+    },
+    {
+     "key": "mars",
+     "lon": 145.821639386,
+     "brzina": 0.445100931,
+     "kuca": 2,
+     "znak": "leo",
+     "deg": 25,
+     "min": 49
+    },
+    {
+     "key": "jupiter",
+     "lon": 145.876121363,
+     "brzina": 0.082134798,
+     "kuca": 2,
+     "znak": "leo",
+     "deg": 25,
+     "min": 52
+    },
+    {
+     "key": "saturn",
+     "lon": 8.475875702,
+     "brzina": -0.042394616,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 8,
+     "min": 28
+    },
+    {
+     "key": "uranus",
+     "lon": 64.085283649,
+     "brzina": -0.041166057,
+     "kuca": 11,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 5
+    },
+    {
+     "key": "neptune",
+     "lon": 1.817024628,
+     "brzina": -0.014388169,
+     "kuca": 9,
+     "znak": "aries",
+     "deg": 1,
+     "min": 49
+    },
+    {
+     "key": "pluto",
+     "lon": 303.295476067,
+     "brzina": 0.014621193,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 17
+    }
+   ],
+   "obliquity": 23.437819437,
+   "ramc": 18.230342416,
+   "asc": 106.745168347,
+   "mc": 19.747610629,
+   "kuspide": [
+    106.745168347,
+    135.735194469,
+    167.199633595,
+    199.747610629,
+    230.647578209,
+    259.130294962,
+    286.745168347,
+    315.735194469,
+    347.199633595,
+    19.747610629,
+    50.647578209,
+    79.130294962
+   ],
+   "fellBack": false,
+   "cvor": 325.150431609,
+   "cvorBrzina": -0.018719274,
+   "lilit": 276.846734515,
+   "sreca": 31.91563645,
+   "faza": 74.823776763,
+   "aspekti": [
+    {
+     "key": "moon.sextile.saturn",
+     "orb": 0.107546445
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 0.054481976
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 2.067749137
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 2.122231113
+    },
+    {
+     "key": "moon.square.mercury",
+     "orb": 3.016270125
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 2.271675953
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.789807582
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.478451439
+    },
+    {
+     "key": "moon.conjunction.pluto",
+     "orb": 5.287946079
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 2.87305583
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.927537807
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 4.498138497
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.268259021
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.658851073
+    }
+   ],
+   "razmaknuto": [
+    384.400435634,
+    305.358849816,
+    287.172111587,
+    274.553543122,
+    217.426598953,
+    226.926598953,
+    442.921984194,
+    495.690243215,
+    433.421984194,
+    374.900435634
+   ]
+  },
+  {
+   "unix": 1794931140,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 327.271337941,
+     "brzina": 12.307606679,
+     "kuca": 10,
+     "znak": "aquarius",
+     "deg": 27,
+     "min": 16
+    },
+    {
+     "key": "sun",
+     "lon": 235.316701796,
+     "brzina": 1.008168869,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 25,
+     "min": 19
+    },
+    {
+     "key": "mercury",
+     "lon": 216.399010692,
+     "brzina": 0.677479286,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 6,
+     "min": 23
+    },
+    {
+     "key": "venus",
+     "lon": 203.123654364,
+     "brzina": 0.15177644,
+     "kuca": 5,
+     "znak": "libra",
+     "deg": 23,
+     "min": 7
+    },
+    {
+     "key": "mars",
+     "lon": 146.508248641,
+     "brzina": 0.438197347,
+     "kuca": 4,
+     "znak": "leo",
+     "deg": 26,
+     "min": 30
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.001199285,
+     "brzina": 0.077767948,
+     "kuca": 4,
+     "znak": "leo",
+     "deg": 26,
+     "min": 0
+    },
+    {
+     "key": "saturn",
+     "lon": 8.411390207,
+     "brzina": -0.039992857,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 8,
+     "min": 24
+    },
+    {
+     "key": "uranus",
+     "lon": 64.021301925,
+     "brzina": -0.041432502,
+     "kuca": 12,
+     "znak": "gemini",
+     "deg": 4,
+     "min": 1
+    },
+    {
+     "key": "neptune",
+     "lon": 1.79509839,
+     "brzina": -0.013650343,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 1,
+     "min": 47
+    },
+    {
+     "key": "pluto",
+     "lon": 303.318494782,
+     "brzina": 0.015278444,
+     "kuca": 9,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 19
+    }
+   ],
+   "obliquity": 23.437827277,
+   "ramc": 316.939881723,
+   "asc": 72.44056976,
+   "mc": 314.474491967,
+   "kuspide": [
+    72.44056976,
+    93.586895173,
+    112.808474243,
+    134.474491967,
+    163.477319143,
+    205.405597088,
+    252.44056976,
+    273.586895173,
+    292.808474243,
+    314.474491967,
+    343.477319143,
+    25.405597088
+   ],
+   "fellBack": false,
+   "cvor": 325.141848587,
+   "cvorBrzina": -0.000469063,
+   "lilit": 277.019487109,
+   "sreca": 340.485933615,
+   "faza": 91.948879831,
+   "aspekti": [
+    {
+     "key": "moon.opposition.mars",
+     "orb": 0.7630893
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 1.191546846
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 0.68449749
+    },
+    {
+     "key": "moon.square.sun",
+     "orb": 1.954636145
+    },
+    {
+     "key": "moon.opposition.jupiter",
+     "orb": 1.270138656
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 0.507049356
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.702807144
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 3.08051591
+    },
+    {
+     "key": "moon.trine.venus",
+     "orb": 4.147683576
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.523396392
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.877544921
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.226203536
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.384594277
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.616291817
+    }
+   ],
+   "razmaknuto": [
+    433.643102298,
+    341.688466153,
+    322.77077505,
+    309.495418722,
+    261.872963643,
+    252.372963643,
+    477.666862747,
+    530.393066283,
+    468.166862747,
+    409.690259139
+   ]
+  },
+  {
+   "unix": 1795065120,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 346.636395599,
+     "brzina": 12.883388085,
+     "kuca": 5,
+     "znak": "pisces",
+     "deg": 16,
+     "min": 38
+    },
+    {
+     "key": "sun",
+     "lon": 236.880345286,
+     "brzina": 1.008707216,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 26,
+     "min": 52
+    },
+    {
+     "key": "mercury",
+     "lon": 217.549130547,
+     "brzina": 0.859362708,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 7,
+     "min": 32
+    },
+    {
+     "key": "venus",
+     "lon": 203.389201143,
+     "brzina": 0.208774732,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 23,
+     "min": 23
+    },
+    {
+     "key": "mars",
+     "lon": 147.184060307,
+     "brzina": 0.431118877,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 27,
+     "min": 11
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.119479702,
+     "brzina": 0.073354053,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 26,
+     "min": 7
+    },
+    {
+     "key": "saturn",
+     "lon": 8.35065759,
+     "brzina": -0.037536285,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 8,
+     "min": 21
+    },
+    {
+     "key": "uranus",
+     "lon": 63.956934398,
+     "brzina": -0.041645329,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 57
+    },
+    {
+     "key": "neptune",
+     "lon": 1.774327373,
+     "brzina": -0.012890032,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 1,
+     "min": 46
+    },
+    {
+     "key": "pluto",
+     "lon": 303.342531967,
+     "brzina": 0.015935882,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 20
+    }
+   ],
+   "obliquity": 23.437827446,
+   "ramc": 132.551199134,
+   "asc": 213.683941796,
+   "mc": 130.105297944,
+   "kuspide": [
+    213.683941796,
+    242.191246776,
+    274.922592027,
+    310.105297944,
+    343.122741685,
+    10.966585988,
+    33.683941796,
+    62.191246776,
+    94.922592027,
+    130.105297944,
+    163.122741685,
+    190.966585988
+   ],
+   "fellBack": false,
+   "cvor": 325.125087671,
+   "cvorBrzina": -0.029089723,
+   "lilit": 277.192239703,
+   "sreca": 103.927891483,
+   "faza": 109.750292836,
+   "aspekti": [
+    {
+     "key": "sun.square.mars",
+     "orb": 0.303715021
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 0.760865584
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 1.064580604
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.614402431
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.568204594
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.730278559
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.182607025
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 4.20659858
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 4.893982086
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.576330217
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 7.076589111
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.794859164
+    }
+   ],
+   "razmaknuto": [
+    311.816544885,
+    202.060494572,
+    182.729279833,
+    168.569350429,
+    120.799628988,
+    111.299628988,
+    336.454476659,
+    389.137083684,
+    326.954476659,
+    268.522681253
+   ]
+  },
+  {
+   "unix": 1795199100,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 6.986358539,
+     "brzina": 13.613310577,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 6,
+     "min": 59
+    },
+    {
+     "key": "sun",
+     "lon": 238.444831163,
+     "brzina": 1.009262745,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 28,
+     "min": 26
+    },
+    {
+     "key": "mercury",
+     "lon": 218.963594224,
+     "brzina": 1.008321185,
+     "kuca": 12,
+     "znak": "scorpio",
+     "deg": 8,
+     "min": 57
+    },
+    {
+     "key": "venus",
+     "lon": 203.742006315,
+     "brzina": 0.263594933,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 23,
+     "min": 44
+    },
+    {
+     "key": "mars",
+     "lon": 147.848803458,
+     "brzina": 0.423863729,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 27,
+     "min": 50
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.230893863,
+     "brzina": 0.068899509,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 26,
+     "min": 13
+    },
+    {
+     "key": "saturn",
+     "lon": 8.293763488,
+     "brzina": -0.035024951,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 8,
+     "min": 17
+    },
+    {
+     "key": "uranus",
+     "lon": 63.892266964,
+     "brzina": -0.041800708,
+     "kuca": 7,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 53
+    },
+    {
+     "key": "neptune",
+     "lon": 1.754748938,
+     "brzina": -0.012103852,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 1,
+     "min": 45
+    },
+    {
+     "key": "pluto",
+     "lon": 303.367590809,
+     "brzina": 0.016597646,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 22
+    }
+   ],
+   "obliquity": 23.437814894,
+   "ramc": 127.242711143,
+   "asc": 232.556612466,
+   "mc": 124.895510276,
+   "kuspide": [
+    232.556612466,
+    259.221641682,
+    281.717903538,
+    304.895510276,
+    332.929095599,
+    9.770104302,
+    52.556612466,
+    79.221641682,
+    101.717903538,
+    124.895510276,
+    152.929095599,
+    189.770104302
+   ],
+   "fellBack": false,
+   "cvor": 325.033252177,
+   "cvorBrzina": -0.093245709,
+   "lilit": 277.364992297,
+   "sreca": 104.015085091,
+   "faza": 128.535768676,
+   "aspekti": [
+    {
+     "key": "sun.square.mars",
+     "orb": 0.596027705
+    },
+    {
+     "key": "moon.conjunction.saturn",
+     "orb": 1.307404949
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 1.617909594
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 2.2139373
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.524676155
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 3.309917774
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.488887549
+    },
+    {
+     "key": "moon.conjunction.neptune",
+     "orb": 5.231609601
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.612841871
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 5.4474358
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.137518026
+    },
+    {
+     "key": "moon.sextile.uranus",
+     "orb": 3.094091575
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.53901455
+    },
+    {
+     "key": "moon.sextile.pluto",
+     "orb": 3.61876773
+    },
+    {
+     "key": "mercury.square.pluto",
+     "orb": 5.596003415
+    }
+   ],
+   "razmaknuto": [
+    316.236989846,
+    183.427072072,
+    163.945835133,
+    148.724247223,
+    100.713134772,
+    91.213134772,
+    325.736989846,
+    368.874507872,
+    306.736989846,
+    248.349831717
+   ]
+  },
+  {
+   "unix": 1795333080,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 28.497704537,
+     "brzina": 14.360218543,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 28,
+     "min": 29
+    },
+    {
+     "key": "sun",
+     "lon": 240.01019124,
+     "brzina": 1.009843177,
+     "kuca": 2,
+     "znak": "sagittarius",
+     "deg": 0,
+     "min": 0
+    },
+    {
+     "key": "mercury",
+     "lon": 220.593337638,
+     "brzina": 1.12833068,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 10,
+     "min": 35
+    },
+    {
+     "key": "venus",
+     "lon": 204.178627084,
+     "brzina": 0.316121198,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 24,
+     "min": 10
+    },
+    {
+     "key": "mars",
+     "lon": 148.502198394,
+     "brzina": 0.416418168,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 28,
+     "min": 30
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.335378853,
+     "brzina": 0.064402737,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 26,
+     "min": 20
+    },
+    {
+     "key": "saturn",
+     "lon": 8.240790294,
+     "brzina": -0.032464977,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 8,
+     "min": 14
+    },
+    {
+     "key": "uranus",
+     "lon": 63.827387919,
+     "brzina": -0.041901643,
+     "kuca": 8,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 49
+    },
+    {
+     "key": "neptune",
+     "lon": 1.736402263,
+     "brzina": -0.011295048,
+     "kuca": 6,
+     "znak": "aries",
+     "deg": 1,
+     "min": 44
+    },
+    {
+     "key": "pluto",
+     "lon": 303.393677447,
+     "brzina": 0.017261172,
+     "kuca": 4,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 23
+    }
+   ],
+   "obliquity": 23.437790869,
+   "ramc": 194.767137301,
+   "asc": 229.070653015,
+   "mc": 196.029491104,
+   "kuspide": [
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120,
+    150,
+    180
+   ],
+   "fellBack": true,
+   "cvor": 324.834260312,
+   "cvorBrzina": -0.160742379,
+   "lilit": 277.537744891,
+   "sreca": 80.583139719,
+   "faza": 148.481753245,
+   "aspekti": [
+    {
+     "key": "moon.trine.mars",
+     "orb": 0.004493858
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 1.507992846
+    },
+    {
+     "key": "moon.trine.jupiter",
+     "orb": 2.162325684
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 2.166819542
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 1.726211023
+    },
+    {
+     "key": "moon.opposition.venus",
+     "orb": 4.319077453
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.433710473
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 3.817196679
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.156751769
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 3.674812388
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.657275184
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.090985657
+    },
+    {
+     "key": "moon.square.pluto",
+     "orb": 4.89597291
+    },
+    {
+     "key": "sun.sextile.pluto",
+     "orb": 3.383486206
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.504388031
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 5.325189525
+    }
+   ],
+   "razmaknuto": [
+    338.394172278,
+    189.906658982,
+    170.48980538,
+    154.075094825,
+    105.731846594,
+    96.231846594,
+    321.132870005,
+    373.723855661,
+    311.632870005,
+    253.290145189
+   ]
+  },
+  {
+   "unix": 1795467060,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 51.095387519,
+     "brzina": 14.923764026,
+     "kuca": 1,
+     "znak": "taurus",
+     "deg": 21,
+     "min": 5
+    },
+    {
+     "key": "sun",
+     "lon": 241.576464408,
+     "brzina": 1.01044731,
+     "kuca": 8,
+     "znak": "sagittarius",
+     "deg": 1,
+     "min": 34
+    },
+    {
+     "key": "mercury",
+     "lon": 222.395771241,
+     "brzina": 1.223785036,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 12,
+     "min": 23
+    },
+    {
+     "key": "venus",
+     "lon": 204.695459158,
+     "brzina": 0.366270057,
+     "kuca": 6,
+     "znak": "libra",
+     "deg": 24,
+     "min": 41
+    },
+    {
+     "key": "mars",
+     "lon": 149.143937531,
+     "brzina": 0.408756417,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 29,
+     "min": 8
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.432865301,
+     "brzina": 0.059855151,
+     "kuca": 5,
+     "znak": "leo",
+     "deg": 26,
+     "min": 25
+    },
+    {
+     "key": "saturn",
+     "lon": 8.19180812,
+     "brzina": -0.02986713,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 8,
+     "min": 11
+    },
+    {
+     "key": "uranus",
+     "lon": 63.762377649,
+     "brzina": -0.04195668,
+     "kuca": 2,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 45
+    },
+    {
+     "key": "neptune",
+     "lon": 1.719318335,
+     "brzina": -0.010472244,
+     "kuca": 12,
+     "znak": "aries",
+     "deg": 1,
+     "min": 43
+    },
+    {
+     "key": "pluto",
+     "lon": 303.420790822,
+     "brzina": 0.017918379,
+     "kuca": 10,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 25
+    }
+   ],
+   "obliquity": 23.437762317,
+   "ramc": 297.122490667,
+   "asc": 29.136496494,
+   "mc": 295.171613196,
+   "kuspide": [
+    29.136496494,
+    59.28809288,
+    87.335618261,
+    115.171613196,
+    144.849990532,
+    176.867073745,
+    209.136496494,
+    239.28809288,
+    267.335618261,
+    295.171613196,
+    324.849990532,
+    356.867073745
+   ],
+   "fellBack": false,
+   "cvor": 324.550079017,
+   "cvorBrzina": -0.198002702,
+   "lilit": 277.710497485,
+   "sreca": 198.655419605,
+   "faza": 169.513161533,
+   "aspekti": [
+    {
+     "key": "sun.trine.neptune",
+     "orb": 0.142853927
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 2.432526877
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 2.185913242
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 2.71107223
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.737406143
+    },
+    {
+     "key": "sun.sextile.pluto",
+     "orb": 1.844326415
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.341586827
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.701472487
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 2.043059315
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 4.618440119
+    },
+    {
+     "key": "sun.square.jupiter",
+     "orb": 5.143599106
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.472489785
+    },
+    {
+     "key": "moon.square.jupiter",
+     "orb": 5.337477782
+    }
+   ],
+   "razmaknuto": [
+    560.977247226,
+    391.458324115,
+    372.277630949,
+    354.577318866,
+    305.814725009,
+    296.314725009,
+    521.101178042,
+    573.644237357,
+    511.601178042,
+    453.30265053
+   ]
+  },
+  {
+   "unix": 1795601040,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 74.392207362,
+     "brzina": 15.126812614,
+     "kuca": 4,
+     "znak": "gemini",
+     "deg": 14,
+     "min": 23
+    },
+    {
+     "key": "sun",
+     "lon": 243.143684165,
+     "brzina": 1.011068162,
+     "kuca": 10,
+     "znak": "sagittarius",
+     "deg": 3,
+     "min": 8
+    },
+    {
+     "key": "mercury",
+     "lon": 224.335079518,
+     "brzina": 1.298912939,
+     "kuca": 9,
+     "znak": "scorpio",
+     "deg": 14,
+     "min": 20
+    },
+    {
+     "key": "venus",
+     "lon": 205.288783066,
+     "brzina": 0.413984824,
+     "kuca": 8,
+     "znak": "libra",
+     "deg": 25,
+     "min": 17
+    },
+    {
+     "key": "mars",
+     "lon": 149.773668532,
+     "brzina": 0.40084495,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 29,
+     "min": 46
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.523268417,
+     "brzina": 0.05524531,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 26,
+     "min": 31
+    },
+    {
+     "key": "saturn",
+     "lon": 8.146869488,
+     "brzina": -0.027242849,
+     "kuca": 2,
+     "znak": "aries",
+     "deg": 8,
+     "min": 8
+    },
+    {
+     "key": "uranus",
+     "lon": 63.697301941,
+     "brzina": -0.041975844,
+     "kuca": 4,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 41
+    },
+    {
+     "key": "neptune",
+     "lon": 1.703513469,
+     "brzina": -0.009645485,
+     "kuca": 2,
+     "znak": "aries",
+     "deg": 1,
+     "min": 42
+    },
+    {
+     "key": "pluto",
+     "lon": 303.448915953,
+     "brzina": 0.018559577,
+     "kuca": 1,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 26
+    }
+   ],
+   "obliquity": 23.437738506,
+   "ramc": 235.832071435,
+   "asc": 302.941170538,
+   "mc": 238.086298613,
+   "kuspide": [
+    302.941170538,
+    353.634856619,
+    32.154834342,
+    58.086298613,
+    78.540343984,
+    98.31206172,
+    122.941170538,
+    173.634856619,
+    212.154834342,
+    238.086298613,
+    258.540343984,
+    278.31206172
+   ],
+   "fellBack": false,
+   "cvor": 324.247750354,
+   "cvorBrzina": -0.181704318,
+   "lilit": 277.883250079,
+   "sreca": 134.189693735,
+   "faza": 191.242759888,
+   "aspekti": [
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 0.553617777
+    },
+    {
+     "key": "sun.sextile.pluto",
+     "orb": 0.305231789
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 1.440170696
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.234485351
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 3.250400115
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 3.370015633
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.248385988
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.745402484
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 3.92363341
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.993788472
+    },
+    {
+     "key": "sun.trine.saturn",
+     "orb": 5.003185323
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.443356019
+    }
+   ],
+   "razmaknuto": [
+    310.520412438,
+    119.27188924,
+    100.463284593,
+    81.416988142,
+    32.151473492,
+    22.651473492,
+    247.331718545,
+    299.825507017,
+    237.831718545,
+    179.577121029
+   ]
+  },
+  {
+   "unix": 1795735020,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 97.787014761,
+     "brzina": 14.927106056,
+     "kuca": 11,
+     "znak": "cancer",
+     "deg": 7,
+     "min": 47
+    },
+    {
+     "key": "sun",
+     "lon": 244.711871973,
+     "brzina": 1.011697398,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 4,
+     "min": 42
+    },
+    {
+     "key": "mercury",
+     "lon": 226.381790554,
+     "brzina": 1.357500684,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 16,
+     "min": 22
+    },
+    {
+     "key": "venus",
+     "lon": 205.954805719,
+     "brzina": 0.459236735,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 25,
+     "min": 57
+    },
+    {
+     "key": "mars",
+     "lon": 150.390985815,
+     "brzina": 0.392649504,
+     "kuca": 1,
+     "znak": "virgo",
+     "deg": 0,
+     "min": 23
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.606486416,
+     "brzina": 0.05056437,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 26,
+     "min": 36
+    },
+    {
+     "key": "saturn",
+     "lon": 8.106010747,
+     "brzina": -0.024599696,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 8,
+     "min": 6
+    },
+    {
+     "key": "uranus",
+     "lon": 63.632212298,
+     "brzina": -0.04196577,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 37
+    },
+    {
+     "key": "neptune",
+     "lon": 1.688989632,
+     "brzina": -0.008821522,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 1,
+     "min": 41
+    },
+    {
+     "key": "pluto",
+     "lon": 303.478023942,
+     "brzina": 0.01917815,
+     "kuca": 6,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 28
+    }
+   ],
+   "obliquity": 23.437726521,
+   "ramc": 51.443466821,
+   "asc": 149.453945098,
+   "mc": 53.822515906,
+   "kuspide": [
+    149.453945098,
+    172.519603129,
+    200.706918345,
+    233.822515906,
+    268.773246618,
+    301.182031201,
+    329.453945098,
+    352.519603129,
+    20.706918345,
+    53.822515906,
+    88.773246618,
+    121.182031201
+   ],
+   "fellBack": false,
+   "cvor": 324.010592348,
+   "cvorBrzina": -0.118939169,
+   "lilit": 278.056002673,
+   "sreca": 296.37880231,
+   "faza": 213.06937755,
+   "aspekti": [
+    {
+     "key": "moon.square.saturn",
+     "orb": 0.318995986
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 1.079659675
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 0.651680698
+    },
+    {
+     "key": "sun.sextile.pluto",
+     "orb": 1.233848031
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.154188356
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 3.784499399
+    },
+    {
+     "key": "sun.trine.saturn",
+     "orb": 3.394138774
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 3.022882341
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 3.241226482
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 4.320886158
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.78903431
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.943222666
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.417021115
+    }
+   ],
+   "razmaknuto": [
+    487.453221714,
+    634.378078926,
+    616.047997508,
+    595.621012672,
+    545.77269337,
+    536.27269337,
+    400.855196585,
+    453.298419251,
+    391.355196585,
+    333.144230896
+   ]
+  },
+  {
+   "unix": 1795869000,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 120.701871827,
+     "brzina": 14.441737012,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 0,
+     "min": 42
+    },
+    {
+     "key": "sun",
+     "lon": 246.281037186,
+     "brzina": 1.012328739,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 6,
+     "min": 16
+    },
+    {
+     "key": "mercury",
+     "lon": 228.512029905,
+     "brzina": 1.402809416,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 18,
+     "min": 30
+    },
+    {
+     "key": "venus",
+     "lon": 206.689705657,
+     "brzina": 0.502028728,
+     "kuca": 3,
+     "znak": "libra",
+     "deg": 26,
+     "min": 41
+    },
+    {
+     "key": "mars",
+     "lon": 150.995433221,
+     "brzina": 0.384141972,
+     "kuca": 1,
+     "znak": "virgo",
+     "deg": 0,
+     "min": 59
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.682407063,
+     "brzina": 0.045810342,
+     "kuca": 1,
+     "znak": "leo",
+     "deg": 26,
+     "min": 40
+    },
+    {
+     "key": "saturn",
+     "lon": 8.06925988,
+     "brzina": -0.021938523,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 8,
+     "min": 4
+    },
+    {
+     "key": "uranus",
+     "lon": 63.56715323,
+     "brzina": -0.041926396,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 34
+    },
+    {
+     "key": "neptune",
+     "lon": 1.675741501,
+     "brzina": -0.008000664,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 1,
+     "min": 40
+    },
+    {
+     "key": "pluto",
+     "lon": 303.508078715,
+     "brzina": 0.019773741,
+     "kuca": 7,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 30
+    }
+   ],
+   "obliquity": 23.437727815,
+   "ramc": 46.135057281,
+   "asc": 119.654297434,
+   "mc": 48.592781087,
+   "kuspide": [
+    119.654297434,
+    161.414689194,
+    199.329452748,
+    228.592781087,
+    252.297899076,
+    274.497540125,
+    299.654297434,
+    341.414689194,
+    19.329452748,
+    48.592781087,
+    72.297899076,
+    94.497540125
+   ],
+   "fellBack": false,
+   "cvor": 323.883622189,
+   "cvorBrzina": -0.046544646,
+   "lilit": 278.228755267,
+   "sreca": 245.233462793,
+   "faza": 234.415067307,
+   "aspekti": [
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 0.007298594
+    },
+    {
+     "key": "moon.trine.neptune",
+     "orb": 0.973869675
+    },
+    {
+     "key": "sun.trine.saturn",
+     "orb": 1.788222694
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 2.713883956
+    },
+    {
+     "key": "moon.opposition.pluto",
+     "orb": 2.806206888
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.059074515
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 2.571720009
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 4.313026157
+    },
+    {
+     "key": "moon.square.venus",
+     "orb": 4.012166169
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.832337214
+    },
+    {
+     "key": "sun.sextile.pluto",
+     "orb": 2.772958471
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.891411729
+    },
+    {
+     "key": "moon.sextile.uranus",
+     "orb": 2.865281403
+    },
+    {
+     "key": "sun.trine.neptune",
+     "orb": 4.605295685
+    },
+    {
+     "key": "sun.square.mars",
+     "orb": 5.285603965
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.393518379
+    },
+    {
+     "key": "moon.trine.sun",
+     "orb": 5.579165359
+    }
+   ],
+   "razmaknuto": [
+    180.218228846,
+    305.797394205,
+    288.028386925,
+    266.206062676,
+    215.698764083,
+    206.198764083,
+    70.69209852,
+    123.083510249,
+    61.19209852,
+    363.024435734
+   ]
+  },
+  {
+   "unix": 1796002980,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 142.790143312,
+     "brzina": 13.854948936,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 22,
+     "min": 47
+    },
+    {
+     "key": "sun",
+     "lon": 247.851180998,
+     "brzina": 1.012958745,
+     "kuca": 3,
+     "znak": "sagittarius",
+     "deg": 7,
+     "min": 51
+    },
+    {
+     "key": "mercury",
+     "lon": 230.706708844,
+     "brzina": 1.437593924,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 20,
+     "min": 42
+    },
+    {
+     "key": "venus",
+     "lon": 207.489683686,
+     "brzina": 0.542397452,
+     "kuca": 1,
+     "znak": "libra",
+     "deg": 27,
+     "min": 29
+    },
+    {
+     "key": "mars",
+     "lon": 151.586516133,
+     "brzina": 0.375304473,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 1,
+     "min": 35
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.750919324,
+     "brzina": 0.040989249,
+     "kuca": 11,
+     "znak": "leo",
+     "deg": 26,
+     "min": 45
+    },
+    {
+     "key": "saturn",
+     "lon": 8.036647135,
+     "brzina": -0.019253814,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 8,
+     "min": 2
+    },
+    {
+     "key": "uranus",
+     "lon": 63.502173127,
+     "brzina": -0.041850824,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 30
+    },
+    {
+     "key": "neptune",
+     "lon": 1.663766877,
+     "brzina": -0.007176745,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 1,
+     "min": 39
+    },
+    {
+     "key": "pluto",
+     "lon": 303.539047163,
+     "brzina": 0.020352337,
+     "kuca": 5,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 32
+    }
+   ],
+   "obliquity": 23.437737511,
+   "ramc": 113.659526025,
+   "asc": 191.849181103,
+   "mc": 111.899063285,
+   "kuspide": [
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120,
+    150
+   ],
+   "fellBack": true,
+   "cvor": 323.852411819,
+   "cvorBrzina": -0.001201275,
+   "lilit": 278.401507861,
+   "sreca": 296.910218789,
+   "faza": 254.933192772,
+   "aspekti": [
+    {
+     "key": "sun.trine.saturn",
+     "orb": 0.185466137
+    },
+    {
+     "key": "moon.square.mercury",
+     "orb": 2.083434469
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 0.738764362
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 1.915656994
+    },
+    {
+     "key": "moon.conjunction.jupiter",
+     "orb": 3.960776011
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.036874036
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 4.349007872
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 4.835596809
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.83840625
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.875280286
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.372880258
+    }
+   ],
+   "razmaknuto": [
+    129.053965118,
+    234.115002804,
+    216.97053065,
+    193.753505492,
+    148.053965118,
+    138.553965118,
+    357.427588683,
+    409.765994933,
+    347.927588683,
+    289.802868969
+   ]
+  },
+  {
+   "unix": 1796136960,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 163.978280368,
+     "brzina": 13.309441596,
+     "kuca": 8,
+     "znak": "virgo",
+     "deg": 13,
+     "min": 58
+    },
+    {
+     "key": "sun",
+     "lon": 249.422300057,
+     "brzina": 1.013584791,
+     "kuca": 11,
+     "znak": "sagittarius",
+     "deg": 9,
+     "min": 25
+    },
+    {
+     "key": "mercury",
+     "lon": 232.950766038,
+     "brzina": 1.464156107,
+     "kuca": 10,
+     "znak": "scorpio",
+     "deg": 22,
+     "min": 57
+    },
+    {
+     "key": "venus",
+     "lon": 208.351014395,
+     "brzina": 0.58041068,
+     "kuca": 9,
+     "znak": "libra",
+     "deg": 28,
+     "min": 21
+    },
+    {
+     "key": "mars",
+     "lon": 152.163717782,
+     "brzina": 0.366129255,
+     "kuca": 7,
+     "znak": "virgo",
+     "deg": 2,
+     "min": 9
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.811924933,
+     "brzina": 0.0361128,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 26,
+     "min": 48
+    },
+    {
+     "key": "saturn",
+     "lon": 8.008213382,
+     "brzina": -0.01653714,
+     "kuca": 3,
+     "znak": "aries",
+     "deg": 8,
+     "min": 0
+    },
+    {
+     "key": "uranus",
+     "lon": 63.437333533,
+     "brzina": -0.041728445,
+     "kuca": 4,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 26
+    },
+    {
+     "key": "neptune",
+     "lon": 1.653075378,
+     "brzina": -0.006340265,
+     "kuca": 2,
+     "znak": "aries",
+     "deg": 1,
+     "min": 39
+    },
+    {
+     "key": "pluto",
+     "lon": 303.570907683,
+     "brzina": 0.02092321,
+     "kuca": 12,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 34
+    }
+   ],
+   "obliquity": 23.437746789,
+   "ramc": 216.014867179,
+   "asc": 303.763210752,
+   "mc": 218.390150676,
+   "kuspide": [
+    303.763210752,
+    334.152384996,
+    6.548279699,
+    38.390150676,
+    67.816761995,
+    95.569532165,
+    123.763210752,
+    154.152384996,
+    186.548279699,
+    218.390150676,
+    247.816761995,
+    275.569532165
+   ],
+   "fellBack": false,
+   "cvor": 323.85411896,
+   "cvorBrzina": -0.006003953,
+   "lilit": 278.574260455,
+   "sreca": 218.319191063,
+   "faza": 274.550208522,
+   "aspekti": [
+    {
+     "key": "sun.trine.saturn",
+     "orb": 1.414086675
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 1.273615751
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 1.539089461
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.13357415
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 3.861158896
+    },
+    {
+     "key": "moon.square.sun",
+     "orb": 4.555980311
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 5.351792849
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.784258155
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.917832305
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 5.984966525
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.355138004
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 5.219893288
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.812703387
+    }
+   ],
+   "razmaknuto": [
+    41.13604281,
+    124.746417935,
+    108.274883915,
+    83.675132272,
+    31.63604281,
+    22.13604281,
+    246.477193255,
+    298.76145141,
+    236.977193255,
+    178.89502556
+   ]
+  },
+  {
+   "unix": 1796270940,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 184.3722932,
+     "brzina": 12.868507381,
+     "kuca": 10,
+     "znak": "libra",
+     "deg": 4,
+     "min": 22
+    },
+    {
+     "key": "sun",
+     "lon": 250.99438596,
+     "brzina": 1.014201616,
+     "kuca": 1,
+     "znak": "sagittarius",
+     "deg": 10,
+     "min": 59
+    },
+    {
+     "key": "mercury",
+     "lon": 235.232493315,
+     "brzina": 1.484395635,
+     "kuca": 1,
+     "znak": "scorpio",
+     "deg": 25,
+     "min": 13
+    },
+    {
+     "key": "venus",
+     "lon": 209.270091022,
+     "brzina": 0.616159963,
+     "kuca": 12,
+     "znak": "libra",
+     "deg": 29,
+     "min": 16
+    },
+    {
+     "key": "mars",
+     "lon": 152.726513329,
+     "brzina": 0.356614994,
+     "kuca": 9,
+     "znak": "virgo",
+     "deg": 2,
+     "min": 43
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.865344943,
+     "brzina": 0.031193808,
+     "kuca": 9,
+     "znak": "leo",
+     "deg": 26,
+     "min": 51
+    },
+    {
+     "key": "saturn",
+     "lon": 7.984012058,
+     "brzina": -0.013782128,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 7,
+     "min": 59
+    },
+    {
+     "key": "uranus",
+     "lon": 63.37271241,
+     "brzina": -0.041549825,
+     "kuca": 7,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 22
+    },
+    {
+     "key": "neptune",
+     "lon": 1.643691147,
+     "brzina": -0.005483201,
+     "kuca": 4,
+     "znak": "aries",
+     "deg": 1,
+     "min": 38
+    },
+    {
+     "key": "pluto",
+     "lon": 303.603652858,
+     "brzina": 0.021494198,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 36
+    }
+   ],
+   "obliquity": 23.437747193,
+   "ramc": 154.724388637,
+   "asc": 228.967261263,
+   "mc": 152.767902685,
+   "kuspide": [
+    228.967261263,
+    259.060872447,
+    295.260561716,
+    332.767902685,
+    4.50163104,
+    29.216723287,
+    48.967261263,
+    79.060872447,
+    115.260561716,
+    152.767902685,
+    184.50163104,
+    209.216723287
+   ],
+   "fellBack": false,
+   "cvor": 323.809447179,
+   "cvorBrzina": -0.058293434,
+   "lilit": 278.747013048,
+   "sreca": 295.589354023,
+   "faza": 293.372133249,
+   "aspekti": [
+    {
+     "key": "moon.trine.pluto",
+     "orb": 0.768640342
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 0.99958079
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 0.646199081
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 1.632851628
+    },
+    {
+     "key": "moon.opposition.neptune",
+     "orb": 2.728602054
+    },
+    {
+     "key": "moon.opposition.saturn",
+     "orb": 3.611718858
+    },
+    {
+     "key": "sun.trine.saturn",
+     "orb": 3.010373902
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.230940448
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 2.404746079
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.729021263
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 1.959961712
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 5.861168386
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 4.333561836
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.456422307
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.340320911
+    },
+    {
+     "key": "sun.opposition.uranus",
+     "orb": 7.62167355
+    }
+   ],
+   "razmaknuto": [
+    134.725180867,
+    201.347273627,
+    185.585380982,
+    159.622978689,
+    106.71823261,
+    97.21823261,
+    321.496578814,
+    373.725600077,
+    311.996578814,
+    253.956540525
+   ]
+  },
+  {
+   "unix": 1796404920,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 204.140899146,
+     "brzina": 12.534669831,
+     "kuca": 5,
+     "znak": "libra",
+     "deg": 24,
+     "min": 8
+    },
+    {
+     "key": "sun",
+     "lon": 252.567419531,
+     "brzina": 1.01479861,
+     "kuca": 6,
+     "znak": "sagittarius",
+     "deg": 12,
+     "min": 34
+    },
+    {
+     "key": "mercury",
+     "lon": 237.542932921,
+     "brzina": 1.49984737,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 27,
+     "min": 32
+    },
+    {
+     "key": "venus",
+     "lon": 210.243457283,
+     "brzina": 0.649750867,
+     "kuca": 5,
+     "znak": "scorpio",
+     "deg": 0,
+     "min": 14
+    },
+    {
+     "key": "mars",
+     "lon": 153.274377108,
+     "brzina": 0.346761578,
+     "kuca": 4,
+     "znak": "virgo",
+     "deg": 3,
+     "min": 16
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.911118918,
+     "brzina": 0.026241684,
+     "kuca": 3,
+     "znak": "leo",
+     "deg": 26,
+     "min": 54
+    },
+    {
+     "key": "saturn",
+     "lon": 7.964103571,
+     "brzina": -0.010988608,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 7,
+     "min": 57
+    },
+    {
+     "key": "uranus",
+     "lon": 63.308399853,
+     "brzina": -0.041311011,
+     "kuca": 12,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 18
+    },
+    {
+     "key": "neptune",
+     "lon": 1.635648172,
+     "brzina": -0.004603155,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 1,
+     "min": 38
+    },
+    {
+     "key": "pluto",
+     "lon": 303.637284883,
+     "brzina": 0.022067624,
+     "kuca": 8,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 38
+    }
+   ],
+   "obliquity": 23.437734762,
+   "ramc": 330.335708189,
+   "asc": 82.437136559,
+   "mc": 328.168681003,
+   "kuspide": [
+    82.437136559,
+    103.171526241,
+    123.803041718,
+    148.168681003,
+    180.417240849,
+    221.799922126,
+    262.437136559,
+    283.171526241,
+    303.803041718,
+    328.168681003,
+    0.417240849,
+    41.799922126
+   ],
+   "fellBack": false,
+   "cvor": 323.662193255,
+   "cvorBrzina": -0.132367749,
+   "lilit": 278.919765642,
+   "sreca": 130.863656944,
+   "faza": 311.567703553,
+   "aspekti": [
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 0.631814004
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 0.034022744
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.32888503
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 3.3938276
+    },
+    {
+     "key": "moon.sextile.jupiter",
+     "orb": 2.770219772
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.672751681
+    },
+    {
+     "key": "moon.conjunction.venus",
+     "orb": 6.102558137
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.001636711
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 3.030919825
+    },
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 4.092715251
+    },
+    {
+     "key": "sun.trine.saturn",
+     "orb": 4.603315961
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 5.765466931
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 6.363258191
+    },
+    {
+     "key": "venus.sextile.jupiter",
+     "orb": 3.332338365
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.328455398
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 5.731444187
+    }
+   ],
+   "razmaknuto": [
+    300.73318976,
+    349.159710145,
+    334.135223536,
+    310.23318976,
+    253.003409532,
+    243.503409532,
+    467.727938786,
+    519.900690467,
+    458.227938786,
+    400.229575497
+   ]
+  },
+  {
+   "unix": 1796538900,
+   "mesto": "Sidnej",
+   "lat": -33.8688,
+   "lon": 151.2093,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 223.437538291,
+     "brzina": 12.280600378,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 13,
+     "min": 26
+    },
+    {
+     "key": "sun",
+     "lon": 254.141362086,
+     "brzina": 1.015359689,
+     "kuca": 7,
+     "znak": "sagittarius",
+     "deg": 14,
+     "min": 8
+    },
+    {
+     "key": "mercury",
+     "lon": 239.875328518,
+     "brzina": 1.511713552,
+     "kuca": 7,
+     "znak": "scorpio",
+     "deg": 29,
+     "min": 52
+    },
+    {
+     "key": "venus",
+     "lon": 211.26782419,
+     "brzina": 0.681294221,
+     "kuca": 6,
+     "znak": "scorpio",
+     "deg": 1,
+     "min": 16
+    },
+    {
+     "key": "mars",
+     "lon": 153.8067821,
+     "brzina": 0.336566024,
+     "kuca": 4,
+     "znak": "virgo",
+     "deg": 3,
+     "min": 48
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.949198113,
+     "brzina": 0.021260168,
+     "kuca": 4,
+     "znak": "leo",
+     "deg": 26,
+     "min": 56
+    },
+    {
+     "key": "saturn",
+     "lon": 7.948544588,
+     "brzina": -0.00816394,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 7,
+     "min": 56
+    },
+    {
+     "key": "uranus",
+     "lon": 63.244488322,
+     "brzina": -0.0410152,
+     "kuca": 1,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 14
+    },
+    {
+     "key": "neptune",
+     "lon": 1.628980402,
+     "brzina": -0.003704836,
+     "kuca": 11,
+     "znak": "aries",
+     "deg": 1,
+     "min": 37
+    },
+    {
+     "key": "pluto",
+     "lon": 303.671805862,
+     "brzina": 0.022638845,
+     "kuca": 9,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 40
+    }
+   ],
+   "obliquity": 23.437711966,
+   "ramc": 325.02724483,
+   "asc": 45.943986844,
+   "mc": 322.678006391,
+   "kuspide": [
+    45.943986844,
+    75.43538738,
+    108.212580627,
+    142.678006391,
+    175.060782602,
+    202.736937673,
+    225.943986844,
+    255.43538738,
+    288.212580627,
+    322.678006391,
+    355.060782602,
+    22.736937673
+   ],
+   "fellBack": false,
+   "cvor": 323.404944721,
+   "cvorBrzina": -0.195030729,
+   "lilit": 279.092518236,
+   "sreca": 15.240163049,
+   "faza": 329.290398279,
+   "aspekti": [
+    {
+     "key": "mars.square.uranus",
+     "orb": 0.562293779
+    },
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 1.753651884
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.427317541
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 2.403981672
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 2.926130405
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 3.369159804
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 2.53895791
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 3.931453583
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.61550792
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.042825461
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.319564187
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 6.857583987
+    },
+    {
+     "key": "mercury.sextile.pluto",
+     "orb": 3.796477345
+    }
+   ],
+   "razmaknuto": [
+    356.911266264,
+    387.615090059,
+    373.349056491,
+    344.741552163,
+    289.922926086,
+    280.422926086,
+    504.602708375,
+    556.718216295,
+    495.102708375,
+    437.145533836
+   ]
+  },
+  {
+   "unix": 1796672880,
+   "mesto": "Tromso",
+   "lat": 69.6492,
+   "lon": 18.9553,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 242.369540526,
+     "brzina": 12.077614162,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 2,
+     "min": 22
+    },
+    {
+     "key": "sun",
+     "lon": 255.716148235,
+     "brzina": 1.015866402,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 15,
+     "min": 42
+    },
+    {
+     "key": "mercury",
+     "lon": 242.224629114,
+     "brzina": 1.520904549,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 2,
+     "min": 13
+    },
+    {
+     "key": "venus",
+     "lon": 212.340075093,
+     "brzina": 0.710901193,
+     "kuca": 3,
+     "znak": "scorpio",
+     "deg": 2,
+     "min": 20
+    },
+    {
+     "key": "mars",
+     "lon": 154.323194483,
+     "brzina": 0.326021342,
+     "kuca": 1,
+     "znak": "virgo",
+     "deg": 4,
+     "min": 19
+    },
+    {
+     "key": "jupiter",
+     "lon": 146.97953684,
+     "brzina": 0.016248358,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 26,
+     "min": 58
+    },
+    {
+     "key": "saturn",
+     "lon": 7.937377093,
+     "brzina": -0.005320908,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 7,
+     "min": 56
+    },
+    {
+     "key": "uranus",
+     "lon": 63.181062096,
+     "brzina": -0.040670997,
+     "kuca": 10,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 10
+    },
+    {
+     "key": "neptune",
+     "lon": 1.623711346,
+     "brzina": -0.002798157,
+     "kuca": 8,
+     "znak": "aries",
+     "deg": 1,
+     "min": 37
+    },
+    {
+     "key": "pluto",
+     "lon": 303.707207652,
+     "brzina": 0.023198171,
+     "kuca": 6,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 42
+    }
+   ],
+   "obliquity": 23.437686509,
+   "ramc": 32.551709481,
+   "asc": 151.708541461,
+   "mc": 34.828008782,
+   "kuspide": [
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    0,
+    30,
+    60,
+    90,
+    120
+   ],
+   "fellBack": true,
+   "cvor": 323.074604437,
+   "cvorBrzina": -0.223671361,
+   "lilit": 279.26527083,
+   "sreca": 165.055149171,
+   "faza": 346.647612766,
+   "aspekti": [
+    {
+     "key": "moon.conjunction.mercury",
+     "orb": 0.144911412
+    },
+    {
+     "key": "moon.opposition.uranus",
+     "orb": 0.81152157
+    },
+    {
+     "key": "moon.trine.neptune",
+     "orb": 0.74582918
+    },
+    {
+     "key": "moon.square.mars",
+     "orb": 1.953653957
+    },
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 0.600917768
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 0.956432982
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 2.098565369
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 1.142132387
+    },
+    {
+     "key": "moon.sextile.pluto",
+     "orb": 1.337667126
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 1.367132559
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 1.98311939
+    },
+    {
+     "key": "mercury.sextile.pluto",
+     "orb": 1.482578538
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.526145556
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.55735075
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.083496306
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.313665747
+    },
+    {
+     "key": "mercury.square.jupiter",
+     "orb": 5.245092274
+    },
+    {
+     "key": "moon.square.jupiter",
+     "orb": 5.390003686
+    },
+    {
+     "key": "moon.trine.saturn",
+     "orb": 5.567836567
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 7.343657643
+    },
+    {
+     "key": "mercury.trine.saturn",
+     "orb": 5.712747979
+    }
+   ],
+   "razmaknuto": [
+    277.995463045,
+    287.495463045,
+    268.495463045,
+    238.610909024,
+    182.750370771,
+    173.250370771,
+    397.394545277,
+    449.451896027,
+    387.894545277,
+    329.978041583
+   ]
+  },
+  {
+   "unix": 1796806860,
+   "mesto": "Kito",
+   "lat": -0.1807,
+   "lon": -78.4678,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 261.008184155,
+     "brzina": 11.916052794,
+     "kuca": 2,
+     "znak": "sagittarius",
+     "deg": 21,
+     "min": 0
+    },
+    {
+     "key": "sun",
+     "lon": 257.291684837,
+     "brzina": 1.016303206,
+     "kuca": 2,
+     "znak": "sagittarius",
+     "deg": 17,
+     "min": 17
+    },
+    {
+     "key": "mercury",
+     "lon": 244.587064613,
+     "brzina": 1.528096184,
+     "kuca": 1,
+     "znak": "sagittarius",
+     "deg": 4,
+     "min": 35
+    },
+    {
+     "key": "venus",
+     "lon": 213.457265534,
+     "brzina": 0.738682945,
+     "kuca": 12,
+     "znak": "scorpio",
+     "deg": 3,
+     "min": 27
+    },
+    {
+     "key": "mars",
+     "lon": 154.823068194,
+     "brzina": 0.315118608,
+     "kuca": 10,
+     "znak": "virgo",
+     "deg": 4,
+     "min": 49
+    },
+    {
+     "key": "jupiter",
+     "lon": 147.002086999,
+     "brzina": 0.011204415,
+     "kuca": 10,
+     "znak": "leo",
+     "deg": 27,
+     "min": 0
+    },
+    {
+     "key": "saturn",
+     "lon": 7.930622183,
+     "brzina": -0.002473182,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 7,
+     "min": 55
+    },
+    {
+     "key": "uranus",
+     "lon": 63.118190936,
+     "brzina": -0.040288156,
+     "kuca": 7,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 7
+    },
+    {
+     "key": "neptune",
+     "lon": 1.619848126,
+     "brzina": -0.001893866,
+     "kuca": 5,
+     "znak": "aries",
+     "deg": 1,
+     "min": 37
+    },
+    {
+     "key": "pluto",
+     "lon": 303.743466143,
+     "brzina": 0.023735229,
+     "kuca": 3,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 44
+    }
+   ],
+   "obliquity": 23.437667581,
+   "ramc": 134.90709964,
+   "asc": 227.426418602,
+   "mc": 132.443630063,
+   "kuspide": [
+    227.426418602,
+    256.148838755,
+    283.74903271,
+    312.443630063,
+    343.61251966,
+    16.194644272,
+    47.426418602,
+    76.148838755,
+    103.74903271,
+    132.443630063,
+    163.61251966,
+    196.194644272
+   ],
+   "fellBack": false,
+   "cvor": 322.734647859,
+   "cvorBrzina": -0.206518148,
+   "lilit": 279.438023423,
+   "sreca": 223.709919284,
+   "faza": 3.710718499,
+   "aspekti": [
+    {
+     "key": "mercury.square.mars",
+     "orb": 0.236003582
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 0.286200609
+    },
+    {
+     "key": "moon.conjunction.sun",
+     "orb": 3.716499318
+    },
+    {
+     "key": "venus.sextile.mars",
+     "orb": 1.36580266
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 1.468873677
+    },
+    {
+     "key": "mercury.sextile.pluto",
+     "orb": 0.84359847
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 1.704877258
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.625275207
+    },
+    {
+     "key": "mercury.trine.saturn",
+     "orb": 3.343557571
+    },
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 2.967216487
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.49834281
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.123618017
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.310774057
+    },
+    {
+     "key": "mars.conjunction.jupiter",
+     "orb": 7.820981195
+    },
+    {
+     "key": "moon.trine.jupiter",
+     "orb": 5.993902844
+    }
+   ],
+   "razmaknuto": [
+    218.300091692,
+    208.800091692,
+    196.095471468,
+    164.965672389,
+    108.010493854,
+    98.510493854,
+    322.628254981,
+    374.626597791,
+    313.128254981,
+    255.251872998
+   ]
+  },
+  {
+   "unix": 1796940840,
+   "mesto": "Beograd",
+   "lat": 44.8176,
+   "lon": 20.4633,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 279.422988599,
+     "brzina": 11.811220148,
+     "kuca": 4,
+     "znak": "capricorn",
+     "deg": 9,
+     "min": 25
+    },
+    {
+     "key": "sun",
+     "lon": 258.867858433,
+     "brzina": 1.016662751,
+     "kuca": 4,
+     "znak": "sagittarius",
+     "deg": 18,
+     "min": 52
+    },
+    {
+     "key": "mercury",
+     "lon": 246.959818092,
+     "brzina": 1.533799784,
+     "kuca": 3,
+     "znak": "sagittarius",
+     "deg": 6,
+     "min": 57
+    },
+    {
+     "key": "venus",
+     "lon": 214.616624464,
+     "brzina": 0.76475333,
+     "kuca": 2,
+     "znak": "scorpio",
+     "deg": 4,
+     "min": 36
+    },
+    {
+     "key": "mars",
+     "lon": 155.305843866,
+     "brzina": 0.303850785,
+     "kuca": 12,
+     "znak": "virgo",
+     "deg": 5,
+     "min": 18
+    },
+    {
+     "key": "jupiter",
+     "lon": 147.016799003,
+     "brzina": 0.006129986,
+     "kuca": 12,
+     "znak": "leo",
+     "deg": 27,
+     "min": 1
+    },
+    {
+     "key": "saturn",
+     "lon": 7.928281334,
+     "brzina": 0.000369477,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 7,
+     "min": 55
+    },
+    {
+     "key": "uranus",
+     "lon": 63.055930857,
+     "brzina": -0.039872901,
+     "kuca": 9,
+     "znak": "gemini",
+     "deg": 3,
+     "min": 3
+    },
+    {
+     "key": "neptune",
+     "lon": 1.617382762,
+     "brzina": -0.000998825,
+     "kuca": 7,
+     "znak": "aries",
+     "deg": 1,
+     "min": 37
+    },
+    {
+     "key": "pluto",
+     "lon": 303.780542783,
+     "brzina": 0.024243674,
+     "kuca": 5,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 46
+    }
+   ],
+   "obliquity": 23.437661384,
+   "ramc": 73.616700582,
+   "asc": 167.53007172,
+   "mc": 74.904181573,
+   "kuspide": [
+    167.53007172,
+    191.517537988,
+    220.862117971,
+    254.904181573,
+    289.863851566,
+    321.125581319,
+    347.53007172,
+    11.517537988,
+    40.862117971,
+    74.904181573,
+    109.863851566,
+    141.125581319
+   ],
+   "fellBack": false,
+   "cvor": 322.454741806,
+   "cvorBrzina": -0.149141364,
+   "lilit": 279.610776017,
+   "sreca": 146.974941554,
+   "faza": 20.549348368,
+   "aspekti": [
+    {
+     "key": "venus.sextile.mars",
+     "orb": 0.689219402
+    },
+    {
+     "key": "moon.square.saturn",
+     "orb": 1.494707265
+    },
+    {
+     "key": "mercury.trine.saturn",
+     "orb": 0.968463242
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 1.653974226
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 0.836081681
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 2.249913009
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.724611926
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 3.903887235
+    },
+    {
+     "key": "moon.trine.mars",
+     "orb": 4.117144733
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.438548095
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.163160021
+    },
+    {
+     "key": "mercury.sextile.pluto",
+     "orb": 3.179275309
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.310898573
+    },
+    {
+     "key": "mercury.trine.neptune",
+     "orb": 5.342435331
+    }
+   ],
+   "razmaknuto": [
+    291.452911222,
+    270.897781056,
+    258.989740715,
+    226.646547087,
+    168.546721626,
+    159.046721626,
+    383.147305385,
+    435.08585348,
+    373.647305385,
+    315.810465406
+   ]
+  },
+  {
+   "unix": 1797074820,
+   "mesto": "Madrid",
+   "lat": 40.4168,
+   "lon": -3.7038,
+   "planete": [
+    {
+     "key": "moon",
+     "lon": 297.718744306,
+     "brzina": 11.798740439,
+     "kuca": 12,
+     "znak": "capricorn",
+     "deg": 27,
+     "min": 43
+    },
+    {
+     "key": "sun",
+     "lon": 260.444549873,
+     "brzina": 1.016948804,
+     "kuca": 10,
+     "znak": "sagittarius",
+     "deg": 20,
+     "min": 26
+    },
+    {
+     "key": "mercury",
+     "lon": 249.340807942,
+     "brzina": 1.538430721,
+     "kuca": 9,
+     "znak": "sagittarius",
+     "deg": 9,
+     "min": 20
+    },
+    {
+     "key": "venus",
+     "lon": 215.815560032,
+     "brzina": 0.789231631,
+     "kuca": 8,
+     "znak": "scorpio",
+     "deg": 5,
+     "min": 48
+    },
+    {
+     "key": "mars",
+     "lon": 155.77095364,
+     "brzina": 0.292215924,
+     "kuca": 7,
+     "znak": "virgo",
+     "deg": 5,
+     "min": 46
+    },
+    {
+     "key": "jupiter",
+     "lon": 147.023628969,
+     "brzina": 0.001033027,
+     "kuca": 7,
+     "znak": "leo",
+     "deg": 27,
+     "min": 1
+    },
+    {
+     "key": "saturn",
+     "lon": 7.930344257,
+     "brzina": 0.003204,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 7,
+     "min": 55
+    },
+    {
+     "key": "uranus",
+     "lon": 62.994331395,
+     "brzina": -0.039425128,
+     "kuca": 3,
+     "znak": "gemini",
+     "deg": 2,
+     "min": 59
+    },
+    {
+     "key": "neptune",
+     "lon": 1.616299987,
+     "brzina": -0.000113226,
+     "kuca": 1,
+     "znak": "aries",
+     "deg": 1,
+     "min": 36
+    },
+    {
+     "key": "pluto",
+     "lon": 303.818392613,
+     "brzina": 0.024723977,
+     "kuca": 12,
+     "znak": "aquarius",
+     "deg": 3,
+     "min": 49
+    }
+   ],
+   "obliquity": 23.437668108,
+   "ramc": 249.228092515,
+   "asc": 325.661313256,
+   "mc": 250.81167658,
+   "kuspide": [
+    325.661313256,
+    13.275664577,
+    46.665319045,
+    70.81167658,
+    91.845401892,
+    114.438595936,
+    145.661313256,
+    193.275664577,
+    226.665319045,
+    250.81167658,
+    271.845401892,
+    294.438595936
+   ],
+   "fellBack": false,
+   "cvor": 322.280400211,
+   "cvorBrzina": -0.07543028,
+   "lilit": 279.78352861,
+   "sreca": 2.935507689,
+   "faza": 37.268411957,
+   "aspekti": [
+    {
+     "key": "venus.sextile.mars",
+     "orb": 0.044606392
+    },
+    {
+     "key": "mercury.trine.saturn",
+     "orb": 1.410463685
+    },
+    {
+     "key": "venus.square.pluto",
+     "orb": 1.997167419
+    },
+    {
+     "key": "uranus.trine.pluto",
+     "orb": 0.824061218
+    },
+    {
+     "key": "mercury.square.mars",
+     "orb": 3.569854302
+    },
+    {
+     "key": "mars.square.uranus",
+     "orb": 2.776622245
+    },
+    {
+     "key": "uranus.sextile.neptune",
+     "orb": 1.378031407
+    },
+    {
+     "key": "neptune.sextile.pluto",
+     "orb": 2.202092625
+    },
+    {
+     "key": "moon.conjunction.pluto",
+     "orb": 6.099648307
+    },
+    {
+     "key": "mercury.opposition.uranus",
+     "orb": 6.346476547
+    },
+    {
+     "key": "saturn.conjunction.neptune",
+     "orb": 6.31404427
+    },
+    {
+     "key": "moon.trine.uranus",
+     "orb": 5.275587089
+    },
+    {
+     "key": "moon.sextile.neptune",
+     "orb": 3.897555682
+    },
+    {
+     "key": "jupiter.square.uranus",
+     "orb": 5.970702426
+    }
+   ],
+   "razmaknuto": [
+    151.323532774,
+    114.049338341,
+    102.945596411,
+    69.4203485,
+    10.128417437,
+    0.628417437,
+    224.721088456,
+    276.599119863,
+    215.221088456,
+    160.823532774
+   ]
+  }
+ ]
+}

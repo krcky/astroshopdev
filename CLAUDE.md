@@ -36,6 +36,7 @@ src/
     dev-kartice.tsx  SAMO DEV: pregled kartica Premium za test kartu sa ASC u Ribama
     dev-tipografija.tsx SAMO DEV: sve uloge teksta i kompozicije, za procenu debljina
     dev-video.tsx    SAMO PROBNI BUILD: video price — merenje kadrova i ceo video sa probnim profilom (pravilo 23)
+    dev-promene.tsx  SAMO DEV: kartice "Promene na nebu" za probni profil (?dan=2026-10-20 = retrogradni Merkur je velika)
     dev-tranziti.tsx SAMO DEV: tab Tranziti + ocene oblasti za test kartu, dan nadjen racunom
     dev-prica-znaka.tsx SAMO DEV: kartice price o znaku (?znak=); ?sve=se = svih 12 x 9 slika redom u okviru
                      iPhone SE (sve=1 pravi ekran), crvene linije = granice okvira — provera snimkom ekrana
@@ -59,6 +60,7 @@ src/
     nova-osoba/      nova osoba KORAK PO KORAK, kao onboarding: ime, ko ti je, datum, vreme, mesto, pregled
     nalog.tsx        list sa profila: email, PODACI O RODJENJU (tabela), BRISANJE NALOGA (namerno korak dalje od profila)
     pitanje-novo.tsx pisanje pitanja astrologu — pageSheet preko celog ekrana (pravilo 21)
+    pitanje-pravila.tsx list "Na šta Boban ne odgovara" sa pisanja pitanja (pravilo 21, samo srpski)
     pitanje.tsx      pitanje i glasovni odgovor — LIST odozdo, kao tumacenja
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
     prica-znak.tsx   PRICA O ZNAKU (pravilo 25) — devet slika o Suncevom znaku, sa prstena oko Sunca u velikoj trojci ("Ti")
@@ -103,6 +105,7 @@ src/
     sky-time.ts      pomeren trenutak na Nebu (null = sadasnjost) — BEZ persist
     osobe.ts         druge osobe, kes servera — PRIPADA NALOGU (`uid`), brise se pri odjavi
     nova-osoba.ts    nova osoba dok se unosi po koracima — BEZ persist (kao draft.ts)
+    novo-log.ts      sta je korisnik video na tabovima Mesec / Promene / Teme pocetne (znacka "novo") — PRIPADA NALOGU, brise se pri odjavi
     prica-log.ts     koji dan je prica pogledana — PRIPADA NALOGU, brise se pri odjavi
     prica-znaka-log.ts  da li je prica o znaku pogledana (pamti ZNAK) — PRIPADA NALOGU, brise se pri odjavi
     video-price.ts   video price: pravi se / gotov (fajl za danas) — PRIPADA NALOGU, brise se pri odjavi
@@ -142,7 +145,14 @@ supabase/
   pitanja.sql        pitanja, krediti, astrolozi, skladiste `odgovori`
   pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
 panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
-modules/             lokalni nativni moduli (samo sopstveni build): postepeno-zamucenje, video-price (MP4 kadar po kadar)
+modules/             lokalni nativni moduli (samo sopstveni build): postepeno-zamucenje, video-price (MP4 kadar po kadar),
+                     nebo-widget (pravilo 27): iOS = veza aplikacija -> widget/sat (pod NeboVeza); android = Kotlin jezgro
+                     (`core/`), crtez (`crtez/`), Android widget (`widget/`) i ista veza (mesto + Wear OS)
+native/SkyCore/      SWIFT JEZGRO WIDGETA I SATA (pravilo 27): prepis `lib/astro|natal|points|sky|wheel` + SwiftUI krug,
+                     widget prikazi; Swift paket (`swift test`, `swift run SkyRender <folder>` = PNG kruga) i pod za Xcode
+targets/             Apple targeti (`@bacons/apple-targets`; ime foldera = ime Xcode targeta): NeboWidget (iOS widget),
+                     NeboSat (Apple Watch aplikacija), NeboSatWidget (komplikacije)
+wear/                Wear OS aplikacija — ZASEBAN Gradle projekat (prebuild ga ne dira), deli Kotlin izvore sa modulom
 scripts/
   check-*.ts         provere tacnosti
   font/              sklapanje AstroGlyphs.ttf iz Noto izvora
@@ -535,6 +545,10 @@ PROBNI PREKIDAC VERZIJA (13.10.2026): sve tri verzije su u aplikaciji — `compo
 `app/(tabs)/home/index.tsx` je samo birac po `useDevStore().pocetnaVerzija` (profil -> Test -> "Pocetna strana", dodir menja v1/v2/v3). Samo u probnom
 buildu (`PROBNI_BUILD`); production uvek v3. Kad se odluci koja ostaje: obrisati ostale fajlove i birac. v3 = vodoravne kartice oblasti
 (`oblasti-kartice.tsx`, sa strelicom gore/dole), "Tema dana" sa ilustracijom dole desno (`tvoj-dan-card.tsx`), "Ide ti / Koci te" sa v1.
+"NOVO" NA TABOVIMA (Ivan, 13.10.2026; samo v4): dugmad Mesec / Promene / Teme nose ljubicasti kruzic sa brojem u uglu (isti kao na kartici "Priča dana";
+`znacka` u `ui/kapsule.tsx`) — koliko stvari na tabu korisnik nije video: Mesec = nov znak (onaj sa kartice "Mesec danas", racuna se jednom za dan), Promene = nove promene
+na nebu (`kljucPromene`), Teme = novi spori tranziti. Otvaranje taba pamti sta je tada na njemu (`store/novo-log.ts`, PRIPADA NALOGU, brise se pri odjavi); racun `lib/novo.ts`
+(`check:natal`, deo 9f). Uvek za DANAS, i kad se gleda drugi dan. PRVI PUT NEMA ZNACKI (Ivan: "previse napadno"): zateceno stanje se upise kao polazno, broji se samo ono sto se pojavi kasnije.
 V4 (13.10.2026): kao v3, ali "Tema dana" nema ilustraciju nego animirane planete tranzita (`planeta-ziva.tsx`: tranzitna + znak aspekta + natalna, tekstura klizi ispod nepomicne senke, 9 s po prolazu; Saturn i Uran stoje) i kartica "Pitaj astrologa" na dnu (`pocetna/v4.tsx`, `pocetna/tvoj-dan-card-v4.tsx`). Prekidac u profilu ima v1—v4, production uvek v4. Tag `pocetna-v4`.
 VERZIJE POCETNE: v1 = tag `pocetna-pre-tocka-zivota` (pre kruga zivota, tabovi sa "Danas ukratko"; i tag `pocetna-v1` na istom commitu), v2 = tag
 `pocetna-v2` (krug zivota sa staklenom karticom, okretanjem i ulaznim okretom, 12.10.2026). Povratak: `git checkout pocetna-v2 -- 'src/app/(tabs)/home'
@@ -546,7 +560,7 @@ sredine pusta skrol strane; zamah (`withDecay`); plocice ostaju uspravne, kartic
 simulatoru; pravi prst i skrol na telefonu ne. (4) Iznad kruga: datum sitnim slovima, pa "Tvoj život danas" (`display` 32, crno, kao na tabu Mesec); ulazni okret kruga `ULAZNI_OKRET`. (5) Dugme "Priča
 dana" ima indigo krug sa brojem 1 gore desno dok danasnja prica nije otvorena.
 Na tabu "Danas" pocetne: KRUG ZIVOTA (naslov "Tvoj zivot danas" + datum iznad njega), ispod kartica izabrane oblasti, pa "Tvoj dan". "Danas ukratko" (ocene
-cetiri oblasti i "Ide ti / Koci te") je SKLONJENO sa pocetne — `OBLASTI` i `pickBrief` ostaju za pricu i karticu za deljenje, koje se NE menjaju.
+cetiri oblasti i "Ide ti / Koci te") je SKLONJENO sa pocetne — `pickBrief` ostaje za pricu i karticu za deljenje; OCENE u prici su od 13.10.2026 osam oblasti kruga (pravilo 23).
 Osam oblasti (`lib/krug-config.ts`: Karijera, Finansije, Zdravlje, Porodica, Partner, Licni razvoj, Zabava, Prijateljstvo; pokrivaju svih 12 kuca).
 IZGLED (vraceno 12.10.2026 na raniji krug, Ivan; natalni stil "verzija 11" je sacuvan u tagu `tocak-zivota-v11`, vracanje:
 `git cat-file blob tocak-zivota-v11^{} > src/components/krug-zivota.tsx`): osam isecaka, u svakom DIREKTNO NA NJEMU (bez staklenih plocica i bez kruzica):
@@ -676,6 +690,15 @@ prvi korak lista (`/pitanje-novo?korak=uvod`). NOV ODGOVOR = snimak bez `procita
 broj u indigo krugu na tabu (`NativeTabs.Trigger.Badge`; kad je 0 ne salje se tekst —
 `hidden` sam ostavlja "0") i indigo tackica u listi (`brand.indigo`). `oznaci_procitano` pri otvaranju
 pitanja; bez push-a se lista osvezava kad se aplikacija vrati u prvi plan.
+TEME I GOTOVA PITANJA (Ivan, 13.10.2026; da korisnik ne pita ono na sta astrolog ne moze da odgovori): dok je polje
+PRAZNO, ispod njega su kapsule sa temama (Ljubav, Posao, Novac, Porodica, Važna odluka, Ovaj period, Ja — BEZ Zdravlja)
+i tri pitanja; dodir pitanje UPISE u polje (ne salje) i otvori tastaturu, korisnik ga prepravi. Cim polje ima tekst,
+predlozi nestaju. Tastatura zato NE iskace sama na prazno polje. Pitanje o osobi / o odnosu ima svoja tri pitanja bez tema.
+Red "Na šta Boban ne odgovara" otvara list `pitanje-pravila`; pitanje krace od `PITANJE_KRATKO` (40, procena) pred
+placanje JEDNOM dobije predlog "Dopuni / Pošalji ovako" — ne blokira. NEMA provere po kljucnim recima ("otac mi je umro,
+kako da prodjem ovaj period" je dobro pitanje) ni sablona sa prazninama (padezi). SAMO SRPSKI (`imaTemePitanja`): tekst je
+u `i18n/sr/pitaj-teme.ts`, VAN tipa `Recnik` (Ivan: "nemoj opet pet jezika"), na drugim jezicima ekran je kakav je bio.
+Tekstovi su PREDLOG — ceka Bobana (svako pitanje i lista). Baza ne pamti temu. Prototip: claude.ai/artifact/6Ed7oc1rg1xY9AsdBc9oJm.
 PLACANJE JOS NIJE UKLJUCENO: `lib/kupovina.ts` vraca `nedostupno`, cena se ne prikazuje
 (dolazi SAMO iz RevenueCat Offerings, `question` / `question_member`; Premium po
 `useEntitlement()`, da i poklon dobije nizu cenu). PRIVREMENO: probna cena `PROBNA_CENA`
@@ -745,7 +768,8 @@ natpis; slojevi: planeta -> balon -> mala planeta (Ivan, 30.9.2026). Planeta je 
 druge dane (`tvoj-dan-card.tsx`).
 SLIKE (`components/prica/slajdovi.tsx`): naslovna (dvostruki tocak na PRAVIM polozajima — tranzitna planeta
 spolja -> natalna tacka unutra, ASC na 9 sati — trake tona, legenda), Tvoj dan (pravi ugao aspekta), ocene
-(strelica "bolje nego juče", rucno zaokruzena petica, BEZ boje pozadine), Ide ti / Koči te (plavo / roze
+(OD 13.10.2026 OSAM OBLASTI KRUGA ZIVOTA — mreza 2 x 4: ikonica, ime, rec stanja, tackice, strelica od juce; `components/prica/ocene-kruga.tsx`,
+ista za sliku i karticu; podaci `useKrug`, isti kao pocetna; "Najbolje ti ide" = najvisa od osam; do tada cetiri reda sa brojem; BEZ boje pozadine), Ide ti / Koči te (plavo / roze
 polje), Mesec (procenat, 8 faza, znak ISPRED naslova — ne na Mesecu, Ivan 30.9.2026 — "Za tebe"), savet
 (zraci iz loga, "Podeli svoj dan", "Pročitaj ceo tekst"). PRELOM NASLOVA po srpskom slogu: jednoslovna rec
 (u, i, a…) ide uz sledecu (`reciZaPrelom`, i na kartici) — "Opadajući Mesec / u Biku", ne "… u / Biku".
@@ -959,6 +983,47 @@ srpski. Font skripta cita `glyph: '...'` iz `astro.ts`/`zodiac.ts`/`points.ts` �
 `npm run check:prevod` (skener: JSX tekst i string sa srpskim slovom van recnika; `--svi` za rucni pregled).
 Pravila i spisak: `docs/PREVOD.md`.
 
+**27. Widget i sat racunaju nebo SAMI — `native/SkyCore` (Swift) i `modules/nebo-widget/android/.../core` (Kotlin) su PREPIS `src/lib` (Ivan, 13.10.2026).**
+Widget i sat ne mogu da izvrse JS, pa je racun neba prepisan dvaput: Swift (iOS widget, Apple Watch) i Kotlin (Android
+widget, Wear OS). Ista biblioteka (astronomy-engine — C i Kotlin izvor ISTE verzije kao npm paket, uneti u repo), isti
+redosled tela, isti orbisi, ECT (pravilo 1), pravi cvor i srednji Lilit (pravilo 16), Placidus sa padom na Whole Sign.
+IZVOR ISTINE je `src/lib`: promena racuna ili rasporeda tocka ide PRVO tamo, pa u oba prepisa, u istom commitu.
+PROVERA: `scripts/native/skycore-golden.ts` izracuna 52 trenutka kodom aplikacije (pet mesta, i polarno i juzna polulopta)
+u `golden.json`; `npm run check:skycore` (`swift test`) i `npm run check:skycore-android` (Gradle, trazi `android/` i
+ANDROID_HOME) porede svoj racun sa tim brojevima (13.10.2026: Swift 0,00000004°, Kotlin 0,0000000005°). `--check` pada
+ako se `src/lib` promeni a golden ne.
+OBLICI su generisani, ne crtani — za oba jezika iz ISTE skripte: znaci iz `lib/znak-oblici.ts`
+(`tsx scripts/native/skycore-znaci.ts`), simboli planeta iz `AstroGlyphs.ttf` kao putanje
+(`swift scripts/native/skycore-oblici.swift`); widget ne nosi font. Nova ikonica ili telo = ponovo obe skripte.
+Brojevi i "R" su sistemsko pismo, ne Plus Jakarta Sans. Crtez kruga postoji TRI puta (`natal-wheel.tsx`, `SkyWheelView.swift`,
+`SkyWheelCrtez.kt`) + panel: promena rasporeda ide u sva cetiri.
+BEZ RECI u prikazu (simbol, znak, stepen, "R") — isti na svih sest jezika; prevedeni su samo ime i opis u galeriji
+(`Localizable.xcstrings`, `res/values-*/strings.xml`). BESPLATNO za sve (Ivan). Svetlo kao aplikacija, crno u tamnom rezimu; sat uvek crn.
+MESTO posmatranja je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u korenu) -> modul `NeboWidget`
+(`postaviMesto`), pri odjavi brise. iOS: App Group (`SharedPlace`; ime grupe se IZVODI iz bundle id-ja, "group." + id —
+probni build `….test` ima svoju, prava ostaje slobodna za nalog firme) + WatchConnectivity (`updateApplicationContext`) za sat.
+Android: SharedPreferences + sloj podataka `/nebo/mesto` za Wear OS (`play-services-wearable`). Bez mesta krug je BEZ kuca,
+0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11).
+iOS WIDGET (`targets/NeboWidget`): mali (krug), srednji (krug + 10 planeta), veliki (krug kao u aplikaciji), zakljucani
+ekran (kruzni, pravougaoni, red teksta). 96 prikaza unapred (24 h na 15 min). Prikazi su u SkyCore (`NeboWidgetKit.swift`),
+zajednicki sa komplikacijama. APPLE WATCH (`targets/NeboSat`, `NeboSatWidget`): krug preko ekrana, KRUNA pomera vreme (zarez =
+15 min, natpis sa datumom vraca na sada), druga strana lista planeta; komplikacije kruzna / pravougaona / ugaona / red teksta.
+Apple ne dozvoljava tudje brojcanike — ne zaobilaziti (workout / extended runtime).
+ANDROID WIDGET (`modules/nebo-widget/android`): jedan, promenljive velicine (kvadrat = krug, sirok = krug + lista, veliki = pun
+krug), crta se u bitmapu; sistem ga osvezava na 30 min + budilnik na 15 min koji ne budi telefon. WEAR OS (`wear/`): aplikacija
+(krug, kruna/obod pomera vreme, lista), plocica (Tile) i komplikacija (slika ili kratak tekst); paket isti kao telefon.
+ZAMKE: (1) `pods.rb` u folderu targeta nosi `platform`, a ime foldera = ime Xcode targeta; (2) `entitlements` sa App Group
+MORA da stoji u `expo-target.config.js` — plugin je ne prenosi sam, a bez nje widget cita prazno mesto bez ikakve greske;
+(3) scheme sada ugradjuje Apple Watch aplikaciju, pa Xcode trazi instaliranu watchOS platformu (`xcodebuild -downloadPlatform
+watchOS`) i NE sme `-sdk iphonesimulator` u komandi (prisili iOS SDK i na sat); (4) SkyCore pod se gradi i za stariji iOS —
+novo iz iOS 17 ide uz `@available`; (5) posle prebuild-a uz tri izmene za besplatni Apple ID idu i id-jevi `….test.widget`,
+`….test.watch`, `….test.watch.widget` i grupa `group.….test` u sva cetiri entitlements fajla; (6) hook-ovi u jednom izrazu
+sa `&&` obaraju aplikaciju (prvi nacrt `useNeboWidget`).
+NIJE PROVERENO (13.10.2026): pravi telefon i pravi sat; prijavljen korisnik od kraja do kraja (mesto iz aplikacije — u
+simulatoru je upisano rucno u grupu); kruna, druga strana i komplikacije na satu (simulator: samo prvi ekran, sa i bez mesta);
+Wear OS je samo PREVEDEN (nema Wear emulatora); prenos mesta telefon -> sat na obe platforme; potpisivanje sa App Group i
+tri nova bundle id-ja na EAS-u; ikonica Wear aplikacije je privremena.
+
 ## Kanonski kljucevi sadrzaja
 
 `findAspects()` generise `contentKey` u formatu `telo.aspekt.telo`, npr.
@@ -978,6 +1043,8 @@ npm run check:ephemeris   pozicije planeta
 npm run check:natal       ascendent, MC, Placidus kuce, tranziti
 npm run check:timezone    vreme rodjenja -> UTC
 npm run check:sky         cvor, Lilit, Tacka srece, kuce (prema astro-seek-u)
+npm run check:skycore     Swift jezgro widgeta i sata (native/SkyCore) racuna isto sto i src/lib (pravilo 27; samo na Mac-u)
+npm run check:skycore-android  isto za Kotlin jezgro (Android widget, Wear OS); trazi android/ (prebuild) i ANDROID_HOME — nije u `check`
 npm run check:cities      predlozi gradova + da se pretraga nije suzila
 npm run check:lunarni-kalendar mreza meseca, glavne faze po danima, pomeranje dana (ekran Mesec)
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
@@ -1060,6 +1127,21 @@ npm run panel:build       panel za objavu -> panel/dist
       lekture i proverava da se nijedna rec ne promeni. 508 tekstova -> 1442 pasusa,
       najduzi 108 reci. Isto za lunarni (`Lunarni kalendar/pasusi.json`, uvodi) i
       dugu verziju tranzita (`Tranziti AstroShop/pasusi.json`) — skill korpus.
+- [ ] NATALNA KARTA V2 + JEDNOKRATNA KUPOVINA (Ivan, 13.10.2026) — PROBNO, iza prekidaca u profilu (Test -> "Natalna karta",
+      `useDevStore().kartaVerzija`; production uvek v1): krug i ime isti, ispod ZBIJEN SPISAK pozicija u dve kolone (bez znacenja),
+      kartica "Otključaj zauvek", pa KARTICA ZA SVAKU PLANETU (animirana planeta, znak dole desno, podnaslovi astrologa za znak i kucu)
+      koja otvara tumacenje ili list kupovine, aspekti prvih 5 + "Svi aspekti" (`components/natalna-karta-v2.tsx`). V2 NEMA veliku
+      trojku, pa ni ulaz u pricu o znaku. Pregled bez naloga: `/dev-karta` (`?v=1`, `?vreme=0`). List `/natal-kupovina`: "Samo natalna
+      karta" (jednokratno, zauvek) ili Premium; kupovina je STUB (`kupiNatalnuKartu`, probna cena 24,99 € — nije odluka).
+      ODLUCENO: kupovina vazi za SVOJU I JOS JEDNU kartu (izabrana osoba, zamena jednom u 12 meseci); posle kupovine podaci o rodjenju
+      se ispravljaju JEDNOM po karti, zatim "Piši nam" (brojac u bazi, okidac). FALI: kratak tekst po planeti (korpus ima samo naslov,
+      podnaslov i dugi tekst), tabela trajnih kupovina + politika `ima_premium()` ILI kupljena karta, izbor druge osobe, ogranicenje
+      izmena, RevenueCat non-consumable; skica svih ekrana: claude.ai/artifact/QcNPL2zFQ8ksRZipBkGWhR.
+      KARTICA PLANETE = RASPORED KARTICE TRANZITA (Ivan, 13.10.2026): verzal "SUNCE U LAVU U 11. KUĆI", naslov astrologa, PRVA RECENICA
+      tumacenja (do 3 reda, i za zakljucane — "rečenica za sve"), linija, krug sa brojem kuce + naslov kuce; katanac u redu kuce.
+      Recenicu salje `natal_kartice` (`supabase/natal-kartice.sql`, `prva_recenica`; proverena na svih 508 tekstova: prosek 125 znakova,
+      max 282) — CEKA DA JE IVAN POKRENE u SQL Editoru; do tada aplikacija zove `natal_naslovi` i kartice su bez recenice.
+      Spisak pozicija: red je dugme (isto sto i kartica), mali znak uz ikonicu, broj kuce u lila krugu uz ime (`KucaBroj puna`).
 - [ ] RevenueCat: subscription + one-time, entitlement na serveru
 - [ ] Pitaj astrologa (pravilo 21) — URADJENO: baza (`pitanja.sql`), tab, pisanje, odgovor
       sa plejerom, panel. FALI: pokrenuti `pitanja.sql` + deploy `delete-account`; nalog za
@@ -1115,6 +1197,9 @@ npm run panel:build       panel za objavu -> panel/dist
       Samo sto se za godinu dana desi: `npx tsx scripts/korpus/promene-godine.ts` (30.9.2026: 60 =
       46 + 14; Excel astrologu, `odgovor.py` list "Planete u znacima"). Jos nisu stigli — redovi
       ne vode nigde. Testovi: `check:natal`, deo 9f.
+      PRVA KARTICA JE VELIKA (Ivan, 13.10.2026; samo pocetna v4): preko CELE kartice pozadina poslednje slike dnevne price, tekst centriran, bez strelice (zlatne mrlje
+      + `Zraci` koji se sporo okrecu, sat iz `SatKartice` — staje uz mirovanje, pravilo 17), u sredini `PlanetaZiva`; ostale
+      kartice imaju `PlanetaZiva` umesto slike. Merkur koji POSTAJE RETROGRADAN je uvek prvi (`istakniPromenu`, `lib/sky-events.ts`).
 - [x] Mesec, drugi krug (27.9.2026): na pocetnoj crtez faze + procenat + znak, bez
       kruzica sa podacima (Ivan); red "Ljubav danas" se pojavi kad stignu saveti.
       Ekran Mesec (`app/moon.tsx`): veliki crtez, lunarni dan, do kad je u znaku,

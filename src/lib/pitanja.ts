@@ -73,6 +73,25 @@ export function pitanjeSpremno(tekst: string): boolean {
   return t.length > 0 && t.length <= PITANJE_MAX;
 }
 
+/**
+ * Ispod ove duzine pitanje je verovatno bez situacije ("Hocu li naci posao?") — ekran pred placanje
+ * jednom predlozi da se dopuni (Ivan, 13.10.2026). PROCENA, nije merena; ne blokira slanje.
+ */
+export const PITANJE_KRATKO = 40;
+
+/** Moze da se posalje, ali je krace od `PITANJE_KRATKO` znakova. */
+export function pitanjeKratko(tekst: string): boolean {
+  return pitanjeSpremno(tekst) && tekst.trim().length < PITANJE_KRATKO;
+}
+
+/**
+ * Teme, gotova pitanja i lista "na sta astrolog ne odgovara" postoje SAMO NA SRPSKOM
+ * (`i18n/sr/pitaj-teme.ts`, ceka astrologa); na drugim jezicima se ne prikazuju.
+ */
+export function imaTemePitanja(jezik: string): boolean {
+  return jezik === 'sr';
+}
+
 /** Odgovor stigao, a korisnik ga jos nije otvorio. */
 export function neprocitan(p: Pick<Pitanje, 'audio_putanja' | 'procitano_at'>): boolean {
   return !!p.audio_putanja && !p.procitano_at;

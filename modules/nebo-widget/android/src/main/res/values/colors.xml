@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Svetao kao aplikacija; u tamnom rezimu crn (values-night). -->
+    <color name="nebo_widget_podloga">#FFFFFF</color>
+</resources>

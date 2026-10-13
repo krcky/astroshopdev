@@ -74,9 +74,13 @@ export function PremiumKartica({ naslov, opis, dugme, izLista = false, ilustraci
       {/* Uz ilustraciju naslov veci i deblji (21pt, Bold — Ivan, 30.9.2026). */}
       <Text variant={ilustracija ? 'title' : 'h3'} className={cn('mt-4 text-center', ilustracija && tezina('naslovStrane'))}>{naslov}</Text>
       <Text variant="muted" className="mt-2 text-center">{opis}</Text>
-      <Button className="mt-5 w-full" onPress={onPress ?? (() => otvoriPremium(izLista))}>
-        <Text>{dugme ?? t.opste.otkljucaj}</Text>
-      </Button>
+      {/* Malo dugme kao "Saznaj više" na pocetnoj, na sredini (Ivan, 13.10.2026; do tada dugme pune sirine).
+          Poravnanje na omotacu: `istaknuto` dugme je umotano u View sa senkom. */}
+      <View className="mt-5 self-center">
+        <Button size="compact" istaknuto className="h-auto px-5 py-[10px]" onPress={onPress ?? (() => otvoriPremium(izLista))}>
+          <Text className="text-[16px] leading-[20px]">{dugme ?? t.opste.otkljucaj}</Text>
+        </Button>
+      </View>
     </>
   );
   if (!ilustracija) {

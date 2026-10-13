@@ -16,7 +16,7 @@ import { isFreeNatalKey, natalTopic, tacnostAspekta, udeoUZnaku } from '@/lib/na
 import { AspektIkona, imaAspekt, type AspektKljuc } from '@/components/aspekt-ikona';
 import { AspektIlustracija } from '@/components/aspekt-ilustracija';
 import { PLANETA_POTEZ, IkonaTacke } from '@/components/planeta-ikona';
-import { Planeta } from '@/components/planete-par';
+import { ZivaTacka } from '@/components/planeta-ziva';
 import { TrakaNapretka } from '@/components/transit-trajanje';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import type { SignPosition } from '@/lib/zodiac';
@@ -230,10 +230,10 @@ function Glava({ tacke, aspekt, slika, oznaka, naslov, traka }: {
         </View>
         {ilustracija && (
           <View className="justify-end">
-            <AspektIlustracija aspekt={aspekt as AspektKljuc} tranzitna={tacke[0]} natalna={tacke[1]} width={120} />
+            <AspektIlustracija aspekt={aspekt as AspektKljuc} tranzitna={tacke[0]} natalna={tacke[1]} width={120} ziva />
           </View>
         )}
-        {slika && <Planeta t={slika} size={SLIKA_PLANETE} />}
+        {slika && <ZivaTacka t={slika} size={SLIKA_PLANETE} />}
       </View>
       {traka && <TrakaNapretka {...traka} boja={OBLAST_BOJA} className="mt-8" />}
       <View className="mb-2" />

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Image, View, type ImageSourcePropType } from 'react-native';
 
 import { Planeta, type Tacka } from '@/components/planete-par';
+import { ZivaTacka } from '@/components/planeta-ziva';
 import type { AspektKljuc } from '@/components/aspekt-ikona';
 
 /**
@@ -60,13 +61,16 @@ function rezerva(width: number, aspekt: AspektKljuc) {
   return { levo, desno, vrh, visina: dno - vrh };
 }
 
-export function AspektIlustracija({ aspekt, tranzitna, natalna, width = 96 }: {
+export function AspektIlustracija({ aspekt, tranzitna, natalna, width = 96, ziva = false }: {
   aspekt: AspektKljuc;
   tranzitna: Tacka;
   natalna: Tacka;
   /** Sirina ilustracije u tackama; visina ide po razmeri. */
   width?: number;
+  /** Planete se vrte (`ZivaTacka`) — samo u zaglavlju tumacenja, ne na karticama u listama. */
+  ziva?: boolean;
 }) {
+  const Telo = ziva ? ZivaTacka : Planeta;
   const m = MERE[aspekt];
   const k = width / m.w;
   const height = m.h * k;
@@ -82,10 +86,10 @@ export function AspektIlustracija({ aspekt, tranzitna, natalna, width = 96 }: {
       importantForAccessibility="no-hide-descendants">
       <Image source={SLIKA[aspekt]} style={{ position: 'absolute', left: r.levo, top: -r.vrh, width, height }} resizeMode="contain" />
       <View style={na(m.natal, dN)}>
-        <Planeta t={natalna} size={dN} />
+        <Telo t={natalna} size={dN} />
       </View>
       <View style={na(m.tranzit, dT)}>
-        <Planeta t={tranzitna} size={dT} />
+        <Telo t={tranzitna} size={dT} />
       </View>
     </View>
   );

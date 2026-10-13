@@ -90,6 +90,27 @@ export async function kupiPremium(_paket: PaketPremium['id']): Promise<IshodKupo
   return 'nedostupno';
 }
 
+/* ------------------------------------------------------------------------- *
+ * NATALNA KARTA, JEDNOKRATNO (Ivan, 13.10.2026) — JOS NIJE UKLJUCENO, samo izgled.
+ *
+ * Tumacenje cele natalne karte kupljeno jednom, zauvek, nezavisno od pretplate: vazi za
+ * svoju i jos jednu kartu. Kad stigne RevenueCat: non-consumable sa SVOJIM pravom pristupa
+ * (posebna tabela, kao `pokloni` — istek pretplate ne sme da obrise trajnu kupovinu), a
+ * politika na `natal_texts` postaje `ima_premium()` ILI kupljena karta. Do tada probna cena
+ * pod istim uslovom kao ostale; broj nije odluka o ceni.
+ * ------------------------------------------------------------------------- */
+
+const PROBNA_CENA_KARTE = '24,99 €';
+
+/** Cena jednokratne kupovine natalne karte; `null` dok RevenueCat ne stigne (osim probne). */
+export function useCenaNatalneKarte(): string | null {
+  return PROBNE_CENE ? PROBNA_CENA_KARTE : null;
+}
+
+export async function kupiNatalnuKartu(): Promise<IshodKupovine> {
+  return 'nedostupno';
+}
+
 export type IshodVracanja = 'vraceno' | 'nema' | 'greska' | 'nedostupno';
 
 /** "Vrati kupovine" — Apple ga trazi na svakom paywall-u. */

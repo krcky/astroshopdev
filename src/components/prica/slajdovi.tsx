@@ -6,17 +6,16 @@ import { Minus, Plus, Share } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { useT } from '@/i18n';
 import { Button } from '@/components/ui/button';
-import { CARD_SURFACE } from '@/components/ui/card';
-import { OblastIkona } from '@/components/oblast-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { MoonDisc } from '@/components/moon-disc';
 import { PricaPozadina } from '@/components/prica/pozadina';
-import { INDIGO, INK, LILA, MINUS, PLUS, SIVA, TON_MASTILO } from '@/components/prica/boje';
+import { INDIGO, INK, LILA, MINUS, PLUS, SIVA } from '@/components/prica/boje';
 import {
-  BLAGO, Broj, FazeMeseca, ISKOK, KrugOko, Pojava, Reci, TackiceOcene, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
+  BLAGO, Broj, FazeMeseca, ISKOK, Pojava, Reci, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
 } from '@/components/prica/crtezi';
+import { IkonaKruga, OceneKruga } from '@/components/prica/ocene-kruga';
 import { useOkret } from '@/components/prica/sat';
-import { boljeNegoJuce, fazaOsmina, korakReci, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
+import { fazaOsmina, korakReci, velicinaSaveta, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
@@ -168,7 +167,7 @@ export function SlikaTvojDan({ p, okvir }: SlikaProps) {
 }
 
 /* ------------------------------------------------------------------------- *
- * 3 · Ocene (bez boje u pozadini — Ivan, 30.9.2026)
+ * 3 · Ocene: osam oblasti kruga zivota (Ivan, 13.10.2026), bez boje u pozadini (30.9.2026)
  * ------------------------------------------------------------------------- */
 
 export function SlikaOcene({ p, okvir }: SlikaProps) {
@@ -180,7 +179,7 @@ export function SlikaOcene({ p, okvir }: SlikaProps) {
       <View style={{ position: 'absolute', top: okvir.vrh, bottom: okvir.dno, left: 24, right: 24, justifyContent: 'center' }}>
         {naj && (
           <Pojava kasni={200} trajanje={600} ublazavanje={ISKOK} zum bledi={false} pomak={0} style={{ marginBottom: 12, alignSelf: 'flex-start' }}>
-            <OblastIkona oblast={naj.key} size={64} />
+            <IkonaKruga oblast={naj.key} size={64} />
           </Pojava>
         )}
         <Pojava kasni={450}>
@@ -191,33 +190,9 @@ export function SlikaOcene({ p, okvir }: SlikaProps) {
             <Reci tekst={naj.name} kasni={550} className={TIP.naslovM} />
           </View>
         )}
-        <Pojava kasni={900} className={cn(CARD_SURFACE, 'mt-5 overflow-hidden')}>
-          {o.redovi.map((r, i) => {
-            const bolje = boljeNegoJuce(r.ocena, r.juce);
-            return (
-              <View
-                key={r.key}
-                accessible
-                accessibilityLabel={t.prica.dnevna.ocenaA11y(r.name, r.ocena, r.oznaka, bolje)}
-                className={cn('flex-row items-center gap-2.5 px-4 py-3', i > 0 && 'border-t border-border')}>
-                <OblastIkona oblast={r.key} size={26} />
-                <View style={{ flex: 1 }}>
-                  <Text variant="default" className="text-[16px] leading-[20px]">{r.name}</Text>
-                  {bolje && (
-                    <Text className={cn('mt-0.5 text-[10px] leading-[13px] uppercase tracking-[1.2px]', tezina('statOznaka'))} style={{ color: TON_MASTILO.povoljno }}>
-                      {t.prica.dnevna.boljeNegoJuce}
-                    </Text>
-                  )}
-                </View>
-                <TackiceOcene ocena={r.ocena} kasni={1200 + i * 240} />
-                <View style={{ width: 30, alignItems: 'flex-end' }}>
-                  <Text className={cn('text-[30px] leading-[32px] tracking-[-1px]', tezina('display'))}>{r.ocena}</Text>
-                  {r.ocena === 5 && <KrugOko sirina={56} />}
-                </View>
-              </View>
-            );
-          })}
-        </Pojava>
+        <View style={{ marginTop: 20 }}>
+          <OceneKruga redovi={o.redovi} />
+        </View>
       </View>
     </View>
   );

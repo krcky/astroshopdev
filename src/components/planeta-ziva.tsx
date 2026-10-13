@@ -4,7 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import Animated, { useAnimatedStyle, useFrameCallback, useReducedMotion, useSharedValue } from 'react-native-reanimated';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
-import { SLIKA } from '@/components/planete-par';
+import { Krunica, Planeta, SLIKA, type Tacka } from '@/components/planete-par';
 import { probudi, useBudnost, useUstedaBaterije } from '@/store/budnost';
 
 /** Planete sa prstenovima: telo je mali deo slike, pa se klizanje teksture ne primenjuje (stoje mirno). */
@@ -79,6 +79,21 @@ export function PlanetaZiva({ planeta, size, period = PERIOD_S, faznoKasni = 0 }
         </Defs>
         <Rect width={size} height={size} fill={`url(#${id})`} />
       </Svg>
+    </View>
+  );
+}
+
+/**
+ * Tacka u zaglavlju TUMACENJA (Ivan, 13.10.2026: "na tumacenjima staviti animirane ikonice planeta"): planeta
+ * koja se vrti kad za nju postoji slika, inace isto sto i `Planeta` (Asc, MC i tacke bez slike miruju). Krunica vladara ostaje.
+ * Samo na listu tumacenja — u listama kartica planete miruju (po dve animacije na svakoj kartici bi kocile skrol).
+ */
+export function ZivaTacka({ t, size }: { t: Tacka; size: number }) {
+  if (!SLIKA[t.key]) return <Planeta t={t} size={size} />;
+  return (
+    <View style={{ width: size, height: size }}>
+      <PlanetaZiva planeta={t.key} size={size} />
+      {t.vladar && <Krunica size={size} />}
     </View>
   );
 }

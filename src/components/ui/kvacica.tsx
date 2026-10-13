@@ -10,7 +10,9 @@ import { neutral } from '@/theme/tokens';
  * Kvacica sa recenicom pored (pristanak pri dodavanju osobe, "o nama dvoma" uz
  * pitanje, 29.9.2026). Ceo red je meta dodira.
  */
-export function Kvacica({ ukljuceno, onPromena, children, className }: {
+export function Kvacica({ ukljuceno, onPromena, children, className, uRedu = false }: {
+  /** U REDU uz druge elemente (npr. desno od kapsula): natpis siri koliko tekst, razmak manji. */
+  uRedu?: boolean;
   ukljuceno: boolean;
   onPromena: (v: boolean) => void;
   children: string;
@@ -21,11 +23,11 @@ export function Kvacica({ ukljuceno, onPromena, children, className }: {
       onPress={() => onPromena(!ukljuceno)}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: ukljuceno }}
-      className={cn('flex-row items-center gap-3 py-1 active:opacity-60', className)}>
+      className={cn('flex-row items-center py-1 active:opacity-60', uRedu ? 'gap-2' : 'gap-3', className)}>
       <View className={cn('h-6 w-6 items-center justify-center rounded-md border-2 border-foreground', ukljuceno && 'bg-foreground')}>
         {ukljuceno && <Check size={16} color={neutral.white} strokeWidth={3} />}
       </View>
-      <Text variant="default" className="flex-1">{children}</Text>
+      <Text variant="default" numberOfLines={uRedu ? 1 : undefined} className={uRedu ? undefined : 'flex-1'}>{children}</Text>
     </Pressable>
   );
 }

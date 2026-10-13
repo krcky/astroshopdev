@@ -2,7 +2,7 @@
 // Delovi su prepisani iz skice `files/avatar-skica/planete-foto.html` kao SVG tekst; filtera (zamucenja) nema.
 // Nije sistem avatara — izbaciti kad se odluci o stilu.
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import Svg, { G, Image as SvgImage, SvgXml } from 'react-native-svg';
 
 const f = (n: number) => Math.round(n * 10) / 10;
@@ -268,12 +268,23 @@ export function AvatarProbni({ size, index = 0 }: { size: number; index?: number
   );
 }
 
-/** Dodir menja sledeceg od 10 probnih avatara. */
+export const SLIKE = [
+  require('../probni-avatari/01.png'), require('../probni-avatari/02.png'), require('../probni-avatari/03.png'), require('../probni-avatari/04.png'),
+  require('../probni-avatari/05.png'), require('../probni-avatari/06.png'), require('../probni-avatari/07.png'), require('../probni-avatari/08.png'),
+  require('../probni-avatari/09.png'), require('../probni-avatari/10.png'), require('../probni-avatari/11.png'), require('../probni-avatari/12.png'),
+];
+
+/** Dodir menja sledeceg: 10 astro avatara, pa 12 slika iz `files/meseci` (kopije u `src/probni-avatari/`). */
 export function AvatarProbaDodir({ size }: { size: number }) {
   const [i, setI] = React.useState(0);
+  const ukupno = AVATARI.length + SLIKE.length;
   return (
-    <Pressable onPress={() => setI((x) => (x + 1) % AVATARI.length)} accessibilityRole="button" accessibilityLabel={`Probni avatar: ${AVATARI[i].ime}. Dodir menja.`} style={{ width: size, height: size }}>
-      <AvatarProbni size={size} index={i} />
+    <Pressable onPress={() => setI((x) => (x + 1) % ukupno)} accessibilityRole="button" accessibilityLabel="Probni avatar. Dodir menja." style={{ width: size, height: size }}>
+      {i < AVATARI.length ? (
+        <AvatarProbni size={size} index={i} />
+      ) : (
+        <Image source={SLIKE[i - AVATARI.length]} style={{ width: size, height: size }} resizeMode="contain" accessibilityIgnoresInvertColors />
+      )}
     </Pressable>
   );
 }

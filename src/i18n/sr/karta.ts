@@ -20,7 +20,7 @@ export const karta = {
   /* --- zajednicko za "Ti", Nebo i tumacenja ------------------------------- */
 
   /** Ime ugla karte (lista, tumacenje, snimak karte za astrologa). */
-  ascendent: 'Ascendent',
+  ascendent: 'Podznak',
   /** Isti ugao u velikoj trojci i listi na "Ti" (UX recenzija 1.10.2026). */
   podznak: 'Podznak',
   /** Medium Coeli — skracenica, i u listi i na tocku. */
@@ -53,7 +53,7 @@ export const karta = {
     infoA11y: 'Šta je natalna karta?',
     nemozeNaslov: 'Karta ne može da se izračuna',
     nemozeOpis: (grad: string) =>
-      `Ne možemo pouzdano da utvrdimo koliko je sati bilo po UTC-u u mestu ${grad} na taj datum. Greška od sat vremena pomeri ascendent za pola znaka, pa radije ne prikazujemo ništa nego pogrešne brojeve.`,
+      `Ne možemo pouzdano da utvrdimo koliko je sati bilo po UTC-u u mestu ${grad} na taj datum. Greška od sat vremena pomeri podznak za pola znaka, pa radije ne prikazujemo ništa nego pogrešne brojeve.`,
     javiNam: (zona: string) => `Javi nam ovo — zona: ${zona}`,
     /** "10. jul 1990 u 14:05 · Beograd"; bez vremena rodjenja bez " u …". */
     rodjenje: (datum: string, vreme: string | null, grad: string) =>
@@ -65,7 +65,7 @@ export const karta = {
     /** Isto u redu planete: "u Blizancima ili Raku". */
     uZnakuIli: (a: Znak, b: Znak) => `u ${nebo.znaci[a].lokativ} ili ${nebo.znaci[b].lokativ}`,
     bezVremena:
-      'Vreme rođenja nije uneto, pa su ascendent i kuće samo procena. Pozicije planeta su tačne — osim Meseca, koji za 12 sati pređe i do 7°.',
+      'Vreme rođenja nije uneto, pa su podznak i kuće samo procena. Pozicije planeta su tačne — osim Meseca, koji za 12 sati pređe i do 7°.',
     /** Citac ekrana, red planete: "Mars, Bik, 2. kuća"; `znak` null = nije siguran. */
     planetaA11y: (ime: string, znak: string | null, kuca: number | null) =>
       `${ime}, ${znak ?? 'znak nije siguran'}${kuca !== null ? `, ${kuca}. kuća` : ''}`,
@@ -74,6 +74,33 @@ export const karta = {
       `${tekst}${naslov ? `: ${naslov}` : ''}${zakljucan ? '. Zaključano' : ''}. Tumačenje`,
     /** Citac ekrana, red Ascendenta: "Podznak u Ribama. Tumačenje". */
     ugaoA11y: (ime: string, z: Znak) => `${ime} ${nebo.uZnaku(z)}. Tumačenje`,
+  },
+
+  /** `components/natalna-karta-v2.tsx` i `app/natal-kupovina.tsx` — probna verzija 2 strane i jednokratna kupovina. */
+  v2: {
+    planeteNaslov: 'Planete u karti',
+    /** Stakleni tabovi ispod kartice za kupovinu: kartice planeta ili lista aspekata. */
+    tabPlanete: 'Planete',
+    tabAspekti: 'Aspekti',
+    procitaj: 'Pročitaj celo tumačenje',
+    otkljucajTumacenje: 'Otključaj celo tumačenje',
+    sviAspekti: (n: number) => `Svi aspekti (${n})`,
+    /** Citac ekrana, kartica planete: "Venera, u Devici · 12. kuća. Ljubav kroz brigu. Zaključano". */
+    karticaA11y: (ime: string, gde: string, podnaslov: string, zakljucano: boolean) =>
+      `${ime}, ${gde}${podnaslov ? `. ${podnaslov}` : ''}${zakljucano ? '. Zaključano' : '. Tumačenje'}`,
+    ctaNaslov: 'Tvoja karta, pročitana do kraja',
+    ctaOpis: 'Tumačenje svake planete, kuće i aspekta, za tebe i još jednu osobu. Kupiš jednom i ostaje tvoje.',
+    ctaDugme: (cena: string | null) => (cena ? `Otključaj zauvek · ${cena}` : 'Otključaj zauvek'),
+    listNaslov: 'Pročitaj celu svoju kartu',
+    listOpis: 'Izaberi kako želiš da čitaš tumačenja astrologa.',
+    samoKarta: 'Samo natalna karta',
+    samoKartaIspod: 'Jednom, zauvek · tvoja i još jedna karta',
+    premium: 'Premium',
+    premiumIspod: 'Karta, ceo tekst dana i više osoba · godišnje',
+    stavke: ['Sve planete u znaku i kući', 'Svi aspekti, sa tumačenjem astrologa', 'Ostaje tvoje i bez pretplate'],
+    kupiKartu: 'Kupi natalnu kartu',
+    pogledajPremium: 'Pogledaj Premium',
+    napomena: 'Jednokratna kupovina.\nNe obnavlja se i ne otkazuje pretplatu ako je imaš.',
   },
 
   /** `components/karta-lista.tsx` — redovi ispod tocka ("Ti" i Nebo). */
@@ -129,7 +156,7 @@ export const karta = {
   /** `app/sky-place.tsx` — odakle se gleda nebo. */
   mesto: {
     naslov: 'Odakle gledaš',
-    opis: 'Kuće i ascendent zavise od mesta — nebo iznad Beograda i iznad Sidneja u istom trenutku nije isto.',
+    opis: 'Kuće i podznak zavise od mesta — nebo iznad Beograda i iznad Sidneja u istom trenutku nije isto.',
     trazi: 'Traži grad',
     gradIzProfila: 'Grad iz tvog profila',
     trazimDalje: 'Tražim dalje…',
@@ -203,13 +230,13 @@ export const karta = {
     aspektiOpis: 'Uglovi između planeta pokazuju da li im se energije dopunjuju ili sudaraju.',
     krunica: 'Krunica — tvoj vladar',
     krunicaOpis: 'Planeta sa krunicom vlada znakom tvog podznaka. Tranzit u kom ona učestvuje ima veću težinu.',
-    krug: 'Spoljni prsten je 12 znakova, a boja kruga oko znaka je njegov element. Brojevi od 1 do 12 su kuće, simboli su planete. Levo je Ascendent, odnosno podznak: znak koji se dizao na istoku u trenutku tvog rođenja. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u sredini su aspekti.',
+    krug: 'Spoljni prsten je 12 znakova, a boja kruga oko znaka je njegov element. Brojevi od 1 do 12 su kuće, simboli su planete. Levo je podznak: znak koji se dizao na istoku u trenutku tvog rođenja. Gore je MC, najviša tačka neba u tom trenutku. Obojene linije u sredini su aspekti.',
     elementi: 'Elementi',
     elementiUvod: 'Svaki znak pripada jednom od četiri elementa.',
     /** Citac ekrana: "Vatra: Ovan, Lav, Strelac". */
     elementA11y: (element: string, znaci: string[]) => `${element}: ${znaci.join(', ')}`,
     vremeRodjenja: 'Vreme rođenja',
-    vremeRodjenjaOpis: 'Podznak i kuće zavise od tačnog vremena rođenja. Za sat vremena Zemlja se okrene toliko da se podznak pomeri za pola znaka. Kad vreme rođenja nije uneto, krug nema kuća, Ascendenta ni MC-a, a levo je Ovan, prvi znak zodijaka.',
+    vremeRodjenjaOpis: 'Podznak i kuće zavise od tačnog vremena rođenja. Za sat vremena Zemlja se okrene toliko da se podznak pomeri za pola znaka. Kad vreme rođenja nije uneto, krug nema kuća, podznaka ni MC-a, a levo je Ovan, prvi znak zodijaka.',
   },
 
   /** `app/nebo-info.tsx` — "Šta je trenutno nebo?". */
@@ -217,7 +244,7 @@ export const karta = {
     naslov: 'Šta je trenutno nebo?',
     uvod: 'Nebo u ovom trenutku, gledano sa izabranog mesta: u kom su znaku sada Sunce, Mesec i planete i kako stoje jedni prema drugima. Položaj planeta je isti za sve, bilo gde da si. Od mesta zavise kuće, 12 delova kruga, i one se pomeraju iz minuta u minut.',
     strelice: 'Strelicama pomeraš sat i dan, a dodirom na datum biraš bilo koji dan.',
-    krug: 'Spoljni prsten je 12 znakova. Brojevi od 1 do 12 su kuće, simboli su planete. Levo je Ascendent: znak koji se upravo diže na istoku. Gore je MC, najviša tačka neba u ovom trenutku. Obojene linije u sredini su aspekti, a sivi simboli su tačke.',
+    krug: 'Spoljni prsten je 12 znakova. Brojevi od 1 do 12 su kuće, simboli su planete. Levo je podznak: znak koji se upravo diže na istoku. Gore je MC, najviša tačka neba u ovom trenutku. Obojene linije u sredini su aspekti, a sivi simboli su tačke.',
     tacke: 'Tačke',
     tackeUvod: 'Čvor, Lilit i Tačka sreće nisu nebeska tela, nego tačke koje se računaju. Linije aspekata se za njih ne crtaju.',
     /** Opis svake tacke — cinjenice, bez tumacenja. Kljucevi kao u `lib/points.ts`. */
@@ -227,7 +254,7 @@ export const karta = {
       lilith:
         'Zove se i Crni Mesec: tačka Mesečeve putanje najudaljenija od Zemlje. Ide napred i ceo zodijak obiđe za oko devet godina. Prikazana je srednja Lilit, jer prava zna da odstupi i do 30°.',
       fortune:
-        'Ne vidi se na nebu, nego se računa iz Ascendenta, Sunca i Meseca. Zato ide brzo kao Ascendent i za dan obiđe ceo krug. Danju i noću se računa po drugačijoj formuli.',
+        'Ne vidi se na nebu, nego se računa iz podznaka, Sunca i Meseca. Zato ide brzo kao podznak i za dan obiđe ceo krug. Danju i noću se računa po drugačijoj formuli.',
     },
   },
 

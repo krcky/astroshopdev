@@ -1,0 +1,30 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.nebowidget'
+version = '1.0.0'
+
+android {
+  namespace "expo.modules.nebowidget"
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+  }
+  testOptions {
+    unitTests.all {
+      // Isti referentni fajl kao Swift test (`scripts/native/skycore-golden.ts`).
+      systemProperty 'golden', new File(projectDir, '../../../native/SkyCore/Tests/SkyCoreTests/golden.json').absolutePath
+    }
+  }
+}
+
+dependencies {
+  implementation 'com.facebook.react:react-android'
+  implementation 'androidx.core:core-ktx:1.13.1'
+  // Mesto posmatranja za Wear OS sat (sloj podataka).
+  implementation 'com.google.android.gms:play-services-wearable:19.0.0'
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.json:json:20240303'
+}

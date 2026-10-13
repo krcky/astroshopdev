@@ -62,7 +62,8 @@ export function danasUPrici(dan: PricaDana | null): DanasUPrici | null {
     { oznaka: t.savet, tekst: dan.savet?.tekst ?? '' },
   ].filter((r) => r.tekst.trim());
   if (redovi.length === 0) return null;
-  const ljubav = dan.ocene?.redovi.find((r) => r.key === 'ljubav');
+  // Ocene su od 13.10.2026 iz kruga zivota: ljubav je oblast Partner.
+  const ljubav = dan.ocene?.redovi.find((r) => r.key === 'partner');
   return {
     naslov: dan.tvojDan.naslov,
     redovi,

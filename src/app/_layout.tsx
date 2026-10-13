@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { isRunningInExpoGo } from 'expo';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useAuthListener, useAuthStore } from '@/store/auth';
+import { useNeboWidget } from '@/lib/nebo-widget';
 import { useProfileStore } from '@/store/profile';
 import { useJezikStore } from '@/store/jezik';
 import { useJezik } from '@/i18n';
@@ -86,6 +87,7 @@ const LIST_PO_SADRZAJU = {
 
 export default function RootLayout() {
   useAuthListener();
+  useNeboWidget();
 
   // Pismo je Plus Jakarta Sans (`theme/font.ts`). Dok se ne ucita, aplikacija se ne
   // crta (preko je uvod) — inace bi prvi kadar bio u sistemskom pismu pa preskocio.
@@ -149,6 +151,8 @@ export default function RootLayout() {
                       Pozivaoci se ne menjaju — `router.push('/transit')` sam otvara list. */}
                   <Stack.Screen name="transit" options={TUMACENJE_LIST} />
                   <Stack.Screen name="natal" options={TUMACENJE_LIST} />
+                  {/* Izbor kupovine natalne karte (jednokratno ili Premium) — probna verzija 2 strane "Ti". */}
+                  <Stack.Screen name="natal-kupovina" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
                   {/* "Šta je natalna karta" sa ikonice "i" na tabu "Ti" — dug tekst, pa isti list do vrha. */}
                   <Stack.Screen name="natalna-karta-info" options={TUMACENJE_LIST} />
                   {/* "Šta je trenutno nebo" sa ikonice "i" pored tocka na Nebu (Ivan, 29.9.2026). */}
@@ -206,6 +210,8 @@ export default function RootLayout() {
                   <Stack.Screen name="nalog" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
                   {/* Promena emaila sa lista "Nalog": nova adresa, pa kod sa mejla (29.9.2026). */}
                   <Stack.Screen name="email" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  {/* "Na šta Boban ne odgovara" — list preko pisanja pitanja, visok koliko sadrzaj (13.10.2026). */}
+                  <Stack.Screen name="pitanje-pravila" options={LIST_PO_SADRZAJU} />
                   <Stack.Screen
                     name="pitanje-novo"
                     options={{ presentation: 'modal', contentStyle: { backgroundColor: neutral.white } }}

@@ -47,7 +47,7 @@ export const danas: Recnik['danas'] = {
     /** Pridjev se slaže sa rodom natalne tačke: "natalna Venera", "natalno Sunce", "natalni Mars". */
     imeNatalni: (tranzitna, aspekt, natalna) =>
       `${tranzitna} ${aspekt} ${natalna === nebo.tela.venus ? 'natalna' : natalna === nebo.tela.sun ? 'natalno' : 'natalni'} ${natalna}`,
-    ascendent: 'Ascendent',
+    ascendent: 'Podznak',
     mc: 'MC',
     samoDanas: 'Samo danas',
     uTvojojKuci: (kuca) => `U tvojoj ${kuca}. kući`,
@@ -117,13 +117,13 @@ export const danas: Recnik['danas'] = {
     tranzitVladara: 'Tranzit tvog vladara',
     nijeDeoKarte: 'Ovaj tranzit nije dio tvoje karte.',
     vladarNatalni: (planeta, uZnaku) =>
-      `${planeta} je vladar tvog Ascendenta ${uZnaku}. Kad ga tranzit dodirne, dan se osjeća ličnije i jače, zato ovaj tranzit danas ima prednost.`,
+      `${planeta} je vladar tvog podznaka ${uZnaku}. Kad ga tranzit dodirne, dan se osjeća ličnije i jače, zato ovaj tranzit danas ima prednost.`,
     vladarTranzitni: (planeta, uZnaku, koga) =>
-      `${planeta} je vladar tvog Ascendenta ${uZnaku}, a danas pokreće ${koga}. Zato ovaj tranzit danas ima prednost.`,
+      `${planeta} je vladar tvog podznaka ${uZnaku}, a danas pokreće ${koga}. Zato ovaj tranzit danas ima prednost.`,
     tvojAkuzativ: {
       sun: 'tvoje Sunce', moon: 'tvoj Mjesec', mercury: 'tvoj Merkur', venus: 'tvoju Veneru',
       mars: 'tvog Marsa', jupiter: 'tvog Jupitera', saturn: 'tvog Saturna', uranus: 'tvog Urana',
-      neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj Ascendent', midheaven: 'tvoj MC',
+      neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj podznak', midheaven: 'tvoj MC',
     },
   },
 

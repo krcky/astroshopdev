@@ -155,7 +155,13 @@ export function TockPopover({ izbor, sidro, okvir, chart, points, bezKuca = fals
     const znak = SIGNS[izbor.indeks];
     ikona = <ZnakIkona znak={znak.key} element={znak.element} size={IKONA} />;
     naslov = znak.name;
-    dodatak = <ListaTela tela={sva.filter((x) => x.position.sign.key === znak.key)} onIzbor={onIzbor} />;
+    // Podznak i MC u ovom znaku idu u isti spisak (Ivan, 13.10.2026: znak kod ascendenta nije pokazivao ascendent);
+    // bez vremena rodjenja uglova nema (pravilo 5).
+    const uglovi = bezKuca ? [] : ([
+      { key: 'ascendant', ime: t.karta.podznak, glyph: 'ASC', pos: chart.ascendantSign },
+      { key: 'midheaven', ime: t.karta.mc, glyph: 'MC', pos: chart.midheavenSign },
+    ] as const).filter((u) => u.pos.sign.key === znak.key);
+    dodatak = <ListaTela tela={sva.filter((x) => x.position.sign.key === znak.key)} uglovi={uglovi} onIzbor={onIzbor} />;
   } else {
     const asc = izbor.key === 'ascendant';
     const pos = asc ? chart.ascendantSign : chart.midheavenSign;
@@ -236,15 +242,26 @@ function Cip({ onPress, label, children }: { onPress: () => void; label: string;
 }
 
 /** Naslov "Planete" pa planete kao kapsule (da se ne mesaju sa vladarom kuce), ili "Nema planeta". */
-function ListaTela({ tela, onIzbor }: { tela: Telo[]; onIzbor: (p: Pogodak) => void }) {
+function ListaTela({ tela, uglovi = [], onIzbor }: {
+  tela: Telo[];
+  /** Podznak i MC koji su u ovom znaku — kapsule ispred planeta, biraju ugao na krugu. */
+  uglovi?: readonly { key: 'ascendant' | 'midheaven'; ime: string; glyph: string }[];
+  onIzbor: (p: Pogodak) => void;
+}) {
   const t = useT();
-  if (tela.length === 0) {
+  if (tela.length === 0 && uglovi.length === 0) {
     return <Text variant="caption" className="mt-2 text-[12px]">{t.karta.tockDodir.prazno}</Text>;
   }
   return (
     <View className="mt-2">
       <Text variant="caption" className="text-[12px] leading-[15px]">{t.karta.tockDodir.planete}</Text>
       <View className="mt-1 flex-row flex-wrap gap-1.5">
+        {uglovi.map((u) => (
+          <Cip key={u.key} label={u.ime} onPress={() => onIzbor({ tip: 'ugao', key: u.key })}>
+            <Tacka tacka={u.key} glyph={u.glyph} size={MALA} />
+            <Text variant="chip" className="text-[12px] text-foreground">{u.ime}</Text>
+          </Cip>
+        ))}
         {tela.map((p) => (
           <Cip key={p.key} label={p.name} onPress={() => onIzbor({ tip: 'planeta', key: p.key })}>
             <Tacka tacka={p.key} glyph={p.glyph} size={MALA} />

@@ -47,6 +47,17 @@ const PREKLOP = 0.3;
 
 export type Tacka = { key: string; glyph: string; vladar?: boolean };
 
+/** Krunica vladara gore desno uz planetu precnika `size` — i na animiranoj planeti (`ZivaTacka`). */
+export function Krunica({ size }: { size: number }) {
+  return (
+    <View
+      className="absolute items-center justify-center rounded-full border border-border bg-background"
+      style={{ width: size * 0.42, height: size * 0.42, right: -size * 0.08, top: -size * 0.08 }}>
+      <Crown size={Math.round(size * 0.24)} color={neutral.ink} strokeWidth={2.4} />
+    </View>
+  );
+}
+
 /** Jedna planeta: slika, ili SVG ikonica za Asc/MC; krunica za vladara. */
 export function Planeta({ t, size }: { t: Tacka; size: number }) {
   const slika = SLIKA[t.key];
@@ -67,13 +78,7 @@ export function Planeta({ t, size }: { t: Tacka; size: number }) {
           <Glyph size={size * 0.5} className="text-foreground">{t.glyph}</Glyph>
         </View>
       )}
-      {t.vladar && (
-        <View
-          className="absolute items-center justify-center rounded-full border border-border bg-background"
-          style={{ width: size * 0.42, height: size * 0.42, right: -size * 0.08, top: -size * 0.08 }}>
-          <Crown size={Math.round(size * 0.24)} color={neutral.ink} strokeWidth={2.4} />
-        </View>
-      )}
+      {t.vladar && <Krunica size={size} />}
     </View>
   );
 }

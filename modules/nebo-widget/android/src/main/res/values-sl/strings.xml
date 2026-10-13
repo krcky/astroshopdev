@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nebo_widget_ime">Nebo zdaj</string>
+    <string name="nebo_widget_opis">Astrološki krog s trenutnimi položaji planetov.</string>
+</resources>

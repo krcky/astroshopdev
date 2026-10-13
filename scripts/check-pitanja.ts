@@ -9,7 +9,7 @@ import { buildNatalChart } from '../src/lib/natal';
 import { natalAspects } from '../src/lib/natal-keys';
 import { localBirthToUtc } from '../src/lib/timezone';
 import {
-  PITANJE_MAX, brojNeprocitanih, datumPitanja, imaOdgovor, natpisStatusa, neprocitan, oKome, pitanjeSpremno, porukaGreske,
+  PITANJE_KRATKO, PITANJE_MAX, brojNeprocitanih, imaTemePitanja, pitanjeKratko, datumPitanja, imaOdgovor, natpisStatusa, neprocitan, oKome, pitanjeSpremno, porukaGreske,
   snimakKarte, snimakODrugoj, trajanjeZvuka,
 } from '../src/lib/pitanja';
 import type { ResolvedProfile, Profile } from '../src/store/profile';
@@ -30,6 +30,11 @@ ok(pitanjeSpremno('  Da li?  '), 'razmaci oko teksta se ne racunaju');
 ok(pitanjeSpremno('a'.repeat(PITANJE_MAX)), `tacno ${PITANJE_MAX} znakova ide`);
 ok(!pitanjeSpremno('a'.repeat(PITANJE_MAX + 1)), `${PITANJE_MAX + 1} ne ide (isto kao baza)`);
 ok(pitanjeSpremno(` ${'ž'.repeat(PITANJE_MAX)} `), 'dijakritika se broji kao jedan znak');
+ok(pitanjeKratko('Hoću li naći posao?'), 'kratko pitanje: predlog da se dopuni');
+ok(!pitanjeKratko(''), 'prazno nije "kratko" — ono se ne salje uopste');
+ok(!pitanjeKratko('a'.repeat(PITANJE_KRATKO)), `${PITANJE_KRATKO} znakova vise nije kratko`);
+ok(pitanjeKratko(`   ${'a'.repeat(PITANJE_KRATKO - 1)}   `), 'razmaci oko teksta se ne racunaju ni ovde');
+ok(imaTemePitanja('sr') && !imaTemePitanja('en') && !imaTemePitanja('hr'), 'teme i gotova pitanja samo na srpskom');
 
 // --- 2. Stanja u listi ------------------------------------------------------
 console.log('\n2. Natpisi stanja (bez "kasni" — roka nema)');

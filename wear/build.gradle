@@ -1,0 +1,60 @@
+// Wear OS aplikacija "Nebo sada" — ZASEBAN Gradle projekat (nije deo Expo `android/`,
+// koji prebuild pravi iznova). Racun i crtez su ISTI fajlovi kao u Android widgetu
+// (`modules/nebo-widget/android`), ukljuceni kao izvor, ne kopirani.
+//
+//   cd wear && ANDROID_HOME=~/Library/Android/sdk ./gradlew assembleDebug
+//
+// Paket je isti kao telefonska aplikacija (`com.krcky.astroshop`): Google Play ih tako
+// vezuje, a sloj podataka (mesto posmatranja sa telefona) trazi isti paket i isti potpis.
+plugins {
+  id 'com.android.application' version '8.12.0'
+  id 'org.jetbrains.kotlin.android' version '2.1.20'
+  id 'org.jetbrains.kotlin.plugin.compose' version '2.1.20'
+}
+
+def zajednicko = '../modules/nebo-widget/android/src/main/java'
+
+android {
+  namespace 'rs.astroshop.nebo.sat'
+  compileSdk 36
+
+  defaultConfig {
+    applicationId 'com.krcky.astroshop'
+    minSdk 30
+    targetSdk 35
+    // Sat i telefon dele paket, pa kod verzije sata mora biti drugaciji od telefonskog.
+    versionCode 100001
+    versionName '1.0.0'
+  }
+
+  sourceSets {
+    main {
+      // Samo racun (`core`), biblioteka i crtez; widget telefona i Expo modul ostaju napolju.
+      kotlin.srcDirs += [
+        "$zajednicko/io/github/cosinekitty/astronomy",
+        "$zajednicko/rs/astroshop/nebo/core",
+        "$zajednicko/rs/astroshop/nebo/crtez",
+      ]
+    }
+  }
+
+  buildFeatures { compose true }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+  kotlinOptions { jvmTarget = '17' }
+}
+
+dependencies {
+  implementation 'androidx.core:core-ktx:1.13.1'
+  implementation 'androidx.activity:activity-compose:1.9.3'
+  implementation 'androidx.compose.foundation:foundation:1.7.6'
+  implementation 'androidx.wear.compose:compose-foundation:1.4.1'
+  implementation 'androidx.wear.compose:compose-material:1.4.1'
+  implementation 'androidx.wear.watchface:watchface-complications-data-source-ktx:1.2.1'
+  implementation 'androidx.wear.tiles:tiles:1.4.1'
+  implementation 'androidx.wear.protolayout:protolayout:1.2.1'
+  implementation 'com.google.guava:guava:33.3.1-android'
+  implementation 'com.google.android.gms:play-services-wearable:19.0.0'
+}

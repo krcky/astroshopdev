@@ -170,7 +170,7 @@ ok(SLIKE_ZNAKA_UVOD[SLIKE_ZNAKA_UVOD.length - 1] === 'danas' && SLIKE_ZNAKA_UVOD
 const lazniDan = (tekst: { efekat: string; izazov: string; savet: string }, ljubav = true): PricaDana => ({
   tvojDan: { naslov: 'Planovi koji donose uspeh', efekat: tekst.efekat, izazov: tekst.izazov },
   savet: tekst.savet ? { tekst: tekst.savet, ime: 'x', kljuc: 'k' } : null,
-  ocene: ljubav ? { redovi: [{ key: 'ljubav', name: 'Ljubav', ocena: 4, oznaka: 'Dobar dan', juce: 3 }], najbolja: null } : null,
+  ocene: ljubav ? { redovi: [{ key: 'partner', name: 'Ljubav', ocena: 4, oznaka: 'Povoljno', juce: 3 }], najbolja: null } : null,
 } as unknown as PricaDana);
 const puna = danasUPrici(lazniDan({ efekat: 'Lakše donosiš odluke.', izazov: 'Ne žuri sa obećanjima.', savet: 'Zapiši šta ti je važno.' }));
 ok(puna !== null && puna.redovi.length === 3 && puna.redovi.map((r) => r.tekst).join('|').startsWith('Lakše'),

@@ -9,7 +9,6 @@ import { Text } from '@/components/ui/text';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { Screen, VRH_ANDROID } from '@/components/screen';
 import { KapsuleRed } from '@/components/ui/kapsule';
-import { PricaDugme } from '@/components/prica/ulaz';
 import { GlassBubble } from '@/components/ui/glass-button';
 import { buildPersonalDaily, formatDate, formatDatumKratko, type PersonalDaily, type SlowTransit } from '@/lib/horoscope';
 import { Calendar, Check, ChevronRight, Lock, Minus, Plus, UserRound } from 'lucide-react-native';
@@ -28,6 +27,11 @@ import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { TvojDanCardV4 as TvojDanCard } from '@/components/pocetna/tvoj-dan-card-v4';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { PromenaNaNebu } from '@/components/promena-na-nebu';
+import { istakniPromenu } from '@/lib/sky-events';
+import { brojNovih, kljucPromene, type NovoTab } from '@/lib/novo';
+import { phaseDay } from '@/lib/moon';
+import { signFromLongitude } from '@/lib/zodiac';
+import { useNovoLog, useNovoVidjeno } from '@/store/novo-log';
 import { SunceSaZracima } from '@/components/sunce-zraci';
 import { PremiumKartica } from '@/components/zakljucano';
 import { AstrologSlika } from '@/components/astrolog-slika';
@@ -131,6 +135,32 @@ export function PocetnaV4() {
   }, [krug]);
   const { texts: krugTekstovi } = useTransitTexts(krugKljucevi);
 
+  // "NOVO" na tabovima (Ivan, 13.10.2026; `lib/novo.ts`): sta je DANAS na tabovima Mesec, Promene i Teme, naspram
+  // onoga sto je korisnik video kad je tab poslednji put otvorio. Uvek za danas, i kad se gleda drugi dan.
+  const sadaNaTabovima = React.useMemo((): Record<NovoTab, string[]> | null => {
+    if (!resolved) return null;
+    const d = offset === 0 && daily ? daily : buildPersonalDaily(resolved, today);
+    return {
+      mesec: [signFromLongitude(phaseDay(today).moonLongitude).sign.key],
+      promene: d.skyEvents.map(kljucPromene),
+      teme: d.bySpeed.slow.map((x) => x.contentKey),
+    };
+  }, [resolved, daily, offset, today]);
+  const vidjeno = useNovoVidjeno(userId);
+  // Otvoren tab (za danas) = vidjeno sve sto je na njemu; i kad se sadrzaj promeni dok je tab otvoren.
+  const novoUcitano = useNovoLog((s) => s.hydrated);
+  React.useEffect(() => {
+    if (!userId || !sadaNaTabovima || !novoUcitano) return;
+    // Prvi put (tab bez dnevnika) zateceno stanje je POLAZNO — znacke nema dok se nesto ne promeni.
+    for (const k of ['mesec', 'promene', 'teme'] as const) {
+      if (!vidjeno[k]) useNovoLog.getState().oznaci(userId, k, sadaNaTabovima[k]);
+    }
+    if (offset !== 0 || tab === 'danas') return;
+    useNovoLog.getState().oznaci(userId, tab, sadaNaTabovima[tab]);
+  }, [userId, sadaNaTabovima, offset, tab, vidjeno, novoUcitano]);
+  const novo = (k: TabPocetne) =>
+    k === 'danas' || k === tab || !sadaNaTabovima ? 0 : brojNovih(sadaNaTabovima[k], vidjeno[k]);
+
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved || !daily) return <Redirect href="/" />;
 
@@ -160,11 +190,12 @@ export function PocetnaV4() {
                 </Text>
               </View>
               {/* Sunce: lice stoji, zraci se sporo vrte oko njega (`sunce-zraci.tsx`, Ivan, 13.10.2026). */}
-              <View pointerEvents="none" style={{ marginRight: -space.screen - 70, marginVertical: -46, transform: [{ translateY: -2 }] }}>
-                <SunceSaZracima size={240} />
+              <View pointerEvents="none" style={{ marginRight: -space.screen - 80, marginVertical: -56, transform: [{ translateY: 2 }] }}>
+                <SunceSaZracima size={280} />
               </View>
             </View>
             <OblastiKartice
+              pricaDatum={date}
               rez={krug}
               otkljucane={premium ? undefined : BESPLATNO.krug}
               onOtvori={(k) => router.push({ pathname: '/oblast', params: { k, day: dayKey(date) } })}
@@ -224,7 +255,7 @@ export function PocetnaV4() {
     <View style={{ flex: 1 }}>
     {/* Pun logo (ASTRO-krug-SHOP) je sacuvan pod git tagom `pun-logo-na-pocetnoj`; vraca se sa `<Logo full />`. */}
     <Screen
-      label={<Logo mirno />}
+      label={<Logo />}
       // Gore desno: dan-meni i profil. Na iOS-u su to NATIVE stavke trake
       // (`unstable_headerRightItems` dole): UIMenu sa zamucenjem na dodir,
       // Liquid Glass dugmad (Ivan, 26.9.2026). Android nema tu traku, pa dobija
@@ -330,7 +361,7 @@ export function PocetnaV4() {
           nijansom preliva (Ivan, 30.9.2026 — podignute iznad preliva, cisto bele, probane
           istog dana i vracene: "ipak da budu providni"). */}
       <View className="pt-4">
-        <KapsuleRed tabovi pocetak={<PricaDugme datum={date} />} stavke={tabovi(t)} izabrana={tab} onIzbor={izaberiTab} />
+        <KapsuleRed tabovi stavke={tabovi(t).map((s) => ({ ...s, znacka: novo(s.key) }))} izabrana={tab} onIzbor={izaberiTab} />
       </View>
       <Animated.View key={tab} entering={ODOZDO} className="pt-7">
         {sadrzaj[tab]}
@@ -557,7 +588,8 @@ function SkyEvents({ daily, today }: { daily: PersonalDaily; today: Date }) {
   // Kartice kao na tabu "Tranziti" (Ivan, 29.9.2026) — `promena-na-nebu.tsx`.
   return (
     <View className="gap-3">
-      {daily.skyEvents.map((e) => <PromenaNaNebu key={e.planet.key} e={e} today={today} />)}
+      {/* Prva je velika; retrogradni Merkur uvek prvi (`istakniPromenu`, Ivan, 13.10.2026). */}
+      {istakniPromenu(daily.skyEvents).map((e, i) => <PromenaNaNebu key={e.planet.key} e={e} today={today} velika={i === 0} />)}
     </View>
   );
 }

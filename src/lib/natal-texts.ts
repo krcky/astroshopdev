@@ -85,7 +85,8 @@ export function useNatalTexts(keys: string[]) {
   return { texts, loading };
 }
 
-export type NatalNaslov = { title: string; subtitle: string; free: boolean };
+/** `recenica` = prva recenica tumacenja (`supabase/natal-kartice.sql`); nema je dok ta funkcija nije pokrenuta. */
+export type NatalNaslov = { title: string; subtitle: string; free: boolean; recenica?: string };
 
 /**
  * NASLOVI tumacenja za listu na ekranu "Ti" — i zakljucanih (`supabase/natal-naslovi.sql`).
@@ -112,17 +113,26 @@ export function useNatalNaslovi(keys: string[]) {
       }
       if (!otkazano && !server && disk.size > 0) setNaslovi(disk);
     });
-    // Sa jezikom (rezerva na srpski je u funkciji, `supabase/prevod-jezik.sql`).
-    supabase.rpc('natal_naslovi', { kljucevi: keys, jez: j }).then(({ data, error }) => {
-      if (otkazano || error || !data) return;
+    type Red = { key: string; title: string; subtitle: string | null; free: boolean; recenica?: string | null };
+    const primi = (data: Red[]) => {
       server = true;
       const m = new Map<string, NatalNaslov>();
-      for (const r of data as { key: string; title: string; subtitle: string | null; free: boolean }[]) {
-        const t = { title: r.title, subtitle: r.subtitle ?? '', free: r.free };
+      for (const r of data) {
+        const t: NatalNaslov = { title: r.title, subtitle: r.subtitle ?? '', free: r.free, ...(r.recenica ? { recenica: r.recenica } : {}) };
         m.set(r.key, t);
         kesUpisi(kljuc(r.key), t);
       }
       setNaslovi(m);
+    };
+    // Sa prvom recenicom (`natal_kartice`); dok ta funkcija nije na serveru, stara `natal_naslovi` bez recenice.
+    // Jezik: rezerva na srpski je u funkciji (`supabase/prevod-jezik.sql`).
+    supabase.rpc('natal_kartice', { kljucevi: keys, jez: j }).then(({ data, error }) => {
+      if (otkazano) return;
+      if (!error && data) { primi(data as Red[]); return; }
+      supabase.rpc('natal_naslovi', { kljucevi: keys, jez: j }).then((stari) => {
+        if (otkazano || stari.error || !stari.data) return;
+        primi(stari.data as Red[]);
+      });
     });
     return () => { otkazano = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

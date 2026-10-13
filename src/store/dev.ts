@@ -34,6 +34,9 @@ type DevState = {
   /** Koja verzija pocetne strane se pokazuje (1, 2, 3 ili 4) — samo probni build, vidi `app/(tabs)/home/index.tsx`. */
   pocetnaVerzija: 1 | 2 | 3 | 4;
   setPocetnaVerzija: (v: 1 | 2 | 3 | 4) => void;
+  /** Verzija strane Natalna karta (1 = dosadasnja, 2 = spisak + kartice planeta) — samo probni build, vidi `natalna-karta-prikaz.tsx`. */
+  kartaVerzija: 1 | 2;
+  setKartaVerzija: (v: 1 | 2) => void;
 };
 
 export const useDevStore = create<DevState>()(
@@ -43,11 +46,13 @@ export const useDevStore = create<DevState>()(
       setPremiumRucno: (premiumRucno) => set({ premiumRucno }),
       pocetnaVerzija: 4,
       setPocetnaVerzija: (pocetnaVerzija) => set({ pocetnaVerzija }),
+      kartaVerzija: 1,
+      setKartaVerzija: (kartaVerzija) => set({ kartaVerzija }),
     }),
     {
       name: 'astroshop-dev',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (s) => ({ premiumRucno: s.premiumRucno, pocetnaVerzija: s.pocetnaVerzija }),
+      partialize: (s) => ({ premiumRucno: s.premiumRucno, pocetnaVerzija: s.pocetnaVerzija, kartaVerzija: s.kartaVerzija }),
     }
   )
 );

@@ -72,3 +72,6 @@ Prevod-Astro-Shop.xlsx
 Prevod-izvoz/
 Recenice-oblasti-za-astrologa.xlsx
 ~$*
+
+# Swift paket SkyCore (widget i sat): izlaz `swift build` / `swift test`
+/native/SkyCore/.build/

@@ -83,6 +83,31 @@ export const karta: Recnik['karta'] = {
     ugaoA11y: (ime, z) => `${ime} ${nebo.uZnaku(z)}. Reading`,
   },
 
+  v2: {
+    planeteNaslov: 'Planets in the chart',
+    /** Stakleni tabovi ispod kartice za kupovinu: kartice planeta ili lista aspekata. */
+    tabPlanete: 'Planets',
+    tabAspekti: 'Aspects',
+    procitaj: 'Read the full reading',
+    otkljucajTumacenje: 'Unlock the full reading',
+    sviAspekti: (n) => `All aspects (${n})`,
+    karticaA11y: (ime, gde, podnaslov, zakljucano) =>
+      `${ime}, ${gde}${podnaslov ? `. ${podnaslov}` : ''}${zakljucano ? '. Locked' : '. Reading'}`,
+    ctaNaslov: 'Your chart, read to the end',
+    ctaOpis: 'A reading of every planet, house and aspect, for you and one more person. Buy it once and it stays yours.',
+    ctaDugme: (cena) => (cena ? `Unlock forever · ${cena}` : 'Unlock forever'),
+    listNaslov: 'Read your whole chart',
+    listOpis: 'Choose how you want to read the astrologer’s readings.',
+    samoKarta: 'Birth chart only',
+    samoKartaIspod: 'Once, forever · yours and one more chart',
+    premium: 'Premium',
+    premiumIspod: 'Chart, full daily text and more people · yearly',
+    stavke: ['Every planet by sign and house', 'Every aspect, read by the astrologer', 'Stays yours without a subscription'],
+    kupiKartu: 'Buy the birth chart',
+    pogledajPremium: 'See Premium',
+    napomena: 'One-time purchase.\nIt doesn’t renew and doesn’t cancel a subscription if you have one.',
+  },
+
   /** `components/karta-lista.tsx` — rows under the wheel ("You" and Sky). */
   lista: {
     /** Screen reader, a point row on Sky. */

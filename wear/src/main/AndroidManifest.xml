@@ -1,0 +1,53 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-feature android:name="android.hardware.type.watch" />
+
+  <application
+      android:label="@string/ime"
+      android:icon="@drawable/ikona"
+      android:theme="@android:style/Theme.DeviceDefault">
+
+    <!-- Radi i bez telefona: nebo se racuna na satu. Mesto posmatranja stize sa telefona kad ga ima. -->
+    <meta-data android:name="com.google.android.wearable.standalone" android:value="true" />
+
+    <activity android:name=".NeboActivity" android:exported="true" android:taskAffinity="">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <!-- Plocica (Tile): krug neba, prevlacenjem sa brojcanika. -->
+    <service
+        android:name=".NeboPlocica"
+        android:exported="true"
+        android:label="@string/widget_ime"
+        android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+      <intent-filter>
+        <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+      </intent-filter>
+      <meta-data android:name="androidx.wear.tiles.PREVIEW" android:resource="@drawable/ikona" />
+    </service>
+
+    <!-- Komplikacija: mali krug (slika) ili Mesecev stepen (kratak tekst). -->
+    <service
+        android:name=".NeboKomplikacija"
+        android:exported="true"
+        android:label="@string/widget_ime"
+        android:icon="@drawable/ikona"
+        android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
+      <intent-filter>
+        <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
+      </intent-filter>
+      <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES" android:value="SMALL_IMAGE,SHORT_TEXT" />
+      <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="900" />
+    </service>
+
+    <!-- Mesto posmatranja sa telefona (sloj podataka, `/nebo/mesto`). -->
+    <service android:name=".MestoSaTelefona" android:exported="true">
+      <intent-filter>
+        <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+        <data android:scheme="wear" android:host="*" android:pathPrefix="/nebo" />
+      </intent-filter>
+    </service>
+  </application>
+</manifest>

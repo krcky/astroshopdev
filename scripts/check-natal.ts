@@ -7,7 +7,8 @@ import {
 import { norm360, SIGNS, SIGN_CASES } from '../src/lib/zodiac';
 const SIGNS_IDX = (key: string) => SIGNS.findIndex((s) => s.key === key);
 import { bodyLongitude } from '../src/lib/astro';
-import { upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
+import { istakniPromenu, upcomingSkyEvents, wholeSignHouse } from '../src/lib/sky-events';
+import { brojNovih, istiKljucevi, kljucPromene } from '../src/lib/novo';
 import { moonState, moonLitPath, mesecSlika, MESEC_SLIKA_UGLOVI, formatIllumination, PLANT_PART, moonSignAt } from '../src/lib/moon';
 import {
   findTransits, findHouseTransits, daysToSolarReturn,
@@ -450,6 +451,20 @@ console.log('\n=== 9f. Promene na nebu (ulazak u znak, retrogradnost) ===');
   ok(redom && razlicite && bezMeseca, 'tri razlicite planete, po datumu, bez Meseca');
   ok(kuce, 'kuca od podznaka; bez vremena rodjenja nema kuce');
   ok(ms < 300, 'racuna se brzo', `${ms.toFixed(0)} ms/dan (sa proverom)`);
+
+  // Velika kartica: najraniji dogadjaj, osim kad je medju njima retrogradni Merkur.
+  const ist = istakniPromenu(okt2);
+  ok(ist[0].planet.key === 'mercury' && ist[0].kind === 'retrograde', 'retrogradni Merkur je prvi (velika kartica)');
+  ok(ist.length === okt2.length && ist.slice(1).every((e, i, a) => i === 0 || a[i - 1].at <= e.at), 'ostali ostaju po datumu');
+  ok(istakniPromenu(nov).every((e, i) => e === nov[i]), 'Merkur ponovo direktan ne menja redosled');
+
+  // "Novo" na tabovima pocetne (`lib/novo.ts`).
+  const k20 = okt2.map(kljucPromene);
+  const k21 = upcomingSkyEvents(chart, new Date(2026, 9, 21, 12)).map(kljucPromene);
+  const k1nov = nov.map(kljucPromene);
+  ok(new Set(k20).size === 3 && brojNovih(k20, undefined) === 0 && brojNovih(k20, []) === 3, 'novo: bez dnevnika (prvi put) nista nije novo; prazan dnevnik = sve novo');
+  ok(brojNovih(k21, k20) === 0 && istiKljucevi(k21, k20), 'novo: sutradan iste promene nisu nove (kljuc ne zavisi od dana gledanja)');
+  ok(brojNovih(k1nov, k20) === k1nov.filter((k) => !k20.includes(k)).length && brojNovih(k1nov, k20) >= 1, 'novo: broje se samo promene koje su se pojavile', String(brojNovih(k1nov, k20)));
 }
 
 // --- 9g. Mesec: procenat, crtez, lunarni dan ---

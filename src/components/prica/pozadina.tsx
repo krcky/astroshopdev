@@ -15,8 +15,14 @@ import { useSekunde } from '@/components/prica/sat';
  *
  * `sirina`/`visina` su za karticu za deljenje (360 × 640); bez njih se meri roditelj.
  */
-export function PricaPozadina({ nijansa, sirina, visina }: {
+export function PricaPozadina({ nijansa, sirina, visina, jacina = 1, mrlje, raspored = MRLJE }: {
   nijansa: Nijansa;
+  /** Svoje mrlje umesto nijanse price (boja + jacina) — npr. `backdrop.blobs.purple`, boje preliva u zaglavlju. */
+  mrlje?: readonly (readonly [string, number])[];
+  /** Svoj raspored mrlja (mesto i velicina kao udeo okvira) umesto rasporeda price. */
+  raspored?: readonly MestoMrlje[];
+  /** Koliko su mrlje jake (1 = kao u prici); kartica "Promene na nebu" ih ublazava. */
+  jacina?: number;
   sirina?: number;
   visina?: number;
 }) {
@@ -30,8 +36,8 @@ export function PricaPozadina({ nijansa, sirina, visina }: {
       pointerEvents="none"
       style={[StyleSheet.absoluteFill, { overflow: 'hidden' }]}
       onLayout={sirina ? undefined : (e) => setMera({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
-      {mera && NIJANSE[nijansa].map(([boja, alfa], i) => (
-        <Mrlja key={i} redni={i} boja={boja} alfa={alfa} sat={sat} w={mera.w} h={mera.h} />
+      {mera && (mrlje ?? NIJANSE[nijansa]).map(([boja, alfa], i) => (
+        <Mrlja key={i} boja={boja} alfa={alfa * jacina} sat={sat} w={mera.w} h={mera.h} m={raspored[i % raspored.length]} />
       ))}
     </View>
   );
@@ -41,18 +47,19 @@ export function PricaPozadina({ nijansa, sirina, visina }: {
  * Po mrlji: mesto i velicina kao udeo slike, period (s) i koliko luta.
  * Iz prototipa: prva gore levo, druga gore desno, treca dole.
  */
-const MRLJE = [
+const MRLJE: readonly MestoMrlje[] = [
   { x: -0.45, y: -0.22, w: 1.5, h: 0.62, period: 16, dx: 0.2, dy: 0.04, ds: 0.08 },
   { x: 0.1, y: -0.08, w: 1.4, h: 0.58, period: 12, dx: -0.2, dy: -0.05, ds: -0.09 },
   { x: -0.2, y: 0.8, w: 1.3, h: 0.5, period: 20, dx: 0.2, dy: 0.04, ds: 0.08 },
-] as const;
+];
 
-function Mrlja({ redni, boja, alfa, sat, w, h }: {
-  redni: number; boja: string; alfa: number; sat: Readonly<SharedValue<number>>; w: number; h: number;
+export type MestoMrlje = { x: number; y: number; w: number; h: number; period: number; dx: number; dy: number; ds: number };
+
+function Mrlja({ boja, alfa, sat, w, h, m }: {
+  m: MestoMrlje; boja: string; alfa: number; sat: Readonly<SharedValue<number>>; w: number; h: number;
 }) {
   // Jedinstven id, bez dvotacaka iz `useId` (pravilo 13).
   const id = `prica-mrlja-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-  const m = MRLJE[redni % MRLJE.length];
   const sw = w * m.w;
   const sh = h * m.h;
   const pokret = useAnimatedStyle(() => {

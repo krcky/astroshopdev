@@ -5,18 +5,18 @@ import { Minus, Plus } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
 import { useT } from '@/i18n';
-import { OblastIkona } from '@/components/oblast-ikona';
+import { IkonaKruga, OceneKruga } from '@/components/prica/ocene-kruga';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { MoonDisc } from '@/components/moon-disc';
 import { LogoPrice } from '@/components/prica/logo-price';
 import { PricaPozadina } from '@/components/prica/pozadina';
-import { INDIGO, INK, LILA, MINUS, PLUS, SIVA, TON_MASTILO } from '@/components/prica/boje';
+import { INDIGO, INK, LILA, MINUS, PLUS, SIVA } from '@/components/prica/boje';
 import {
-  BLAGO, Broj, FazeMeseca, ISKOK, KrugOko, Pojava, Reci, TackiceOcene, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
+  BLAGO, Broj, FazeMeseca, ISKOK, Pojava, Reci, Tocak, TrakeTona, UgaoAspekta, ZAVESA, Zraci,
 } from '@/components/prica/crtezi';
 import { useOkret } from '@/components/prica/sat';
 import type { Nijansa } from '@/components/prica/boje';
-import { boljeNegoJuce, fazaOsmina, korakReci, PRORED_IDE_KOCI, velicinaSaveta, VELICINE_IDE_KOCI_KARTICA, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
+import { fazaOsmina, korakReci, PRORED_IDE_KOCI, velicinaSaveta, VELICINE_IDE_KOCI_KARTICA, VELICINE_SAVETA_KARTICA, visinaNatpisa, type SlikaKljuc } from '@/lib/prica';
 import type { PricaDana } from '@/lib/use-prica';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
@@ -31,7 +31,7 @@ import { neutral } from '@/theme/tokens';
  *  - obracanje u prvom licu ("Moj dan", "Ide mi"), jer sliku objavljuje korisnik;
  *  - gore datum i sajt, dole mali logo (na punoj boji negativ);
  *  - sadrzaj u sigurnoj zoni Instagram PRICE (~250 px gore i dole od 1920), ne Reels-a;
- *  - katanaca nema: i besplatni vidi i deli sve cetiri ocene (Ivan, 30.9.2026).
+ *  - katanaca nema: i besplatni vidi i deli svih osam ocena (krug zivota, 13.10.2026) (Ivan, 30.9.2026).
  * Imena tranzita i tocak ostaju, iako uz datum odaju datum rodjenja u razmaku od par dana — Ivan je to prihvatio.
  *
  * VIDEO (Ivan, 30.9.2026): ista kartica je i kadar videa price (`video-radionica.tsx`). Pokreti su
@@ -164,7 +164,7 @@ function KOcene({ p }: { p: PricaDana }) {
     <Okvir pozadina={SIVA} datum={p.datumTekst} boja={MUTNO}>
       {naj && (
         <Pojava kasni={200} trajanje={600} ublazavanje={ISKOK} zum bledi={false} pomak={0} style={{ marginBottom: 8, alignSelf: 'flex-start' }}>
-          <OblastIkona oblast={naj.key} size={60} />
+          <IkonaKruga oblast={naj.key} size={48} />
         </Pojava>
       )}
       <Pojava kasni={450}>
@@ -175,34 +175,9 @@ function KOcene({ p }: { p: PricaDana }) {
           <Reci tekst={naj.name} kasni={550} className={cn('text-[34px] leading-[38px] tracking-[-1px]', tezina('display'))} />
         </View>
       )}
-      {/* VIDEO: linija izmedju redova je traka visine 1, ne `border-t` — ivicu samo sa jedne strane RN crta
-          kao sliku koju `layer.render` razvuce u debelu sivu prugu (Ivan, 1.10.2026; pravilo 23). */}
-      <Pojava kasni={900} className="mt-4 overflow-hidden rounded-lg border border-card bg-card/80">
-        {o.redovi.map((r, i) => {
-          const bolje = boljeNegoJuce(r.ocena, r.juce);
-          return (
-            <React.Fragment key={r.key}>
-            {i > 0 && <View className="h-px bg-border" />}
-            <View className="flex-row items-center gap-2.5 px-3.5 py-2.5">
-              <OblastIkona oblast={r.key} size={24} />
-              <View style={{ flex: 1 }}>
-                <Text className="text-[16px] leading-[20px]">{r.name}</Text>
-                {bolje && (
-                  <Text className={cn('text-[9.5px] leading-[12px] uppercase tracking-[1.1px]', tezina('statOznaka'))} style={{ color: TON_MASTILO.povoljno }}>
-                    {t.prica.dnevna.boljeNegoJuce}
-                  </Text>
-                )}
-              </View>
-              <TackiceOcene ocena={r.ocena} velicina={8} kasni={1200 + i * 240} />
-              <View style={{ width: 26, alignItems: 'flex-end' }}>
-                <Text className={cn('text-[26px] leading-[28px] tracking-[-0.8px]', tezina('display'))}>{r.ocena}</Text>
-                {r.ocena === 5 && <KrugOko sirina={50} />}
-              </View>
-            </View>
-            </React.Fragment>
-          );
-        })}
-      </Pojava>
+      <View style={{ marginTop: 14 }}>
+        <OceneKruga redovi={o.redovi} kartica />
+      </View>
     </Okvir>
   );
 }

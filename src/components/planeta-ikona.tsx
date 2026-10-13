@@ -102,14 +102,23 @@ export function imaIkonu(key: string): key is PlanetaKljuc {
   return key in IKONE;
 }
 
-export function PlanetaIkona({ planeta, size = 32 }: { planeta: PlanetaKljuc; size?: number }) {
+/** Koliko se mreza obrezuje kad nema kruga: znak zauzima sredinu mreze, pa bi u punoj mrezi bio sitan. */
+const BEZ_KRUGA_ISECAK = 7;
+
+export function PlanetaIkona({ planeta, size = 32, bezKruga = false }: {
+  planeta: PlanetaKljuc;
+  size?: number;
+  /** Samo znak u indigu, bez belog kruga i obrisa (Ivan, 13.10.2026) — uz ime planete na kartici natalne karte. */
+  bezKruga?: boolean;
+}) {
   // Obris od 1pt na svakoj velicini: mreza je 40, pa je 1pt = 40 / size jedinica.
   const obris = MREZA / size;
   const id = React.useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const c = MREZA / 2;
   return (
-    <Svg width={size} height={size} viewBox={`0 0 ${MREZA} ${MREZA}`}>
-      <Circle cx={c} cy={c} r={c - obris / 2} fill={neutral.white} stroke={brand.indigo} strokeWidth={obris} />
+    <Svg width={size} height={size}
+      viewBox={bezKruga ? `${BEZ_KRUGA_ISECAK} ${BEZ_KRUGA_ISECAK} ${MREZA - 2 * BEZ_KRUGA_ISECAK} ${MREZA - 2 * BEZ_KRUGA_ISECAK}` : `0 0 ${MREZA} ${MREZA}`}>
+      {!bezKruga && <Circle cx={c} cy={c} r={c - obris / 2} fill={neutral.white} stroke={brand.indigo} strokeWidth={obris} />}
       {IKONE[planeta].map((deo, i) =>
         deo.potez ? (
           <Path key={i} d={deo.d} fill="none" stroke={brand.indigo} strokeWidth={PLANETA_POTEZ * MREZA} />

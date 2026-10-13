@@ -3,7 +3,7 @@
  *
  * Isti racun kao ocene oblasti (`lib/oblasti.ts`): aktivni tranziti dana -> veza sa oblascu
  * (kuca ili planeta) -> ocena 1—5. Razlike:
- *   - oblasti ima osam (`KRUG`), a pricu i karticu za deljenje i dalje drzi `OBLASTI` (cetiri);
+ *   - oblasti ima osam (`KRUG`); od 13.10.2026 ih pokazuje i dnevna prica (`lib/use-prica.ts`);
  *   - uz DANASNJU OCENU (tackice, bez ublazavanja) oblast ima STANJE: ocena se usrednji za tri
  *     dana (jedan pre, tekuci, jedan posle), pa se stanje ne menja iz dana u dan.
  *

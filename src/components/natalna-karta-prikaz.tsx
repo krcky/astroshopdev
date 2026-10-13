@@ -22,6 +22,8 @@ import {
   AspektRed, BALON_PREKO, BALON_VISINA, KUCA_KOLONA, Tacka, TrojkaPlocica, ZnakKolona, redosledPlaneta, stepenMinut, TockInfo,
 } from '@/components/karta-lista';
 import { PREMIUM } from '@/components/zakljucano';
+import { KartaV2 } from '@/components/natalna-karta-v2';
+import { PROBNI_BUILD, useDevStore } from '@/store/dev';
 import { useAuthStore, useEntitlement } from '@/store/auth';
 import { usePricaZnakaPogledana } from '@/store/prica-znaka-log';
 import type { ResolvedProfile } from '@/store/profile';
@@ -49,12 +51,14 @@ const KARTICA = CARD_SURFACE;
  * bez preliva), pa kartice nose standardnu povrsinu kao ostali tabovi — bela
  * kartica na sivom, preliv je boji kad prolazi ispod njega (pravilo 17).
  */
-export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
+export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke, verzija }: {
   resolved: ResolvedProfile;
   /** Karta druge osobe — ide uz svako tumacenje; bez njega je karta korisnikova. */
   osobaId?: string;
   /** Umetak posle velike trojke ("Tvoji ljudi" na tabu "Ti"). */
   posleTrojke?: React.ReactNode;
+  /** Samo za `/dev-karta`: verzija mimo prekidaca u profilu. */
+  verzija?: 1 | 2;
 }) {
   const rec = useT();
   const tp = rec.karta.prikaz;
@@ -75,6 +79,9 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   );
   const naslovi = useNatalNaslovi(kljucevi);
   const premium = !!useEntitlement()?.active;
+  // Probna verzija 2 donjeg dela strane (prekidac u profilu); build za prodavnicu uvek 1.
+  const izProfila = useDevStore((s) => s.kartaVerzija);
+  const v2 = (verzija ?? izProfila) === 2 && PROBNI_BUILD;
   // Prica o znaku (pravilo 25) je samo za SVOJU kartu: Sunce u trojci je ulaz, a tumacenje je na njenoj poslednjoj slici.
   const userId = useAuthStore((s) => s.user?.id ?? null);
   const sunceZnak = resolved.chart.planets.find((x) => x.key === 'sun')?.position.sign.key ?? null;
@@ -184,6 +191,10 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
         </Text>
       </View>
 
+      {v2 && !zoneUnreliable ? (
+        <KartaV2 resolved={resolved} osobaId={osobaId} mesecZnak={mesecZnak} aspects={aspects}
+          naslovi={naslovi} zakljucan={zakljucan} premium={premium} otvori={otvori} />
+      ) : (<>
       {/* Velika trojka: Sunce, Mesec, podznak (Ivan, 28.9.2026 — kao na sajtu, plus Mesec) */}
       {!zoneUnreliable && (
         <View className="mx-5 mt-5 flex-row gap-2" style={imaPricu ? { paddingBottom: BALON_VISINA - BALON_PREKO - 8 } : undefined}>
@@ -272,6 +283,7 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           </View>
         </>
       )}
+      </>)}
     </>
   );
 }

@@ -69,7 +69,7 @@ export const danas = {
     /** "Sunce konjunkcija natalni Jupiter" — kad se vidi samo ime, bez teksta. */
     imeNatalni: (tranzitna: string, aspekt: string, natalna: string) => `${tranzitna} ${aspekt} ${natalni(natalna)} ${natalna}`,
     /** Ascendent i MC kao natalne mete tranzita. */
-    ascendent: 'Ascendent',
+    ascendent: 'Podznak',
     mc: 'MC',
     /** Trajanje Mesecevog tranzita. */
     samoDanas: 'Samo danas',
@@ -158,15 +158,15 @@ export const danas = {
     nijeDeoKarte: 'Ovaj tranzit nije deo tvoje karte.',
     /** `lib/tvoj-dan.ts` — vladar je natalna tacka. `uZnaku` = "u Ribama". */
     vladarNatalni: (planeta: string, uZnaku: string) =>
-      `${planeta} je vladar tvog Ascendenta ${uZnaku}. Kad ga tranzit dodirne, dan se oseća ličnije i jače, zato ovaj tranzit danas ima prednost.`,
+      `${planeta} je vladar tvog podznaka ${uZnaku}. Kad ga tranzit dodirne, dan se oseća ličnije i jače, zato ovaj tranzit danas ima prednost.`,
     /** Vladar je tranzitna planeta; `koga` je iz `tvojAkuzativ`. */
     vladarTranzitni: (planeta: string, uZnaku: string, koga: string) =>
-      `${planeta} je vladar tvog Ascendenta ${uZnaku}, a danas pokreće ${koga}. Zato ovaj tranzit danas ima prednost.`,
+      `${planeta} je vladar tvog podznaka ${uZnaku}, a danas pokreće ${koga}. Zato ovaj tranzit danas ima prednost.`,
     /** "tvoje Sunce", "tvoju Veneru" — akuzativ sa prisvojnom zamenicom. */
     tvojAkuzativ: {
       sun: 'tvoje Sunce', moon: 'tvoj Mesec', mercury: 'tvoj Merkur', venus: 'tvoju Veneru',
       mars: 'tvog Marsa', jupiter: 'tvog Jupitera', saturn: 'tvog Saturna', uranus: 'tvog Urana',
-      neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj Ascendent', midheaven: 'tvoj MC',
+      neptune: 'tvog Neptuna', pluto: 'tvog Plutona', ascendant: 'tvoj podznak', midheaven: 'tvoj MC',
     } as Record<string, string>,
   },
 

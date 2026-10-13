@@ -60,6 +60,31 @@ export const karta: Recnik['karta'] = {
     ugaoA11y: (ime, z) => `${ime} ${nebo.uZnaku(z)}. Толкување`,
   },
 
+  v2: {
+    planeteNaslov: 'Планети во картата',
+    /** Stakleni tabovi ispod kartice za kupovinu: kartice planeta ili lista aspekata. */
+    tabPlanete: 'Планети',
+    tabAspekti: 'Аспекти',
+    procitaj: 'Прочитај го целото толкување',
+    otkljucajTumacenje: 'Отклучи го целото толкување',
+    sviAspekti: (n) => `Сите аспекти (${n})`,
+    karticaA11y: (ime, gde, podnaslov, zakljucano) =>
+      `${ime}, ${gde}${podnaslov ? `. ${podnaslov}` : ''}${zakljucano ? '. Заклучено' : '. Толкување'}`,
+    ctaNaslov: 'Твојата карта, прочитана до крај',
+    ctaOpis: 'Толкување на секоја планета, куќа и аспект, за тебе и уште една личност. Купуваш еднаш и останува твое.',
+    ctaDugme: (cena) => (cena ? `Отклучи засекогаш · ${cena}` : 'Отклучи засекогаш'),
+    listNaslov: 'Прочитај ја целата своја карта',
+    listOpis: 'Избери како сакаш да ги читаш толкувањата на астрологот.',
+    samoKarta: 'Само натална карта',
+    samoKartaIspod: 'Еднаш, засекогаш · твојата и уште една карта',
+    premium: 'Premium',
+    premiumIspod: 'Карта, цел текст за денот и повеќе личности · годишно',
+    stavke: ['Сите планети во знак и куќа', 'Сите аспекти, со толкување од астрологот', 'Останува твое и без претплата'],
+    kupiKartu: 'Купи натална карта',
+    pogledajPremium: 'Види Premium',
+    napomena: 'Еднократно купување.\nНе се обновува и не ја откажува претплатата ако ја имаш.',
+  },
+
   lista: {
     tackaA11y: (ime, deg, min, znak, retro, kuca) =>
       `${ime}, ${deg}° ${min}' во знакот ${znak}${retro ? ', ретроградно' : ''}${kuca ? `, ${redni(kuca, 'z')} куќа` : ''}`,

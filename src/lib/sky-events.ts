@@ -155,3 +155,12 @@ export function upcomingSkyEvents(
   }
   return found.slice(0, limit);
 }
+
+/**
+ * Redosled kartica "Promene na nebu" (Ivan, 13.10.2026): prva je VELIKA. To je najraniji dogadjaj,
+ * osim kad je medju njima Merkur koji postaje retrogradan — tada je on prvi, a ostali ostaju po datumu.
+ */
+export function istakniPromenu(events: SkyEvent[]): SkyEvent[] {
+  const i = events.findIndex((e) => e.planet.key === 'mercury' && e.kind === 'retrograde');
+  return i <= 0 ? events : [events[i], ...events.slice(0, i), ...events.slice(i + 1)];
+}

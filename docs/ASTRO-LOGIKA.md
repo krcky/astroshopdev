@@ -224,6 +224,8 @@ Za tri planete se prikazuje **prvi sledeći događaj**: ulazak u znak, početak 
 
 Bez vremena rođenja kuća se ne prikazuje. ✅
 
+**Redosled** (13.10.2026): po datumu, prva kartica je velika. Izuzetak: kad je među tri **Merkur koji postaje retrogradan**, on je prvi i veliki, a ostale dve ostaju po datumu. „Merkur ponovo direktan" ne menja redosled. ✅
+
 **Tekst uz promenu** (30.9.2026) ide po **znaku**, ne po kući, i isti je za sve korisnike:
 
 - planeta **uđe u znak** ili u njemu **ponovo postane direktna** → „planeta u znaku" (npr. Mars u Lavu);
@@ -245,7 +247,7 @@ Nekoliko slika o današnjem danu, kao „story" na Instagramu, sa dugmetom za de
 
 - **Naslovna:** svi tranziti sa liste „Tranziti" (poglavlje 5), prebrojani po tonu (skladan / mešovit / napet, `lib/tone.ts`). Točak pokazuje prave položaje: tranzitna planeta spolja, natalna tačka unutra, Ascendent levo. ✅
 - **Tvoj dan:** isti tranzit kao kartica „Tvoj dan" (4.0), naslov i prve rečenice **kratkog** teksta. ✅
-- **Ocene:** iste ocene kao na početnoj (poglavlje 11); strelica „bolje nego juče" kad je juče ocena bila niža. U priči **i besplatni vidi sve četiri** (30.9.2026) — na početnoj i dalje samo Ljubav. ✅
+- **Ocene:** od 13.10.2026 **osam oblasti kruga života** (poglavlje 12), iste ocene kao na početnoj: reč stanja, tačkice i strelica gore / dole u odnosu na juče; „Najbolje ti ide“ je oblast sa najvišom ocenom (pri istoj prva po redosledu kruga). Do tada četiri oblasti iz poglavlja 11. U priči **i besplatni vidi svih osam**, bez katanaca. ✅
 - **Ide ti / Koči te:** isti izbor kao 4.2, rečenice `positive` i `challenge`. Bez teksta slike nema. ✅
 - **Mesec:** faza, procenat, znak, sledeća glavna faza; „Za tebe" je najjači Mesečev tranzit dana (4.3), ako ima tekst. ✅
 - **Savet:** savet iz kratkog teksta tranzita „Tvog dana". Bez saveta slike nema. ✅
@@ -285,7 +287,7 @@ Besplatni i Premium vide **iste ekrane**; Premium otključava dubinu. Sve granic
 |---|---|---|
 | „Tvoj dan" | isti izbor, kratak tekst | ceo tekst |
 | Krug života (od 8.10.2026, poglavlje 12) | stanje i tačkice za svih osam oblasti; rečenica za danas, list oblasti i tranziti u njemu samo za Partner i Zdravlje, ostalih šest pod katancem | sve, plus narednih 7 dana i ceo tranzit |
-| Ocene četiri oblasti (poglavlje 11) | samo u priči dana (sve četiri, bez katanaca) | isto |
+| Ocene četiri oblasti (poglavlje 11) | više se ne prikazuju (priča od 13.10.2026 ima osam oblasti kruga života, bez katanaca) | isto |
 | Mesec danas, Promene na nebu | sve | sve |
 | Tema perioda | prvi spori tranzit | svi |
 | Tab „Tranziti" | prva 3, ostali po imenu | svi |
@@ -330,6 +332,12 @@ Kratke osobine po Sunčevom znaku (3 reda po znaku) su **moje privremene formula
 | Mesečev čvor | **pravi** (ne srednji); znak „R" se računa, ne pretpostavlja, jer pravi čvor povremeno ide napred | ✅ provereno prema astro-seek-u |
 | Lilit | **srednji** apogej (Meeus); pravi osciluje i do 30° | ✅ provereno prema astro-seek-u |
 | Tačka sreće | danju ASC + Mesec − Sunce, noću ASC + Sunce − Mesec (dan = Sunce u kućama 7–12) | ✅ |
+
+**Widget „Nebo sada" i sat (iPhone, Android, Apple Watch, Wear OS; od 13.10.2026)** prikazuju isto nebo van aplikacije: krug sa planetama, a u srednjoj veličini i
+znak i stepen svake planete. Račun je isti kao na tabu „Nebo" (iste pozicije, isti aspekti i orbisi, Placidus, pravi čvor,
+srednji Lilit) — prepisan je za te uređaje i automatski se poredi sa aplikacijom (52 trenutka, odstupanje ispod milionitog dela
+stepena). Mesto je ono izabrano na tabu „Nebo"; dok ga widget ne zna, krug je bez kuća i ascendenta, sa 0° Ovna levo.
+Osvežava se na 15 minuta; na satu kruna pomera vreme napred i nazad. Bez tumačenja, kao i tab.
 
 ---
 

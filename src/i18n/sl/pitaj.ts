@@ -93,7 +93,7 @@ export const pitaj: Recnik['pitaj'] = {
     vidiOsobe: (ime) => `${ime} vidi karto osebe, o kateri sprašuješ, zato ti ni treba pisati njenih podatkov.`,
     oKome: 'O kom je vprašanje',
     ja: 'Jaz',
-    oNamaDvoma: 'Vprašanje je o naju dveh — pošlji tudi mojo karto',
+    oNamaDvoma: 'O naju dveh',
     primerJa: 'Npr. To jesen razmišljam o menjavi službe. Kaj o tem obdobju pravi moja karta?',
     primerOdnos: 'Npr. Kako se lahko bolje razumeva, ko se ne strinjava?',
     primerOsoba: 'Npr. Čemu naj to jesen posvetim pozornost? Kaj pravi karta te osebe?',

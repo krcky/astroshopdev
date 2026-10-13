@@ -70,7 +70,7 @@ export const onboarding = {
     /** Citac ekrana: "Sunce: Lav"; bez vremena rodjenja podznak je `nepoznat`. */
     uloga: (uloga: string, znak: string) => `${uloga}: ${znak}`,
     nepoznat: 'nepoznat',
-    bezVremena: 'Bez vremena rođenja ascendent se ne može izračunati. Dopunićeš ga kasnije u profilu.',
+    bezVremena: 'Bez vremena rođenja podznak se ne može izračunati. Dopunićeš ga kasnije u profilu.',
   },
 
   /** `(onboarding)/account.tsx` — email (i lozinka u rezimu `password`). */

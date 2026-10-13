@@ -8,7 +8,7 @@ import { useT } from '@/i18n';
 import { bodyLongitude, type AspectDef } from '@/lib/astro';
 import { buildPersonalDaily, datum } from '@/lib/horoscope';
 import { phaseDay, naslovMeseca, type PhaseDay } from '@/lib/moon';
-import { oceneOblasti, trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
+import { trajanjeTekst, trajanjeTranzita } from '@/lib/oblasti';
 import {
   brojTonova, legendaTonova, momenatNatpis, najbolja, slikeDana, trajanjeSlike, TRAJANJE_STALNO,
   type BrojTonova, type SlikaKljuc,
@@ -18,13 +18,14 @@ import { useTransitTexts } from '@/lib/transit-texts';
 import { dayKey, pickBrief, strongestMoonHit, type NatalTarget, type Transit } from '@/lib/transits';
 import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { prveRecenice } from '@/lib/tumacenje';
+import { useKrug } from '@/lib/use-krug';
 import { useOblastiDana } from '@/lib/use-oblasti';
 import { SIGN_CASES, signFromLongitude, type ZodiacSign } from '@/lib/zodiac';
 import { useAuthStore } from '@/store/auth';
 import { useDanas } from '@/store/danas';
 import { useResolvedProfile } from '@/store/profile';
 import { tvojDanShownFor, useTvojDanLog } from '@/store/tvoj-dan-log';
-import type { OblastKey } from '@/lib/oblasti-config';
+import type { KrugKey } from '@/lib/krug-config';
 
 export type Tetiva = { tranzit: number; natal: number; ton: Tone };
 export type Tacka = { key: string; name: string; glyph: string };
@@ -60,9 +61,10 @@ export type PricaDana = {
     efekat: string;
     izazov: string;
   } | null;
+  /** Osam oblasti KRUGA ZIVOTA, iste ocene kao na pocetnoj (Ivan, 13.10.2026; do tada cetiri iz `OBLASTI`). `oznaka` = rec stanja. */
   ocene: {
-    redovi: { key: OblastKey; name: string; ocena: number; oznaka: string; juce: number | null }[];
-    najbolja: { key: OblastKey; name: string; ocena: number; oznaka: string } | null;
+    redovi: { key: KrugKey; name: string; ocena: number; oznaka: string; juce: number | null }[];
+    najbolja: { key: KrugKey; name: string; ocena: number; oznaka: string } | null;
   } | null;
   ideKoci: { ide: { tekst: string; ime: string } | null; koci: { tekst: string; ime: string } | null } | null;
   mesec: {
@@ -86,9 +88,9 @@ export function usePricaDana(): PricaDana | null {
   const recnik = useT();
   const tvojDanLog = useTvojDanLog(tvojDanShownFor(userId));
 
-  const juce = React.useMemo(() => new Date(danas.getFullYear(), danas.getMonth(), danas.getDate() - 1, 12), [danas]);
   const oblasti = useOblastiDana(resolved, danas);
-  const oblastiJuce = useOblastiDana(resolved, juce);
+  // Ocene su iz kruga zivota — ISTI izvor kao pocetna (`useKrug`), da prica ne kaze drugo nego kartice oblasti.
+  const { rez: krug } = useKrug(resolved, danas);
 
   // Isti izbor "Tvog dana" kao na pocetnoj (isti dnevnik, isti dan).
   const pick = React.useMemo(
@@ -148,10 +150,11 @@ export function usePricaDana(): PricaDana | null {
       izazov: tdTekst?.challenge ?? '',
     } : null;
 
-    // --- ocene: u prici SVE cetiri i za besplatne, bez katanaca (Ivan, 30.9.2026) —
-    // izuzetak od pravila 18c; na pocetnoj besplatni i dalje vidi samo `BESPLATNO.oblasti`.
-    const jucerasnje = new Map((oblastiJuce ? oceneOblasti(oblastiJuce) : []).map((o) => [o.key, o.ocena]));
-    const redovi = oceneOblasti(oblasti).map((o) => ({ ...o, juce: jucerasnje.get(o.key) ?? null }));
+    // --- ocene: osam oblasti kruga zivota, u prici SVE i za besplatne, bez katanaca (Ivan, 30.9.2026) —
+    // izuzetak od pravila 18c; na pocetnoj besplatni ima otvorene samo `BESPLATNO.krug`.
+    const redovi = (krug?.oblasti ?? []).map((o) => ({
+      key: o.def.key, name: recnik.krug.oblasti[o.def.key], ocena: o.ocena, oznaka: recnik.krug.stanja[o.stanje], juce: o.juce,
+    }));
     const ocene = redovi.length ? { redovi, najbolja: najbolja(redovi) } : null;
 
     // --- Ide ti / Koči te: prva recenica koja IMA tekst, kao "Danas ukratko"
@@ -222,5 +225,5 @@ export function usePricaDana(): PricaDana | null {
       savet,
       ucitava: loading,
     };
-  }, [resolved, oblasti, oblastiJuce, pick, brief, mesecHit, texts, loading, danas, recnik]);
+  }, [resolved, oblasti, krug, pick, brief, mesecHit, texts, loading, danas, recnik]);
 }

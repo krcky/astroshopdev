@@ -93,6 +93,8 @@ export default function ProfileSheet() {
   const setPremiumRucno = useDevStore((s) => s.setPremiumRucno);
   const pocetnaVerzija = useDevStore((s) => s.pocetnaVerzija);
   const setPocetnaVerzija = useDevStore((s) => s.setPocetnaVerzija);
+  const kartaVerzija = useDevStore((s) => s.kartaVerzija);
+  const setKartaVerzija = useDevStore((s) => s.setKartaVerzija);
   const resolved = useResolvedProfile();
   const promeniSliku = usePromeniSliku();
   const [radiSlika, setRadiSlika] = React.useState(false);
@@ -271,6 +273,16 @@ export default function ProfileSheet() {
               trailing={<VrednostReda>{`v${pocetnaVerzija}`}</VrednostReda>}
               onPress={() => setPocetnaVerzija(pocetnaVerzija === 4 ? 1 : ((pocetnaVerzija + 1) as 2 | 3 | 4))}
             />
+            {/* Probni izbor verzije strane Natalna karta (v1 dosadasnja, v2 spisak + kartice planeta). */}
+            <ListRow
+              title="Natalna karta"
+              subtitle="Dodir menja verziju"
+              chevron={false}
+              trailing={<VrednostReda>{`v${kartaVerzija}`}</VrednostReda>}
+              onPress={() => setKartaVerzija(kartaVerzija === 1 ? 2 : 1)}
+            />
+            {/* Pregled kartice podznaka za svih 12 znakova (`/dev-podznaci`), samo probni build. */}
+            <ListRow title="Podznak: 12 znakova" subtitle="Pregled kartice za svaki znak" onPress={() => leaveSheetTo('/dev-podznaci')} />
             <ListRow title={tp.pricaNepogledana} chevron={false} onPress={() => usePricaLog.getState().ponisti(dayKey(new Date()))} />
           </Group>
         </>

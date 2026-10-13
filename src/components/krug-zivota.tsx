@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { useFocusEffect, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -13,7 +13,7 @@ import Svg, { Circle, Defs, G, Path, RadialGradient, Stop } from 'react-native-s
 import { Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { AVATARI, AvatarProbni } from '@/components/avatar-probni';
+import { AVATARI, AvatarProbni, SLIKE } from '@/components/avatar-probni';
 import { KrugLoga } from '@/components/logo';
 import { OBLAST_BOJA, OblastIkona, type IkonaOblasti } from '@/components/oblast-ikona';
 import { PREMIUM } from '@/components/zakljucano';
@@ -28,18 +28,24 @@ const PROBNI_AVATAR = true;
 
 /**
  * SREDINA KRUGA, PROBA (Ivan, 13.10.2026): prvo je KRUG LOGA koji se vrti; dodir pokaze PRVI avatar, svaki sledeci dodir sledeceg,
- * a posle poslednjeg se vraca logo. Samo za gledanje avatara (`avatar-probni.tsx`) — izbaciti kad se odluci o stilu.
+ * a pa 12 slika iz `files/meseci` (kopije u `src/probni-avatari/`), a posle poslednje se vraca logo. Samo za gledanje avatara (`avatar-probni.tsx`) — izbaciti kad se odluci o stilu.
  */
 function SredinaKruga({ size }: { size: number }) {
   const [i, setI] = React.useState(-1);
   return (
     <Pressable
-      onPress={() => setI((x) => (x + 1 >= AVATARI.length ? -1 : x + 1))}
+      onPress={() => setI((x) => (x + 1 >= AVATARI.length + SLIKE.length ? -1 : x + 1))}
       accessibilityRole="button"
-      accessibilityLabel={i < 0 ? 'Logo. Dodir pokazuje prvi avatar.' : `Probni avatar: ${AVATARI[i].ime}. Dodir menja.`}
+      accessibilityLabel={i < 0 ? 'Logo. Dodir pokazuje prvi avatar.' : `Probni avatar ${i + 1}. Dodir menja.`}
       style={{ width: size, height: size }}>
       <View pointerEvents="none">
-        {i < 0 ? <KrugLoga size={size} stalno /> : <AvatarProbni size={size} index={i} />}
+        {i < 0 ? (
+          <KrugLoga size={size} stalno />
+        ) : i < AVATARI.length ? (
+          <AvatarProbni size={size} index={i} />
+        ) : (
+          <Image source={SLIKE[i - AVATARI.length]} style={{ width: size, height: size }} resizeMode="contain" accessibilityIgnoresInvertColors />
+        )}
       </View>
     </Pressable>
   );

@@ -11,6 +11,11 @@
       "bundleIdentifier": "com.krcky.astroshop",
       "infoPlist": {
         "NSPhotoLibraryAddUsageDescription": "Astro Shop dodaje u Fotografije samo sliku ili video koji izabereš da sačuvaš."
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.krcky.astroshop"
+        ]
       }
     },
     "android": {
@@ -57,7 +62,8 @@
       ],
       "expo-sharing",
       "expo-video",
-      "expo-localization"
+      "expo-localization",
+      "@bacons/apple-targets"
     ],
     "experiments": {
       "typedRoutes": true,

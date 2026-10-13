@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <receiver android:name="rs.astroshop.nebo.widget.NeboWidgetProvider" android:exported="false" android:label="@string/nebo_widget_ime">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/nebo_widget_info" />
+    </receiver>
+  </application>
+</manifest>
