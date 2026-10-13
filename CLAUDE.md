@@ -531,6 +531,10 @@ Tekst za besplatne je KRATKA verzija — dugu ionako salje samo server (pravilo 
 Tabela: `docs/ASTRO-LOGIKA.md`, poglavlje 5c.
 
 **18d. Krug zivota na pocetnoj (Ivan, 8.10.2026; varijanta A sa prototipa).**
+PROBNI PREKIDAC VERZIJA (13.10.2026): sve tri verzije su u aplikaciji — `components/pocetna/v1.tsx`, `v2.tsx`, `v3.tsx` (+ `tvoj-dan-card-v1/v2.tsx`), a
+`app/(tabs)/home/index.tsx` je samo birac po `useDevStore().pocetnaVerzija` (profil -> Test -> "Pocetna strana", dodir menja v1/v2/v3). Samo u probnom
+buildu (`PROBNI_BUILD`); production uvek v3. Kad se odluci koja ostaje: obrisati ostale fajlove i birac. v3 = vodoravne kartice oblasti
+(`oblasti-kartice.tsx`, sa strelicom gore/dole), "Tema dana" sa ilustracijom dole desno (`tvoj-dan-card.tsx`), "Ide ti / Koci te" sa v1.
 VERZIJE POCETNE: v1 = tag `pocetna-pre-tocka-zivota` (pre kruga zivota, tabovi sa "Danas ukratko"; i tag `pocetna-v1` na istom commitu), v2 = tag
 `pocetna-v2` (krug zivota sa staklenom karticom, okretanjem i ulaznim okretom, 12.10.2026). Povratak: `git checkout pocetna-v2 -- 'src/app/(tabs)/home'
 src/components/krug-zivota.tsx src/components/oblast-kartica.tsx src/components/tvoj-dan-card.tsx src/components/prica/ulaz.tsx`.

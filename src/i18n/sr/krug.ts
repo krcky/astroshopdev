@@ -33,6 +33,8 @@ export const krug = {
   /** Citac ekrana: "Partner, Pritisak, 1 od 5". */
   oblastA11y: (oblast: string, stanje: string, ocena: number) => `${oblast}, ${stanje}, ${ocena} od 5`,
   oblastZakljucanaA11y: (oblast: string, stanje: string) => `${oblast}, ${stanje}, detalji uz Premium`,
+  /** Promena ocene u odnosu na prethodni dan (strelica na kartici oblasti; cita ga citac ekrana). */
+  odJuce: { gore: 'poraslo u odnosu na juče', dole: 'palo u odnosu na juče' },
   znakSunca: (znak: string) => `Znak Sunca: ${znak}`,
   podznak: (znak: string) => `Podznak: ${znak}`,
 };

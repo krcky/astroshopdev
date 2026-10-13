@@ -28,6 +28,8 @@ export type KrugOblast = {
   def: KrugDef;
   /** Danasnja jacina 1—5 (tackice). */
   ocena: number;
+  /** Jucerasnja ocena 1—5 (za strelicu gore / dole na kartici); `null` kad juce nema osnove. */
+  juce: number | null;
   /** Stanje iz proseka tri dana. */
   stanje: StanjeKey;
   /** Tranziti vezani za oblast, po uticaju na ocenu (najjaci prvi). */
@@ -87,10 +89,11 @@ export const stanjeIzOcene = (ocena: number): StanjeKey => STANJA[Math.min(OCENA
 export function krugDana(osnove: { jucer: OsnovaDana | null; danas: OsnovaDana; sutra: OsnovaDana | null }, tonovi: Map<string, string>, bezKuca: boolean): KrugDana {
   const oblasti = KRUG.map((def): KrugOblast => {
     const danas = ocenaOblasti(def, osnove.danas, tonovi);
+    const juce = osnove.jucer ? ocenaOblasti(def, osnove.jucer, tonovi).ocena : null;
     const ocene = [osnove.jucer, osnove.danas, osnove.sutra]
       .filter((o): o is OsnovaDana => !!o)
-      .map((o) => (o === osnove.danas ? danas.ocena : ocenaOblasti(def, o, tonovi).ocena));
-    return { def, ocena: danas.ocena, stanje: stanjeIzOcene(usrednji(ocene)), stavke: danas.stavke };
+      .map((o) => (o === osnove.danas ? danas.ocena : o === osnove.jucer ? (juce as number) : ocenaOblasti(def, o, tonovi).ocena));
+    return { def, ocena: danas.ocena, juce, stanje: stanjeIzOcene(usrednji(ocene)), stavke: danas.stavke };
   });
   return { oblasti, bezKuca };
 }

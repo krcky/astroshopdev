@@ -29,6 +29,8 @@ export const krug: Recnik['krug'] = {
   zakljucanoUPremium: 'Утре, следните 7 дена и целиот транзит се со Premium.',
   oblastA11y: (oblast, stanje, ocena) => `${oblast}, ${stanje}, ${ocena} од 5`,
   oblastZakljucanaA11y: (oblast, stanje) => `${oblast}, ${stanje}, деталите се со Premium`,
+  /** Promena ocene u odnosu na prethodni dan (strelica na kartici oblasti; cita ga citac ekrana). */
+  odJuce: { gore: 'повисоко од вчера', dole: 'пониско од вчера' },
   znakSunca: (znak) => `Знак на Сонцето: ${znak}`,
   podznak: (znak) => `Подзнак: ${znak}`,
 };

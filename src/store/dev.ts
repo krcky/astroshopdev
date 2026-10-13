@@ -31,6 +31,9 @@ export const PREKIDAC_PRODUCT_ID = 'test.prekidac';
 type DevState = {
   premiumRucno: boolean | null;
   setPremiumRucno: (v: boolean | null) => void;
+  /** Koja verzija pocetne strane se pokazuje (1, 2 ili 3) — samo probni build, vidi `app/(tabs)/home/index.tsx`. */
+  pocetnaVerzija: 1 | 2 | 3;
+  setPocetnaVerzija: (v: 1 | 2 | 3) => void;
 };
 
 export const useDevStore = create<DevState>()(
@@ -38,11 +41,13 @@ export const useDevStore = create<DevState>()(
     (set) => ({
       premiumRucno: null,
       setPremiumRucno: (premiumRucno) => set({ premiumRucno }),
+      pocetnaVerzija: 3,
+      setPocetnaVerzija: (pocetnaVerzija) => set({ pocetnaVerzija }),
     }),
     {
       name: 'astroshop-dev',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (s) => ({ premiumRucno: s.premiumRucno }),
+      partialize: (s) => ({ premiumRucno: s.premiumRucno, pocetnaVerzija: s.pocetnaVerzija }),
     }
   )
 );

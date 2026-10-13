@@ -16,12 +16,12 @@ import { useT } from '@/i18n';
  * Ocena oblasti 1—5 kao tackice (●●●○○), na slajdu "Danas ukratko". Crno i svetlosivo, bez boje: ocena je
  * informacija, ne ukras. VoiceOver cita zaglavlje oblasti, ne tackice.
  */
-export function OcenaTackice({ ocena }: { ocena: number }) {
+export function OcenaTackice({ ocena, boja = OBLAST_BOJA }: { ocena: number; boja?: string }) {
   return (
     <View className="flex-row gap-1" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
       {Array.from({ length: OCENA_MAX }, (_, i) => (
         // Pune u boji ikonica oblasti (Ivan, 28.9.2026), prazne svetlosive.
-        <View key={i} className={cn('h-2 w-2 rounded-pill', i >= ocena && 'bg-fill-strong')} style={i < ocena ? { backgroundColor: OBLAST_BOJA } : undefined} />
+        <View key={i} className={cn('h-2 w-2 rounded-pill', i >= ocena && 'bg-fill-strong')} style={i < ocena ? { backgroundColor: boja } : undefined} />
       ))}
     </View>
   );

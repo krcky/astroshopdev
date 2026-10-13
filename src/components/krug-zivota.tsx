@@ -13,7 +13,7 @@ import Svg, { Circle, Defs, G, Path, RadialGradient, Stop } from 'react-native-s
 import { Lock } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
-import { AvatarProbaDodir } from '@/components/avatar-probni';
+import { AVATARI, AvatarProbni } from '@/components/avatar-probni';
 import { KrugLoga } from '@/components/logo';
 import { OBLAST_BOJA, OblastIkona, type IkonaOblasti } from '@/components/oblast-ikona';
 import { PREMIUM } from '@/components/zakljucano';
@@ -25,6 +25,25 @@ import { brand, neutral } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 
 const PROBNI_AVATAR = true;
+
+/**
+ * SREDINA KRUGA, PROBA (Ivan, 13.10.2026): prvo je KRUG LOGA koji se vrti; dodir pokaze PRVI avatar, svaki sledeci dodir sledeceg,
+ * a posle poslednjeg se vraca logo. Samo za gledanje avatara (`avatar-probni.tsx`) — izbaciti kad se odluci o stilu.
+ */
+function SredinaKruga({ size }: { size: number }) {
+  const [i, setI] = React.useState(-1);
+  return (
+    <Pressable
+      onPress={() => setI((x) => (x + 1 >= AVATARI.length ? -1 : x + 1))}
+      accessibilityRole="button"
+      accessibilityLabel={i < 0 ? 'Logo. Dodir pokazuje prvi avatar.' : `Probni avatar: ${AVATARI[i].ime}. Dodir menja.`}
+      style={{ width: size, height: size }}>
+      <View pointerEvents="none">
+        {i < 0 ? <KrugLoga size={size} stalno /> : <AvatarProbni size={size} index={i} />}
+      </View>
+    </Pressable>
+  );
+}
 
 /*
  * KRUG ZIVOTA (Ivan, 8.10.2026; varijanta A sa prototipa): pravi krug podeljen na osam isecaka, u svakom
@@ -204,7 +223,7 @@ export const IKONA_OBLASTI: Record<KrugKey, IkonaOblasti> = {
 };
 
 /** Sira slika izgleda manja u kvadratu pa se crta veca (Ivan, 8.10.2026: Finansije). */
-const RAZMERA_IKONE: Partial<Record<KrugKey, number>> = { finansije: 1.3, zdravlje: 1.2, licni_razvoj: 1.2, prijateljstvo: 1.1, zabava: 1.1 };
+export const RAZMERA_IKONE: Partial<Record<KrugKey, number>> = { finansije: 1.3, zdravlje: 1.2, licni_razvoj: 1.2, prijateljstvo: 1.1, zabava: 1.1 };
 
 function Plocica({ kljuc, naziv, stanje, ocena, otvorena, izabrana, onPress, k, indeks, D, rot, kasni, ulaz }: {
   kljuc: KrugKey; naziv: string; stanje: string; ocena: number; otvorena: boolean; izabrana: boolean; onPress: () => void;
@@ -448,8 +467,8 @@ export function KrugZivota({ rez, izabrana, onIzbor, otkljucane, detalj }: {
           <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, top: 0, width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
             {/* KRUG LOGA koji se okrece (Ivan, 8.10.2026; do tada ilustracija vladara): isti `KrugLoga` kao u zaglavlju — uvodni okret
                 pri fokusu, pa jedan krug u minut; vrti se STALNO (ne staje posle mirovanja, Ivan, 8.10.2026), stoji samo uz "Smanji pokrete" i u ustedi baterije. Precnik ~ rupa (92). */}
-            {/* PROBA (Ivan, 12.10.2026): avatar umesto loga. Povratak: PROBNI_AVATAR = false. */}
-            {PROBNI_AVATAR ? <AvatarProbaDodir size={88 * k} /> : <KrugLoga size={88 * k} stalno />}
+            {/* PROBA (Ivan, 13.10.2026): logo prvi, dodir menja avatare. Povratak: PROBNI_AVATAR = false. */}
+            {PROBNI_AVATAR ? <SredinaKruga size={88 * k} /> : <KrugLoga size={88 * k} stalno />}
           </View>
 
           {rez.oblasti.map((o, i) => {

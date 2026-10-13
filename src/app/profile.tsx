@@ -91,6 +91,8 @@ export default function ProfileSheet() {
   const naServeru = useAuthStore((s) => s.entitlement?.active ?? false);
   const premiumRucno = useDevStore((s) => s.premiumRucno);
   const setPremiumRucno = useDevStore((s) => s.setPremiumRucno);
+  const pocetnaVerzija = useDevStore((s) => s.pocetnaVerzija);
+  const setPocetnaVerzija = useDevStore((s) => s.setPocetnaVerzija);
   const resolved = useResolvedProfile();
   const promeniSliku = usePromeniSliku();
   const [radiSlika, setRadiSlika] = React.useState(false);
@@ -261,6 +263,14 @@ export default function ProfileSheet() {
             {premiumRucno !== null && (
               <ListRow title={tp.vratiNaServer} chevron={false} onPress={() => setPremiumRucno(null)} />
             )}
+            {/* Probni izbor verzije pocetne strane (v1 / v2 / v3), dodir menja redom. Natpis namerno bez recnika: ide napolje sa probnim buildom. */}
+            <ListRow
+              title="Pocetna strana"
+              subtitle="Dodir menja verziju"
+              chevron={false}
+              trailing={<VrednostReda>{`v${pocetnaVerzija}`}</VrednostReda>}
+              onPress={() => setPocetnaVerzija(pocetnaVerzija === 3 ? 1 : ((pocetnaVerzija + 1) as 2 | 3))}
+            />
             <ListRow title={tp.pricaNepogledana} chevron={false} onPress={() => usePricaLog.getState().ponisti(dayKey(new Date()))} />
           </Group>
         </>

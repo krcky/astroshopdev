@@ -292,7 +292,13 @@ const LUK = 0.34;
  * posle poslednjeg dodira (`useBudnost`), uz "Smanji pokrete" i u ustedi baterije stoji (obris miruje, bez luka koji tece).
  * Crta se u SVG-u PREKO stakla, kao dete stakla — raste sa dugmetom pri dodiru.
  */
-function ObrisKojiTece({ w, h, van, obris }: { w: number; h: number; van: number; obris: number }) {
+export function ObrisKojiTece({ w, h, van, obris, radijus, boje = PRSTEN_PRELIV }: {
+  w: number; h: number; van: number; obris: number;
+  /** Zaobljenje uglova; bez njega kapsula (pola visine). */
+  radijus?: number;
+  /** Tri boje preliva (svetla ljubicasta -> indigo kao podrazumevano). */
+  boje?: readonly [string, string, string];
+}) {
   const id = `prica-dugme-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const budan = useBudnost((s) => s.budan);
   const usteda = useUstedaBaterije();
@@ -311,7 +317,9 @@ function ObrisKojiTece({ w, h, van, obris }: { w: number; h: number; van: number
 
   const rw = w + 2 * (obris - 0.5);
   const rh = h + 2 * (obris - 0.5);
-  const obim = 2 * (rw - rh) + Math.PI * rh;
+  const rx = radijus !== undefined ? radijus + obris - 0.5 : rh / 2;
+  // Obim zaobljenog pravougaonika; za kapsulu (rx = rh / 2) isto sto i `2 (rw - rh) + pi rh`.
+  const obim = 2 * (rw + rh) - 8 * rx + 2 * Math.PI * rx;
   const luk = obim * LUK;
   const props = useAnimatedProps(() => ({ strokeDashoffset: -napredak.get() * obim }));
   const x = van - obris + 0.5;
@@ -319,14 +327,14 @@ function ObrisKojiTece({ w, h, van, obris }: { w: number; h: number; van: number
     <Svg width={w + 2 * van} height={h + 2 * van} pointerEvents="none" style={{ position: 'absolute', left: -van, top: -van }}>
       <Defs>
         <LinearGradient id={id} x1="0" y1="1" x2="1" y2="0">
-          <Stop offset="0" stopColor={PRSTEN_PRELIV[0]} />
-          <Stop offset="0.45" stopColor={PRSTEN_PRELIV[1]} />
-          <Stop offset="1" stopColor={PRSTEN_PRELIV[2]} />
+          <Stop offset="0" stopColor={boje[0]} />
+          <Stop offset="0.45" stopColor={boje[1]} />
+          <Stop offset="1" stopColor={boje[2]} />
         </LinearGradient>
       </Defs>
-      <Rect x={x} y={x} width={rw} height={rh} rx={rh / 2} fill="none" stroke={`url(#${id})`} strokeWidth={obris} opacity={miruje ? 1 : 0.4} />
+      <Rect x={x} y={x} width={rw} height={rh} rx={rx} fill="none" stroke={`url(#${id})`} strokeWidth={obris} opacity={miruje ? 1 : 0.4} />
       {!miruje && (
-        <ARect x={x} y={x} width={rw} height={rh} rx={rh / 2} fill="none" stroke={`url(#${id})`} strokeWidth={obris}
+        <ARect x={x} y={x} width={rw} height={rh} rx={rx} fill="none" stroke={`url(#${id})`} strokeWidth={obris}
           strokeLinecap="round" strokeDasharray={[luk, obim - luk]} animatedProps={props} />
       )}
     </Svg>

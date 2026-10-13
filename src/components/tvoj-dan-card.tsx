@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Pressable, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { Info } from 'lucide-react-native';
 
@@ -32,6 +32,27 @@ type OdeljakKljuc = 'efekat' | 'pazi' | 'savet';
 const ODELJAK_BOJA: Partial<Record<OdeljakKljuc, string>> = { efekat: PLUS_BOJA, pazi: MINUS_BOJA };
 /** Varijanta `oznaka` je 11/15; na ovoj kartici datum i oznake odeljaka idu 12/16 (Ivan, 28.9.2026). */
 export const OZNAKA_12 = 'text-[12px] leading-[16px]';
+
+/**
+ * Slika u DONJEM DESNOM uglu gornjeg dela kartice (Ivan, 13.10.2026): cetiri crteza, svaki dan druga, redom (po danu u godini,
+ * ne po slucaju — ista slika ceo dan i na svakom telefonu). Crtezi su kadrirani za taj ugao (isecaju se na desnoj i donjoj ivici).
+ * Stoji uz desnu ivicu kartice i do linije ispod, a ispod dugmeta "Saznaj vise" je ostavljeno toliko mesta da ne dodiruje tekst
+ * (`UGAO_VISINA`); ne hvata dodir. Raniji pokusaji (gore desno: obilazenje, fiksna zona, pozadina, traka) su u istoriji fajla.
+ */
+const UGAO = [
+  { slika: require('../../assets/images/tema-dana/ugao-1.png'), w: 297, h: 280 },
+  { slika: require('../../assets/images/tema-dana/ugao-2.png'), w: 344, h: 332 },
+  { slika: require('../../assets/images/tema-dana/ugao-3.png'), w: 321, h: 340 },
+  { slika: require('../../assets/images/tema-dana/ugao-4.png'), w: 245, h: 246 },
+];
+/** Visina slike (pt); sirina prati razmeru. */
+const UGAO_VISINA = 120;
+/** Padding kartice (`p-4`) i razmak do linije ispod gornjeg dela (`mt-5` na `Odeljci`). */
+const PAD = 16;
+const DO_LINIJE = 20;
+/** Visina reda sa dugmetom "Saznaj vise" + razmak iznad njega (`mt-4`). */
+const DUGME_RED = 40 + 16;
+const ugaoZaDan = (d: Date) => UGAO[Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000) % UGAO.length];
 
 /**
  * "Tvoj dan" — Premium kartica sa najvaznijim tranzitom dana.
@@ -82,13 +103,44 @@ export function TvojDanCard({ pick, date, isToday }: {
     { key: 'savet', oznaka: t.danas.tvojDan.savet, s: odeljci ? stavkaZaPrikaz(odeljci.savet, pick.shownBefore) : kratka?.advice ? { tekst: kratka.advice } : null },
   ];
 
+  const ugao = ugaoZaDan(date);
+  const slikaVisina = UGAO_VISINA;
+  const slikaSirina = (UGAO_VISINA * ugao.w) / ugao.h;
+
   // Bez kartice (Ivan, 28.9.2026): stoji direktno na sivoj pozadini pocetne,
   // kao prvi slajd karusela.
   return (
     // CELO U JEDNOJ KARTICI (Ivan, 8.10.2026): oznaka "Tema dana", naslov (manji), sazetak i "Saznaj vise", pa ispod LINIJE
     // Pozitivni efekat / Izazov / Savet — redovi su u istoj kartici, odvojeni linijama od ivice do ivice.
-    <View className={cn(CARD_SURFACE, 'p-4')}>
-      <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.temaDana}</Text>
+    <View className={cn(CARD_SURFACE, 'overflow-hidden p-4')}>
+      {/* Gornji deo kartice (do linije); slika je u njegovom donjem desnom uglu, a donji razmak ostavlja mesto za nju. */}
+      <View style={{ paddingBottom: Math.max(0, slikaVisina - DUGME_RED - DO_LINIJE) }}>
+      <View pointerEvents="none" style={{ position: 'absolute', right: -PAD, bottom: -DO_LINIJE }}>
+        <Image
+          source={ugao.slika}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+          style={{ width: slikaSirina, height: slikaVisina }}
+          resizeMode="contain"
+        />
+      </View>
+      <View>
+      <View>
+      {/* Ikonica "i" je pored oznake "Tema dana" (Ivan, 13.10.2026), ne uz naslov. Otvara list "Zašto baš ovaj tekst". */}
+      <View className="flex-row items-center gap-1.5">
+        <Text variant="oznaka" className={OZNAKA_12}>{t.danas.tvojDan.temaDana}</Text>
+        <Pressable
+          // `day`: izabrani dan, da trajanje u listu bude za taj dan, ne za danas.
+          onPress={() => router.push({ pathname: '/tvoj-dan-info', params: { key, day: dayKey(date) } })}
+          accessibilityRole="button"
+          accessibilityLabel={t.danas.tvojDan.zastoOvajTekst}
+          // Dodirna povrsina 44pt preko `hitSlop`; red ne raste.
+          hitSlop={14}
+          className="active:opacity-60">
+          {/* Svetla lila, kao "Savet" i izabrani tab (Ivan, 28.9.2026). */}
+          <Info size={16} color={OBLAST_BOJA} strokeWidth={2} />
+        </Pressable>
+      </View>
       {/* Datum i naslov su jedna celina, planeta desno centrirana u odnosu na njih;
           sazetak ispod ide preko cele sirine (Ivan, 29.9.2026). */}
       <View>
@@ -108,25 +160,13 @@ export function TvojDanCard({ pick, date, isToday }: {
             // tekst" (`app/tvoj-dan-info.tsx`). Nerazdvojni razmak: ikonica se ne odvaja
             // od poslednje reci u novi red.
             <Text variant="display" className="mt-2 text-[25px] leading-[31px]">
-              {naslov}{'\u00A0'}
-              <Pressable
-                // `day`: izabrani dan, da trajanje u listu bude za taj dan, ne za danas.
-                onPress={() => router.push({ pathname: '/tvoj-dan-info', params: { key, day: dayKey(date) } })}
-                accessibilityRole="button"
-                accessibilityLabel={t.danas.tvojDan.zastoOvajTekst}
-                // Dodirna povrsina 44pt preko `hitSlop`; red ne raste.
-                hitSlop={14}
-                // Ugradjen element stoji na osnovnoj liniji teksta; podignut da bude u
-                // visini slova, ne na dnu reda (Ivan, 28.9.2026); -5 -> -3, 2pt nize (29.9.2026).
-                style={{ transform: [{ translateY: -3 }] }}
-                className="active:opacity-60">
-                {/* Svetla lila, kao "Savet" i izabrani tab (Ivan, 28.9.2026). */}
-                <Info size={20} color={OBLAST_BOJA} strokeWidth={2} />
-              </Pressable>
+              {naslov}
             </Text>
           )}
 
         </View>
+      </View>
+      </View>
       </View>
 
       {/* 5. Sazetak — preko cele sirine, ispod celine datum + naslov + planeta. */}
@@ -144,6 +184,7 @@ export function TvojDanCard({ pick, date, isToday }: {
           onPress={() => router.push({ pathname: '/transit', params: { key } })}>
           <Text className="text-[16px] leading-[20px]">{t.danas.tvojDan.saznajVise}</Text>
         </Button>
+      </View>
       </View>
 
       {/* Trajanje (traka) je samo u listu "Zašto baš ovaj tekst" — sa pocetne izbaceno (Ivan, 28.9.2026). */}
