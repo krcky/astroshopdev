@@ -787,9 +787,9 @@ Androidu odsece donji deo j, g, ć (`TextView` crta samo u svom okviru; iOS ne s
 `Reci`, koja reci i omotacu daje `REP_SLOVA` (vazduh ispod + negativna margina, red ostaje isti); nov
 krupan tekst u prici sa tesnim proredom mora isto.
 SAVET: VELICINA SLOVA PO DUZINI (Ivan, 30.9.2026 — savet od 141 znaka je prelazio preko zaglavlja i dugmeta):
-`velicinaSaveta` (`lib/prica.ts`) bira najvecu velicinu (44 -> 20; kartica 39 -> 18) pri kojoj savet staje u
+`velicinaSaveta` (`lib/prica.ts`) bira najvecu velicinu (36 -> 20; kartica 32 -> 18 — Ivan, 14.10.2026: "smanji font saveta"; do tada 44 i 39) pri kojoj savet staje u
 prostor koji slika stvarno ima. Model preloma je OPREZAN (`ZNAK_EM` 0,53, podesen na dva snimka: 72 znaka = 6
-redova, 141 = 12) — radije manji nego preko ivice. 596 saveta: na iPhone 16/17 589 ostaje 44, na SE 513.
+redova, 141 = 12) — radije manji nego preko ivice. 596 saveta: na iPhone 16/17 589 je ostajalo 44, na SE 513 (brojano pre smanjenja na 36).
 23 saveta preko 100 znakova treba da skrati astrolog (jedna recenica); do tada ih ovo drzi u okviru. Slika bez teksta astrologa se PRESKACE (Ide ti / Koči te, savet);
 naslovna i Mesec su uvek tu. Zbirne kartice NEMA. Podaci: `lib/use-prica.ts` — ISTI izbori kao pocetna
 (`pickTvojDan` + dnevnik, `pickBrief`, `useOblastiDana`), da prica ne kaze drugo nego kartice. Racun:

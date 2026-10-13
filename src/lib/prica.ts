@@ -95,9 +95,10 @@ export const ZNAK_EM = 0.53;
 /** Prored u odnosu na velicinu (48 / 44). */
 export const PRORED = 1.09;
 /** Velicine za sliku price, od najvece; prva je ona koju savet ima kad staje. */
-export const VELICINE_SAVETA = [44, 40, 36, 33, 30, 27, 24, 22, 20] as const;
+// Najveca je 36 (Ivan, 14.10.2026: "smanji font saveta"; do tada 44, kartica 39).
+export const VELICINE_SAVETA = [36, 33, 30, 27, 24, 22, 20] as const;
 /** Isto za karticu za deljenje (360 × 640). */
-export const VELICINE_SAVETA_KARTICA = [39, 36, 33, 30, 27, 24, 22, 20, 18] as const;
+export const VELICINE_SAVETA_KARTICA = [32, 30, 27, 24, 22, 20, 18] as const;
 /**
  * Recenica "Ide mi / Koči me" na kartici: 25/30 kao do sada; manja samo kad ne staje (5+ redova,
  * ~3% tekstova) — inace bi presla preko loga ili datuma (Ivan, 30.9.2026, uz veci logo).

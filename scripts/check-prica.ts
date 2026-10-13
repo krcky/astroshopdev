@@ -117,11 +117,11 @@ const MALI = { w: 327, h: 667 - 84 - 128 - 85 };
 // Kartica: blok 332 pt oko sredine zraka, bez oznake (25), razmaka (14) i natpisa u jednom redu (18).
 const KARTICA_H = 332 - 25 - 14 - visinaNatpisa('Iz tumačenja tranzita Sunce kvadrat Sunce.', 316);
 ok(visinaNatpisa('Iz tumačenja tranzita Sunce kvadrat Sunce.', 316) === 18, 'natpis ispod saveta na kartici: jedan red');
-ok(velicinaSaveta(S72, 316, KARTICA_H, VELICINE_SAVETA_KARTICA).velicina === 39, 'kartica: savet od 72 znaka ostaje 39 (kao do sada)');
-ok(velicinaSaveta(KRATAK, VELIKI.w, VELIKI.h).velicina === 44, 'kratak savet ostaje 44');
-ok(velicinaSaveta(S72, VELIKI.w, VELIKI.h).velicina === 44, 'savet od 72 znaka (6 redova) ostaje 44');
+ok(velicinaSaveta(S72, 316, KARTICA_H, VELICINE_SAVETA_KARTICA).velicina === 32, 'kartica: savet od 72 znaka ostaje 32 (najveca)');
+ok(velicinaSaveta(KRATAK, VELIKI.w, VELIKI.h).velicina === 36, 'kratak savet ostaje 36 (najveca)');
+ok(velicinaSaveta(S72, VELIKI.w, VELIKI.h).velicina === 36, 'savet od 72 znaka ostaje 36');
 const v141 = velicinaSaveta(S141, VELIKI.w, VELIKI.h);
-ok(v141.velicina < 44 && v141.redova * v141.prored <= VELIKI.h, 'savet sa slike (141) je manji i staje', `${v141.velicina} pt, ${v141.redova} redova`);
+ok(v141.velicina <= 36 && v141.redova * v141.prored <= VELIKI.h, 'savet sa slike (141) staje', `${v141.velicina} pt, ${v141.redova} redova`);
 for (const [ime, t] of [['141', S141], ['196 (najduzi)', S196]] as const) {
   for (const [telefon, m] of [['iPhone 16/17', VELIKI], ['iPhone SE', MALI]] as const) {
     const v = velicinaSaveta(t, m.w, m.h);

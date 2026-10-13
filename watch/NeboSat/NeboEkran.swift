@@ -24,10 +24,13 @@ struct NeboEkran: View {
         let sky = buildSky(at: trenutak, place: mesto.grad?.place)
 
         TabView(selection: $strana) {
-          ZStack(alignment: .bottom) {
-            SkyWheelView(sky: sky, style: WheelStyle(theme: .dark, detail: .compact, dimmed: priguseno))
-              .padding(-6)
-              .ignoresSafeArea(.container, edges: [.bottom, .horizontal])
+          // Strelice i natpis su PREKO kruga (`overlay`), da ne menjaju njegovu velicinu ni mesto.
+          SkyWheelView(sky: sky, style: WheelStyle(theme: .dark, detail: .compact, dimmed: priguseno))
+            // Krug je kvadrat u sredini raspolozivog prostora; bez okvira bi se, kad je prostor visi nego
+            // sirok, poravnao ulevo i izasao preko desne ivice.
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(.container, edges: .bottom)
+            .overlay(alignment: .bottom) {
             HStack {
               korak("chevron.left", -4)
               Spacer()
@@ -35,7 +38,7 @@ struct NeboEkran: View {
                 Button { withAnimation { pomeraj = 0 } } label: {
                   HStack(spacing: 4) {
                     Image(systemName: "arrow.uturn.backward")
-                    Text(trenutak, format: .dateTime.day().month(.abbreviated).hour().minute())
+                    Text(trenutak, format: .dateTime.day().month(.abbreviated).hour().minute().locale(Tekst.locale))
                   }
                   .font(.system(size: 12, weight: .semibold, design: .rounded))
                   .padding(.horizontal, 8).padding(.vertical, 3)
@@ -48,7 +51,7 @@ struct NeboEkran: View {
               Spacer()
               korak("chevron.right", 4)
             }
-            .ignoresSafeArea(.container, edges: .bottom)
+            .padding(.horizontal, 2)
           }
           .focusable()
           .digitalCrownRotation($pomeraj, from: -96 * 366, through: 96 * 366, by: 1,
@@ -103,13 +106,16 @@ struct IzborMesta: View {
     List {
       Button { mesto.izaberi(nil) } label: {
         HStack {
-          Label(Zones.current?.name ?? "—", systemImage: "clock")
+          VStack(alignment: .leading) {
+            Label(Tekst.t("ui.followWatch"), systemImage: "clock")
+            Text(Zones.current?.name ?? "—").font(.footnote).foregroundStyle(.secondary)
+          }
           Spacer()
           if mesto.izabrana == nil { Image(systemName: "checkmark").foregroundStyle(Brend.lila) }
         }
       }
       ForEach(Zones.regions, id: \.name) { deo in
-        NavigationLink(deo.name) {
+        NavigationLink(Tekst.t("region.\(deo.name)")) {
           List(deo.cities) { grad in
             Button { mesto.izaberi(grad.id) } label: {
               HStack {
@@ -119,9 +125,10 @@ struct IzborMesta: View {
               }
             }
           }
-          .navigationTitle(deo.name)
+          .navigationTitle(Tekst.t("region.\(deo.name)"))
         }
       }
     }
+    .navigationTitle(Tekst.t("ui.place"))
   }
 }

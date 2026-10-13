@@ -12,6 +12,9 @@ public enum Tekst {
     return "en"
   }()
 
+  /// Lokal za datume i sate na jeziku natpisa (srpski latinicom, kao u aplikaciji).
+  public static let locale = Locale(identifier: jezik == "sr" ? "sr-Latn" : jezik)
+
   public static func t(_ kljuc: String) -> String { RECNIK[jezik]?[kljuc] ?? RECNIK["en"]?[kljuc] ?? kljuc }
   public static func sign(_ index: Int) -> String { t("sign.\(index)") }
   public static func planet(_ p: Planet) -> String { t("planet.\(p.rawValue)") }
@@ -40,8 +43,8 @@ public enum Tekst {
   /// Sat i minut danas, inace dan i mesec.
   public static func when(_ date: Date, now: Date = .now) -> String {
     Calendar.current.isDate(date, inSameDayAs: now) || date.timeIntervalSince(now) < 12 * 3600
-      ? date.formatted(date: .omitted, time: .shortened)
-      : date.formatted(.dateTime.day().month(.abbreviated))
+      ? date.formatted(Date.FormatStyle(date: .omitted, time: .shortened).locale(locale))
+      : date.formatted(.dateTime.day().month(.abbreviated).locale(locale))
   }
 }
 

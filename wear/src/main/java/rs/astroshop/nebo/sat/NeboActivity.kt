@@ -109,13 +109,14 @@ private fun IzborMesta(deo: String, onDeo: (String) -> Unit, onIzbor: (String?) 
             item {
                 Chip(
                     onClick = { onIzbor(null) },
-                    label = { Text((if (izabrana == null) "✓ " else "") + "◷ " + (Mesto.gradSata()?.ime ?: "—")) },
+                    label = { Text((if (izabrana == null) "✓ " else "") + Tekst.t("ui.followWatch")) },
+                    secondaryLabel = { Text(Mesto.gradSata()?.ime ?: "—") },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
             items(ZONE_PLACES.map { it.deoSveta }.distinct().sorted()) { ime ->
-                Chip(onClick = { onDeo(ime) }, label = { Text(ime) }, colors = ChipDefaults.secondaryChipColors(), modifier = Modifier.fillMaxWidth())
+                Chip(onClick = { onDeo(ime) }, label = { Text(Tekst.t("region.$ime")) }, colors = ChipDefaults.secondaryChipColors(), modifier = Modifier.fillMaxWidth())
             }
         } else {
             items(ZONE_PLACES.filter { it.deoSveta == deo }.sortedBy { it.ime }) { grad ->

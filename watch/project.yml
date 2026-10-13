@@ -36,6 +36,8 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
         WKWatchOnly: true
+        # Jezici natpisa (`Recnik.generated.swift`); bez ovoga sistem datume pise na engleskom.
+        CFBundleLocalizations: [en, sr-Latn, hr, bs, sl, mk]
         # Komplikacije otvaraju svoju stranu (`zodiacwheel://moon` …).
         CFBundleURLTypes:
           - CFBundleURLSchemes: [zodiacwheel]

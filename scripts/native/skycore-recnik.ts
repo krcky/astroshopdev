@@ -22,6 +22,17 @@ const SAT: Record<string, Record<Jezik, string>> = {
   'ui.then': { en: 'then', sr: 'zatim', hr: 'zatim', bs: 'zatim', sl: 'nato', mk: 'потоа' },
   'ui.place': { en: 'Place', sr: 'Mesto', hr: 'Mjesto', bs: 'Mjesto', sl: 'Kraj', mk: 'Место' },
   'ui.followWatch': { en: 'Follow the watch', sr: 'Prati sat', hr: 'Prati sat', bs: 'Prati sat', sl: 'Sledi uri', mk: 'Следи го часовникот' },
+  // Delovi sveta u izboru mesta (imena iz tz baze).
+  'region.Africa': { en: 'Africa', sr: 'Afrika', hr: 'Afrika', bs: 'Afrika', sl: 'Afrika', mk: 'Африка' },
+  'region.America': { en: 'Americas', sr: 'Amerika', hr: 'Amerika', bs: 'Amerika', sl: 'Amerika', mk: 'Америка' },
+  'region.Antarctica': { en: 'Antarctica', sr: 'Antarktik', hr: 'Antarktika', bs: 'Antarktik', sl: 'Antarktika', mk: 'Антарктик' },
+  'region.Arctic': { en: 'Arctic', sr: 'Arktik', hr: 'Arktik', bs: 'Arktik', sl: 'Arktika', mk: 'Арктик' },
+  'region.Asia': { en: 'Asia', sr: 'Azija', hr: 'Azija', bs: 'Azija', sl: 'Azija', mk: 'Азија' },
+  'region.Atlantic': { en: 'Atlantic', sr: 'Atlantik', hr: 'Atlantik', bs: 'Atlantik', sl: 'Atlantik', mk: 'Атлантик' },
+  'region.Australia': { en: 'Australia', sr: 'Australija', hr: 'Australija', bs: 'Australija', sl: 'Avstralija', mk: 'Австралија' },
+  'region.Europe': { en: 'Europe', sr: 'Evropa', hr: 'Europa', bs: 'Evropa', sl: 'Evropa', mk: 'Европа' },
+  'region.Indian': { en: 'Indian Ocean', sr: 'Indijski okean', hr: 'Indijski ocean', bs: 'Indijski okean', sl: 'Indijski ocean', mk: 'Индиски Океан' },
+  'region.Pacific': { en: 'Pacific', sr: 'Pacifik', hr: 'Pacifik', bs: 'Pacifik', sl: 'Pacifik', mk: 'Пацифик' },
   'ui.noSun': { en: 'No sunrise here today', sr: 'Sunce danas ovde ne izlazi', hr: 'Sunce danas ovdje ne izlazi', bs: 'Sunce danas ovdje ne izlazi', sl: 'Sonce tu danes ne vzide', mk: 'Сонцето денес тука не изгрева' },
 };
 
