@@ -24,6 +24,13 @@ const SAT: Record<string, Record<Jezik, string>> = {
   'ui.then': { en: 'then', sr: 'zatim', hr: 'zatim', bs: 'zatim', sl: 'nato', mk: 'потоа' },
   'ui.place': { en: 'Place', sr: 'Mesto', hr: 'Mjesto', bs: 'Mjesto', sl: 'Kraj', mk: 'Место' },
   'ui.followWatch': { en: 'Follow the watch', sr: 'Prati sat', hr: 'Prati sat', bs: 'Prati sat', sl: 'Sledi uri', mk: 'Следи го часовникот' },
+  // Uputstvo "Dodaj na brojcanik". Imena sistemskih dugmadi su na ENGLESKOM, u navodnicima: watchOS nema
+  // srpski, bosanski ni makedonski, a Apple-ove prevode za ostale nismo proverili.
+  'ui.addToFace': { en: 'Add to watch face', sr: 'Dodaj na brojčanik', hr: 'Dodaj na brojčanik', bs: 'Dodaj na brojčanik', sl: 'Dodaj na številčnico', mk: 'Додај на бројчаник' },
+  'ui.face1': { en: 'Touch and hold the watch face.', sr: 'Pritisni i drži brojčanik.', hr: 'Dodirni i drži brojčanik.', bs: 'Pritisni i drži brojčanik.', sl: 'Pritisni in drži številčnico.', mk: 'Допри и држи го бројчаникот.' },
+  'ui.face2': { en: 'Tap “Edit”, then swipe to “Complications”.', sr: 'Dodirni „Edit“, pa prevuci do „Complications“.', hr: 'Dodirni „Edit“, pa povuci do „Complications“.', bs: 'Dodirni „Edit“, pa prevuci do „Complications“.', sl: 'Tapni „Edit“ in podrsaj do „Complications“.', mk: 'Допри „Edit“, па повлечи до „Complications“.' },
+  'ui.face3': { en: 'Tap a slot and choose Astrodial.', sr: 'Dodirni mesto i izaberi Astrodial.', hr: 'Dodirni mjesto i odaberi Astrodial.', bs: 'Dodirni mjesto i izaberi Astrodial.', sl: 'Tapni mesto in izberi Astrodial.', mk: 'Допри место и избери Astrodial.' },
+  'ui.face4': { en: 'Or turn the crown up from the watch face: Astrodial is in the Smart Stack too.', sr: 'Ili okreni krunu nagore sa brojčanika: Astrodial je i u Smart Stack-u.', hr: 'Ili okreni krunu prema gore s brojčanika: Astrodial je i u Smart Stacku.', bs: 'Ili okreni krunu nagore sa brojčanika: Astrodial je i u Smart Stacku.', sl: 'Ali zavrti krono navzgor na številčnici: Astrodial je tudi v Smart Stacku.', mk: 'Или заврти ја круната нагоре од бројчаникот: Astrodial е и во Smart Stack.' },
   // Delovi sveta u izboru mesta (imena iz tz baze).
   'region.Africa': { en: 'Africa', sr: 'Afrika', hr: 'Afrika', bs: 'Afrika', sl: 'Afrika', mk: 'Африка' },
   'region.America': { en: 'Americas', sr: 'Amerika', hr: 'Amerika', bs: 'Amerika', sl: 'Amerika', mk: 'Америка' },

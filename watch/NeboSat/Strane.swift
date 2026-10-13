@@ -189,8 +189,34 @@ struct StranaSledece: View {
           Label(grad, systemImage: "mappin.and.ellipse")
         }
         .padding(.top, 6)
+        NavigationLink { Uputstvo() } label: {
+          Label(Tekst.t("ui.addToFace"), systemImage: "plus.circle")
+        }
       }
       .padding(.horizontal, 8)
     }
+  }
+}
+
+/// "Dodaj na brojcanik": watchOS nema poziv koji iz aplikacije otvara izbor komplikacija na brojcaniku
+/// koji korisnik vec koristi, pa dugme vodi na kratko uputstvo. (Gotov brojcanik jednim dodirom —
+/// `CLKWatchFaceLibrary` — trazi .watchface fajl napravljen na pravom satu; kad ga bude, ide ovde.)
+struct Uputstvo: View {
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 10) {
+        ForEach(1...3, id: \.self) { n in
+          HStack(alignment: .top, spacing: 8) {
+            Text("\(n)").font(.system(size: 13, weight: .bold, design: .rounded))
+              .frame(width: 22, height: 22).background(Brend.indigo, in: Circle())
+            Text(Tekst.t("ui.face\(n)")).font(.system(size: 14, design: .rounded))
+          }
+        }
+        Text(Tekst.t("ui.face4")).font(.system(size: 12, design: .rounded)).foregroundStyle(.secondary).padding(.top, 4)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 6)
+    }
+    .navigationTitle(Tekst.t("ui.addToFace"))
   }
 }

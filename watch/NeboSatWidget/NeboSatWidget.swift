@@ -25,6 +25,15 @@ struct MesecWidget: Widget {
   }
 }
 
+struct LunarWidget: Widget {
+  var body: some WidgetConfiguration {
+    StaticConfiguration(kind: "lunarni", provider: SatProvider()) { LunarKomplikacija(entry: $0) }
+      .configurationDisplayName(Text(verbatim: Tekst.t("ui.lunarDay")))
+      .description(Text(verbatim: Tekst.t("ui.lunarDay")))
+      .supportedFamilies([.accessoryCircular, .accessoryCorner, .accessoryRectangular, .accessoryInline])
+  }
+}
+
 struct SatWidget: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: "sat", provider: SatProvider()) { SatKomplikacija(entry: $0) }
@@ -58,6 +67,7 @@ struct AstroShopKomplikacije: WidgetBundle {
   var body: some Widget {
     NeboKomplikacija()
     MesecWidget()
+    LunarWidget()
     SatWidget()
     AscWidget()
     SledeceWidget()

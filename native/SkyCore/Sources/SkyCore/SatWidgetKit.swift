@@ -82,6 +82,47 @@ public struct MesecKomplikacija: View {
   }
 }
 
+/// Lunarni dan: broj dana od mladog Meseca (1—30) i izgled Meseca.
+@available(watchOS 10.0, *)
+public struct LunarKomplikacija: View {
+  let e: SatEntry
+  @Environment(\.widgetFamily) private var family
+  public init(entry: SatEntry) { e = entry }
+
+  public var body: some View {
+    Group {
+      switch family {
+      case .accessoryInline:
+        Text("\(Tekst.t("ui.lunarDay")) \(e.moon.lunarDay) · \(Tekst.phase(e.moon.phase))")
+      case .accessoryCorner:
+        Text("\(e.moon.lunarDay)").font(.system(size: 22, weight: .bold, design: .rounded))
+          .widgetLabel { Text(Tekst.phase(e.moon.phase)) }
+      case .accessoryRectangular:
+        HStack(spacing: 8) {
+          MoonPhaseView(angle: e.moon.phaseAngle).frame(width: 40, height: 40)
+          VStack(alignment: .leading, spacing: 0) {
+            Text("\(Tekst.t("ui.lunarDay")) \(e.moon.lunarDay)").font(.system(size: 16, weight: .bold, design: .rounded))
+            Text(Tekst.phase(e.moon.phase)).font(.system(size: 13, design: .rounded)).foregroundStyle(.secondary)
+            Text("\(Int((e.moon.illumination * 100).rounded()))%").font(.system(size: 13, weight: .semibold, design: .rounded))
+          }
+          .lineLimit(1).minimumScaleFactor(0.7)
+          Spacer(minLength: 0)
+        }
+      default:
+        // Prsten = koliko je lunarnog meseca proslo; u sredini broj dana.
+        Prsten(Double(e.moon.lunarDay) / 30, boja: .primary, debljina: 4) {
+          VStack(spacing: -2) {
+            Text("\(e.moon.lunarDay)").font(.system(size: 19, weight: .bold, design: .rounded))
+            PlanetGlyph(.moon).fill(.primary).frame(width: 10, height: 10)
+          }
+        }
+      }
+    }
+    .containerBackground(for: .widget) { Color.black }
+    .widgetURL(URL(string: "astrodial://lunar"))
+  }
+}
+
 /// Planetarni sat: simbol vladara, prsten koliko je sata proslo.
 @available(watchOS 10.0, *)
 public struct SatKomplikacija: View {
