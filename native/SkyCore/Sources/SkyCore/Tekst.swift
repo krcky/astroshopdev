@@ -184,3 +184,17 @@ public struct MoonWheelView<Sredina: View>: View {
     .aspectRatio(1, contentMode: .fit)
   }
 }
+
+/// Redni broj slike Meseca 1—30 za ugao faze — isto pravilo kao `mesecSlika` u `src/lib/moon.ts`:
+/// slika n je napravljena za sredinu n-tog dana srednjeg ciklusa, bira se najbliza po uglu.
+public func mesecSlika(angle: Double) -> Int {
+  let a = norm360(angle)
+  var najbliza = 1
+  var razlika = Double.infinity
+  for i in 0..<30 {
+    let u = (Double(i) + 0.5) / 29.530588 * 360
+    let d = min(abs(a - u), 360 - abs(a - u))
+    if d < razlika { razlika = d; najbliza = i + 1 }
+  }
+  return najbliza
+}

@@ -15,7 +15,7 @@ import {
 } from '@/lib/prica';
 import type { Tone } from '@/lib/tone';
 import { useTransitTexts } from '@/lib/transit-texts';
-import { dayKey, pickBrief, strongestMoonHit, type NatalTarget, type Transit } from '@/lib/transits';
+import { dayKey, pickBrief, moonHitsByStrength, strongestMoonHitWithText, type NatalTarget, type Transit } from '@/lib/transits';
 import { pickTvojDan, tvojDanLogFor } from '@/lib/tvoj-dan';
 import { prveRecenice } from '@/lib/tumacenje';
 import { useKrug } from '@/lib/use-krug';
@@ -105,8 +105,9 @@ export function usePricaDana(): PricaDana | null {
     () => (daily ? pickBrief(daily.entries.map((e) => e.transit), pick?.contentKey ?? null) : null),
     [daily, pick]
   );
-  const mesecHit = React.useMemo(
-    () => (daily ? strongestMoonHit(daily.moonDay.hits, pick?.contentKey ?? null) : null),
+  // Svi Mesecevi aspekti dana, najjaci prvi — uzima se prvi koji ima tekst (kao kartica "Mesec danas").
+  const mesecHits = React.useMemo(
+    () => (daily ? moonHitsByStrength(daily.moonDay.hits, pick?.contentKey ?? null) : []),
     [daily, pick]
   );
 
@@ -115,9 +116,9 @@ export function usePricaDana(): PricaDana | null {
     if (pick) k.add(pick.contentKey);
     for (const t of brief?.ide ?? []) k.add(t.contentKey);
     for (const t of brief?.koci ?? []) k.add(t.contentKey);
-    if (mesecHit) k.add(mesecHit.contentKey);
+    for (const h of mesecHits) k.add(h.contentKey);
     return [...k];
-  }, [pick, brief, mesecHit]);
+  }, [pick, brief, mesecHits]);
   const { texts, loading } = useTransitTexts(kljucevi, 'short');
 
   return React.useMemo(() => {
@@ -172,6 +173,7 @@ export function usePricaDana(): PricaDana | null {
     // --- Mesec: isti izvor kao kartica i ekran Mesec
     const faza = phaseDay(danas);
     const znak = signFromLongitude(faza.moonLongitude).sign;
+    const mesecHit = strongestMoonHitWithText(mesecHits, (k) => !!texts.get(k)?.body);
     const hitTekst = mesecHit ? texts.get(mesecHit.contentKey) : undefined;
     const mesec = {
       faza,
@@ -225,5 +227,5 @@ export function usePricaDana(): PricaDana | null {
       savet,
       ucitava: loading,
     };
-  }, [resolved, oblasti, krug, pick, brief, mesecHit, texts, loading, danas, recnik]);
+  }, [resolved, oblasti, krug, pick, brief, mesecHits, texts, loading, danas, recnik]);
 }

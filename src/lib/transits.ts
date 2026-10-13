@@ -602,16 +602,34 @@ export function moonDay(chart: NatalChart, date: Date = new Date(), timeUnknown 
   return { sign: SIGNS[signIndex], ingress, hits, strongest: strongestMoonHit(hits) };
 }
 
+/** Mesecevi aspekti dana od najjaceg ka najslabijem (kriterijum gore), bez `excludeKey`. */
+export function moonHitsByStrength(hits: MoonHit[], excludeKey: string | null = null): MoonHit[] {
+  return [...hits].filter((h) => h.contentKey !== excludeKey).sort(
+    (a, b) =>
+      b.score - a.score ||
+      MOON_ASPECT_RANK[a.aspect.key] - MOON_ASPECT_RANK[b.aspect.key] ||
+      a.exactAt.getTime() - b.exactAt.getTime()
+  );
+}
+
 /**
  * Najjaci Mesecev aspekt dana (kriterijum gore), bez `excludeKey`. Kartica
  * "Mesec danas" izostavlja tranzit koji je vec u "Tvom danu" — tamo Mesec ulazi
  * bas na dan tacnog aspekta, pa bi se isti red pojavio dvaput.
  */
 export function strongestMoonHit(hits: MoonHit[], excludeKey: string | null = null): MoonHit | null {
-  return [...hits].filter((h) => h.contentKey !== excludeKey).sort(
-    (a, b) =>
-      b.score - a.score ||
-      MOON_ASPECT_RANK[a.aspect.key] - MOON_ASPECT_RANK[b.aspect.key] ||
-      a.exactAt.getTime() - b.exactAt.getTime()
-  )[0] ?? null;
+  return moonHitsByStrength(hits, excludeKey)[0] ?? null;
+}
+
+/**
+ * Najjaci Mesecev aspekt dana KOJI IMA TEKST (Ivan, 14.10.2026): "Za tebe" je do tada gledalo
+ * samo najjaci, pa je red nestajao kad bas on nema tekst (npr. Mesec na Ascendent ili MC),
+ * iako tog dana postoje drugi Mesecevi aspekti sa tekstom.
+ */
+export function strongestMoonHitWithText(
+  hits: MoonHit[],
+  imaTekst: (contentKey: string) => boolean,
+  excludeKey: string | null = null
+): MoonHit | null {
+  return moonHitsByStrength(hits, excludeKey).find((h) => imaTekst(h.contentKey)) ?? null;
 }

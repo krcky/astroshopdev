@@ -21,7 +21,7 @@ import {
 } from '@/lib/moon';
 import { useLunarText } from '@/lib/lunar-texts';
 import { useTransitTexts } from '@/lib/transit-texts';
-import { moonDay, strongestMoonHit } from '@/lib/transits';
+import { moonDay, moonHitsByStrength, strongestMoonHitWithText } from '@/lib/transits';
 import { lunarneStavke, prveRecenice, type Stavka } from '@/lib/tumacenje';
 import { tezina } from '@/theme/tipografija';
 import { useNaMrezi } from '@/lib/mreza';
@@ -69,10 +69,14 @@ export function MesecDanasCard({ date, offset, chart, timeUnknown, excludeKey = 
   // Mesecev aspekt na natalnu kartu koji postaje tacan tog dana (`moonDay`),
   // isti ceo dan. Bez njega (0—9 dana godisnje) red se ne prikazuje.
   const dan = React.useMemo(() => moonDay(chart, date, timeUnknown), [chart, date, timeUnknown]);
-  const hit = strongestMoonHit(dan.hits, excludeKey);
-  const kljucevi = React.useMemo(() => (hit ? [hit.contentKey] : []), [hit?.contentKey]);
+  // Najjaci KOJI IMA TEKST (Ivan, 14.10.2026): traze se tekstovi svih aspekata dana, pa red
+  // ne nestaje kad bas najjaci nema tekst. Bez imena tranzita i sata (Ivan, 28.9.2026).
+  const kljucevi = React.useMemo(
+    () => moonHitsByStrength(dan.hits, excludeKey).map((h) => h.contentKey),
+    [dan, excludeKey]
+  );
   const { texts } = useTransitTexts(kljucevi);
-  // Bez imena tranzita i sata (Ivan, 28.9.2026) — red postoji samo kad ima tekst.
+  const hit = strongestMoonHitWithText(dan.hits, (k) => !!texts.get(k)?.body, excludeKey);
   const hitTekst = hit ? texts.get(hit.contentKey) : undefined;
 
   // Red "Mlad/Pun Mesec u tvojoj N. kuci" (`lunationHouse`) ceka tekst astrologa;

@@ -98,6 +98,27 @@ fun Znak(index: Int, velicina: Dp) {
 @Composable
 private fun Naslov(tekst: String) = Text(tekst, color = LILA, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
 
+/** Redni broj slike Meseca 1—30 za ugao faze — isto pravilo kao `mesecSlika` u `src/lib/moon.ts`. */
+fun mesecSlika(ugao: Double): Int {
+    val a = ((ugao % 360) + 360) % 360
+    var najbliza = 1
+    var razlika = Double.MAX_VALUE
+    for (i in 0 until 30) {
+        val u = (i + 0.5) / 29.530588 * 360
+        val d = minOf(kotlin.math.abs(a - u), 360 - kotlin.math.abs(a - u))
+        if (d < razlika) { razlika = d; najbliza = i + 1 }
+    }
+    return najbliza
+}
+
+/** Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.sh`). */
+@Composable
+fun MesecSlika(ugao: Double, modifier: Modifier = Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val id = context.resources.getIdentifier("mesec_%02d".format(mesecSlika(ugao)), "drawable", context.packageName)
+    if (id != 0) androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(id), contentDescription = null, modifier = modifier)
+}
+
 /** Mesec u fazi: taman disk i osvetljeni deo (desno dok raste, levo dok opada). */
 @Composable
 private fun MesecCrtez(ugao: Double, velicina: Dp) {
@@ -128,7 +149,7 @@ fun StranaMesec(s: Slika) {
     Column(Modifier.fillMaxSize().padding(horizontal = 26.dp), verticalArrangement = Arrangement.Center) {
         Naslov(Tekst.planet(Planet.MOON))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            MesecCrtez(s.moon.phaseAngle, 36.dp)
+            MesecSlika(s.moon.phaseAngle, Modifier.size(38.dp))
             Spacer(Modifier.width(8.dp))
             Column {
                 Text(Tekst.t("phase.${s.moon.phase}"), color = SIVA, fontSize = 11.sp, maxLines = 1)
@@ -227,15 +248,14 @@ fun StranaLuna(s: Slika) {
                 drawPath(mesecOsvetljen(p, rr, (i + 0.5) / 29.530588 * 360), if (tekuci) Color.White else Color(0xB8FFFFFF))
                 if (tekuci) drawCircle(LILA, rr + 2f * k, p, style = Stroke(1.5.dp.toPx()))
             }
-            // Veliki Mesec u sredini, u trenutnoj fazi.
-            val sredina = Offset(center.x, center.y - 5f * k)
-            drawCircle(Color(0xFF1C1C22), 44f * k, sredina)
-            drawPath(mesecOsvetljen(sredina, 44f * k, s.moon.phaseAngle), Color(0xFFF3F4FA))
         }
-        Text(
-            "${Tekst.t("ui.lunarDay")} ${s.moon.lunarDay}", color = LILA, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-            modifier = Modifier.align(Alignment.Center).padding(top = 96.dp),
-        )
+        // U SREDINI kruga slika Meseca u trenutnoj fazi (ista ilustracija kao u aplikaciji), a preko nje lunarni dan.
+        MesecSlika(s.moon.phaseAngle, Modifier.fillMaxSize(0.5f))
+        val senka = androidx.compose.ui.graphics.Shadow(Color.Black, blurRadius = 10f)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("${s.moon.lunarDay}", fontSize = 26.sp, fontWeight = FontWeight.Bold, style = androidx.compose.ui.text.TextStyle(shadow = senka))
+            Text(Tekst.t("ui.lunarDay"), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, style = androidx.compose.ui.text.TextStyle(shadow = senka))
+        }
     }
 }
 

@@ -18,7 +18,7 @@ struct StranaMesec: View {
     VStack(alignment: .leading, spacing: 6) {
       Naslov(tekst: Tekst.planet(.moon))
       HStack(spacing: 10) {
-        MoonPhaseView(angle: s.moon.phaseAngle).frame(width: 44, height: 44)
+        MesecSlika(angle: s.moon.phaseAngle).frame(width: 46, height: 46)
         VStack(alignment: .leading, spacing: 0) {
           Text(Tekst.phase(s.moon.phase)).font(.system(size: 13, design: .rounded)).foregroundStyle(.secondary)
           Text("\(Int((s.moon.illumination * 100).rounded()))%").font(.system(size: 24, weight: .bold, design: .rounded))
@@ -51,18 +51,31 @@ struct StranaMesec: View {
   }
 }
 
-/// Krug Mesecevih mena: brojevi lunarnih dana i mene ukrug, tekuci dan istaknut; u sredini veliki
-/// Mesec u trenutnoj fazi i ispod njega koji je lunarni dan.
+/// Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.sh`), po uglu faze.
+struct MesecSlika: View {
+  let angle: Double
+  var body: some View {
+    Image(String(format: "mesec-%02d", mesecSlika(angle: angle))).resizable().scaledToFit()
+  }
+}
+
+/// Krug Mesecevih mena: brojevi lunarnih dana i mene ukrug, tekuci dan istaknut; u SREDINI kruga
+/// slika Meseca u trenutnoj fazi, a preko nje koji je lunarni dan (Ivan, 14.10.2026).
 struct StranaLuna: View {
   let s: Slika
 
   var body: some View {
     MoonWheelView(lunarDay: s.moon.lunarDay) {
-      VStack(spacing: 2) {
-        MoonPhaseView(angle: s.moon.phaseAngle)
-        Text("\(Tekst.t("ui.lunarDay")) \(s.moon.lunarDay)")
-          .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Brend.lila)
-          .lineLimit(1).minimumScaleFactor(0.6)
+      ZStack {
+        MesecSlika(angle: s.moon.phaseAngle)
+        VStack(spacing: -2) {
+          Text("\(s.moon.lunarDay)").font(.system(size: 30, weight: .bold, design: .rounded))
+          Text(Tekst.t("ui.lunarDay")).font(.system(size: 10, weight: .semibold, design: .rounded))
+            .lineLimit(1).minimumScaleFactor(0.6)
+        }
+        // Senka drzi natpis citljivim i preko svetle strane Meseca.
+        .shadow(color: .black, radius: 3).shadow(color: .black.opacity(0.8), radius: 6)
+        .padding(.horizontal, 10)
       }
     }
     .padding(.bottom, 4)

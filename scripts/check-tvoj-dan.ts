@@ -15,7 +15,7 @@ import { toneByRule, transitTone, type Tone } from '../src/lib/tone';
 import {
   dayStatus, pickTvojDan, tvojDanCandidates, tvojDanWindow, tvojDanInfo, TD_ORB, type TvojDanLog,
 } from '../src/lib/tvoj-dan';
-import { dayKey, moonDay, strongestMoonHit } from '../src/lib/transits';
+import { dayKey, moonDay, strongestMoonHit, strongestMoonHitWithText } from '../src/lib/transits';
 import { kartaSaAscendentom } from '../src/lib/test-karta';
 import { triOdeljka, stavkaZaPrikaz, prveRecenice, stavka, lunarneStavke } from '../src/lib/tumacenje';
 
@@ -217,6 +217,11 @@ console.log('\n=== 5b. Licni Mesecev aspekt na kartici "Mesec danas" ===');
     const drugi = strongestMoonHit(m.hits, prvi!.contentKey);
     ok(prvi?.contentKey === m.strongest?.contentKey, `${dayKey(d)}: bez iskljucenja = moonDay.strongest`, prvi?.contentKey);
     ok(!!drugi && drugi.contentKey !== prvi!.contentKey, 'tranzit iz "Tvog dana" se ne ponavlja', drugi?.contentKey);
+    // Najjaci bez teksta -> sledeci koji ga ima; nijedan sa tekstom -> reda nema.
+    const saTekstom = strongestMoonHitWithText(m.hits, (k) => k !== prvi!.contentKey);
+    ok(saTekstom?.contentKey === drugi?.contentKey, 'najjaci bez teksta: ide sledeci sa tekstom', saTekstom?.contentKey);
+    ok(strongestMoonHitWithText(m.hits, () => true)?.contentKey === prvi!.contentKey, 'svi imaju tekst: ostaje najjaci');
+    ok(strongestMoonHitWithText(m.hits, () => false) === null, 'nijedan nema tekst: reda nema');
     proveren = true;
   }
   ok(proveren, 'nadjen dan sa dva Meseceva aspekta');
