@@ -339,6 +339,16 @@ srednji Lilit) — prepisan je za te uređaje i automatski se poredi sa aplikaci
 stepena). Mesto je ono izabrano na tabu „Nebo"; dok ga widget ne zna, krug je bez kuća i ascendenta, sa 0° Ovna levo.
 Osvežava se na 15 minuta; na satu kruna pomera vreme napred i nazad. Bez tumačenja, kao i tab.
 
+**Zodiac Wheel (zasebna aplikacija za sat, od 14.10.2026)** računa još tri stvari koje telefonska aplikacija nema. ⏳ Sve tri čekaju potvrdu astrologa:
+
+| Šta | Kako se računa |
+|---|---|
+| Mesec bez kursa | od poslednjeg **tačnog** glavnog aspekta Meseca (konjunkcija, sekstil, kvadrat, trigon, opozicija) sa bilo kojom od devet planeta — uključujući Uran, Neptun i Pluton — do ulaska Meseca u sledeći znak |
+| Planetarni sat | haldejski red (Saturn, Jupiter, Mars, Sunce, Venera, Merkur, Mesec); dan počinje izlaskom Sunca nad mestom; dan i noć se dele na po 12 jednakih delova; vladar prvog sata je vladar dana u nedelji |
+| Naredni događaji | za 30 dana: promena Mesečevog znaka, četvrti Meseca, ulazak planete u znak (i retrogradno), stanice (planeta postaje retrogradna ili direktna) |
+
+Pitanja za astrologa: (1) da li u Mesec bez kursa ulaze spoljne planete; (2) da li se računa i aspekt koji postaje tačan tek u sledećem znaku; (3) da li planetarni dan počinje izlaskom Sunca ili u ponoć.
+
 ---
 
 ## 8. Stanje tekstova (korpus)

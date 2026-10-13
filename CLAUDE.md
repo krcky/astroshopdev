@@ -1017,6 +1017,20 @@ MESTO NA WIDGETU je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u 
 probni build `….test` ima svoju, prava ostaje slobodna za nalog firme). Android: SharedPreferences. Bez mesta krug je BEZ kuca,
 0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11). Trenutna lokacija
 telefona (GPS) NIJE uvedena (Ivan: "za sada nista") — trazila bi dozvolu u aplikaciji, a na Androidu lokaciju u pozadini.
+ZODIAC WHEEL IMA CETIRI STRANE (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
+nagore: 1 KRUG (kruna pomera vreme, strelice u uglovima po sat), 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
+Mesec bez kursa), 3 SAT (vladar planetarnog sata i do kada, sledeci, ASC i MC, izlazak i zalazak Sunca), 4 SLEDECE (dogadjaji po
+vremenu za 30 dana: promena Mesecevog znaka, pocetak Meseca bez kursa, cetvrti, ulasci planeta u znak, stanice; pa planete i izbor
+mesta). RACUN: `src/lib/sat.ts` -> `Sat.swift` / `Sat.kt`, isti golden (14.10.2026: vremena se slazu do 0,75 s na 52 trenutka);
+trazenje trenutka je SVOJA bisekcija nad longitudom, ne funkcije biblioteke — da sva tri prepisa budu isti algoritam.
+DEFINICIJE CEKAJU BOBANA: Mesec bez kursa = od poslednjeg TACNOG glavnog aspekta (0/60/90/120/180) sa bilo kojom od devet planeta
+(i Uran, Neptun, Pluton) do ulaska u sledeci znak; planetarni sati = haldejski red, dan od izlaska Sunca, dan i noc na po 12,
+dan u nedelji po mesnom vremenu izlaska. Preko polarnog kruga planetarnih sati nema (`null`, strana to kaze).
+NATPISI NA SATU: `Recnik.generated.swift` / `.kt` iz RECNIKA APLIKACIJE (`tsx scripts/native/skycore-recnik.ts`: znaci, planete,
+faze na sest jezika + devet natpisa samo za sat); dogadjaji se pisu BEZ PADEZA ("Mesec → Strelac", "Pluton D", "Merkur R").
+KOMPLIKACIJE (Apple Watch, `SatWidgetKit.swift`): krug, Mesec u znaku (prsten = napredak kroz znak), planetarni sat, ascendent
+(raspored na 5 min), sledeci dogadjaj; svaka otvara svoju stranu (`zodiacwheel://moon|hour|next|wheel`). Wear OS ima samo plocicu
+i komplikaciju sa krugom — ostale FALE. U simulatoru sata `openurl` ne radi: strana se bira argumentom `-strana moon`.
 MESTO NA SATU: grad VREMENSKE ZONE sata, bez dozvole za lokaciju — tabela 418 zona iz tz baze (`scripts/native/zone.tab` ->
 `tsx scripts/native/skycore-zone.ts` -> `Zone.generated.swift` / `.kt`) — ili grad koji korisnik izabere na satu (lista po
 delovima sveta, na dnu strane sa planetama). Imena delova sveta i gradova su iz tz baze, na engleskom (nisu prevedena).
