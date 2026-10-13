@@ -158,6 +158,8 @@ export default function RootLayout() {
                   {/* "Šta je trenutno nebo" sa ikonice "i" pored tocka na Nebu (Ivan, 29.9.2026). */}
                   <Stack.Screen name="nebo-info" options={TUMACENJE_LIST} />
                   <Stack.Screen name="tvoj-dan-info" options={LIST_PO_SADRZAJU} />
+                  {/* Kako se dodaje widget "Nebo sada" — sa kartice na tabu "Nebo" (Ivan, 13.10.2026). */}
+                  <Stack.Screen name="widget-uputstvo" options={LIST_PO_SADRZAJU} />
                   {/* Video price (Ivan, 30.9.2026): sa trake iznad tabova i iz obavestenja. */}
                   <Stack.Screen name="video-price" options={LIST_PO_SADRZAJU} />
                   {/* Ceo lunarni kalendar (ekran Mesec) kao list odozdo do vrha, bez strelice

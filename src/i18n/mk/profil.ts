@@ -64,6 +64,9 @@ export const profil: Recnik['profil'] = {
   },
 
   dugmeProfil: 'Профил',
+  /** Opis avatara za citac ekrana (`components/profil-avatar.tsx`): Sunce i, uz vreme rodjenja, podznak. */
+  avatarOpis: (sunce: string, podznak?: string) =>
+    (podznak ? `Профил. Сонце: ${sunce}. Асцендент: ${podznak}.` : `Профил. Сонце: ${sunce}.`),
 
   premium: {
     naslov: 'Целата слика на твојот ден',

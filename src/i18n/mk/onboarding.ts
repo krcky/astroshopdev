@@ -88,6 +88,8 @@ export const onboarding: Recnik['onboarding'] = {
     naslov: 'Внеси го кодот',
     poslatPre: 'Пративме шестцифрен код на\n',
     poslatPosle: '.',
+    /** Sitno ispod polja za kod (mejl ume da zavrsi u spamu). */
+    spam: 'Ако мејлот не стигнал, провери во Спам.',
     potvrdi: 'Потврди',
     noviPoslat: 'Нов код е пратен.',
     posaljiNovi: 'Прати нов код',

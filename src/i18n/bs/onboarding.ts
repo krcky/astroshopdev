@@ -93,6 +93,8 @@ export const onboarding: Recnik['onboarding'] = {
     /** Podnaslov: `poslatPre` + e-mail (podebljan) + `poslatPosle`. */
     poslatPre: 'Poslali smo šestocifreni kod na\n',
     poslatPosle: '.',
+    /** Sitno ispod polja za kod (mejl ume da zavrsi u spamu). */
+    spam: 'Ako ti mejl nije stigao, pogledaj Spam folder.',
     potvrdi: 'Potvrdi',
     noviPoslat: 'Novi kod je poslan.',
     posaljiNovi: 'Pošalji novi kod',

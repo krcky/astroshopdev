@@ -139,6 +139,31 @@ export const karta: Recnik['karta'] = {
     zatvori: 'Close',
   },
 
+  /** Poziv za widget na tabu "Nebo" (`components/widget-poziv.tsx`) i list `app/widget-uputstvo.tsx`. */
+  widget: {
+    naslov: 'The sky on your Home Screen',
+    opis: 'A widget with this wheel. It’s free and comes with the app.',
+    /** Android: otvara sistemski dijalog za dodavanje. */
+    dodaj: 'Add to Home Screen',
+    /** iOS: otvara list sa koracima. */
+    pokazi: 'Show me how',
+    skloni: 'Dismiss',
+    listNaslov: 'The sky on your Home Screen',
+    listUvod: 'The widget shows this wheel on your phone’s Home Screen and refreshes on its own every 15 minutes. It uses the place you choose here, on the Sky tab.',
+    koraciIos: [
+      'Touch and hold an empty area of the Home Screen until the icons jiggle.',
+      'Tap Edit in the top-left corner, then Add Widget.',
+      'Search for Astro Shop, pick a size and tap Add Widget.',
+    ],
+    koraciAndroid: [
+      'Touch and hold an empty area of the Home Screen.',
+      'Tap Widgets.',
+      'Find Astro Shop and drag “Sky now” onto the screen.',
+    ],
+    napomenaIos: 'There’s a smaller one for the Lock Screen too: touch and hold the Lock Screen, then tap Customize.',
+    slikaA11y: 'Sky now widget',
+  },
+
   /** `app/(tabs)/sky/index.tsx` — "The sky right now". */
   nebo: {
     naslov: 'The sky right now',

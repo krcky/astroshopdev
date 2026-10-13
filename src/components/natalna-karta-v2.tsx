@@ -111,13 +111,16 @@ export function KartaV2({ resolved, osobaId, mesecZnak, aspects, naslovi, zaklju
   return (
     <>
       {/* Spisak pozicija: dve kolone, bez znacenja; dodir otvara tumacenje te tacke (Ivan, 13.10.2026). */}
-      {/* Red = leva i desna pozicija; linija izmedju redova ide od ivice do ivice kartice (pravilo 2). */}
+      {/* JEDNA kartica: red = leva i desna pozicija, vodoravne linije izmedju redova od ivice do ivice (pravilo 2) i
+          jedna uspravna na sredini (Ivan, 13.10.2026; bez linija i posebna kartica za svaku poziciju probani istog dana i
+          vraceni). Redosled PO REDOVIMA (1 2 / 3 4 / …; Ivan, 13.10.2026): Podznak, Sunce / Mesec, Merkur / … / Pluton, MC. */}
       <View className={cn(CARD_SURFACE, 'mx-5 mt-5 overflow-hidden')}>
-        {pozicije.slice(0, pola).map((leva, i) => {
-          const desna = pozicije[i + pola];
+        {Array.from({ length: pola }, (_, i) => {
+          const leva = pozicije[2 * i];
+          const desna = pozicije[2 * i + 1];
           return (
             <View key={leva.tacka} className={cn('flex-row px-1', i < pola - 1 && 'border-b border-border')}>
-              {/* Uspravna linija izmedju kolona: desna ivica leve celije, neprekinuta kroz sve redove. */}
+              {/* Uspravna linija: desna ivica leve celije, neprekinuta kroz sve redove. */}
               <View className="flex-1 border-r border-border"><Pozicija {...leva} onPress={akcija(leva.tacka)?.onPress} /></View>
               <View className="flex-1 pl-1">{desna ? <Pozicija {...desna} onPress={akcija(desna.tacka)?.onPress} /> : null}</View>
             </View>

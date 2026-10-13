@@ -48,6 +48,7 @@ src/
     tvoj-dan-info.tsx  nativni iOS list (formSheet): na osnovu cega je tekst "Tvog dana" + vladar
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     natalna-karta-info.tsx  list "Šta je natalna karta" (ikonica "i" pored tocka): sazetak, legenda aspekata, elementi
+    widget-uputstvo.tsx  list "Nebo na početnom ekranu": tri koraka za dodavanje widgeta (pravilo 27, POZIV)
     nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
     moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
                      i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
@@ -79,6 +80,14 @@ src/
                          ivicu pokazuju tacke planeta; ose iz ASC/MC, ne iz broja kuspide (Ivan, 30.9.2026)
     natalna-karta-prikaz.tsx  cela natalna karta (tocak, trojka, planete, aspekti) — tab "Ti" i strana osobe
     tvoji-ljudi.tsx      kartica "Tvoji ljudi" na tabu "Ti" (druge osobe, "Dodaj osobu")
+    profil-avatar.tsx    NE KORISTI SE (Ivan, 13.10.2026: "vrati user ikonicu"; gore desno je opet ikonica osobe, `profile-button.tsx` i pocetna
+                         nisu vezani za ovo; ostaje za pregled `/dev-avatar` i ako se predomisli). AVATAR PROFILA: znak Sunca u krugu boje elementa + dole desno
+                         beo krug sa indigo znakom podznaka; native stavka trake je `type: 'custom'` (`profilStavka()`), 36 pt — iznad toga
+                         sistem pravi ovalan balon. Znak se centrira po stvarnim granicama putanje (`lib/znak-avatar.ts`, `check:avatar`).
+                         Bez vremena rodjenja nema malog kruga, bez pouzdane zone stara ikonica. Pregled: `/dev-avatar`.
+                         MALI KRUG NE MOZE DA VIRI VAN BALONA (probano 13.10.2026, iOS 26.5): sistemski balon isece sve van okvira
+                         stavke, a sopstveno staklo (SwiftUI i `GlassView`) uz `hidesSharedBackground: true` se na hladnom startu
+                         postavlja 22 pt nize i van desne ivice ekrana (radi samo posle Fast Refresh-a) — ne ponavljati
     polje-mesto.tsx      pretraga grada rodjenja — korak nove osobe, list jednog podatka (`rodjenje-polje`)
     polje-za-kod.tsx     sest cifara koda sa mejla (`DUZINA_KODA`) — prijava (`code.tsx`) i promena emaila
     izbor-odnosa.tsx     "Ko ti je" (redovi sa kvacicom) — korak nove osobe i list izmene
@@ -1000,7 +1009,7 @@ Brojevi i "R" su sistemsko pismo, ne Plus Jakarta Sans. Crtez kruga postoji TRI 
 BEZ RECI u prikazu (simbol, znak, stepen, "R") — isti na svih sest jezika; prevedeni su samo ime i opis u galeriji
 (`Localizable.xcstrings`, `res/values-*/strings.xml`). Svetlo kao aplikacija, crno u tamnom rezimu; sat uvek crn.
 POSLOVNA ODLUKA (Ivan, 13.10.2026): WIDGET NA TELEFONU JE BESPLATAN, deo aplikacije (widget ne moze da postoji bez aplikacije).
-SATOVI (Apple Watch i Wear OS) SU ZASEBNE APLIKACIJE koje se NAPLACUJU PO FIKSNOJ CENI, odvojene od telefonske: svoj bundle id /
+SATOVI (Apple Watch i Wear OS) SU ZASEBNE APLIKACIJE — PROIZVOD SE ZOVE "ZODIAC WHEEL" (Ivan) — koje se NAPLACUJU PO FIKSNOJ CENI, odvojene od telefonske: svoj bundle id /
 paket (`com.krcky.astroshop.nebo` — TRAJAN posle prve objave, potvrditi pre toga), svoj listing, cena se postavlja u App Store
 Connect-u i Google Play konzoli (u kodu nema nicega o naplati). Telefonska aplikacija satu NISTA ne salje i ne ugradjuje ga.
 MESTO NA WIDGETU je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u korenu) -> modul `NeboWidget`
@@ -1032,6 +1041,13 @@ sa `&&` obaraju aplikaciju (prvi nacrt `useNeboWidget`).
 PROVERENO NA IVANOVOM iPHONE-u (13.10.2026, prijavljen nalog): aplikacija upise mesto, mali i srednji widget crtaju kuce i
 ose kao tab "Nebo" (Nis: ASC u Raku; promena na Madrid -> ASC u Blizancima, widget se okrenuo za par sekundi), lista planeta
 se slaze sa aplikacijom. Widget crta pocetak tekuce cetvrti sata, pa kasni za aplikacijom do ~4°.
+POZIV ZA WIDGET NA TABU "NEBO" (Ivan, 13.10.2026): kartica `components/widget-poziv.tsx` ispod dugmadi za vreme — slika malog
+widgeta (`assets/images/widget-nebo.png`, pravi je `swift run SkyRender`), "Besplatan je, dolazi uz aplikaciju", dugme i X. Pokazuje se
+od DRUGE posete tabu, dok je korisnik ne skloni ili ne doda widget (`lib/widget-poziv.ts`, `check:sky` deo 15; `store/widget-poziv.ts`
+PRIPADA TELEFONU, pri odjavi se NE brise). Modul javlja `brojWidgeta` (iOS `getCurrentConfigurations`, Android `getAppWidgetIds`);
+Android dugme zove `dodajNaEkran` (`requestPinAppWidget`, sistemski dijalog), a gde ga pokretac nema i na iOS-u (aplikacija ne moze
+sama da doda widget) otvara list `/widget-uputstvo`. Stari build nema te dve funkcije — zovu se sa `?.`. U Expo Go-u se kartica vidi
+samo u razvoju (`IMA_WIDGET`). NIJE PROVERENO: kartica na tabu (simulator nije prijavljen), nove nativne funkcije (nije gradjeno), Android dijalog.
 APP GROUP NA BESPLATNOM APPLE NALOGU: `xcodebuild -allowProvisioningUpdates` je NE registruje (profil "doesn't match the
 entitlements file's value") — jednom rucno u Xcode-u: target -> Signing & Capabilities -> Team (bez tima grupa ostaje crvena)
 -> App Groups -> kruzna strelica; za AstroShop i NeboWidget. Kad je grupa jednom registrovana, komandna linija prolazi i
@@ -1067,6 +1083,7 @@ npm run check:lunarni-kalendar mreza meseca, glavne faze po danima, pomeranje da
 npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/natal-texts.csv)
 npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
 npm run check:krug        krug zivota: osam oblasti, 12 kuca pokriveno, stanje iz proseka 3 dana, bez vremena rodjenja
+npm run check:avatar      avatar profila: granice putanje znaka, svih 12 znakova centrirano u krugu, mali krug unutar kvadrata
 npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor
 npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpisi
 npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)

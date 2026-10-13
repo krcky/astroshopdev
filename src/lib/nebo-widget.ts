@@ -15,9 +15,31 @@ import { useAuthStore } from '@/store/auth';
 import { useProfileStore } from '@/store/profile';
 import { useMestoNeba, useSkyPlaceStore } from '@/store/sky-place';
 
-type Modul = { postaviMesto(latitude: number | null, longitude: number | null): void };
+type Modul = {
+  postaviMesto(latitude: number | null, longitude: number | null): void;
+  /** Nema ih u buildu starijem od 13.10.2026 — zato se zovu sa `?.`. */
+  brojWidgeta?: () => Promise<number>;
+  /** Samo Android. */
+  dodajNaEkran?: () => Promise<boolean>;
+};
 
 const modul = requireOptionalNativeModule<Modul>('NeboWidget');
+
+/**
+ * Widget postoji samo u sopstvenom buildu. U razvoju (Expo Go) se poziv na tabu "Nebo"
+ * ipak vidi, da moze da se pregleda — dugme tada samo otvara uputstvo.
+ */
+export const IMA_WIDGET = !!modul || __DEV__;
+
+/** Koliko widgeta korisnik vec ima; 0 i kad se ne zna. */
+export async function brojWidgeta(): Promise<number> {
+  try { return (await modul?.brojWidgeta?.()) ?? 0; } catch { return 0; }
+}
+
+/** Android: sistemski dijalog za dodavanje. `false` = nije otvoren, treba pokazati uputstvo. */
+export async function dodajWidgetNaEkran(): Promise<boolean> {
+  try { return (await modul?.dodajNaEkran?.()) ?? false; } catch { return false; }
+}
 
 /** U korenu aplikacije: drzi mesto widgeta jednakim mestu na tabu "Nebo"; pri odjavi ga brise. */
 export function useNeboWidget(): void {

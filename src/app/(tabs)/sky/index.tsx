@@ -15,6 +15,7 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { IznadPreliva, Screen } from '@/components/screen';
 import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
+import { WidgetPoziv } from '@/components/widget-poziv';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
 import { buildSky, danZaKalendar, shiftDays, vremeZaOkret, zoneClock, zoneShift } from '@/lib/sky';
@@ -237,6 +238,9 @@ export default function Sky() {
         <StakloDugme siroko strelica="desno" tekst={tn.sat} onPress={() => pomeriSat(1)} accessibilityLabel={tn.satNapred} />
         <StakloDugme siroko strelica="desno" tekst={tn.dan} onPress={() => pomeriDan(1)} accessibilityLabel={tn.danNapred} />
       </View>
+
+      {/* Poziv za widget (Ivan, 13.10.2026): od druge posete tabu, dok ga korisnik ne skloni ili ne doda widget. */}
+      <WidgetPoziv className="mx-5 mt-4" />
 
       {/* Bez velike trojke (Ivan, 28.9.2026: "samo lista") — Sunce, Mesec i
           Ascendent su prvi redovi liste. */}

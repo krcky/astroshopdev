@@ -1,4 +1,4 @@
-# Astro Shop za Apple Watch — ZASEBNA aplikacija, samo za sat (Ivan, 13.10.2026): prodaje se
+# Zodiac Wheel (Apple Watch) — ZASEBNA aplikacija, samo za sat (Ivan, 13.10.2026): prodaje se
 # odvojeno od telefonske, po fiksnoj ceni (cena se postavlja u App Store Connect-u, ne ovde).
 # Xcode projekat se PRAVI iz ovog fajla i nije u repou:
 #
@@ -31,7 +31,7 @@ targets:
     info:
       path: NeboSat/Info.plist
       properties:
-        CFBundleDisplayName: Astro Shop
+        CFBundleDisplayName: Zodiac Wheel
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
@@ -54,7 +54,7 @@ targets:
     info:
       path: NeboSatWidget/Info.plist
       properties:
-        CFBundleDisplayName: Astro Shop
+        CFBundleDisplayName: Zodiac Wheel
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:

@@ -67,6 +67,9 @@ export const profil: Recnik['profil'] = {
 
   /** `components/profile-button.tsx` — top-right button. */
   dugmeProfil: 'Profile',
+  /** Opis avatara za citac ekrana (`components/profil-avatar.tsx`): Sunce i, uz vreme rodjenja, podznak. */
+  avatarOpis: (sunce: string, podznak?: string) =>
+    (podznak ? `Profile. Sun: ${sunce}. Ascendant: ${podznak}.` : `Profile. Sun: ${sunce}.`),
 
   /** `app/premium.tsx` — paywall. */
   premium: {

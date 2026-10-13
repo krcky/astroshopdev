@@ -11,6 +11,7 @@
  * iz `astronomy-engine` nego iz nase formule. Ako se neko poigra sa njima,
  * greska se na ekranu ne vidi — broj i dalje izgleda kao broj.
  */
+import { trebaPozivZaWidget } from '../src/lib/widget-poziv';
 import { planetPositions } from '../src/lib/astro';
 import {
   buildSky, danZaKalendar, istiDanUKalendaru, izKalendara, naDan, shiftDays, vremeZaOkret, zoneClock, zoneShift,
@@ -479,6 +480,15 @@ ok(Math.max(...brzine) - Math.min(...brzine) > 3, 'ascendent se ne krece ravnome
 // Polarna sirina: ravnomerno, ne puca.
 const polarno = vremeZaOkret(TRENUTAK, 69.6492, 18.9553, 90);
 ok(Math.abs(polarno.getTime() - TRENUTAK.getTime() - 86_164_090.5 / 4) < 5, 'iznad polarnog kruga ide ravnomerno');
+
+console.log('\n=== 15. Poziv za widget na tabu "Nebo" ===');
+const poziv = { imaWidget: true, posete: 1, sklonjeno: false, naEkranu: 0 as number | null };
+ok(trebaPozivZaWidget(poziv), 'od druge posete se pokazuje');
+ok(!trebaPozivZaWidget({ ...poziv, posete: 0 }), 'pri prvoj poseti ne');
+ok(!trebaPozivZaWidget({ ...poziv, sklonjeno: true }), 'sklonjena se ne vraca');
+ok(!trebaPozivZaWidget({ ...poziv, naEkranu: 1 }), 'ko widget vec ima, ne vidi je');
+ok(!trebaPozivZaWidget({ ...poziv, naEkranu: null }), 'dok se ne zna ima li widgeta, ceka');
+ok(!trebaPozivZaWidget({ ...poziv, imaWidget: false }), 'u buildu bez widgeta je nema');
 
 console.log(fail ? `\n${fail} PROVERA PALO\n` : '\nSve provere prosle.\n');
 process.exit(fail ? 1 : 0);

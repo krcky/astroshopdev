@@ -178,6 +178,8 @@ export default function Code() {
           onChange={(v) => { setCode(v); setError(null); }}
         />
 
+        <Text variant="muted" className="mt-3 px-2 text-center text-sm">{tk.spam}</Text>
+
         {error && <Text className="mt-4 px-2 text-center text-sm text-destructive">{error}</Text>}
         {resentAt && !error && (
           <Text variant="muted" className="mt-4 text-center text-sm">{tk.noviPoslat}</Text>

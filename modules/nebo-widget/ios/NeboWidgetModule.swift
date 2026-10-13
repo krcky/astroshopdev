@@ -32,6 +32,14 @@ public class NeboWidgetModule: Module {
       }
       WidgetCenter.shared.reloadAllTimelines()
     }
+
+    /// Koliko widgeta "Nebo sada" korisnik vec ima (pocetni i zakljucani ekran) —
+    /// kartica "Dodaj" na tabu "Nebo" se tada ne prikazuje.
+    AsyncFunction("brojWidgeta") { (promise: Promise) in
+      WidgetCenter.shared.getCurrentConfigurations { rezultat in
+        promise.resolve((try? rezultat.get())?.count ?? 0)
+      }
+    }
   }
 
 }

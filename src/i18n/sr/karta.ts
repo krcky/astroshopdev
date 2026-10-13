@@ -134,6 +134,31 @@ export const karta = {
     zatvori: 'Zatvori',
   },
 
+  /** Poziv za widget na tabu "Nebo" (`components/widget-poziv.tsx`) i list `app/widget-uputstvo.tsx`. */
+  widget: {
+    naslov: 'Nebo na početnom ekranu',
+    opis: 'Vidžet sa ovim krugom. Besplatan je, dolazi uz aplikaciju.',
+    /** Android: otvara sistemski dijalog za dodavanje. */
+    dodaj: 'Dodaj na ekran',
+    /** iOS: otvara list sa koracima. */
+    pokazi: 'Pokaži kako',
+    skloni: 'Skloni',
+    listNaslov: 'Nebo na početnom ekranu',
+    listUvod: 'Vidžet pokazuje ovaj krug na početnom ekranu telefona i sam se osvežava na svakih 15 minuta. Koristi mesto koje izabereš ovde, na tabu Nebo.',
+    koraciIos: [
+      'Drži prst na praznom mestu početnog ekrana dok ikonice ne zadrhte.',
+      'Dodirni „Uredi“ (Edit) gore levo, pa „Dodaj vidžet“ (Add Widget).',
+      'Potraži Astro Shop, izaberi veličinu i dodirni „Dodaj vidžet“.',
+    ],
+    koraciAndroid: [
+      'Drži prst na praznom mestu početnog ekrana.',
+      'Dodirni „Vidžeti“.',
+      'Nađi Astro Shop i prevuci „Nebo sada“ na ekran.',
+    ],
+    napomenaIos: 'Postoji i manji, za zaključani ekran: drži prst na zaključanom ekranu, pa dodirni „Prilagodi“ (Customize).',
+    slikaA11y: 'Vidžet Nebo sada',
+  },
+
   /** `app/(tabs)/sky/index.tsx` — "Trenutno na nebu". */
   nebo: {
     naslov: 'Trenutno na nebu',

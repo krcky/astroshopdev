@@ -108,6 +108,8 @@ export const onboarding = {
     /** Podnaslov: `poslatPre` + email (podebljan) + `poslatPosle`. */
     poslatPre: 'Poslali smo šestocifreni kod na\n',
     poslatPosle: '.',
+    /** Sitno ispod polja za kod (mejl ume da zavrsi u spamu). */
+    spam: 'Ako ti mejl nije stigao, pogledaj Spam folder.',
     potvrdi: 'Potvrdi',
     noviPoslat: 'Novi kod je poslat.',
     posaljiNovi: 'Pošalji novi kod',

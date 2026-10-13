@@ -71,6 +71,9 @@ export const profil = {
 
   /** `components/profile-button.tsx` — dugme gore desno. */
   dugmeProfil: 'Profil',
+  /** Opis avatara za citac ekrana (`components/profil-avatar.tsx`): Sunce i, uz vreme rodjenja, podznak. */
+  avatarOpis: (sunce: string, podznak?: string) =>
+    (podznak ? `Profil. Sunce: ${sunce}. Podznak: ${podznak}.` : `Profil. Sunce: ${sunce}.`),
 
   /** `app/premium.tsx` — paywall. */
   premium: {

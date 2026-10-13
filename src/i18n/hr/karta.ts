@@ -105,6 +105,31 @@ export const karta: Recnik['karta'] = {
     zatvori: 'Zatvori',
   },
 
+  /** Poziv za widget na tabu "Nebo" (`components/widget-poziv.tsx`) i list `app/widget-uputstvo.tsx`. */
+  widget: {
+    naslov: 'Nebo na početnom zaslonu',
+    opis: 'Widget s ovim krugom. Besplatan je, dolazi uz aplikaciju.',
+    /** Android: otvara sistemski dijalog za dodavanje. */
+    dodaj: 'Dodaj na zaslon',
+    /** iOS: otvara list sa koracima. */
+    pokazi: 'Pokaži kako',
+    skloni: 'Makni',
+    listNaslov: 'Nebo na početnom zaslonu',
+    listUvod: 'Widget prikazuje ovaj krug na početnom zaslonu mobitela i sam se osvježava svakih 15 minuta. Koristi mjesto koje odabereš ovdje, na kartici Nebo.',
+    koraciIos: [
+      'Drži prst na praznom mjestu početnog zaslona dok ikone ne zatrepere.',
+      'Dodirni „Uredi“ gore lijevo, pa „Dodaj widget“.',
+      'Potraži Astro Shop, odaberi veličinu i dodirni „Dodaj widget“.',
+    ],
+    koraciAndroid: [
+      'Drži prst na praznom mjestu početnog zaslona.',
+      'Dodirni „Widgeti“.',
+      'Nađi Astro Shop i povuci „Nebo sada“ na zaslon.',
+    ],
+    napomenaIos: 'Postoji i manji, za zaključani zaslon: drži prst na zaključanom zaslonu, pa dodirni „Prilagodi“.',
+    slikaA11y: 'Widget Nebo sada',
+  },
+
   nebo: {
     naslov: 'Trenutačno na nebu',
     infoA11y: 'Što je trenutačno nebo?',
