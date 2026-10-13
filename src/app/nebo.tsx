@@ -168,7 +168,7 @@ export default function Nebo() {
   };
 
   return (
-    <Screen label={tn.naslov} padded={false} tint="pink" pushed tabBarSpace={false}>
+    <Screen label={tn.naslov} padded={false} pushed tabBarSpace={false}>
       {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
           preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
       <IznadPreliva

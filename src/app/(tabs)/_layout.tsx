@@ -131,7 +131,7 @@ export default function TabsLayout() {
           <NativeTabs.Trigger.Label>{t.danas.tabovi.ti}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="ostalo" disableAutomaticContentInsets>
-          <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.circle', selected: 'ellipsis.circle.fill' }} md="more_horiz" />
+          <NativeTabs.Trigger.Icon sf="ellipsis" md="more_horiz" />
           <NativeTabs.Trigger.Label>{t.danas.tabovi.ostalo}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       </NativeTabs>

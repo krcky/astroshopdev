@@ -4,7 +4,7 @@
 import type { Recnik } from '../sr';
 
 export const ostalo: Recnik['ostalo'] = {
-  naslov: 'More',
+  naslov: 'Astro products',
 
   uporedni: {
     oznaka: 'Compatibility',
@@ -25,7 +25,7 @@ export const ostalo: Recnik['ostalo'] = {
 
   proizvodi: {
     oznaka: 'Shop',
-    naslov: 'Products',
+    naslov: 'To buy',
     napomena: 'An arrow on the right means the purchase is completed on astroshop.rs.',
     izlazA11y: 'Opens the astroshop.rs website',
     besplatno: 'Free',

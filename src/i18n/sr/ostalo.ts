@@ -5,7 +5,7 @@
  */
 export const ostalo = {
   /** Natpis taba ima `danas.tabovi.ostalo`; ovo je naslov strane. */
-  naslov: 'Ostalo',
+  naslov: 'Astro proizvodi',
 
   /** Velika kartica "Uporedni horoskop" na vrhu taba. */
   uporedni: {
@@ -29,7 +29,7 @@ export const ostalo = {
   /** Lista "Proizvodi". */
   proizvodi: {
     oznaka: 'Prodavnica',
-    naslov: 'Proizvodi',
+    naslov: 'Za kupovinu',
     napomena: 'Strelica sa desne strane znači da se kupovina završava na astroshop.rs.',
     /** Dodaje se uz ime za citac ekrana kad red vodi na sajt. */
     izlazA11y: 'Otvara sajt astroshop.rs',

@@ -21,8 +21,9 @@ export default function OstaloTab() {
   if (!hydrated) return <View className="flex-1 bg-grouped" />;
   if (!resolved) return <Redirect href="/" />;
 
+  // Roze preliv (Ivan, 14.10.2026): isti koji je imao tab "Nebo", sada je ovde; ekran "Trenutno na nebu" je bez preliva.
   return (
-    <Screen label={t.ostalo.naslov} right={<ProfileButton />}>
+    <Screen label={t.ostalo.naslov} tint="pink" right={<ProfileButton />}>
       <OstaloSadrzaj />
     </Screen>
   );

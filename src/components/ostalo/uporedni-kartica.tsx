@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Pressable, View } from 'react-native';
-import { Heart, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 
+import { Ampersand } from '@/components/ampersand';
 import { Button } from '@/components/ui/button';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
@@ -16,7 +17,7 @@ const KRUG = 60;
 /**
  * Velika kartica "Uporedni horoskop" na vrhu taba "Ostalo" (Ivan, 14.10.2026: ono sto ljudi najvise vole, zato je
  * prva i najveca). Levo korisnikov znak, desno prazan krug "Izaberi znak"; i krug i dugme vode na `/uporedni`.
- * Bez pouzdanog znaka (`null`) levo stoji samo "Ti" — ekran poredjenja kaze zasto (pravilo 4).
+ * Izmedju znakova je "&" (`components/ampersand.tsx`), ne srce. Bez pouzdanog znaka (`null`) levo stoji samo "Ti" — ekran poredjenja kaze zasto (pravilo 4).
  */
 export function UporedniKartica({ znak, onPress }: { znak: ZodiacSign | null; onPress: () => void }) {
   const t = useT().ostalo.uporedni;
@@ -40,10 +41,8 @@ export function UporedniKartica({ znak, onPress }: { znak: ZodiacSign | null; on
           <Text variant="caption" className="text-center text-foreground">{znak ? t.ti(znak.name) : t.tiBezZnaka}</Text>
         </View>
 
-        <View
-          className="mt-4 items-center justify-center"
-          style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: `${brand.indigo}1A` }}>
-          <Heart size={15} color={brand.indigo} fill={brand.indigo} strokeWidth={0} />
+        <View className="mt-2">
+          <Ampersand visina={44} />
         </View>
 
         <View className="w-24 items-center gap-2">
@@ -56,9 +55,12 @@ export function UporedniKartica({ znak, onPress }: { znak: ZodiacSign | null; on
         </View>
       </Pressable>
 
-      <Button className="mt-5 self-start" onPress={onPress}>
-        <Text>{t.dugme}</Text>
-      </Button>
+      {/* Isto dugme kao "Saznaj više" na pocetnoj (Ivan, 14.10.2026): `compact`, `istaknuto`, omotac sa senkom. */}
+      <View className="mt-5 self-center">
+        <Button size="compact" istaknuto className="h-auto px-5 py-[10px]" onPress={onPress}>
+          <Text className="text-[16px] leading-[20px]">{t.dugme}</Text>
+        </Button>
+      </View>
     </View>
   );
 }

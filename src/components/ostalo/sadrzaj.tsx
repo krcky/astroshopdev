@@ -55,8 +55,9 @@ export function OstaloSadrzaj({ znak: znakProp }: {
     }
   };
 
+  // `pt-4`: prva kartica malo nize od zaglavlja (Ivan, 14.10.2026).
   return (
-    <View className="gap-3 pb-6">
+    <View className="gap-3 pb-6 pt-4">
       <UporedniKartica znak={znak} onPress={() => router.push('/uporedni')} />
       <NeboKartica onPress={() => router.push('/nebo')} />
 

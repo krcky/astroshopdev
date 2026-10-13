@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Heart, HeartCrack, Plus } from 'lucide-react-native';
 
+import { Ampersand } from '@/components/ampersand';
 import { useMojZnak } from '@/components/ostalo/moj-znak';
 import { SheetScroll } from '@/components/sheet';
 import { TumacenjeTekst } from '@/components/tumacenje-tekst';
@@ -68,10 +69,8 @@ export default function Uporedni() {
                 <ZnakIkona znak={moj.key} element={moj.element} size={KRUG} accessibilityLabel={moj.name} />
                 <Text variant="caption" className="text-center text-foreground">{te.tvojZnak}</Text>
               </View>
-              <View
-                className="mt-3 items-center justify-center"
-                style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: `${brand.indigo}1A` }}>
-                <Heart size={15} color={brand.indigo} fill={brand.indigo} strokeWidth={0} />
+              <View className="mt-1">
+                <Ampersand visina={44} />
               </View>
               <View className="w-24 items-center gap-2">
                 {drugi ? (

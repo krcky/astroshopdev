@@ -73,7 +73,7 @@ src/
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
     prica-znak.tsx   PRICA O ZNAKU (pravilo 25) — devet slika o Suncevom znaku, sa prstena oko Sunca u velikoj trojci ("Ti")
     video-price.tsx  "Tvoj video" — LIST odozdo (traka iznad tabova, obavestenje, "Podeli" u prici): pregled, "Podeli", "Sačuvaj u Fotografije"
-    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), ostalo (Ostalo — od 14.10.2026 umesto taba Nebo; ikonica tri tackice)
+    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), ostalo (natpis taba "Ostalo", NASLOV STRANE "Istraži" — `ostalo.naslov`; od 14.10.2026 umesto taba Nebo; ikonica goloh tri tackice, SF `ellipsis`, bez kruga)
                      ostalo = Uporedni horoskop (prva i najveca kartica), Trenutno na nebu (-> `/nebo`) i lista PROIZVODI: JEDNA lista (Ivan) za ono
                      sto se kupuje u aplikaciji i ono sto vodi na sajt (strelica nagore); `components/ostalo/`, katalog `lib/proizvodi.ts`
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
@@ -89,6 +89,7 @@ src/
                          ivicu pokazuju tacke planeta; ose iz ASC/MC, ne iz broja kuspide (Ivan, 30.9.2026)
     natalna-karta-prikaz.tsx  cela natalna karta (tocak, trojka, planete, aspekti) — tab "Ti" i strana osobe
     tvoji-ljudi.tsx      kartica "Tvoji ljudi" na tabu "Ti" (druge osobe, "Dodaj osobu")
+    ampersand.tsx        "&" izmedju dva znaka na kartici i listu Uporednog horoskopa: glif Playfair Display Italic (SIL OFL 1.1) kao SVG putanja, svetlo siv (Ivan, 14.10.2026)
     profil-avatar.tsx    NE KORISTI SE (Ivan, 13.10.2026: "vrati user ikonicu"; gore desno je opet ikonica osobe, `profile-button.tsx` i pocetna
                          nisu vezani za ovo; ostaje za pregled `/dev-avatar` i ako se predomisli). AVATAR PROFILA: znak Sunca u krugu boje elementa + dole desno
                          beo krug sa indigo znakom podznaka; native stavka trake je `type: 'custom'` (`profilStavka()`), 36 pt — iznad toga
@@ -1041,9 +1042,9 @@ DEFINICIJE CEKAJU BOBANA: Mesec bez kursa = od poslednjeg TACNOG glavnog aspekta
 dan u nedelji po mesnom vremenu izlaska. Preko polarnog kruga planetarnih sati nema (`null`, strana to kaze).
 NATPISI NA SATU: `Recnik.generated.swift` / `.kt` iz RECNIKA APLIKACIJE (`tsx scripts/native/skycore-recnik.ts`: znaci, planete,
 faze na sest jezika + devet natpisa samo za sat); dogadjaji se pisu BEZ PADEZA ("Mesec → Strelac", "Pluton D", "Merkur R").
-KOMPLIKACIJE (Apple Watch, `SatWidgetKit.swift`): krug, Mesec u znaku (prsten = napredak kroz znak), planetarni sat, ascendent
+KOMPLIKACIJE (Apple Watch, `SatWidgetKit.swift`): krug, Mesec u znaku (prsten = napredak kroz znak), LUNARNI DAN, planetarni sat, ascendent
 (raspored na 5 min), sledeci dogadjaj; svaka otvara svoju stranu (`astrodial://moon|hour|next|wheel`). Wear OS ima samo plocicu
-i komplikaciju sa krugom — ostale FALE. U simulatoru sata `openurl` ne radi: strana se bira argumentom `-strana moon`.
+i komplikaciju sa krugom — ostale FALE. U simulatoru sata `openurl` ne radi: strana se bira argumentom `-strana moon`. "DODAJ NA BROJCANIK" (dno strane Sledece) je UPUTSTVO u tri koraka: watchOS nema poziv koji otvara izbor komplikacija; gotov brojcanik jednim dodirom (`CLKWatchFaceLibrary`) trazi .watchface fajl sa pravog sata — kad ga bude.
 MESTO NA SATU: grad VREMENSKE ZONE sata, bez dozvole za lokaciju — tabela 418 zona iz tz baze (`scripts/native/zone.tab` ->
 `tsx scripts/native/skycore-zone.ts` -> `Zone.generated.swift` / `.kt`) — ili grad koji korisnik izabere na satu (lista po
 delovima sveta, na dnu strane sa planetama). Imena delova sveta i gradova su iz tz baze, na engleskom (nisu prevedena).
