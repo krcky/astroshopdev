@@ -566,7 +566,8 @@ function BackButton() {
   const t = useT();
   return (
     <Pressable
-      onPress={() => router.back()}
+      // Bez istorije (npr. widget "Nebo sada" otvara `/nebo` pravo kroz kapiju, 14.10.2026) nazad vodi na pocetnu.
+      onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
       accessibilityRole="button"
       accessibilityLabel={t.opste.nazad}
       className="-ml-3 h-11 w-11 items-center justify-center active:opacity-60">

@@ -13,7 +13,6 @@ import { istiPogodak, type Pogodak } from '@/lib/wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { IznadPreliva, Screen } from '@/components/screen';
-import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
 import { WidgetPoziv } from '@/components/widget-poziv';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
@@ -30,6 +29,9 @@ import { neutral } from '@/theme/tokens';
 /**
  * Trenutno na nebu — gde su planete SADA, nad gradom iz profila.
  *
+ * OD 14.10.2026 nije tab nego obican ekran: otvara se sa kartice na tabu "Ostalo" (`app/(tabs)/ostalo`) i sa
+ * widgeta (`?tab=sky` kroz kapiju). Zato je `pushed` (strelica nazad) i bez prostora za traku tabova.
+ *
  * Razlika u odnosu na tab "Karta": tamo je nebo zamrznuto na trenutak rodjenja
  * i tice se samo korisnika, ovde se pomera dok gledas i isto je za sve.
  *
@@ -42,7 +44,7 @@ import { neutral } from '@/theme/tokens';
  * retrogradnost — a ne tekst astrologa, pa redovi nigde ne vode. Tumacenja
  * tranzita na licnu kartu su i dalje u tabu "Tranziti", jer se tamo placaju.
  */
-export default function Sky() {
+export default function Nebo() {
   const t = useT();
   const tn = t.karta.nebo;
   const hydrated = useProfileStore((s) => s.hydrated);
@@ -166,7 +168,7 @@ export default function Sky() {
   };
 
   return (
-    <Screen label={tn.naslov} padded={false} tint="pink" right={<ProfileButton />}>
+    <Screen label={tn.naslov} padded={false} tint="pink" pushed tabBarSpace={false}>
       {/* Krug malo navise, blize zaglavlju (Ivan, 28.9.2026; isto na "Ti"), i IZNAD
           preliva — beo, ne obojen roze (Ivan, 30.9.2026). */}
       <IznadPreliva

@@ -1,5 +1,5 @@
 /**
- * Recnik za Zodiac Wheel (sat): imena znakova, planeta i Mesecevih faza iz RECNIKA APLIKACIJE
+ * Recnik za Astrodial (sat): imena znakova, planeta i Mesecevih faza iz RECNIKA APLIKACIJE
  * (`src/i18n`, pravilo 26), na svih sest jezika, plus nekoliko natpisa koje ima samo sat.
  * Tako sat i aplikacija zovu Skorpiju isto, a nov jezik u aplikaciji stize i na sat.
  *

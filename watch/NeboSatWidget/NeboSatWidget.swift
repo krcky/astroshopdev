@@ -8,7 +8,7 @@ import WidgetKit
 struct NeboKomplikacija: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: "nebo", provider: NeboProvider()) { entry in
-      NeboPrikaz(entry: entry).widgetURL(URL(string: "zodiacwheel://wheel"))
+      NeboPrikaz(entry: entry).widgetURL(URL(string: "astrodial://wheel"))
     }
     .configurationDisplayName(Text("widget.ime", comment: "Ime komplikacije"))
     .description(Text("widget.opis", comment: "Opis komplikacije"))

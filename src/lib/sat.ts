@@ -1,5 +1,5 @@
 /**
- * Racun za "Zodiac Wheel" — zasebnu aplikaciju za sat (pravilo 27 u CLAUDE.md).
+ * Racun za "Astrodial" — zasebnu aplikaciju za sat (pravilo 27 u CLAUDE.md).
  *
  * Telefonska aplikacija ovo NE prikazuje; fajl postoji jer je `src/lib` izvor istine za
  * svaki racun neba: odavde se pravi `golden.json`, a Swift (`native/SkyCore/.../Sat.swift`)

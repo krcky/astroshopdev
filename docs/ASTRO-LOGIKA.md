@@ -339,7 +339,7 @@ srednji Lilit) — prepisan je za te uređaje i automatski se poredi sa aplikaci
 stepena). Mesto je ono izabrano na tabu „Nebo"; dok ga widget ne zna, krug je bez kuća i ascendenta, sa 0° Ovna levo.
 Osvežava se na 15 minuta; na satu kruna pomera vreme napred i nazad. Bez tumačenja, kao i tab.
 
-**Zodiac Wheel (zasebna aplikacija za sat, od 14.10.2026)** računa još tri stvari koje telefonska aplikacija nema. ⏳ Sve tri čekaju potvrdu astrologa:
+**Astrodial (zasebna aplikacija za sat, od 14.10.2026)** računa još tri stvari koje telefonska aplikacija nema. ⏳ Sve tri čekaju potvrdu astrologa:
 
 | Šta | Kako se računa |
 |---|---|

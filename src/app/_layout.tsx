@@ -191,6 +191,10 @@ export default function RootLayout() {
                   {/* Nebo (Ivan, 28.9.2026): kalendar sa dugmeta sa datumom, visok koliko
                       sadrzaj; izbor mesta sa dugmeta sa gradom, do vrha — lista gradova
                       raste dok se kuca, a list koji menja visinu bi skakao. */}
+                  {/* Tab "Ostalo" (Ivan, 14.10.2026): Uporedni horoskop je SIV list do vrha (na njemu su bele kartice),
+                      proizvod sa sajta ili sat je list visok koliko sadrzaj. Nebo je obican ekran (`app/nebo.tsx`). */}
+                  <Stack.Screen name="uporedni" options={{ ...TUMACENJE_LIST, contentStyle: { backgroundColor: neutral.grouped } }} />
+                  <Stack.Screen name="proizvod" options={LIST_PO_SADRZAJU} />
                   <Stack.Screen name="sky-datum" options={LIST_PO_SADRZAJU} />
                   <Stack.Screen name="sky-place" options={TUMACENJE_LIST} />
                   {/* Pitaj astrologa (29.9.2026): odgovor je list kao tumacenje; pisanje je

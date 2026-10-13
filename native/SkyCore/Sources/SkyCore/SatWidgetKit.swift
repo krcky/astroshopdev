@@ -1,5 +1,5 @@
-// Komplikacije Zodiac Wheel-a (sat): Mesec u znaku, planetarni sat, ascendent i sledeci
-// dogadjaj. Svaka otvara SVOJU stranu aplikacije (`zodiacwheel://moon` …). Krug je u
+// Komplikacije Astrodial-a (sat): Mesec u znaku, planetarni sat, ascendent i sledeci
+// dogadjaj. Svaka otvara SVOJU stranu aplikacije (`astrodial://moon` …). Krug je u
 // `NeboWidgetKit.swift`.
 #if os(watchOS)
 import SwiftUI
@@ -78,7 +78,7 @@ public struct MesecKomplikacija: View {
       }
     }
     .containerBackground(for: .widget) { Color.black }
-    .widgetURL(URL(string: "zodiacwheel://moon"))
+    .widgetURL(URL(string: "astrodial://moon"))
   }
 }
 
@@ -107,7 +107,7 @@ public struct SatKomplikacija: View {
       }
     }
     .containerBackground(for: .widget) { Color.black }
-    .widgetURL(URL(string: "zodiacwheel://hour"))
+    .widgetURL(URL(string: "astrodial://hour"))
   }
 }
 
@@ -139,7 +139,7 @@ public struct AscKomplikacija: View {
       }
     }
     .containerBackground(for: .widget) { Color.black }
-    .widgetURL(URL(string: "zodiacwheel://hour"))
+    .widgetURL(URL(string: "astrodial://hour"))
   }
 }
 
@@ -171,7 +171,7 @@ public struct SledeceKomplikacija: View {
       }
     }
     .containerBackground(for: .widget) { Color.black }
-    .widgetURL(URL(string: "zodiacwheel://next"))
+    .widgetURL(URL(string: "astrodial://next"))
   }
 }
 #endif

@@ -64,7 +64,7 @@ import kotlin.math.min
 import kotlin.math.roundToLong
 
 /**
- * Zodiac Wheel za Wear OS: cetiri strane, prevlacenjem nagore — krug, Mesec, Sat, Sledece
+ * Astrodial za Wear OS: cetiri strane, prevlacenjem nagore — krug, Mesec, Sat, Sledece
  * (`Strane.kt`). KRUNA ILI OBOD POMERAJU VREME — jedan zarez je 15 minuta; dok
  * je vreme pomereno, pise koje je, a dodir na taj natpis vraca na sada. Na dnu liste je izbor mesta.
  */

@@ -21,7 +21,7 @@ android {
   compileSdk 36
 
   defaultConfig {
-    applicationId 'com.krcky.astroshop.nebo'
+    applicationId 'com.krcky.astrodial'
     minSdk 30
     targetSdk 35
     versionCode 1

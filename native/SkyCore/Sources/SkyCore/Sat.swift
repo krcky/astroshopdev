@@ -1,4 +1,4 @@
-// PREPIS `src/lib/sat.ts` — racun za Zodiac Wheel (sat): Mesec u znaku, Mesec bez
+// PREPIS `src/lib/sat.ts` — racun za Astrodial (sat): Mesec u znaku, Mesec bez
 // kursa, planetarni sat i naredni dogadjaji. Menja se TAMO, pa ovde i u Kotlin-u;
 // `npm run check:skycore` poredi sa `golden.json`. Trazenje trenutka je ista
 // bisekcija, korak po korak, kao u TS-u — ne funkcije biblioteke.

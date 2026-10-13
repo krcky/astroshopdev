@@ -38,6 +38,8 @@ export const danas: Recnik['danas'] = {
     pitaj: 'Прашај',
     ti: 'Ти',
     nebo: 'Небо',
+    /** Peti tab (Ivan, 14.10.2026): Uporedni horoskop, nebo sada i proizvodi — `ostalo.ts`. */
+    ostalo: 'Друго',
   },
 
   pocetna: {

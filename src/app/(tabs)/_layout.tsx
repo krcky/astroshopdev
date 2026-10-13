@@ -15,11 +15,12 @@ import { useT } from '@/i18n';
  * Material na Androidu) umesto rucno crtane lebdece trake (Ivan, 26.9.2026).
  * Sistem sam crta staklo, animacije i skrivanje na skrol.
  *
- * Tabovi (Ivan, 26.9.2026): Danas · Tranziti · Pitaj · Ti · Nebo. "Ti" je
- * natalna karta — ono sto se ne menja; "Nebo" je stanje neba sada; "Pitaj" je
- * pitanje astrologu. Profil NIJE tab — otvara se dugmetom gore desno
+ * Tabovi (Ivan, 26.9.2026): Danas · Tranziti · Pitaj · Ti · Ostalo. "Ti" je
+ * natalna karta — ono sto se ne menja; "Pitaj" je pitanje astrologu; "Ostalo" (14.10.2026, umesto
+ * taba "Nebo") je strana sa karticama: Uporedni horoskop, Trenutno na nebu (`app/nebo.tsx`, obican
+ * ekran) i Proizvodi. Profil NIJE tab — otvara se dugmetom gore desno
  * (`app/profile.tsx`, u korenskom Stack-u). Ekrani u kodu zadrzavaju stara
- * imena fajlova (daily, chart, sky). Ikone: SF Symbols na iOS-u (obicna
+ * imena fajlova (daily, chart). Ikone: SF Symbols na iOS-u (obicna
  * kad tab nije izabran, ispunjena kad jeste), Material ikone (`md`) na Androidu —
  * bez `md` Android ostaje BEZ ikona.
  *
@@ -129,9 +130,9 @@ export default function TabsLayout() {
           <NativeTabs.Trigger.Icon sf={{ default: 'circle.circle', selected: 'circle.circle.fill' }} md="adjust" />
           <NativeTabs.Trigger.Label>{t.danas.tabovi.ti}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="sky" disableAutomaticContentInsets>
-          <NativeTabs.Trigger.Icon sf={{ default: 'moon.stars', selected: 'moon.stars.fill' }} md="nights_stay" />
-          <NativeTabs.Trigger.Label>{t.danas.tabovi.nebo}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger name="ostalo" disableAutomaticContentInsets>
+          <NativeTabs.Trigger.Icon sf={{ default: 'ellipsis.circle', selected: 'ellipsis.circle.fill' }} md="more_horiz" />
+          <NativeTabs.Trigger.Label>{t.danas.tabovi.ostalo}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       </NativeTabs>
       {!SISTEMSKA_TRAKA && <VideoTrakaPlutajuca odDna={odDna} />}

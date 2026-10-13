@@ -1,4 +1,4 @@
-// Natpisi za sat (Zodiac Wheel) na jeziku uredjaja. Tabela je GENERISANA iz recnika
+// Natpisi za sat (Astrodial) na jeziku uredjaja. Tabela je GENERISANA iz recnika
 // aplikacije (`scripts/native/skycore-recnik.ts`), pa sat i aplikacija zovu stvari isto.
 import SwiftUI
 

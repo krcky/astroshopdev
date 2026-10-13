@@ -14,7 +14,7 @@ import { useProfileStore } from '@/store/profile';
  *   sve postoji            -> aplikacija
  *
  * Widget "Nebo sada" otvara `astroshop:///?tab=sky`: dodir prolazi kroz kapiju (ne pravo na
- * tab), pa bez naloga i dalje vodi na welcome, a sa nalogom na tab "Nebo".
+ * ekran), pa bez naloga i dalje vodi na welcome, a sa nalogom na ekran "Nebo" (`/nebo`; do 14.10.2026 tab).
  */
 export default function Gate() {
   const authLoading = useAuthStore((s) => s.loading);
@@ -27,5 +27,5 @@ export default function Gate() {
   if (authLoading || !hydrated) return <View className="flex-1 bg-grouped" />;
 
   if (!user || !profile) return <Redirect href="/welcome" />;
-  return <Redirect href={tab === 'sky' ? '/sky' : '/home'} />;
+  return <Redirect href={tab === 'sky' ? '/nebo' : '/home'} />;
 }

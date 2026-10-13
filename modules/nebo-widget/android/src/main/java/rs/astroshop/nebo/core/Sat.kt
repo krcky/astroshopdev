@@ -1,5 +1,5 @@
 /*
- * PREPIS `src/lib/sat.ts` — racun za Zodiac Wheel (sat): Mesec u znaku, Mesec bez kursa,
+ * PREPIS `src/lib/sat.ts` — racun za Astrodial (sat): Mesec u znaku, Mesec bez kursa,
  * planetarni sat i naredni dogadjaji. Menja se TAMO, pa ovde i u Swift-u (`Sat.swift`);
  * `SkyCoreTest` poredi sa `golden.json`. Trazenje trenutka je ista bisekcija, korak po korak,
  * kao u TS-u — ne funkcije biblioteke. Vremena su u milisekundama od 1970 (Double), kao u TS-u.

@@ -111,6 +111,16 @@ export async function kupiNatalnuKartu(): Promise<IshodKupovine> {
   return 'nedostupno';
 }
 
+/**
+ * Aplikacija za sat (Zodiac Wheel, "Ostalo" -> Proizvodi, Ivan, 14.10.2026). JOS NIJE U PRODAVNICI i nije odluceno
+ * da li je placena: probna cena samo da se vidi raspored, pod istim uslovom kao ostale; `null` bez nje.
+ */
+const PROBNA_CENA_SATA = '4,99 €';
+
+export function useCenaSata(): string | null {
+  return PROBNE_CENE ? PROBNA_CENA_SATA : null;
+}
+
 export type IshodVracanja = 'vraceno' | 'nema' | 'greska' | 'nedostupno';
 
 /** "Vrati kupovine" — Apple ga trazi na svakom paywall-u. */

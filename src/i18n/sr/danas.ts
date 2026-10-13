@@ -25,6 +25,8 @@ export const danas = {
     /** Natalna karta korisnika. */
     ti: 'Ti',
     nebo: 'Nebo',
+    /** Peti tab (Ivan, 14.10.2026): Uporedni horoskop, nebo sada i proizvodi — `ostalo.ts`. */
+    ostalo: 'Ostalo',
   },
 
   /** `app/(tabs)/home/index.tsx` — pocetna. */

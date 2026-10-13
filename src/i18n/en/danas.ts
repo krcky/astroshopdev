@@ -33,6 +33,8 @@ export const danas: Recnik['danas'] = {
     /** The user’s birth chart. */
     ti: 'You',
     nebo: 'Sky',
+    /** Peti tab (Ivan, 14.10.2026): Uporedni horoskop, nebo sada i proizvodi — `ostalo.ts`. */
+    ostalo: 'More',
   },
 
   /** Home screen. */

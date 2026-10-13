@@ -1009,16 +1009,16 @@ Brojevi i "R" su sistemsko pismo, ne Plus Jakarta Sans. Crtez kruga postoji TRI 
 BEZ RECI u prikazu (simbol, znak, stepen, "R") — isti na svih sest jezika; prevedeni su samo ime i opis u galeriji
 (`Localizable.xcstrings`, `res/values-*/strings.xml`). Svetlo kao aplikacija, crno u tamnom rezimu; sat uvek crn.
 POSLOVNA ODLUKA (Ivan, 13.10.2026): WIDGET NA TELEFONU JE BESPLATAN, deo aplikacije (widget ne moze da postoji bez aplikacije).
-SATOVI (Apple Watch i Wear OS) SU ZASEBNE APLIKACIJE — PROIZVOD SE ZOVE "ZODIAC WHEEL" (Ivan) — koje se NAPLACUJU PO FIKSNOJ CENI, odvojene od telefonske: svoj bundle id /
-paket (`com.krcky.astroshop.nebo` — TRAJAN posle prve objave, potvrditi pre toga), svoj listing, cena se postavlja u App Store
+SATOVI (Apple Watch i Wear OS) SU ZASEBNE APLIKACIJE — PROIZVOD SE ZOVE "ASTRODIAL" (Ivan, 14.10.2026; prvo "Astrodial", ali to ime na App Store-u vec drzi ziva aplikacija istog opisa — Stuart Woolley, id343286891) — koje se NAPLACUJU PO FIKSNOJ CENI, odvojene od telefonske: svoj bundle id /
+paket (`com.krcky.astrodial` — TRAJAN posle prve objave, potvrditi pre toga), svoj listing, cena se postavlja u App Store
 Connect-u i Google Play konzoli (u kodu nema nicega o naplati). Telefonska aplikacija satu NISTA ne salje i ne ugradjuje ga.
 MESTO NA WIDGETU je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u korenu) -> modul `NeboWidget`
 (`postaviMesto`), pri odjavi brise. iOS: App Group (`SharedPlace`; ime grupe se IZVODI iz bundle id-ja, "group." + id —
 probni build `….test` ima svoju, prava ostaje slobodna za nalog firme). Android: SharedPreferences. Bez mesta krug je BEZ kuca,
 0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11). Trenutna lokacija
 telefona (GPS) NIJE uvedena (Ivan: "za sada nista") — trazila bi dozvolu u aplikaciji, a na Androidu lokaciju u pozadini.
-ZODIAC WHEEL IMA CETIRI STRANE (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
-nagore: 1 KRUG (kruna pomera vreme, strelice u uglovima po sat), 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
+ASTRODIAL IMA CETIRI STRANE (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
+nagore: 1 KRUG (kruna pomera vreme; strelica nema — prekrivale su znake), 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
 Mesec bez kursa), 3 SAT (vladar planetarnog sata i do kada, sledeci, ASC i MC, izlazak i zalazak Sunca), 4 SLEDECE (dogadjaji po
 vremenu za 30 dana: promena Mesecevog znaka, pocetak Meseca bez kursa, cetvrti, ulasci planeta u znak, stanice; pa planete i izbor
 mesta). RACUN: `src/lib/sat.ts` -> `Sat.swift` / `Sat.kt`, isti golden (14.10.2026: vremena se slazu do 0,75 s na 52 trenutka);
@@ -1029,7 +1029,7 @@ dan u nedelji po mesnom vremenu izlaska. Preko polarnog kruga planetarnih sati n
 NATPISI NA SATU: `Recnik.generated.swift` / `.kt` iz RECNIKA APLIKACIJE (`tsx scripts/native/skycore-recnik.ts`: znaci, planete,
 faze na sest jezika + devet natpisa samo za sat); dogadjaji se pisu BEZ PADEZA ("Mesec → Strelac", "Pluton D", "Merkur R").
 KOMPLIKACIJE (Apple Watch, `SatWidgetKit.swift`): krug, Mesec u znaku (prsten = napredak kroz znak), planetarni sat, ascendent
-(raspored na 5 min), sledeci dogadjaj; svaka otvara svoju stranu (`zodiacwheel://moon|hour|next|wheel`). Wear OS ima samo plocicu
+(raspored na 5 min), sledeci dogadjaj; svaka otvara svoju stranu (`astrodial://moon|hour|next|wheel`). Wear OS ima samo plocicu
 i komplikaciju sa krugom — ostale FALE. U simulatoru sata `openurl` ne radi: strana se bira argumentom `-strana moon`.
 MESTO NA SATU: grad VREMENSKE ZONE sata, bez dozvole za lokaciju — tabela 418 zona iz tz baze (`scripts/native/zone.tab` ->
 `tsx scripts/native/skycore-zone.ts` -> `Zone.generated.swift` / `.kt`) — ili grad koji korisnik izabere na satu (lista po
@@ -1065,7 +1065,7 @@ samo u razvoju (`IMA_WIDGET`). NIJE PROVERENO: kartica na tabu (simulator nije p
 APP GROUP NA BESPLATNOM APPLE NALOGU: `xcodebuild -allowProvisioningUpdates` je NE registruje (profil "doesn't match the
 entitlements file's value") — jednom rucno u Xcode-u: target -> Signing & Capabilities -> Team (bez tima grupa ostaje crvena)
 -> App Groups -> kruzna strelica; za AstroShop i NeboWidget. Kad je grupa jednom registrovana, komandna linija prolazi i
-posle `prebuild --clean`. Isto ce trebati za `watch/` (grupa `group.com.krcky.astroshop.nebo`) pri prvom buildu za pravi sat.
+posle `prebuild --clean`. Isto ce trebati za `watch/` (grupa `group.com.krcky.astrodial`) pri prvom buildu za pravi sat.
 NIJE PROVERENO (13.10.2026): Android widget na pravom telefonu; pravi sat (Ivan ih trenutno nema); na Apple Watch-u kruna,
 druga strana, izbor mesta i komplikacije (simulator: samo prvi ekran, mesto iz zone); Wear OS je samo PREVEDEN (nema Wear
 emulatora); potpisivanje widgeta sa App Group na EAS-u; pregled u prodavnicama za aplikacije samo za sat. FALI ZA PRODAJU SATA:
