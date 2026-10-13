@@ -1019,8 +1019,14 @@ watchOS`) i NE sme `-sdk iphonesimulator` u komandi (prisili iOS SDK i na sat); 
 novo iz iOS 17 ide uz `@available`; (5) posle prebuild-a uz tri izmene za besplatni Apple ID idu i id-jevi `….test.widget`,
 `….test.watch`, `….test.watch.widget` i grupa `group.….test` u sva cetiri entitlements fajla; (6) hook-ovi u jednom izrazu
 sa `&&` obaraju aplikaciju (prvi nacrt `useNeboWidget`).
-NIJE PROVERENO (13.10.2026): pravi telefon i pravi sat; prijavljen korisnik od kraja do kraja (mesto iz aplikacije — u
-simulatoru je upisano rucno u grupu); kruna, druga strana i komplikacije na satu (simulator: samo prvi ekran, sa i bez mesta);
+PROVERENO NA IVANOVOM iPHONE-u (13.10.2026, prijavljen nalog): aplikacija upise mesto, mali i srednji widget crtaju kuce i
+ose kao tab "Nebo" (Nis: ASC u Raku; promena na Madrid -> ASC u Blizancima, widget se okrenuo za par sekundi), lista planeta
+se slaze sa aplikacijom. Widget crta pocetak tekuce cetvrti sata, pa kasni za aplikacijom do ~4°.
+APP GROUP NA BESPLATNOM APPLE NALOGU: `xcodebuild -allowProvisioningUpdates` je NE registruje (profil "doesn't match the
+entitlements file's value") — jednom rucno u Xcode-u: target -> Signing & Capabilities -> Team (bez tima grupa ostaje crvena)
+-> App Groups -> kruzna strelica; za AstroShop i NeboWidget. Za probni build bez sata grupa se skida iz
+`ios/.targets/NeboSat*/generated.entitlements`. Profili za sat se prave i bez registrovanog sata.
+NIJE PROVERENO (13.10.2026): Android na pravom telefonu i pravi sat; kruna, druga strana i komplikacije na satu (simulator: samo prvi ekran, sa i bez mesta);
 Wear OS je samo PREVEDEN (nema Wear emulatora); prenos mesta telefon -> sat na obe platforme; potpisivanje sa App Group i
 tri nova bundle id-ja na EAS-u; ikonica Wear aplikacije je privremena.
 
