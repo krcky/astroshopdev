@@ -20,7 +20,7 @@ import { TransitTrajanje } from '@/components/transit-trajanje';
 import { NaslovCeleReci } from '@/components/naslov-cele-reci';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { OdeljakIkona } from '@/components/odeljak-ikona';
-import { rasporedDuge, vrstaSekcije } from '@/lib/tumacenje';
+import { bezTacke, rasporedDuge, vrstaSekcije } from '@/lib/tumacenje';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { ASTROLOG } from '@/lib/pitanja';
 import { useNaMrezi } from '@/lib/mreza';
@@ -116,17 +116,17 @@ export default function TransitDetail() {
               return (
                 <>
                   {!!r.uvod && (
-                    <UvodRecenica>{r.uvod}</UvodRecenica>
+                    <UvodRecenica>{bezTacke(r.uvod)}</UvodRecenica>
                   )}
                   {!!r.prviPasus && (
-                    <View className={r.uvod ? 'mt-3' : undefined}><TumacenjeTekst tekst={r.prviPasus} /></View>
+                    <View className={r.uvod ? 'mt-3' : undefined}><TumacenjeTekst bezTacke tekst={r.prviPasus} /></View>
                   )}
                   {r.odeljci.map((s) => <OdeljakDuge key={s.heading} s={s} />)}
                   {/* Isti naslov kao odeljci iznad, samo bez ikonice (Ivan, 1.10.2026). */}
                   {imaNastavak && (
                     <View className="mt-7">
                       <NaslovSekcije>{tx.viseOTranzitu}</NaslovSekcije>
-                      <TumacenjeTekst tekst={r.nastavakTekst} />
+                      <TumacenjeTekst bezTacke tekst={r.nastavakTekst} />
                     </View>
                   )}
                   {tranzit && (
@@ -188,7 +188,7 @@ function OdeljakDuge({ s }: { s: { heading: string; body: string } }) {
         ikona={vrsta ? <OdeljakIkona odeljak={vrsta} size={26} /> : undefined}>
         {s.heading}
       </NaslovSekcije>
-      <TumacenjeTekst tekst={s.body} />
+      <TumacenjeTekst bezTacke tekst={s.body} />
     </View>
   );
 }

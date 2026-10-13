@@ -40,6 +40,7 @@ import { KRUG, type KrugKey } from '@/lib/krug-config';
 import { useDanas } from '@/store/danas';
 import { dayKey, pickBrief, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
+import { bezTacke } from '@/lib/tumacenje';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
@@ -492,7 +493,7 @@ function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNo
           accessibilityLabel={`${recenica ?? ''} ${imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}`.trim()}
           className="flex-row items-center gap-3 py-1.5 active:opacity-60">
           {recenica ? (
-            <Text variant="default" className="flex-1">{recenica}</Text>
+            <Text variant="default" className="flex-1">{bezTacke(recenica)}</Text>
           ) : (
             // Bez teksta ostaje samo ime tranzita, sivo — jedino sto se o njemu zna.
             <Text variant="muted" className="flex-1">{imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}</Text>

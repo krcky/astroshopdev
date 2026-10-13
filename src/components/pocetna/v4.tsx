@@ -1,6 +1,6 @@
 /* Pocetna strana, verzija 4 (Ivan, 13.10.2026) — probni prekidac verzija u profilu (sekcija Test); tag `pocetna-v3` je prethodna. */
 import * as React from 'react';
-import { Modal, Platform, Pressable, View } from 'react-native';
+import { Image, Modal, Platform, Pressable, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Redirect, Stack, router } from 'expo-router';
 import type { NativeStackHeaderItem } from 'expo-router';
@@ -28,6 +28,7 @@ import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { TvojDanCardV4 as TvojDanCard } from '@/components/pocetna/tvoj-dan-card-v4';
 import { MesecDanasCard } from '@/components/mesec-danas-card';
 import { PromenaNaNebu } from '@/components/promena-na-nebu';
+import { SunceSaZracima } from '@/components/sunce-zraci';
 import { PremiumKartica } from '@/components/zakljucano';
 import { AstrologSlika } from '@/components/astrolog-slika';
 import { ASTROLOG } from '@/lib/pitanja';
@@ -43,6 +44,7 @@ import { KRUG, type KrugKey } from '@/lib/krug-config';
 import { useDanas } from '@/store/danas';
 import { dayKey, pickBrief, type Transit } from '@/lib/transits';
 import { cn } from '@/lib/utils';
+import { bezTacke } from '@/lib/tumacenje';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { STARI_IOS } from '@/lib/platform';
 import { NativeDayMenu } from '@/components/native-day-menu';
@@ -149,11 +151,19 @@ export function PocetnaV4() {
         {krug && (
           <>
             {/* Datum sitnim slovima, ispod njega naslov krupnim crnim ali manjim nego na tabu Mesec (Ivan, 12.10.2026). */}
-            <Text variant="oznaka" className={OZNAKA_12}>{formatDatumKratko(date)}</Text>
-            <Text variant="display" className="mb-4 mt-1" accessibilityRole="header">
-              {offset === 0 ? t.krug.naslov : t.krug.naslovDrugiDan}
-            </Text>
-            {/* v3: vodoravne kartice oblasti umesto kruga (Ivan, 12.10.2026); dodir otvara ceo list oblasti. */}
+            {/* v4: naslov u DVA reda, desno slika sunca (Ivan, 13.10.2026). */}
+            <View className="flex-row items-center justify-between" style={{ marginTop: -24, marginBottom: -4 }}>
+              <View className="flex-1">
+                <Text variant="oznaka" className={OZNAKA_12}>{formatDatumKratko(date)}</Text>
+                <Text variant="display" className="mt-1" accessibilityRole="header">
+                  {uDvaReda(offset === 0 ? t.krug.naslov : t.krug.naslovDrugiDan)}
+                </Text>
+              </View>
+              {/* Sunce: lice stoji, zraci se sporo vrte oko njega (`sunce-zraci.tsx`, Ivan, 13.10.2026). */}
+              <View pointerEvents="none" style={{ marginRight: -space.screen - 70, marginVertical: -46, transform: [{ translateY: -2 }] }}>
+                <SunceSaZracima size={240} />
+              </View>
+            </View>
             <OblastiKartice
               rez={krug}
               otkljucane={premium ? undefined : BESPLATNO.krug}
@@ -330,6 +340,13 @@ export function PocetnaV4() {
   );
 }
 
+/** Naslov u dva reda: prelom pre POSLEDNJE reci ("Tvoj život / danas"); jedna rec ostaje u jednom. */
+function uDvaReda(naslov: string): string {
+  const reci = naslov.trim().split(/\s+/);
+  if (reci.length < 2) return naslov;
+  return `${reci.slice(0, -1).join(' ')}\n${reci[reci.length - 1]}`;
+}
+
 type TabPocetne = 'danas' | 'mesec' | 'promene' | 'teme';
 const tabovi = (t: Recnik): { key: TabPocetne; label: string }[] => [
   { key: 'danas', label: t.danas.pocetna.tabTvojDan },
@@ -475,14 +492,15 @@ type Redovi = { t: Transit; recenica: string | null }[];
 function Brief({ ide, koci }: { ide: Redovi; koci: Redovi }) {
   const t = useT();
   return (
-    <View>
+    // Jedna pored druge (Ivan, 13.10.2026, v4); ako je samo jedna grupa, ide preko cele sirine.
+    <View className="flex-row items-stretch gap-3">
       {ide.length > 0 && (
-        <View className={CARD_SURFACE}>
+        <View className={cn(CARD_SURFACE, 'flex-1')}>
           <Grupa naslov={t.danas.pocetna.ideTi} ikona={<Plus size={16} color={PLUS} strokeWidth={3} />} redovi={ide} />
         </View>
       )}
       {koci.length > 0 && (
-        <View className={cn(CARD_SURFACE, ide.length > 0 && 'mt-3')}>
+        <View className={cn(CARD_SURFACE, 'flex-1')}>
           <Grupa naslov={t.danas.pocetna.kociTe} ikona={<Minus size={16} color={MINUS} strokeWidth={3} />} redovi={koci} />
         </View>
       )}
@@ -498,25 +516,26 @@ const MINUS = MINUS_BOJA;
 function Grupa({ naslov, ikona, redovi }: { naslov: string; ikona: React.ReactNode; redovi: Redovi }) {
   const { imeNatalni } = useT().danas.tranzit;
   return (
-    <View className="px-4 py-4">
-      <View className="mb-1 flex-row items-center gap-1.5">
+    <View className="px-3 pb-1 pt-4">
+      <View className="mb-2 flex-row items-center gap-1.5">
         {ikona}
         <Text variant="h3">{naslov}</Text>
       </View>
-      {redovi.map(({ t, recenica }) => (
+      {redovi.map(({ t, recenica }, i) => (
         <Pressable
           key={t.contentKey}
           onPress={() => router.push({ pathname: '/transit', params: { key: t.contentKey } })}
           accessibilityRole="button"
           accessibilityLabel={`${recenica ?? ''} ${imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}`.trim()}
-          className="flex-row items-center gap-3 py-1.5 active:opacity-60">
+          // Linija izmedju tranzita ide od ivice do ivice kartice (-mx-3 poništava padding grupe).
+          className={cn('-mx-3 flex-row items-center gap-1.5 px-3 py-3 active:opacity-60', i > 0 && 'border-t border-border')}>
           {recenica ? (
-            <Text variant="default" className="flex-1">{recenica}</Text>
+            <Text variant="default" className="flex-1 text-[14px] leading-[19px]">{bezTacke(recenica)}</Text>
           ) : (
             // Bez teksta ostaje samo ime tranzita, sivo — jedino sto se o njemu zna.
             <Text variant="muted" className="flex-1">{imeNatalni(t.transiting.name, t.aspect.name, t.natal.name)}</Text>
           )}
-          <ChevronRight size={18} color={neutral.inkSubtle} strokeWidth={2.2} />
+          <ChevronRight size={14} color={neutral.inkSubtle} strokeWidth={2.2} />
         </Pressable>
       ))}
     </View>

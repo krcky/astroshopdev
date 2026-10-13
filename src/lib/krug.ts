@@ -83,17 +83,14 @@ export function usrednji(ocene: number[]): number {
 export const stanjeIzOcene = (ocena: number): StanjeKey => STANJA[Math.min(OCENA_MAX, Math.max(OCENA_MIN, ocena)) - 1];
 
 /**
- * Krug za dan: `osnove` su [juce, danas, sutra] — stanje je prosek njihovih ocena, a tackice i
- * stavke su DANASNJE. Dan koji nedostaje (nema osnove) se preskace.
+ * Krug za dan: tackice, STANJE (ime ocene) i stavke su DANASNJE (Ivan, 13.10.2026; do tada je stanje bilo prosek ocena za
+ * juce, danas i sutra, `usrednji`). `jucer` sluzi samo za strelicu gore / dole. `sutra` se vise ne koristi, ostaje da pozivi ne pucaju.
  */
 export function krugDana(osnove: { jucer: OsnovaDana | null; danas: OsnovaDana; sutra: OsnovaDana | null }, tonovi: Map<string, string>, bezKuca: boolean): KrugDana {
   const oblasti = KRUG.map((def): KrugOblast => {
     const danas = ocenaOblasti(def, osnove.danas, tonovi);
     const juce = osnove.jucer ? ocenaOblasti(def, osnove.jucer, tonovi).ocena : null;
-    const ocene = [osnove.jucer, osnove.danas, osnove.sutra]
-      .filter((o): o is OsnovaDana => !!o)
-      .map((o) => (o === osnove.danas ? danas.ocena : o === osnove.jucer ? (juce as number) : ocenaOblasti(def, o, tonovi).ocena));
-    return { def, ocena: danas.ocena, juce, stanje: stanjeIzOcene(usrednji(ocene)), stavke: danas.stavke };
+    return { def, ocena: danas.ocena, juce, stanje: stanjeIzOcene(danas.ocena), stavke: danas.stavke };
   });
   return { oblasti, bezKuca };
 }

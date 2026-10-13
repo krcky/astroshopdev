@@ -240,3 +240,12 @@ export function rasporedDuge<S extends { heading: string; body: string }>(body: 
     nastavakTekst: pasusi.slice(1).join('\n\n'),
   };
 }
+
+/**
+ * Bez tacke na kraju (Ivan, 13.10.2026): kratki tekstovi (efekat, izazov, savet, "Ide ti" / "Koci te", tumacenja tranzita)
+ * se zavrsavaju bez tacke. Skida se SAMO jedna tacka na samom kraju; "…", "?" i "!" ostaju, kao i tacke usred teksta.
+ */
+export function bezTacke(tekst: string): string {
+  const t = tekst.replace(/\s+$/, '');
+  return t.endsWith('.') && !t.endsWith('..') ? t.slice(0, -1) : t;
+}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
-import { blokovi, prvaRecenica } from '@/lib/tumacenje';
+import { bezTacke as bezTackeFn, blokovi, prvaRecenica } from '@/lib/tumacenje';
 import { tezina } from '@/theme/tipografija';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
  * tekst ispod (Ivan, 27. i 28.9.2026). Oblik pravi izvoz korpusa, a deli ga
  * `lib/tumacenje.ts`.
  */
-export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false }: {
+export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false, bezTacke: skiniTacku = false }: {
   tekst: string;
   /** Stavke (•) pre pasusa — saveti lunarnog kalendara (Ivan, 29.9.2026; od 1.10.2026 vise ne, vidi `uvod`). */
   listePrvo?: boolean;
@@ -22,7 +22,10 @@ export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false }: {
    * Recenica duza od `UVOD_MAX` ostaje u pasusu (`prvaRecenica`).
    */
   uvod?: boolean;
+  /** Svaki pasus i stavka bez tacke na kraju (tumacenja tranzita, Ivan, 13.10.2026). */
+  bezTacke?: boolean;
 }) {
+  const k = (t: string) => (skiniTacku ? bezTackeFn(t) : t);
   const b0 = blokovi(tekst);
   if (uvod) {
     const i = b0.findIndex((b) => b.vrsta === 'pasus');
@@ -33,9 +36,9 @@ export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false }: {
       <View className="gap-3">
         {deo && <UvodRecenica>{deo.recenica}</UvodRecenica>}
         {prvi && prvi.vrsta === 'pasus' && (deo ? !!deo.ostatak : true) && (
-          <Text variant="reading">{deo ? deo.ostatak : prvi.tekst}</Text>
+          <Text variant="reading">{k(deo ? deo.ostatak : prvi.tekst)}</Text>
         )}
-        <TumacenjeTekst tekst={[...ostali.filter((b) => b.vrsta !== 'pasus'), ...ostali.filter((b) => b.vrsta === 'pasus')]
+        <TumacenjeTekst bezTacke={skiniTacku} tekst={[...ostali.filter((b) => b.vrsta !== 'pasus'), ...ostali.filter((b) => b.vrsta === 'pasus')]
           .map((b) => (b.vrsta === 'pasus' ? b.tekst : b.stavke.map((s) => `• ${s.naslov ? `${s.naslov} – ` : ''}${s.tekst}`).join('\n')))
           .join('\n\n')} />
       </View>
@@ -46,7 +49,7 @@ export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false }: {
     <View className="gap-3">
       {redom.map((b, i) =>
         b.vrsta === 'pasus' ? (
-          <Text key={i} variant="reading">{b.tekst}</Text>
+          <Text key={i} variant="reading">{k(b.tekst)}</Text>
         ) : (
           <View key={i} className="gap-2">
             {b.stavke.map((s, j) => (
@@ -58,7 +61,7 @@ export function TumacenjeTekst({ tekst, listePrvo = false, uvod = false }: {
                     28.9.2026, "Nepotpuni podaci"). Bez ugnezdenog teksta nema ni greske. */}
                 <View className="flex-1">
                   {!!s.naslov && <Text variant="reading" className={cn('text-foreground', tezina('naslovStavke'))}>{s.naslov}</Text>}
-                  <Text variant="reading">{s.tekst}</Text>
+                  <Text variant="reading">{k(s.tekst)}</Text>
                 </View>
               </View>
             ))}

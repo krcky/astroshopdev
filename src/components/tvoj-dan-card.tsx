@@ -11,11 +11,12 @@ import { CARD_SURFACE } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { NatalChart } from '@/lib/natal';
 import { useTransitTexts } from '@/lib/transit-texts';
-import { prveRecenice, stavkaZaPrikaz, triOdeljka, type Stavka } from '@/lib/tumacenje';
+import { bezTacke, prveRecenice, stavkaZaPrikaz, triOdeljka, type Stavka } from '@/lib/tumacenje';
 import type { TvojDanPick } from '@/lib/tvoj-dan';
 import { dayKey } from '@/lib/transits';
 import { useTvojDanLog } from '@/store/tvoj-dan-log';
 import { useAuthStore } from '@/store/auth';
+import { brand } from '@/theme/tokens';
 import { tezina } from '@/theme/tipografija';
 import { MINUS_BOJA, PLUS_BOJA } from '@/components/ton';
 import { useT } from '@/i18n';
@@ -138,7 +139,7 @@ export function TvojDanCard({ pick, date, isToday }: {
           hitSlop={14}
           className="active:opacity-60">
           {/* Svetla lila, kao "Savet" i izabrani tab (Ivan, 28.9.2026). */}
-          <Info size={16} color={OBLAST_BOJA} strokeWidth={2} />
+          <Info size={16} color={brand.indigo} strokeWidth={2} />
         </Pressable>
       </View>
       {/* Datum i naslov su jedna celina, planeta desno centrirana u odnosu na njih;
@@ -213,7 +214,7 @@ function Odeljci({ stavke }: { stavke: { key: OdeljakKljuc; oznaka: string; s: S
             <Text variant="oznaka" className={OZNAKA_12} style={{ color: ODELJAK_BOJA[x.key] ?? OBLAST_BOJA }}>{x.oznaka}</Text>
             {/* Podebljani deo u SVOM redu, tekst ispod njega (Ivan, 28.9.2026). */}
             {!!x.s.naslov && <Text variant="default" className={cn('mt-1', tezina('naslovUTekstu'))}>{x.s.naslov}</Text>}
-            <Text variant="default" className={x.s.naslov ? undefined : 'mt-1'}>{x.s.tekst}</Text>
+            <Text variant="default" className={x.s.naslov ? undefined : 'mt-1'}>{bezTacke(x.s.tekst)}</Text>
           </View>
         </View>
       ))}

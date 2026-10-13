@@ -14,7 +14,7 @@ import { dnoKruga } from '@/components/natal-wheel';
 import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { cn } from '@/lib/utils';
 import type { SignPosition, ZodiacSign } from '@/lib/zodiac';
-import { neutral } from '@/theme/tokens';
+import { brand, neutral } from '@/theme/tokens';
 import { PREMIUM } from '@/components/zakljucano';
 import { Balon, Prsten } from '@/components/prica/ulaz';
 import { tr, useT } from '@/i18n';
@@ -277,7 +277,7 @@ export function TockInfo({ velicina, onPress, accessibilityLabel }: {
       hitSlop={8}
       style={{ top: dnoKruga(velicina) - INFO_DUGME / 2 - INFO_IKONA / 2, width: INFO_DUGME, height: INFO_DUGME }}
       className="absolute right-3 items-center justify-center active:opacity-60">
-      <Info size={INFO_IKONA} color={OBLAST_BOJA} strokeWidth={2} />
+      <Info size={INFO_IKONA} color={brand.indigo} strokeWidth={2} />
     </Pressable>
   );
 }

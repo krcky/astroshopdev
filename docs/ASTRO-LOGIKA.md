@@ -509,7 +509,7 @@ tranzite o emocijama u Finansije (Pluton–Mesec); gde ide 5. kuća (romansa) �
 Zabave i Prijateljstva; naziv „Zdravlje" ili „Telo i energija" (zdravstveni saveti, Apple).
 
 **Ocena i stanje:** ocena oblasti za jedan dan je ista kao u poglavlju 11 (3 + zbir doprinosa, 1–5, simetrično zaokruženo). **Tačkice su današnja
-ocena.** **Stanje** je prosek ocena za tri dana (juče, danas, sutra), simetrično zaokružen oko 3: 1 Zahtevno, 2 Oprezno, 3 Uravnoteženo, 4 Povoljno, 5 Sjajno (8.10.2026; ranije Pritisak, Oprez, Mirno, Raste, Procvat). Prozor od tri dana
+ocena.** **Stanje** je ime današnje ocene, isto što i tačkice (od 13.10.2026; do tada prosek ocena za tri dana: juče, danas, sutra): 1 Zahtevno, 2 Oprezno, 3 Uravnoteženo, 4 Povoljno, 5 Sjajno (8.10.2026; ranije Pritisak, Oprez, Mirno, Raste, Procvat). Prozor od tri dana
 je izabran merenjem: sa dnevnom ocenom se oblast menja svaka ~3 dana (stanje bi skakalo), sa prozorom od 3 dana otprilike jednom u 4 dana, a bar jedna od osam
 oblasti se menja u 79% dana (sa 7 dana bi bilo 60%, a stanje bi stajalo nedelju i po).
 
