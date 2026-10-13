@@ -51,11 +51,15 @@ struct StranaMesec: View {
   }
 }
 
-/// Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.sh`), po uglu faze.
+/// Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.swift`), po uglu faze.
 struct MesecSlika: View {
   let angle: Double
   var body: some View {
-    Image(String(format: "mesec-%02d", mesecSlika(angle: angle))).resizable().scaledToFit()
+    // HEIC fajl u paketu aplikacije (ne u katalogu slika — katalog bi ga prepakovao bez gubitka i vratio tezinu).
+    Image(uiImage: UIImage(named: String(format: "mesec-%02d.heic", mesecSlika(angle: angle))) ?? UIImage())
+      .resizable().scaledToFit()
+      // Slika je kvadrat na crnoj podlozi (bez providnosti); krug sece uglove, da ne prekriju mene oko nje.
+      .clipShape(Circle())
   }
 }
 

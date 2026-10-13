@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -111,12 +112,14 @@ fun mesecSlika(ugao: Double): Int {
     return najbliza
 }
 
-/** Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.sh`). */
+/** Mesec kakav je sada: jedna od 30 ilustracija iz aplikacije (`scripts/native/skycore-mesec.swift`). */
 @Composable
 fun MesecSlika(ugao: Double, modifier: Modifier = Modifier) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val id = context.resources.getIdentifier("mesec_%02d".format(mesecSlika(ugao)), "drawable", context.packageName)
-    if (id != 0) androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(id), contentDescription = null, modifier = modifier)
+    if (id != 0) androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(id), contentDescription = null,
+        // Slika je kvadrat na crnoj podlozi; krug sece uglove, da ne prekriju mene oko nje.
+        modifier = modifier.clip(androidx.compose.foundation.shape.CircleShape))
 }
 
 /** Mesec u fazi: taman disk i osvetljeni deo (desno dok raste, levo dok opada). */
