@@ -51,21 +51,21 @@ struct StranaMesec: View {
   }
 }
 
-/// Krug Mesecevih mena: 30 lunarnih dana ukrug, tekuci istaknut; u sredini broj lunarnog dana i faza.
+/// Krug Mesecevih mena: brojevi lunarnih dana i mene ukrug, tekuci dan istaknut; u sredini veliki
+/// Mesec u trenutnoj fazi i ispod njega koji je lunarni dan.
 struct StranaLuna: View {
   let s: Slika
 
   var body: some View {
     MoonWheelView(lunarDay: s.moon.lunarDay) {
-      VStack(spacing: 0) {
-        Text("\(s.moon.lunarDay)").font(.system(size: 34, weight: .bold, design: .rounded))
-        Text(Tekst.t("ui.lunarDay")).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Brend.lila)
-        Text(Tekst.phase(s.moon.phase)).font(.system(size: 11, design: .rounded)).foregroundStyle(.secondary)
+      VStack(spacing: 2) {
+        MoonPhaseView(angle: s.moon.phaseAngle)
+        Text("\(Tekst.t("ui.lunarDay")) \(s.moon.lunarDay)")
+          .font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(Brend.lila)
+          .lineLimit(1).minimumScaleFactor(0.6)
       }
-      .lineLimit(1).minimumScaleFactor(0.7)
-      .padding(.horizontal, 34)
     }
-    .padding(.bottom, 8)
+    .padding(.bottom, 4)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .ignoresSafeArea(.container, edges: .bottom)
   }

@@ -164,45 +164,78 @@ fun StranaMesec(s: Slika) {
     }
 }
 
-/** Krug Mesecevih mena: 30 lunarnih dana ukrug (od prvog na vrhu, u smeru kazaljke), tekuci istaknut. */
+/** Osvetljeni deo Meseca za ugao faze, u krugu poluprecnika `r` oko `c` (desno dok raste, levo dok opada). */
+private fun mesecOsvetljen(c: Offset, r: Float, ugao: Double): androidx.compose.ui.graphics.Path {
+    val strana = if (((ugao % 360) + 360) % 360 < 180) 1f else -1f
+    val k = cos(Math.toRadians(ugao)).toFloat()
+    val p = androidx.compose.ui.graphics.Path()
+    val n = 24
+    for (j in 0..n) {
+        val y = -r + 2 * r * j / n
+        val x = sqrt(maxOf(0f, r * r - y * y))
+        if (j == 0) p.moveTo(c.x + strana * x, c.y + y) else p.lineTo(c.x + strana * x, c.y + y)
+    }
+    for (j in n downTo 0) {
+        val y = -r + 2 * r * j / n
+        p.lineTo(c.x + strana * k * sqrt(maxOf(0f, r * r - y * y)), c.y + y)
+    }
+    p.close()
+    return p
+}
+
+/**
+ * Krug Mesecevih mena, kao `MoonWheelView` u Swift-u: spoljni prsten sa BROJEVIMA lunarnih dana,
+ * unutrasnji sa menama, tekuci dan istaknut, u sredini veliki Mesec i koji je lunarni dan.
+ * TRIDESET polja, ne 28: od mladog do mladog Meseca prodje 29,5 dana, pa lunarni dan ide 1—30.
+ */
 @Composable
 fun StranaLuna(s: Slika) {
     androidx.compose.foundation.layout.Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize().padding(6.dp)) {
-            // TRIDESET, ne 28: od mladog do mladog Meseca prodje 29,5 dana, pa lunarni dan ide od 1 do 30.
+        Canvas(Modifier.fillMaxSize().padding(4.dp)) {
             val n = 30
-            val r = size.minDimension / 2 * 0.085f
-            val veliki = size.minDimension / 2 - r * 1.7f
+            val k = size.minDimension / 200f // crta se u krugu precnika 200
+            val linija = Color(0x29FFFFFF)
+            for (rr in listOf(99f, 82.5f, 63.5f)) drawCircle(linija, rr * k, center, style = Stroke(0.8.dp.toPx()))
+            val slova = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; typeface = android.graphics.Typeface.DEFAULT_BOLD }
             for (i in 0 until n) {
                 val ugao = (i.toDouble() / n) * 2 * Math.PI - Math.PI / 2
-                val c = Offset(center.x + veliki * cos(ugao).toFloat(), center.y + veliki * kotlin.math.sin(ugao).toFloat())
                 val tekuci = i + 1 == s.moon.lunarDay
-                val rr = if (tekuci) r * 1.5f else r
-                val faza = (i + 0.5) / 29.530588 * 360
-                drawCircle(Color(0xFF26262E), rr, c)
-                val strana = if (faza % 360 < 180) 1f else -1f
-                val k = cos(Math.toRadians(faza)).toFloat()
-                val p = androidx.compose.ui.graphics.Path()
-                val koraka = 24
-                for (j in 0..koraka) {
-                    val y = -rr + 2 * rr * j / koraka
-                    val x = sqrt(maxOf(0f, rr * rr - y * y))
-                    if (j == 0) p.moveTo(c.x + strana * x, c.y + y) else p.lineTo(c.x + strana * x, c.y + y)
+                val granica = ugao - Math.PI / n
+                drawLine(linija,
+                    Offset(center.x + 82.5f * k * cos(granica).toFloat(), center.y + 82.5f * k * kotlin.math.sin(granica).toFloat()),
+                    Offset(center.x + 99f * k * cos(granica).toFloat(), center.y + 99f * k * kotlin.math.sin(granica).toFloat()), 0.8.dp.toPx())
+
+                // Broj dana, okrenut tako da se cita duz kruga.
+                drawIntoCanvas {
+                    val c = it.nativeCanvas
+                    c.save()
+                    c.translate(center.x + 91f * k * cos(ugao).toFloat(), center.y + 91f * k * kotlin.math.sin(ugao).toFloat())
+                    c.rotate(Math.toDegrees(ugao + Math.PI / 2).toFloat())
+                    if (tekuci) {
+                        slova.color = android.graphics.Color.WHITE
+                        c.drawRoundRect(-8.5f * k, -6.5f * k, 8.5f * k, 6.5f * k, 3f * k, 3f * k, slova)
+                    }
+                    slova.textSize = (if (tekuci) 10.5f else 9f) * k
+                    slova.color = if (tekuci) android.graphics.Color.BLACK else 0x8CFFFFFF.toInt()
+                    c.drawText("${i + 1}", 0f, -(slova.descent() + slova.ascent()) / 2, slova)
+                    c.restore()
                 }
-                for (j in koraka downTo 0) {
-                    val y = -rr + 2 * rr * j / koraka
-                    p.lineTo(c.x + strana * k * sqrt(maxOf(0f, rr * rr - y * y)), c.y + y)
-                }
-                p.close()
-                drawPath(p, if (tekuci) Color.White else Color(0xCCF3F4FA))
-                if (tekuci) drawCircle(LILA, rr + 2.5.dp.toPx(), c, style = Stroke(1.5.dp.toPx()))
+
+                val p = Offset(center.x + 73f * k * cos(ugao).toFloat(), center.y + 73f * k * kotlin.math.sin(ugao).toFloat())
+                val rr = 5.6f * k * (if (tekuci) 1.25f else 1f)
+                drawCircle(Color(0xFF2A2A32), rr, p)
+                drawPath(mesecOsvetljen(p, rr, (i + 0.5) / 29.530588 * 360), if (tekuci) Color.White else Color(0xB8FFFFFF))
+                if (tekuci) drawCircle(LILA, rr + 2f * k, p, style = Stroke(1.5.dp.toPx()))
             }
+            // Veliki Mesec u sredini, u trenutnoj fazi.
+            val sredina = Offset(center.x, center.y - 5f * k)
+            drawCircle(Color(0xFF1C1C22), 44f * k, sredina)
+            drawPath(mesecOsvetljen(sredina, 44f * k, s.moon.phaseAngle), Color(0xFFF3F4FA))
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("${s.moon.lunarDay}", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-            Text(Tekst.t("ui.lunarDay"), color = LILA, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            Text(Tekst.t("phase.${s.moon.phase}"), color = SIVA, fontSize = 10.sp, maxLines = 1)
-        }
+        Text(
+            "${Tekst.t("ui.lunarDay")} ${s.moon.lunarDay}", color = LILA, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+            modifier = Modifier.align(Alignment.Center).padding(top = 96.dp),
+        )
     }
 }
 

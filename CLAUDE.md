@@ -52,7 +52,8 @@ src/
     nebo.tsx         "Trenutno na nebu" — OBICAN EKRAN (`pushed`, strelica nazad), do 14.10.2026 peti tab; otvara se sa kartice na tabu "Ostalo"
                      i sa widgeta (`astroshop:///?tab=sky` kroz kapiju -> `/nebo`; nazad bez istorije vodi na pocetnu)
     uporedni.tsx     UPOREDNI HOROSKOP (14.10.2026) — SIV list odozdo: moj znak levo, izbor znaka druge osobe, ocena para (`lib/uporedni.ts`);
-                     `?dev=leo` zadaje znak bez profila. TEKSTOVA (431, sa sajta) JOS NEMA u aplikaciji
+                     `?dev=leo` zadaje znak bez profila; ispod ocene tri taba (Ljubav / Prijateljstvo / Posao) sa tekstovima iz baze
+                     (`lib/uporedni-texts.ts`, tabela `uporedni_texts`, uvezeno 14.10.2026: 430 od 432, besplatno za prijavljene)
     proizvod.tsx     list sa JEDNIM proizvodom (?id=): sajt (narukvica, konsultacije uzivo -> dugme otvara astroshop.rs) i sat (jos nije u prodavnici)
     dev-ostalo.tsx   SAMO DEV: sadrzaj taba "Ostalo" bez naloga i tabova (znak Lav)
     nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
@@ -161,6 +162,7 @@ supabase/
   osobe.sql          druge osobe + okidac za granicu (1 / 10) — PRE pitanja.sql
   pitanja.sql        pitanja, krediti, astrolozi, skladiste `odgovori`
   pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
+  uporedni-texts.sql tabela uporedni_texts (tekstovi uporednog horoskopa, kolona `jezik`, RLS: cita svaki prijavljen, upisa nema); uvoz: `scripts/korpus/uporedni.py`
 panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
 modules/             lokalni nativni moduli (samo sopstveni build): postepeno-zamucenje, video-price (MP4 kadar po kadar),
                      nebo-widget (pravilo 27): iOS = veza aplikacija -> widget (pod NeboVeza); android = Kotlin jezgro
@@ -1027,7 +1029,7 @@ probni build `….test` ima svoju, prava ostaje slobodna za nalog firme). Androi
 telefona (GPS) NIJE uvedena (Ivan: "za sada nista") — trazila bi dozvolu u aplikaciji, a na Androidu lokaciju u pozadini.
 ASTRODIAL IMA SEST STRANA (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
 nagore: KRUG (kruna pomera vreme; strelica nema — prekrivale su znake), PLANETE (spisak sa stepenom i minutom, odmah posle
-kruga — Ivan), MESEC, KRUG MESECEVIH MENA (30 lunarnih dana ukrug, tekuci istaknut, u sredini lunarni dan; Ivan je trazio 28
+kruga — Ivan), MESEC, KRUG MESECEVIH MENA (po uzoru na Apple-ov brojcanik "Lunar", Ivan: spoljni prsten sa brojevima lunarnih dana, unutrasnji sa menama, tekuci istaknut, u sredini veliki Mesec i "Lunarni dan N"; Ivan je trazio 28
 polja, ali od mladog do mladog prodje 29,5 dana i lunarni dan ide 1—30 kao u `moon.ts`, pa je 30 — CEKA NJEGOVU POTVRDU), SAT, SLEDECE.
 Opis strana: 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
 Mesec bez kursa), 3 SAT (vladar planetarnog sata i do kada, sledeci, ASC i MC, izlazak i zalazak Sunca), 4 SLEDECE (dogadjaji po
@@ -1240,10 +1242,14 @@ npm run panel:build       panel za objavu -> panel/dist
       osobe, astrolog ih vidi); pitanja za astrologa (ASTRO-LOGIKA, pogl. 9, tacke 14 i 15).
       Faza 2: kompatibilnost/sinastrija (novi korpus), "Tvoj dan" za osobe, "Posalji joj kartu".
       UPOREDNI HOROSKOP (14.10.2026) — URADJENO: tab "Ostalo", kartica, list sa izborom znaka i ocenom (SAMO po znaku Sunca, bez osobe).
-      Tekstovi su vec napisani i javni na astroshop.rs/uporedni-horoskop/<znak>-<znak>/ (144 USMERENA para x Ljubav / Prijateljstvo /
-      Posao = 431, fali Posao za strelac-rak; ~68.000 reci, pisani na "Vi", sa slovnim greskama — treba lektura i odluka o "ti");
-      FALI: uvod u bazu sa kolonom `jezik` (kao ostali korpus, pravilo 26), prikaz tri taba na listu, "Zameni mesta" (druga strana),
-      prevod hr/bs/en, i tacno poredjenje po celoj karti (osoba iz "Tvojih ljudi") kao Premium dubina. Dete/roditelj nemaju tekst
+      TEKSTOVI UVEZENI 14.10.2026 (tabela `uporedni_texts`, `supabase/uporedni-texts.sql`): 144 USMERENA para x Ljubav / Prijateljstvo / Posao
+      sa astroshop.rs/uporedni-horoskop/<znak>-<znak>/, 430 od 432 (~67.900 reci, srpski, pisani na "Vi"). Pravi ih `scripts/korpus/uporedni.py`
+      (skida sajt, lektura iz `ispravke.json`, podela na pasuse od ~75 reci bez promene reci, CSV + `uvoz.sql`); izvor i izlaz:
+      ~/Desktop/Astroshop App/Uporedni horoskop/. LEKTURA: 496 ispravki slovnih gresaka (agenti, filtrirano da menjaju samo slova) —
+      `za-astrologa.json` drzi 9 mesta koja menjaju reci ("ste oboje ste", "Jupiterom vladaju" kod Raka/Riba...). NIJE UVEZENO: Lav->Devica
+      Ljubav (na sajtu odsecena usred recenice: "...lavlje srce, i") i Strelac->Rak Posao (na sajtu nema) — ekran za ta dva para pokazuje
+      ostale oblasti, a astrolog treba da ih dopise. FALI: "Zameni mesta" (druga strana), prevod hr/bs/en (do tada ekran kaze "Tekstovi su
+      na srpskom"), odluka o "Vi"/"ti" u tekstu, i tacno poredjenje po celoj karti (osoba iz "Tvojih ljudi") kao Premium dubina. Dete/roditelj nemaju tekst
       ("Ljubav" je romanticna). PROIZVODI: cene u aplikaciji su probne (`PROBNE_CENE`) dok ne stigne RevenueCat, "Zodiac Wheel" (sat)
       nije u prodavnici; PDF proizvodi sa sajta NAMERNO nisu u listi (digitalno, Apple 3.1.1). Pitanje kosta isto za sve (19,99 €).
 - [x] Kartica MESEC na pocetnom ekranu, posle "Danas ukratko" — faza, znak (i sat

@@ -552,4 +552,10 @@ Tab „Ostalo" → kartica „Uporedni horoskop" → list sa izborom znaka. Levo
 
 Raspodela 72 / 48 / 24 polja od 144. **Za astrologa:** opozicija je ovde „odličan par", a jedini X je kvadrat. To je izbor sajta, preuzet bez izmene — potvrditi ili promeniti (menja se na jednom mestu). Provera: `npm run check:uporedni`.
 
-**Tekstovi** (Ljubav / Prijateljstvo / Posao) postoje na sajtu za svih 144 *usmerenih* parova (Ovan→Bik se razlikuje od Bik→Ovan; „vi" je prvi znak), 431 tekst, oko 68.000 reči; fali „Posao" za Strelac→Rak. Pisani su na „Vi" i imaju slovnih grešaka (npr. „intezivno", „zajedniči", „senzalani"), pa pre uvoza treba lektura i odluka o obraćanju. Dete i roditelj nemaju odgovarajući tekst („Ljubav" je romantična). **Još nisu u aplikaciji.**
+**Tekstovi** (Ljubav / Prijateljstvo / Posao) su sa sajta, za 144 *usmerena* para (Ovan→Bik se razlikuje od Bik→Ovan; „vi" je prvi znak), i **uvezeni su u aplikaciju 14.10.2026**: 430 od 432 teksta, oko 67.900 reči, srpski, na „Vi". Besplatno za sve prijavljene. Dugački blok je podeljen na pasuse od oko 75 reči (reči nisu menjane), a **lektura je ispravila 496 slovnih grešaka** (npr. „intezivno", „zajedniči", „senzalani").
+
+**Za astrologa:**
+1. **Dva teksta fale:** Lav→Devica, Ljubav (na sajtu je odsečena usred rečenice: „…Retko će jedna Devica slomiti veliko lavlje srce, i") i Strelac→Rak, Posao (na sajtu ga nema). Aplikacija za ta dva para pokazuje samo oblasti koje postoje.
+2. **Devet mesta menja reči, ne samo slova**, pa ih lektura nije dirala (`za-astrologa.json`): „ste oboje ste" (tri teksta: Bik→Rak Posao, Bik→Jarac Posao, Strelac→Škorpija Ljubav), „ste veoma ste" (Strelac→Strelac Prijateljstvo), „Vagi nudite" (Bik→Vaga Ljubav), „zadivljeni ste Vaginim" (Blizanci→Vaga Ljubav), „ostavlja vam" (Strelac→Vaga Posao), „koji čiji" (Devica→Ovan Ljubav) i **Rak→Ribe, Prijateljstvo: „Jupiterom vladaju"** — Ribama vladaju Jupiter i Neptun, pa tekst verovatno treba „Ribama vladaju".
+3. **Obraćanje:** tekstovi su na „Vi" (ostali korpus isto), a aplikacija na „ti" — odluka nije pala.
+4. Dete i roditelj nemaju odgovarajući tekst („Ljubav" je romantična).

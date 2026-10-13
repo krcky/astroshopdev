@@ -112,8 +112,10 @@ func mesecOsvetljen(_ c: CGPoint, _ r: Double, _ angle: Double) -> Path {
   return p
 }
 
-/// Krug Mesecevih mena: 30 lunarnih dana ukrug, od prvog na vrhu u smeru kazaljke, svaki sa
-/// svojim izgledom Meseca; tekuci dan je veci i u prstenu. U sredini mesto za broj dana.
+/// Krug Mesecevih mena, po uzoru na Apple-ov brojcanik "Lunar" (Ivan, 14.10.2026): spoljni prsten
+/// sa BROJEVIMA lunarnih dana, unutrasnji sa izgledom Meseca za svaki dan, tekuci dan istaknut
+/// (broj u beloj plocici, mena u prstenu), a u sredini mesto za veliki Mesec. Prvi dan je na vrhu,
+/// dani idu u smeru kazaljke.
 ///
 /// TRIDESET, ne 28: od mladog do mladog Meseca prodje 29,5 dana, pa lunarni dan ide od 1 do 30
 /// (kao u aplikaciji, `moon.ts`). Sa 28 polja poslednja dva dana ne bi imala svoje mesto.
@@ -132,26 +134,52 @@ public struct MoonWheelView<Sredina: View>: View {
       Canvas { ctx, size in
         let strana = min(size.width, size.height)
         let c = CGPoint(x: size.width / 2, y: size.height / 2)
+        let k = strana / 200 // crta se u krugu precnika 200
         let n = Double(Self.DANA)
-        // Mali Mesec staje u svoj luk; tekuci je za polovinu veci.
-        let r = strana / 2 * 0.085
-        let R = strana / 2 - r * 1.7
+        let rBroj = 91.0 * k, rMena = 73.0 * k, r = 5.6 * k
+        // Tanki prstenovi izmedju brojeva, mena i sredine.
+        for rr in [99.0, 82.5, 63.5] {
+          ctx.stroke(Path(ellipseIn: CGRect(x: c.x - rr * k, y: c.y - rr * k, width: 2 * rr * k, height: 2 * rr * k)),
+                     with: .color(.white.opacity(0.16)), lineWidth: 0.8)
+        }
         for i in 0..<Self.DANA {
           let ugao = (Double(i) / n) * 2 * .pi - .pi / 2
-          let p = CGPoint(x: c.x + R * cos(ugao), y: c.y + R * sin(ugao))
           let tekuci = i + 1 == lunarDay
-          let rr = tekuci ? r * 1.5 : r
-          // Izgled Meseca na sredini tog dana (sinodicki mesec 29,53 dana).
-          let faza = (Double(i) + 0.5) / 29.530588 * 360
-          ctx.fill(Path(ellipseIn: CGRect(x: p.x - rr, y: p.y - rr, width: 2 * rr, height: 2 * rr)), with: .color(boja(0x26262E)))
-          ctx.fill(mesecOsvetljen(p, rr, faza), with: .color(tekuci ? .white : Brend.svetlaLila.opacity(0.8)))
+          // Crtica izmedju dana, u prstenu sa brojevima.
+          let granica = ugao - .pi / n
+          var crta = Path()
+          crta.move(to: CGPoint(x: c.x + 82.5 * k * cos(granica), y: c.y + 82.5 * k * sin(granica)))
+          crta.addLine(to: CGPoint(x: c.x + 99 * k * cos(granica), y: c.y + 99 * k * sin(granica)))
+          ctx.stroke(crta, with: .color(.white.opacity(0.16)), lineWidth: 0.8)
+
+          // Broj dana, okrenut tako da se cita duz kruga.
+          var g = ctx
+          g.translateBy(x: c.x + rBroj * cos(ugao), y: c.y + rBroj * sin(ugao))
+          g.rotate(by: .radians(ugao + .pi / 2))
           if tekuci {
-            let o = rr + 2.5
+            g.fill(Path(roundedRect: CGRect(x: -8.5 * k, y: -6.5 * k, width: 17 * k, height: 13 * k), cornerRadius: 3 * k), with: .color(.white))
+          }
+          g.draw(Text("\(i + 1)").font(.system(size: (tekuci ? 10.5 : 9) * k, weight: tekuci ? .bold : .medium, design: .rounded))
+            .foregroundColor(tekuci ? .black : .white.opacity(0.55)), at: .zero)
+
+          // Izgled Meseca na sredini tog dana (sinodicki mesec 29,53 dana).
+          let p = CGPoint(x: c.x + rMena * cos(ugao), y: c.y + rMena * sin(ugao))
+          let rr = tekuci ? r * 1.25 : r
+          ctx.fill(Path(ellipseIn: CGRect(x: p.x - rr, y: p.y - rr, width: 2 * rr, height: 2 * rr)), with: .color(boja(0x2A2A32)))
+          ctx.fill(mesecOsvetljen(p, rr, (Double(i) + 0.5) / 29.530588 * 360), with: .color(tekuci ? .white : .white.opacity(0.72)))
+          if tekuci {
+            let o = rr + 2 * k
             ctx.stroke(Path(ellipseIn: CGRect(x: p.x - o, y: p.y - o, width: 2 * o, height: 2 * o)), with: .color(Brend.lila), lineWidth: 1.5)
           }
         }
       }
-      sredina
+      // Sredina staje u unutrasnji prsten (poluprecnik 63,5 od 100).
+      GeometryReader { geo in
+        let strana = min(geo.size.width, geo.size.height)
+        sredina
+          .frame(width: strana * 0.53, height: strana * 0.53)
+          .position(x: geo.size.width / 2, y: geo.size.height / 2)
+      }
     }
     .aspectRatio(1, contentMode: .fit)
   }
