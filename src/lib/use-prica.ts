@@ -173,7 +173,7 @@ export function usePricaDana(): PricaDana | null {
     // --- Mesec: isti izvor kao kartica i ekran Mesec
     const faza = phaseDay(danas);
     const znak = signFromLongitude(faza.moonLongitude).sign;
-    const mesecHit = strongestMoonHitWithText(mesecHits, (k) => !!texts.get(k)?.body);
+    const mesecHit = strongestMoonHitWithText(mesecHits, (k) => !!texts.get(k)?.title);
     const hitTekst = mesecHit ? texts.get(mesecHit.contentKey) : undefined;
     const mesec = {
       faza,
