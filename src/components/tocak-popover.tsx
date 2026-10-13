@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Pressable, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { ChevronRight, X } from 'lucide-react-native';
 
 import { AspektIkona, imaAspekt } from '@/components/aspekt-ikona';
@@ -11,10 +11,13 @@ import { Text } from '@/components/ui/text';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { findAspects } from '@/lib/astro';
 import type { NatalChart } from '@/lib/natal';
+import { signRulers } from '@/lib/rulers';
 import { SIGNS, signFromLongitude, type SignPosition } from '@/lib/zodiac';
 import type { Pogodak } from '@/lib/wheel';
-import { useT } from '@/i18n';
+import { useT, type Recnik } from '@/i18n';
 import { neutral } from '@/theme/tokens';
+
+type ZnakKljuc = keyof Recnik['nebo']['znaci'];
 
 /** Planeta ili izvedena tacka — sve sto tocak crta na prstenu planeta. */
 type Telo = {
@@ -69,9 +72,21 @@ export function TockPopover({ izbor, sidro, okvir, chart, points, bezKuca = fals
   const aspekti = React.useMemo(() => findAspects(chart.planets), [chart]);
   const [mera, setMera] = React.useState<{ w: number; h: number } | null>(null);
 
-  // Malo "iskoci" iz dodirnute tacke: samo razmera, bez providnosti.
-  const razmera = useSharedValue(0.9);
-  React.useEffect(() => { razmera.value = withSpring(1, { damping: 16, stiffness: 260 }); }, [razmera]);
+  // JEDAN odskok (Ivan, 8.10.2026, drugi put): 0,92 -> 1,05 -> 1 i stane. Kreće TEK KAD JE KARTICA IZMERENA I
+  // POSTAVLJENA — dok je van ekrana (`mera == null`) animacije nema, pa se ne gleda kako kartica skace sa
+  // mesta na mesto usred odskoka (to je bilo "dva"). Prva verzija jednog odskoka (isti tajming) je vracena na
+  // oprugu jer je bila pokrenuta pre merenja. Samo razmera, bez providnosti.
+  const razmera = useSharedValue(1);
+  const odskocio = React.useRef(false);
+  React.useEffect(() => {
+    if (!mera || odskocio.current) return;
+    odskocio.current = true;
+    razmera.value = withSequence(
+      withTiming(0.92, { duration: 0 }),
+      withTiming(1.05, { duration: 130, easing: Easing.out(Easing.quad) }),
+      withTiming(1, { duration: 110, easing: Easing.inOut(Easing.quad) }),
+    );
+  }, [mera, razmera]);
   const stil = useAnimatedStyle(() => ({ transform: [{ scale: razmera.value }] }));
 
   let ikona: React.ReactNode;
@@ -116,8 +131,26 @@ export function TockPopover({ izbor, sidro, okvir, chart, points, bezKuca = fals
     const kuspida = signFromLongitude(chart.houses.cusps[izbor.broj - 1]);
     ikona = <KucaBroj kuca={izbor.broj} size={IKONA} />;
     naslov = t.karta.kuca(izbor.broj);
-    podnaslov = `${tk.pocinjeU} ${kuspida.sign.name} ${stepenMinut(kuspida)}`;
-    dodatak = <ListaTela tela={sva.filter((x) => x.house === izbor.broj)} onIzbor={onIzbor} />;
+    podnaslov = tk.pocinjeU(kuspida.sign.key as ZnakKljuc, stepenMinut(kuspida));
+    // Vladar kuce = vladar znaka na kuspidi (tradicionalni, `signRulers`), i u kojoj kuci je on (Ivan, 8.10.2026).
+    const vladar = sva.find((x) => x.key === signRulers(kuspida.sign.key)[0]);
+    dodatak = (
+      <>
+        {vladar ? (
+          <View className="mt-2">
+            <Text variant="caption" className="text-[12px] leading-[15px]">{tk.vladarKuce}</Text>
+            <View className="mt-1 flex-row items-center gap-2">
+              <Cip label={vladar.name} onPress={() => onIzbor({ tip: 'planeta', key: vladar.key })}>
+                <Tacka tacka={vladar.key} glyph={vladar.glyph} size={MALA} />
+                <Text variant="chip" className="text-[12px] text-foreground">{vladar.name}</Text>
+              </Cip>
+              {vladar.house ? <Text className="text-[13px] leading-[17px] text-foreground">{t.karta.uKuci(vladar.house)}</Text> : null}
+            </View>
+          </View>
+        ) : null}
+        <ListaTela tela={sva.filter((x) => x.house === izbor.broj)} onIzbor={onIzbor} />
+      </>
+    );
   } else if (izbor.tip === 'znak') {
     const znak = SIGNS[izbor.indeks];
     ikona = <ZnakIkona znak={znak.key} element={znak.element} size={IKONA} />;
@@ -202,20 +235,23 @@ function Cip({ onPress, label, children }: { onPress: () => void; label: string;
   );
 }
 
-/** Planete kao kapsule, ili "Nema planeta". */
+/** Naslov "Planete" pa planete kao kapsule (da se ne mesaju sa vladarom kuce), ili "Nema planeta". */
 function ListaTela({ tela, onIzbor }: { tela: Telo[]; onIzbor: (p: Pogodak) => void }) {
   const t = useT();
   if (tela.length === 0) {
     return <Text variant="caption" className="mt-2 text-[12px]">{t.karta.tockDodir.prazno}</Text>;
   }
   return (
-    <View className="mt-2 flex-row flex-wrap gap-1.5">
-      {tela.map((p) => (
-        <Cip key={p.key} label={p.name} onPress={() => onIzbor({ tip: 'planeta', key: p.key })}>
-          <Tacka tacka={p.key} glyph={p.glyph} size={MALA} />
-          <Text variant="chip" className="text-[12px] text-foreground">{p.name}</Text>
-        </Cip>
-      ))}
+    <View className="mt-2">
+      <Text variant="caption" className="text-[12px] leading-[15px]">{t.karta.tockDodir.planete}</Text>
+      <View className="mt-1 flex-row flex-wrap gap-1.5">
+        {tela.map((p) => (
+          <Cip key={p.key} label={p.name} onPress={() => onIzbor({ tip: 'planeta', key: p.key })}>
+            <Tacka tacka={p.key} glyph={p.glyph} size={MALA} />
+            <Text variant="chip" className="text-[12px] text-foreground">{p.name}</Text>
+          </Cip>
+        ))}
+      </View>
     </View>
   );
 }

@@ -13,16 +13,17 @@
  */
 import { planetPositions } from '../src/lib/astro';
 import {
-  buildSky, danZaKalendar, istiDanUKalendaru, izKalendara, naDan, shiftDays, zoneClock, zoneShift,
+  buildSky, danZaKalendar, istiDanUKalendaru, izKalendara, naDan, shiftDays, vremeZaOkret, zoneClock, zoneShift,
 } from '../src/lib/sky';
 import { formatDate } from '../src/lib/horoscope';
 import { trueNodeLongitude, meanLilithLongitude, nodeSpeed } from '../src/lib/points';
 import {
-  chartAngle, chordAt, degreeTickPaths, labelBlockWidth, levaTacka, naOsi, oseKarte, polar, spreadAngles,
+  BEZ_ZUMA, ZUM_MAX, chartAngle, chordAt, degreeTickPaths, ekranUKrug, krugUEkran, labelBlockWidth, levaTacka, naOsi, oseKarte, pogodiTocak, polar, primeniPokret, spreadAngles, ugloviSimbola,
   LABEL, LABEL_SEP, WHEEL_R,
 } from '../src/lib/wheel';
 import { buildNatalChart } from '../src/lib/natal';
 import { signFromLongitude } from '../src/lib/zodiac';
+import { CENTAR, OKVIR, VIEW } from '../src/lib/tocak-stil';
 
 let fail = 0;
 const ok = (c: boolean, label: string, detail = '') => {
@@ -363,6 +364,121 @@ ok(tromse.houses.fellBack && tromse.houses.cusps.filter((c) => naOsi(c, oseSever
 // Bez vremena rodjenja nema kuca ni ASC: levo je 0° Ovna, ne ascendent za podne.
 ok(chartAngle(0, levaTacka(sky.chart.houses.ascendant, true)) === 180, 'bez vremena rodjenja levo je 0° Ovna');
 ok(levaTacka(sky.chart.houses.ascendant, false) === sky.chart.houses.ascendant, 'sa vremenom levo je ascendent');
+
+console.log('\n=== 12. Dodir na tocak ===');
+// Tocak se crta u viewBox-u (VIEW x VIEW) na `size` tacaka; dodir stize u tackama.
+const VELICINA = 400;
+const zaTacku = (r: number, ugao: number) => {
+  const q = polar(CENTAR, CENTAR, r, ugao);
+  return { x: ((q.x + OKVIR) * VELICINA) / VIEW, y: ((q.y + OKVIR) * VELICINA) / VIEW };
+};
+const nebo = sky.chart;
+const leva = levaTacka(nebo.houses.ascendant, false);
+const simboli = [...nebo.planets, ...sky.points];
+const uglovi = ugloviSimbola(simboli.map((s) => s.longitude), leva, true);
+const opis: Parameters<typeof pogodiTocak>[2] = {
+  size: VELICINA, leva, degrees: true,
+  planete: simboli.map((s, i) => ({ key: s.key, ugao: uglovi[i] })),
+  kuspide: nebo.houses.cusps, ascendant: nebo.houses.ascendant, midheaven: nebo.houses.midheaven,
+};
+const pogodi = (r: number, ugao: number, o = opis) => { const q = zaTacku(r, ugao); return pogodiTocak(q.x, q.y, o); };
+
+// Svaki simbol, dodirnut na mestu gde je nacrtan (i malo sa strane), je ta planeta.
+const promasaji = simboli.filter((s, i) => {
+  const a = pogodi(WHEEL_R.planetUp, uglovi[i]);
+  const b = pogodi(WHEEL_R.number, uglovi[i] + 3);
+  return !(a?.tip === 'planeta' && a.key === s.key && b?.tip === 'planeta' && b.key === s.key);
+});
+ok(promasaji.length === 0, 'dodir na simbol pogadja bas tu planetu', promasaji.map((s) => s.key).join(', '));
+
+// Sredina svake kuce je ta kuca; broj kuce je isti kao u `houseOf`.
+const losaKuca: number[] = [];
+nebo.houses.cusps.forEach((c, i) => {
+  const raspon = (((nebo.houses.cusps[(i + 1) % 12] - c) % 360) + 360) % 360;
+  // Poluprecnik izmedju brojeva i polja planeta: tu planete ne smetaju.
+  const h = pogodi(WHEEL_R.houseNum + 20, chartAngle(c + raspon / 2, leva));
+  if (!(h?.tip === 'kuca' && h.broj === i + 1)) losaKuca.push(i + 1);
+});
+ok(losaKuca.length === 0, 'sredina svake kuce je ta kuca', losaKuca.join(', '));
+
+// Prsten znakova: sredina znaka. Ascendent je levo, pa je znak ascendenta pogodjen levo.
+const znakAsc = Math.floor(nebo.houses.ascendant / 30);
+const zn = pogodi((WHEEL_R.outer + WHEEL_R.zodiacIn) / 2, 180);
+ok(zn?.tip === 'znak' && zn.indeks === znakAsc, 'prsten znakova: levo je znak ascendenta', `${zn && 'indeks' in zn ? zn.indeks : '-'} vs ${znakAsc}`);
+
+// Natpisi ASC i MC van kruga; mali krug u sredini i sve van tocka nisu nista.
+const a1 = pogodi(WHEEL_R.outer + 16, 180);
+ok(a1?.tip === 'ugao' && a1.key === 'ascendant', 'natpis ASC van kruga je ugao ascendenta');
+const m1 = pogodi(WHEEL_R.outer + 16, chartAngle(nebo.houses.midheaven, leva));
+ok(m1?.tip === 'ugao' && m1.key === 'midheaven', 'natpis MC van kruga je ugao MC');
+ok(pogodi(5, 40) === null, 'mali krug u sredini nije nista');
+ok(pogodi(WHEEL_R.outer + 60, 90) === null, 'van tocka nije nista');
+
+// Bez vremena rodjenja nema kuca ni uglova, ali planete i znakovi rade.
+const bezKuca = { ...opis, kuspide: null, leva: levaTacka(nebo.houses.ascendant, true) };
+const ugBez = ugloviSimbola(simboli.map((s) => s.longitude), bezKuca.leva, true);
+const bezOpis = { ...bezKuca, planete: simboli.map((s, i) => ({ key: s.key, ugao: ugBez[i] })) };
+const planBez = pogodi(WHEEL_R.planetUp, ugBez[0], bezOpis);
+ok(planBez?.tip === 'planeta' && planBez.key === simboli[0].key, 'bez vremena rodjenja planeta se i dalje pogadja');
+ok(pogodi(WHEEL_R.houseNum + 20, 100, bezOpis) === null, 'bez vremena rodjenja nema kuca');
+ok(pogodi(WHEEL_R.outer + 16, 180, bezOpis) === null, 'bez vremena rodjenja nema uglova');
+ok(pogodi((WHEEL_R.outer + WHEEL_R.zodiacIn) / 2, 100, bezOpis)?.tip === 'znak', 'bez vremena rodjenja znakovi rade');
+
+console.log('\n=== 13. Zum kruga ===');
+const Z = VELICINA;
+const blizu = (a: number, b: number) => Math.abs(a - b) < 1e-9;
+
+// Zum 2x oko tacke (100, 150): ta tacka na ekranu ostaje na istom mestu, a ekran->krug->ekran je identitet.
+const f = { x: 100, y: 150 };
+const r2 = primeniPokret(BEZ_ZUMA, Z, 2, f, { x: 0, y: 0 });
+const pod = ekranUKrug(f.x, f.y, Z, r2.zum);
+ok(blizu(r2.zum.s, 2) && blizu(r2.g, 2), 'stezanje 2x daje razmeru 2');
+ok(blizu(pod.x, f.x) && blizu(pod.y, f.y), 'tacka pod prstima ostaje pod prstima', `${pod.x.toFixed(2)},${pod.y.toFixed(2)}`);
+const nazad = krugUEkran(...(Object.values(ekranUKrug(70, 220, Z, r2.zum)) as [number, number]), Z, r2.zum);
+ok(blizu(nazad.x, 70) && blizu(nazad.y, 220), 'ekran -> krug -> ekran vraca istu tacku');
+
+// Pomeraj: bez promene razmere sredina ide suprotno od prsta.
+const pan = primeniPokret(r2.zum, Z, 1, { x: Z / 2, y: Z / 2 }, { x: 40, y: 0 });
+ok(pan.zum.fx < r2.zum.fx && blizu(pan.zum.fy, r2.zum.fy), 'pomeranje udesno pokazuje levlji deo kruga');
+
+// Granice: ne moze preko ZUM_MAX, ne moze ispod 1, sredina ne izlazi iz kruga, a `t` prati ogranicenje.
+const veliki = primeniPokret(BEZ_ZUMA, Z, 99, f, { x: 0, y: 0 });
+ok(blizu(veliki.zum.s, ZUM_MAX), 'razmera se zaustavlja na ZUM_MAX', String(veliki.zum.s));
+const odzum = primeniPokret(BEZ_ZUMA, Z, 0.3, f, { x: 0, y: 0 });
+ok(blizu(odzum.zum.s, 1) && blizu(odzum.zum.fx, 0.5), 'odzumiranje se vraca na pun krug');
+const izvan = primeniPokret(r2.zum, Z, 1, { x: Z / 2, y: Z / 2 }, { x: 9999, y: 9999 });
+ok(izvan.zum.fx >= 0.25 - 1e-9 && izvan.zum.fy >= 0.25 - 1e-9, 'pomeranje ne izlazi iz kruga', `${izvan.zum.fx.toFixed(3)}`);
+ok(Math.abs(izvan.t.x) < 9999, 'ogranicen pomeraj se vraca kao `t` (prikaz = ono sto se upise)');
+
+// Dodir pod zumom: zumiraj tacno na simbol pa dodirni sredinu — to je ta planeta.
+const prvi = simboli[0];
+const tacka = zaTacku(WHEEL_R.planetUp, uglovi[0]);
+const zumPlaneta = primeniPokret(BEZ_ZUMA, VELICINA, 2, tacka, { x: 0, y: 0 }).zum;
+const pod2 = ekranUKrug(tacka.x, tacka.y, VELICINA, zumPlaneta);
+const pogodak2 = pogodiTocak(pod2.x, pod2.y, opis);
+ok(pogodak2?.tip === 'planeta' && pogodak2.key === prvi.key, 'dodir pod zumom pogadja planetu pod prstom', prvi.key);
+
+console.log('\n=== 14. Okretanje neba prstom ===');
+const asc0 = sky.chart.houses.ascendant;
+const ascU = (d: Date) => buildSky(d, BEOGRAD.latitude, BEOGRAD.longitude).chart.houses.ascendant;
+const raz = (a: number, b: number) => Math.abs((((a - b + 540) % 360) + 360) % 360 - 180);
+for (const stepeni of [10, 30, 90, 200]) {
+  const t = vremeZaOkret(TRENUTAK, BEOGRAD.latitude, BEOGRAD.longitude, stepeni);
+  ok(raz(ascU(t), asc0 + stepeni) < 0.01, `ascendent ide ${stepeni}° napred`, `${raz(ascU(t), asc0 + stepeni).toFixed(4)}° odstupanja`);
+  ok(t > TRENUTAK, `${stepeni}° napred je kasnije vreme`);
+}
+const unazad = vremeZaOkret(TRENUTAK, BEOGRAD.latitude, BEOGRAD.longitude, -45);
+ok(unazad < TRENUTAK && raz(ascU(unazad), asc0 - 45) < 0.01, '-45° je ranije vreme sa ascendentom 45° iza');
+const ceo = vremeZaOkret(TRENUTAK, BEOGRAD.latitude, BEOGRAD.longitude, 360);
+ok(Math.abs(ceo.getTime() - TRENUTAK.getTime() - 86_164_090) < 2000, '360° je jedan zvezdani dan', `${((ceo.getTime() - TRENUTAK.getTime()) / 3600000).toFixed(3)} h`);
+ok(vremeZaOkret(TRENUTAK, BEOGRAD.latitude, BEOGRAD.longitude, 0).getTime() === TRENUTAK.getTime(), '0° je isti trenutak');
+// Neravnomerno: sat vremena ne pomera ascendent uvek isto — to je razlog za trazenje vremena, a ne 15° na sat.
+const satKasnije = (d: Date) => raz(ascU(new Date(d.getTime() + 3600000)), ascU(d));
+const brzine = [0, 6, 12, 18].map((h) => satKasnije(new Date(TRENUTAK.getTime() + h * 3600000)));
+ok(Math.max(...brzine) - Math.min(...brzine) > 3, 'ascendent se ne krece ravnomerno kroz dan', brzine.map((b) => b.toFixed(1)).join(', ') + ' °/h');
+// Polarna sirina: ravnomerno, ne puca.
+const polarno = vremeZaOkret(TRENUTAK, 69.6492, 18.9553, 90);
+ok(Math.abs(polarno.getTime() - TRENUTAK.getTime() - 86_164_090.5 / 4) < 5, 'iznad polarnog kruga ide ravnomerno');
 
 console.log(fail ? `\n${fail} PROVERA PALO\n` : '\nSve provere prosle.\n');
 process.exit(fail ? 1 : 0);

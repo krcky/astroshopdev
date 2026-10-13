@@ -70,12 +70,15 @@ export const karta: Recnik['karta'] = {
 
   /** `components/tocak-kartica.tsx` — Točka, izbrana z dotikom kroga. */
   tockDodir: {
-    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida). */
-    pocinjeU: 'Se začne v',
+    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida); znak u lokativu kroz `nebo.uZnaku`. */
+    pocinjeU: (z, stepen) => `Se začne ${nebo.uZnaku(z)} ${stepen}`,
+    planete: 'Planeti',
+    vladarKuce: 'Vladar hiše',
     uOvojKuci: 'V tej hiši',
     uOvomZnaku: 'Planeti v tem znamenju',
     prazno: 'Ni planetov',
     procitaj: 'Preberi',
+    vratiZum: 'Ponastavi povečavo',
     zatvori: 'Zapri',
   },
 

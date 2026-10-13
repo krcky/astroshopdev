@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { NatalWheel, pogodiNatalniTocak, polozajSimbola } from '@/components/natal-wheel';
 import { IznadPreliva } from '@/components/screen';
 import { TockPopover } from '@/components/tocak-popover';
+import { ZumOkvir, ZumVrati, useTockZum } from '@/components/tocak-zum';
 import { istiPogodak, type Pogodak } from '@/lib/wheel';
 import { Text } from '@/components/ui/text';
 
@@ -58,6 +59,8 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   const rec = useT();
   const tp = rec.karta.prikaz;
   const { width } = useWindowDimensions();
+  // Zum kruga stezanjem (8.10.2026). Velicina je ista kao `wheelSize` ispod; hook mora pre ranog izlaza.
+  const tockZum = useTockZum(Math.min(width - 16, 430));
 
   // Aspekti izmedju planeta i na Ascendent (na MC ne — Ivan, 28.9.2026), najtesnji prvi.
   // Bez vremena rodjenja nema aspekata na ASC, a Mesecevi se ne tumace (`natal-keys.ts`).
@@ -114,10 +117,13 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
   };
   const sunce = chart.planets.find((x) => x.key === 'sun')!;
   const dodirTocka = (x: number, y: number) => {
-    const p = pogodiNatalniTocak(x, y, { chart, size: wheelSize, bezKuca: timeUnknown });
+    if (tockZum.gestTraje() || !tockZum.udarioOkvir(y)) return;
+    // Dodir je u koordinatama ekrana; pod zumom se prvo vraca na krug bez zuma.
+    const u = tockZum.uKrug(x, y);
+    const p = pogodiNatalniTocak(u.x, u.y, { chart, size: wheelSize, bezKuca: timeUnknown });
     const novi = p && !istiPogodak(p, izbor) ? p : null;
     if (novi) Haptics.selectionAsync().catch(() => {});
-    izaberi(novi, { x, y });
+    izaberi(novi, u);
   };
 
   return (
@@ -137,18 +143,28 @@ export function NatalnaKartaPrikaz({ resolved, osobaId, posleTrojke }: {
           // Bez vremena rodjenja krug nema kuca, ASC ni MC (Ivan, 30.9.2026; pravilo 5).
           velicina={{ w: wheelSize, h: wheelSize }}
           onDodir={dodirTocka}
-          povrsina={izbor && sidro ? (
-            <TockPopover
-              izbor={izbor}
-              sidro={sidro}
-              okvir={wheelSize}
-              chart={chart}
-              bezKuca={timeUnknown}
-              onIzbor={(p) => izaberi(p)}
-              onProcitaj={(tema) => otvori(tema)}
-            />
+          gest={tockZum.gest}
+          povrsina={(izbor && sidro) || tockZum.zumirano ? (
+            <>
+              {izbor && sidro ? (
+                <TockPopover
+                  izbor={izbor}
+                  sidro={tockZum.naEkran(sidro.x, sidro.y)}
+                  okvir={wheelSize}
+                  chart={chart}
+                  bezKuca={timeUnknown}
+                  onIzbor={(p) => izaberi(p)}
+                  onProcitaj={(tema) => otvori(tema)}
+                />
+              ) : null}
+              {tockZum.zumirano ? <ZumVrati onPress={tockZum.vrati} /> : null}
+            </>
           ) : undefined}
-          podignuto={<NatalWheel chart={chart} size={wheelSize} bezKuca={timeUnknown} izbor={izbor} />}>
+          podignuto={(
+            <ZumOkvir z={tockZum}>{(vel) => (
+              <NatalWheel chart={chart} size={vel} bezKuca={timeUnknown} izbor={izbor} />
+            )}</ZumOkvir>
+          )}>
           {/* "i" DOLE desno od kruga, dno ikonice u liniji sa dnom kruga, svetlo ljubicasta
               (Ivan, 28.9.2026): sta je natalna karta, legenda aspekata, elementi. */}
           <TockInfo velicina={wheelSize} onPress={() => router.push('/natalna-karta-info')}

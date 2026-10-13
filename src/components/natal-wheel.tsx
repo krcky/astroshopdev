@@ -168,7 +168,11 @@ type Props = {
 /** Boja isticanja — indigo iz brenda, providan, da ostane vidljivo sve ispod. */
 const ISTAKNUTO = brand.indigo;
 
-export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false, izbor = null }: Props) {
+/**
+ * `memo`: zum (`tocak-zum.tsx`) ga ne sme ponovo crtati dok se samo POMERA — crtez je ceo, uvecan jednom,
+ * a pomeranje je transformacija. Bez `memo` bi svaka promena stanja ekrana (sidro kartice) crtala SVG iznova.
+ */
+export const NatalWheel = React.memo(function NatalWheel({ chart, size = 360, showAspects = true, showDegrees, points, bezKuca = false, izbor = null }: Props) {
   const rec = useT();
   const cx = CENTAR;
   const cy = CENTAR;
@@ -450,4 +454,4 @@ export function NatalWheel({ chart, size = 360, showAspects = true, showDegrees,
       )}
     </Svg>
   );
-}
+});

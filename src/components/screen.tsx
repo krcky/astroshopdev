@@ -23,6 +23,7 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
+import { GestureDetector } from 'react-native-gesture-handler';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -495,7 +496,7 @@ export function Screen({
  * ANDROID (`JEDAN_PRIMERAK`, 1.10.2026): primerka u sadrzaju NEMA — tamo je samo prazno mesto
  * velicine `velicina`, a element se crta jednom, u sloju 3b. Bez `velicina` ostaju oba primerka.
  */
-export function IznadPreliva({ podignuto, povrsina, velicina, onDodir, className, children }: {
+export function IznadPreliva({ podignuto, povrsina, velicina, onDodir, gest, className, children }: {
   podignuto: React.ReactNode;
   /**
    * Plutajuca kartica preko elementa (8.10.2026: detalji izabranog sa tocka, staklo). Crta se
@@ -509,6 +510,8 @@ export function IznadPreliva({ podignuto, povrsina, velicina, onDodir, className
    * primerak (sloj 3b, `pointerEvents="none"`) samo prikazuje isto stanje.
    */
   onDodir?: (x: number, y: number) => void;
+  /** Gestovi na elementu (stezanje za zum kruga, 8.10.2026) — na istom providnom sloju kao dodir. */
+  gest?: React.ComponentProps<typeof GestureDetector>['gesture'];
   /** Stalna velicina elementa (tocak: `size` x `size`) — za prazno mesto na Androidu. */
   velicina?: { w: number; h: number };
   className?: string;
@@ -529,15 +532,22 @@ export function IznadPreliva({ podignuto, povrsina, velicina, onDodir, className
     <View className={className} onLayout={postavi ? (e) => setOmot(e.nativeEvent.layout) : undefined}>
       <View onLayout={postavi ? (e) => setUnutra(e.nativeEvent.layout) : undefined}>
         {samoGore ? <View style={{ width: velicina!.w, height: velicina!.h }} /> : podignuto}
-        {onDodir && (
+        {onDodir && (() => {
           // Za citac ekrana krug nema stavke (lista ispod ima sve to), pa sloj nije dugme.
-          <Pressable
-            accessible={false}
-            importantForAccessibility="no"
-            style={StyleSheet.absoluteFill}
-            onPress={(e) => onDodir(e.nativeEvent.locationX, e.nativeEvent.locationY)}
-          />
-        )}
+          const sloj = (
+            <Pressable
+              accessible={false}
+              importantForAccessibility="no"
+              style={StyleSheet.absoluteFill}
+              onPress={(e) => onDodir(e.nativeEvent.locationX, e.nativeEvent.locationY)}
+            />
+          );
+          return gest ? (
+            <GestureDetector gesture={gest}>
+              <View style={StyleSheet.absoluteFill}>{sloj}</View>
+            </GestureDetector>
+          ) : sloj;
+        })()}
         {/* Bez preliva nema sloja 3c: kartica stoji odmah preko elementa. */}
         {!postavi && povrsina ? (
           <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>{povrsina}</View>

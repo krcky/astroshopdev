@@ -102,12 +102,15 @@ export const karta: Recnik['karta'] = {
 
   /** `components/tocak-kartica.tsx` — Item picked by tapping the wheel ("You" and Sky). */
   tockDodir: {
-    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida). */
-    pocinjeU: 'Starts in',
+    /** "Počinje u Blizancima 12°30'" — gde kuca pocinje (kuspida); znak u lokativu kroz `nebo.uZnaku`. */
+    pocinjeU: (z, stepen) => `Starts ${nebo.uZnaku(z)} ${stepen}`,
+    planete: 'Planets',
+    vladarKuce: 'House ruler',
     uOvojKuci: 'In this house',
     uOvomZnaku: 'Planets in this sign',
     prazno: 'No planets',
     procitaj: 'Read',
+    vratiZum: 'Reset zoom',
     zatvori: 'Close',
   },
 

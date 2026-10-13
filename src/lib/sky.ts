@@ -17,7 +17,7 @@
  */
 import { tr } from '@/i18n/jezik';
 import { findAspects, moonPhase, type Aspect, type PlanetPosition } from '@/lib/astro';
-import { buildNatalChart, houseOf, type NatalChart } from '@/lib/natal';
+import { ascendant, buildNatalChart, houseOf, obliquity, rightAscensionMC, type NatalChart } from '@/lib/natal';
 import { computeSkyPoints, isDayChart, type SkyPoint } from '@/lib/points';
 import { localBirthToUtc, zoneOffsetMinutes, type TimeZoneInfo } from '@/lib/timezone';
 
@@ -150,4 +150,40 @@ export function istiDanUKalendaru(date: Date, tz: TimeZoneInfo, izabrano: Date):
   return nosilac.getFullYear() === izabrano.getFullYear()
     && nosilac.getMonth() === izabrano.getMonth()
     && nosilac.getDate() === izabrano.getDate();
+}
+
+/** Zvezdani dan u milisekundama: za toliko se ascendent obrne ceo krug. */
+const ZVEZDANI_DAN_MS = 86_164_090.5;
+
+/**
+ * Trenutak u kome je ascendent za `stepeni` ISPRED (pozitivno) ili IZA (negativno) onog u `t0` — za
+ * okretanje neba prstom na "Nebu" (Ivan, 8.10.2026): krug je ukljesten na ascendent (levo), pa se pri
+ * promeni vremena okrece zodijak, i to NE ravnomerno (ascendent se krece 10—25° na sat, zavisno od znaka i
+ * sirine). Zato se vreme ne racuna po 15° na sat, nego se trazi tacno ono u kome je ascendent tamo gde ga
+ * prst vodi — krug prati prst.
+ *
+ * Ascendent raste sa vremenom (jedan krug = zvezdani dan), pa se resava bisekcijom unutar jednog dana, uz
+ * cele krugove sa strane. Preko polarnog kruga (kuce padaju na Whole Sign) ascendent ne raste uvek,
+ * pa tamo ide ravnomerno, 360° za zvezdani dan.
+ */
+export function vremeZaOkret(t0: Date, latitude: number, longitude: number, stepeni: number): Date {
+  const celih = Math.floor(stepeni / 360);
+  const ostatak = stepeni - celih * 360;
+  const osnova = t0.getTime() + celih * ZVEZDANI_DAN_MS;
+  if (Math.abs(latitude) > 66 || ostatak === 0) return new Date(osnova + (ostatak / 360) * ZVEZDANI_DAN_MS);
+
+  const eps = obliquity(t0);
+  const asc = (ms: number) => ascendant(rightAscensionMC(new Date(ms), longitude), latitude, eps);
+  const asc0 = asc(t0.getTime());
+  // Koliko je ascendent odmakao od `t0` (0..360), uz `ms` od `t0`.
+  const odmak = (ms: number) => (((asc(t0.getTime() + ms) - asc0) % 360) + 360) % 360;
+
+  let lo = 0;
+  let hi = ZVEZDANI_DAN_MS;
+  for (let i = 0; i < 26; i++) {
+    const sredina = (lo + hi) / 2;
+    if (odmak(sredina) < ostatak) lo = sredina;
+    else hi = sredina;
+  }
+  return new Date(osnova + (lo + hi) / 2);
 }

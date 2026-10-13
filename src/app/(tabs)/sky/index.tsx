@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 
 import { NatalWheel, pogodiNatalniTocak, polozajSimbola } from '@/components/natal-wheel';
 import { TockPopover } from '@/components/tocak-popover';
+import { ZumOkvir, ZumVrati, useTockZum } from '@/components/tocak-zum';
 import { istiPogodak, type Pogodak } from '@/lib/wheel';
 import { Text } from '@/components/ui/text';
 import { CARD_SURFACE } from '@/components/ui/card';
@@ -16,7 +17,7 @@ import { ProfileButton } from '@/components/profile-button';
 import { StakloDugme } from '@/components/staklo-dugme';
 import { OZNAKA_12 } from '@/components/tvoj-dan-card';
 import { AspektRed, TackaRed, TockInfo, redosledPlaneta } from '@/components/karta-lista';
-import { buildSky, danZaKalendar, shiftDays, zoneClock, zoneShift } from '@/lib/sky';
+import { buildSky, danZaKalendar, shiftDays, vremeZaOkret, zoneClock, zoneShift } from '@/lib/sky';
 import { formatDatum } from '@/lib/horoscope';
 import { useProfileStore, useResolvedProfile } from '@/store/profile';
 import { useSkyPlaceStore } from '@/store/sky-place';
@@ -62,6 +63,26 @@ export default function Sky() {
   const setIzabran = useSkyTimeStore((s) => s.setIzabran);
   const izaberiDan = useSkyTimeStore((s) => s.izaberiDan);
   const now = izabran ?? sada;
+
+  // Zum stezanjem i OKRETANJE KRUGA PRSTOM (8.10.2026): krug je ukljesten na ascendent, pa okretanje prstenom
+  // pomera VREME — trazi se trenutak u kome je ascendent tamo gde ga prst vodi (`vremeZaOkret`), krug prati prst.
+  // Velicina je ista kao `wheelSize` ispod; hook mora pre ranih izlaza, a podaci mesta stizu kroz `ref`.
+  const okretRef = React.useRef<{ now: Date; latitude?: number; longitude?: number }>({ now });
+  const okretT0 = React.useRef(now);
+  const okretSat = React.useRef(0);
+  const okretanje = React.useMemo(() => ({
+    pocetak: () => { okretT0.current = okretRef.current.now; okretSat.current = Math.floor(okretRef.current.now.getTime() / 3_600_000); },
+    pomak: (stepeni: number) => {
+      const { latitude: la, longitude: lo } = okretRef.current;
+      if (la === undefined || lo === undefined) return;
+      const t = vremeZaOkret(okretT0.current, la, lo, stepeni);
+      const sat = Math.floor(t.getTime() / 3_600_000);
+      if (sat !== okretSat.current) { okretSat.current = sat; Haptics.selectionAsync().catch(() => {}); } // klik na svaki sat
+      useSkyTimeStore.getState().setIzabran(t);
+    },
+    kraj: () => {},
+  }), []);
+  const tockZum = useTockZum(Math.min(width - 16, 430), okretanje);
   // Izabrano dodirom na tocak (8.10.2026); ostaje dok se vreme pomera, pa se vidi sta se menja.
   const [izbor, setIzbor] = React.useState<Pogodak | null>(null);
   // Gde je kartica sa detaljima (na krugu, pt).
@@ -88,6 +109,7 @@ export default function Sky() {
   // ikakvog povoda.
   const latitude = grad?.latitude;
   const longitude = grad?.longitude;
+  okretRef.current = { now, latitude, longitude };
   const sky = React.useMemo(
     () => (latitude === undefined || longitude === undefined
       ? null
@@ -125,16 +147,21 @@ export default function Sky() {
   // (tesnoca x tezina tela), sto je redosled za izbor teksta, ne za citanje.
   const aspects = [...sky.aspects].sort((x, y) => x.orb - y.orb);
   const wheelSize = Math.min(width - 16, 430);
+  // Izabrana planeta se pomera sa vremenom (okretanje, dugmad za sat i dan): kartica ide za njom.
+  const sidroPrikaz = (izbor?.tip === 'planeta' ? polozajSimbola(izbor.key, { chart, size: wheelSize, points }) : null) ?? sidro ?? { x: 0, y: 0 };
   const izaberi = (p: Pogodak | null, tacka?: { x: number; y: number }) => {
     if (!p) { setIzbor(null); setSidro(null); return; }
     setIzbor(p);
     setSidro((p.tip === 'planeta' ? polozajSimbola(p.key, { chart, size: wheelSize, points }) : null) ?? tacka ?? sidro);
   };
   const dodirTocka = (x: number, y: number) => {
-    const p = pogodiNatalniTocak(x, y, { chart, size: wheelSize, points });
+    if (tockZum.gestTraje() || !tockZum.udarioOkvir(y)) return;
+    // Dodir je u koordinatama ekrana; pod zumom se prvo vraca na krug bez zuma.
+    const u = tockZum.uKrug(x, y);
+    const p = pogodiNatalniTocak(u.x, u.y, { chart, size: wheelSize, points });
     const novi = p && !istiPogodak(p, izbor) ? p : null;
     if (novi) Haptics.selectionAsync().catch(() => {});
-    izaberi(novi, { x, y });
+    izaberi(novi, u);
   };
 
   return (
@@ -145,10 +172,20 @@ export default function Sky() {
         className="-mt-3 items-center"
         velicina={{ w: wheelSize, h: wheelSize }}
         onDodir={dodirTocka}
-        povrsina={izbor && sidro ? (
-          <TockPopover izbor={izbor} sidro={sidro} okvir={wheelSize} chart={chart} points={points} onIzbor={(p) => izaberi(p)} />
+        gest={tockZum.gest}
+        povrsina={(izbor && sidro) || tockZum.zumirano ? (
+          <>
+            {izbor && sidro ? (
+              <TockPopover izbor={izbor} sidro={tockZum.naEkran(sidroPrikaz.x, sidroPrikaz.y)} okvir={wheelSize} chart={chart} points={points} onIzbor={(p) => izaberi(p)} />
+            ) : null}
+            {tockZum.zumirano ? <ZumVrati onPress={tockZum.vrati} /> : null}
+          </>
         ) : undefined}
-        podignuto={<NatalWheel chart={chart} size={wheelSize} points={points} izbor={izbor} />}>
+        podignuto={(
+          <ZumOkvir z={tockZum}>{(vel) => (
+            <NatalWheel chart={chart} size={vel} points={points} izbor={izbor} />
+          )}</ZumOkvir>
+        )}>
         {/* "i" kao na "Ti" (Ivan, 29.9.2026): krug, tacke, aspekti — i legenda
             linija, pa je legenda ispod liste uklonjena. */}
         <TockInfo velicina={wheelSize} onPress={() => router.push('/nebo-info')}

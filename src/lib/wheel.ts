@@ -354,3 +354,57 @@ export function pogodiTocak(x: number, y: number, o: {
   }
   return null;
 }
+
+/* ------------------------------------------------------------------------- *
+ * Zum kruga (8.10.2026): stezanje prstima.
+ *
+ * Zum je `{ s, fx, fy }`: razmera i SREDINA PRIKAZA kao razlomak velicine kruga (0..1).
+ * Bez zuma je `{ 1, .5, .5 }`. Krug se crta CEO, uvecan, jednom (`tocak-zum.tsx`); zum i pomeranje
+ * su samo transformacija, pa nema ponovnog crtanja. Sve ovde je cista racunica koju zove i UI nit (`'worklet'`).
+ * ------------------------------------------------------------------------- */
+
+export type Zum = { s: number; fx: number; fy: number };
+export const BEZ_ZUMA: Zum = { s: 1, fx: 0.5, fy: 0.5 };
+/** Najveci zum. Preko toga stepeni su vec dovoljno veliki, a nacrt pocinje da seca okvir. */
+export const ZUM_MAX = 2.5;
+
+/** Zum u granicama: razmera 1..`ZUM_MAX`, sredina tako da prikaz ne izlazi iz kruga. */
+export function ogranicenZum(s: number, fx: number, fy: number): Zum {
+  'worklet';
+  const ss = Math.min(ZUM_MAX, Math.max(1, s));
+  const lo = 0.5 / ss;
+  const hi = 1 - lo;
+  return { s: ss, fx: Math.min(hi, Math.max(lo, fx)), fy: Math.min(hi, Math.max(lo, fy)) };
+}
+
+/** Tacka na ekranu (u okviru kruga, pt) -> tacka na krugu BEZ zuma (pt). */
+export function ekranUKrug(x: number, y: number, size: number, zum: Zum): { x: number; y: number } {
+  'worklet';
+  return { x: (zum.fx + (x / size - 0.5) / zum.s) * size, y: (zum.fy + (y / size - 0.5) / zum.s) * size };
+}
+
+/** Obrnuto: tacka na krugu bez zuma (pt) -> gde je na ekranu uz taj zum. */
+export function krugUEkran(x: number, y: number, size: number, zum: Zum): { x: number; y: number } {
+  'worklet';
+  return { x: ((x / size - zum.fx) * zum.s + 0.5) * size, y: ((y / size - zum.fy) * zum.s + 0.5) * size };
+}
+
+/**
+ * Zum posle pokreta: razmera se mnozi sa `g` oko tacke `f` (pt na ekranu), pa se krug pomeri za `t`.
+ * Vraca NOV (ogranicen) zum i `g`/`t` koji tacno odgovaraju njemu — da se privremena transformacija
+ * dok traje pokret ne razlikuje od onoga sto se na kraju upise (nema skoka kad se pusti).
+ */
+export function primeniPokret(
+  zum: Zum, size: number, g: number, f: { x: number; y: number }, t: { x: number; y: number }
+): { zum: Zum; g: number; t: { x: number; y: number } } {
+  'worklet';
+  const s2 = Math.min(ZUM_MAX, Math.max(1, zum.s * g));
+  const u = ekranUKrug(f.x, f.y, size, zum);
+  const nov = ogranicenZum(
+    s2,
+    u.x / size - ((f.x + t.x) / size - 0.5) / s2,
+    u.y / size - ((f.y + t.y) / size - 0.5) / s2,
+  );
+  const gde = krugUEkran(u.x, u.y, size, nov);
+  return { zum: nov, g: nov.s / zum.s, t: { x: gde.x - f.x, y: gde.y - f.y } };
+}
