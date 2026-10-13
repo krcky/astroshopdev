@@ -11,14 +11,13 @@ import { OBLAST_BOJA } from '@/components/oblast-ikona';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { KucaBroj } from '@/components/kuca-broj';
 import { PlanetaZiva } from '@/components/planeta-ziva';
-import { SIVA } from '@/components/prica/boje';
 import { Zraci } from '@/components/prica/crtezi';
 import { PricaPozadina, type MestoMrlje } from '@/components/prica/pozadina';
 import { SatSlike } from '@/components/prica/sat';
 import { useBudnost, useUstedaBaterije } from '@/store/budnost';
 import { cn } from '@/lib/utils';
 import { tezina } from '@/theme/tipografija';
-import { backdrop } from '@/theme/tokens';
+import { backdrop, neutral } from '@/theme/tokens';
 import { formatDatum, formatUntil } from '@/lib/horoscope';
 import { useT } from '@/i18n';
 import type { SkyEvent } from '@/lib/sky-events';
@@ -120,9 +119,10 @@ export function PromenaNaNebu({ e, today, velika = false }: { e: SkyEvent; today
   const strelica = <ChevronRight size={20} color={OBLAST_BOJA} strokeWidth={2.2} style={{ marginLeft: -6, marginRight: -4 }} />;
 
   if (velika) {
+    // Podloga je CISTO BELA (Ivan, 13.10.2026; do tada siva iz price), ljubicaste mrlje ostaju na sredini i dole.
     // Pozadina price je preko CELE kartice; zraci su centrirani na planetu, tekst ispod je centriran (Ivan, 13.10.2026).
     return (
-      <View className={cn(CARD_SURFACE, 'items-center overflow-hidden px-4 pb-6')} style={{ backgroundColor: SIVA, paddingTop: VRH_VELIKE }}
+      <View className={cn(CARD_SURFACE, 'items-center overflow-hidden px-4 pb-6')} style={{ backgroundColor: neutral.white, paddingTop: VRH_VELIKE }}
         accessible accessibilityLabel={oznaka}>
         <SatKartice>
           <PricaPozadina nijansa="lila" mrlje={POZADINA} raspored={RASPORED} jacina={POZADINA_JACINA} />

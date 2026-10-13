@@ -1,0 +1,70 @@
+# Astro Shop za Apple Watch — ZASEBNA aplikacija, samo za sat (Ivan, 13.10.2026): prodaje se
+# odvojeno od telefonske, po fiksnoj ceni (cena se postavlja u App Store Connect-u, ne ovde).
+# Xcode projekat se PRAVI iz ovog fajla i nije u repou:
+#
+#   cd watch && xcodegen generate && open NeboSat.xcodeproj
+#
+# Racun i crtez su u native/SkyCore (pravilo 27), ovde kao lokalni Swift paket.
+# BUNDLE ID je trajan cim se aplikacija prvi put posalje Apple-u — potvrditi ga pre toga.
+name: NeboSat
+options:
+  deploymentTarget:
+    watchOS: "10.0"
+  createIntermediateGroups: true
+packages:
+  SkyCore:
+    path: ../native/SkyCore
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  NeboSat:
+    type: application
+    platform: watchOS
+    sources: [NeboSat]
+    dependencies:
+      - package: SkyCore
+      - target: NeboSatWidget
+    info:
+      path: NeboSat/Info.plist
+      properties:
+        CFBundleDisplayName: Astro Shop
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        WKApplication: true
+        WKWatchOnly: true
+    entitlements:
+      path: NeboSat/NeboSat.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.krcky.astroshop.nebo]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krcky.astroshop.nebo
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: $accent
+  NeboSatWidget:
+    type: app-extension
+    platform: watchOS
+    sources: [NeboSatWidget]
+    dependencies:
+      - package: SkyCore
+    info:
+      path: NeboSatWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Astro Shop
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: NeboSatWidget/NeboSatWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.krcky.astroshop.nebo]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krcky.astroshop.nebo.widget
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: $accent
+        ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME: $widgetBackground

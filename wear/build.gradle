@@ -4,8 +4,10 @@
 //
 //   cd wear && ANDROID_HOME=~/Library/Android/sdk ./gradlew assembleDebug
 //
-// Paket je isti kao telefonska aplikacija (`com.krcky.astroshop`): Google Play ih tako
-// vezuje, a sloj podataka (mesto posmatranja sa telefona) trazi isti paket i isti potpis.
+// ZASEBNA aplikacija (Ivan, 13.10.2026): prodaje se odvojeno od telefonske, po fiksnoj ceni
+// (cena se postavlja u Google Play konzoli, ne ovde), pa ima SVOJ paket i ne ceka telefon:
+// mesto posmatranja je grad vremenske zone sata ili grad izabran na satu.
+// PAKET je trajan cim se aplikacija prvi put objavi — potvrditi ga pre toga.
 plugins {
   id 'com.android.application' version '8.12.0'
   id 'org.jetbrains.kotlin.android' version '2.1.20'
@@ -19,11 +21,10 @@ android {
   compileSdk 36
 
   defaultConfig {
-    applicationId 'com.krcky.astroshop'
+    applicationId 'com.krcky.astroshop.nebo'
     minSdk 30
     targetSdk 35
-    // Sat i telefon dele paket, pa kod verzije sata mora biti drugaciji od telefonskog.
-    versionCode 100001
+    versionCode 1
     versionName '1.0.0'
   }
 
@@ -56,5 +57,4 @@ dependencies {
   implementation 'androidx.wear.tiles:tiles:1.4.1'
   implementation 'androidx.wear.protolayout:protolayout:1.2.1'
   implementation 'com.google.guava:guava:33.3.1-android'
-  implementation 'com.google.android.gms:play-services-wearable:19.0.0'
 }

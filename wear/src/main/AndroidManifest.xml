@@ -6,7 +6,7 @@
       android:icon="@drawable/ikona"
       android:theme="@android:style/Theme.DeviceDefault">
 
-    <!-- Radi i bez telefona: nebo se racuna na satu. Mesto posmatranja stize sa telefona kad ga ima. -->
+    <!-- Zasebna aplikacija: nebo se racuna na satu, telefon nije potreban. -->
     <meta-data android:name="com.google.android.wearable.standalone" android:value="true" />
 
     <activity android:name=".NeboActivity" android:exported="true" android:taskAffinity="">
@@ -42,12 +42,5 @@
       <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="900" />
     </service>
 
-    <!-- Mesto posmatranja sa telefona (sloj podataka, `/nebo/mesto`). -->
-    <service android:name=".MestoSaTelefona" android:exported="true">
-      <intent-filter>
-        <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-        <data android:scheme="wear" android:host="*" android:pathPrefix="/nebo" />
-      </intent-filter>
-    </service>
   </application>
 </manifest>

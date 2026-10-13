@@ -146,13 +146,13 @@ supabase/
   pitanja-obavestenja.sql  okidac: placeno pitanje -> mejl astrologu (pg_net)
 panel/               veb panel za astrologa (Vite + React), NIJE deo aplikacije
 modules/             lokalni nativni moduli (samo sopstveni build): postepeno-zamucenje, video-price (MP4 kadar po kadar),
-                     nebo-widget (pravilo 27): iOS = veza aplikacija -> widget/sat (pod NeboVeza); android = Kotlin jezgro
-                     (`core/`), crtez (`crtez/`), Android widget (`widget/`) i ista veza (mesto + Wear OS)
+                     nebo-widget (pravilo 27): iOS = veza aplikacija -> widget (pod NeboVeza); android = Kotlin jezgro
+                     (`core/`), crtez (`crtez/`), Android widget (`widget/`) i ista veza (mesto posmatranja)
 native/SkyCore/      SWIFT JEZGRO WIDGETA I SATA (pravilo 27): prepis `lib/astro|natal|points|sky|wheel` + SwiftUI krug,
                      widget prikazi; Swift paket (`swift test`, `swift run SkyRender <folder>` = PNG kruga) i pod za Xcode
-targets/             Apple targeti (`@bacons/apple-targets`; ime foldera = ime Xcode targeta): NeboWidget (iOS widget),
-                     NeboSat (Apple Watch aplikacija), NeboSatWidget (komplikacije)
-wear/                Wear OS aplikacija — ZASEBAN Gradle projekat (prebuild ga ne dira), deli Kotlin izvore sa modulom
+targets/             Apple targeti (`@bacons/apple-targets`; ime foldera = ime Xcode targeta): NeboWidget (iOS widget)
+watch/               APPLE WATCH — ZASEBNA aplikacija samo za sat (prodaje se odvojeno): `project.yml` (XcodeGen), NeboSat + NeboSatWidget
+wear/                WEAR OS — ZASEBNA aplikacija (prodaje se odvojeno), svoj Gradle projekat, deli Kotlin izvore sa modulom
 scripts/
   check-*.ts         provere tacnosti
   font/              sklapanje AstroGlyphs.ttf iz Noto izvora
@@ -998,37 +998,48 @@ OBLICI su generisani, ne crtani — za oba jezika iz ISTE skripte: znaci iz `lib
 Brojevi i "R" su sistemsko pismo, ne Plus Jakarta Sans. Crtez kruga postoji TRI puta (`natal-wheel.tsx`, `SkyWheelView.swift`,
 `SkyWheelCrtez.kt`) + panel: promena rasporeda ide u sva cetiri.
 BEZ RECI u prikazu (simbol, znak, stepen, "R") — isti na svih sest jezika; prevedeni su samo ime i opis u galeriji
-(`Localizable.xcstrings`, `res/values-*/strings.xml`). BESPLATNO za sve (Ivan). Svetlo kao aplikacija, crno u tamnom rezimu; sat uvek crn.
-MESTO posmatranja je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u korenu) -> modul `NeboWidget`
+(`Localizable.xcstrings`, `res/values-*/strings.xml`). Svetlo kao aplikacija, crno u tamnom rezimu; sat uvek crn.
+POSLOVNA ODLUKA (Ivan, 13.10.2026): WIDGET NA TELEFONU JE BESPLATAN, deo aplikacije (widget ne moze da postoji bez aplikacije).
+SATOVI (Apple Watch i Wear OS) SU ZASEBNE APLIKACIJE koje se NAPLACUJU PO FIKSNOJ CENI, odvojene od telefonske: svoj bundle id /
+paket (`com.krcky.astroshop.nebo` — TRAJAN posle prve objave, potvrditi pre toga), svoj listing, cena se postavlja u App Store
+Connect-u i Google Play konzoli (u kodu nema nicega o naplati). Telefonska aplikacija satu NISTA ne salje i ne ugradjuje ga.
+MESTO NA WIDGETU je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u korenu) -> modul `NeboWidget`
 (`postaviMesto`), pri odjavi brise. iOS: App Group (`SharedPlace`; ime grupe se IZVODI iz bundle id-ja, "group." + id —
-probni build `….test` ima svoju, prava ostaje slobodna za nalog firme) + WatchConnectivity (`updateApplicationContext`) za sat.
-Android: SharedPreferences + sloj podataka `/nebo/mesto` za Wear OS (`play-services-wearable`). Bez mesta krug je BEZ kuca,
-0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11).
+probni build `….test` ima svoju, prava ostaje slobodna za nalog firme). Android: SharedPreferences. Bez mesta krug je BEZ kuca,
+0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11). Trenutna lokacija
+telefona (GPS) NIJE uvedena (Ivan: "za sada nista") — trazila bi dozvolu u aplikaciji, a na Androidu lokaciju u pozadini.
+MESTO NA SATU: grad VREMENSKE ZONE sata, bez dozvole za lokaciju — tabela 418 zona iz tz baze (`scripts/native/zone.tab` ->
+`tsx scripts/native/skycore-zone.ts` -> `Zone.generated.swift` / `.kt`) — ili grad koji korisnik izabere na satu (lista po
+delovima sveta, na dnu strane sa planetama). Imena delova sveta i gradova su iz tz baze, na engleskom (nisu prevedena).
 iOS WIDGET (`targets/NeboWidget`): mali (krug), srednji (krug + 10 planeta), veliki (krug kao u aplikaciji), zakljucani
 ekran (kruzni, pravougaoni, red teksta). 96 prikaza unapred (24 h na 15 min). Prikazi su u SkyCore (`NeboWidgetKit.swift`),
-zajednicki sa komplikacijama. APPLE WATCH (`targets/NeboSat`, `NeboSatWidget`): krug preko ekrana, KRUNA pomera vreme (zarez =
-15 min, natpis sa datumom vraca na sada), druga strana lista planeta; komplikacije kruzna / pravougaona / ugaona / red teksta.
+zajednicki sa komplikacijama. APPLE WATCH (`watch/`, `WKWatchOnly`): Xcode projekat se PRAVI iz `project.yml`
+(`cd watch && xcodegen generate`, nije u repou; SkyCore kao lokalni Swift paket, bez CocoaPods-a); krug preko ekrana, KRUNA
+pomera vreme (zarez = 15 min, natpis sa datumom vraca na sada), druga strana lista planeta + izbor mesta; komplikacije kruzna /
+pravougaona / ugaona / red teksta.
 Apple ne dozvoljava tudje brojcanike — ne zaobilaziti (workout / extended runtime).
 ANDROID WIDGET (`modules/nebo-widget/android`): jedan, promenljive velicine (kvadrat = krug, sirok = krug + lista, veliki = pun
-krug), crta se u bitmapu; sistem ga osvezava na 30 min + budilnik na 15 min koji ne budi telefon. WEAR OS (`wear/`): aplikacija
-(krug, kruna/obod pomera vreme, lista), plocica (Tile) i komplikacija (slika ili kratak tekst); paket isti kao telefon.
+krug), crta se u bitmapu; sistem ga osvezava na 30 min + budilnik na 15 min koji ne budi telefon. WEAR OS (`wear/`,
+`cd wear && ./gradlew assembleDebug`): aplikacija (krug, kruna/obod pomera vreme, lista, izbor mesta), plocica (Tile) i
+komplikacija (slika ili kratak tekst).
 ZAMKE: (1) `pods.rb` u folderu targeta nosi `platform`, a ime foldera = ime Xcode targeta; (2) `entitlements` sa App Group
 MORA da stoji u `expo-target.config.js` — plugin je ne prenosi sam, a bez nje widget cita prazno mesto bez ikakve greske;
-(3) scheme sada ugradjuje Apple Watch aplikaciju, pa Xcode trazi instaliranu watchOS platformu (`xcodebuild -downloadPlatform
-watchOS`) i NE sme `-sdk iphonesimulator` u komandi (prisili iOS SDK i na sat); (4) SkyCore pod se gradi i za stariji iOS —
-novo iz iOS 17 ide uz `@available`; (5) posle prebuild-a uz tri izmene za besplatni Apple ID idu i id-jevi `….test.widget`,
-`….test.watch`, `….test.watch.widget` i grupa `group.….test` u sva cetiri entitlements fajla; (6) hook-ovi u jednom izrazu
+(3) watchOS platforma (`xcodebuild -downloadPlatform watchOS`) treba samo za `watch/` — telefonska aplikacija od 13.10.2026
+uvece vise ne ugradjuje sat; (4) SkyCore pod se gradi i za stariji iOS —
+novo iz iOS 17 ide uz `@available`; (5) posle prebuild-a uz tri izmene za besplatni Apple ID idu i id `….test.widget` i grupa
+`group.….test` u oba entitlements fajla (aplikacija i `ios/.targets/NeboWidget`); (6) hook-ovi u jednom izrazu
 sa `&&` obaraju aplikaciju (prvi nacrt `useNeboWidget`).
 PROVERENO NA IVANOVOM iPHONE-u (13.10.2026, prijavljen nalog): aplikacija upise mesto, mali i srednji widget crtaju kuce i
 ose kao tab "Nebo" (Nis: ASC u Raku; promena na Madrid -> ASC u Blizancima, widget se okrenuo za par sekundi), lista planeta
 se slaze sa aplikacijom. Widget crta pocetak tekuce cetvrti sata, pa kasni za aplikacijom do ~4°.
 APP GROUP NA BESPLATNOM APPLE NALOGU: `xcodebuild -allowProvisioningUpdates` je NE registruje (profil "doesn't match the
 entitlements file's value") — jednom rucno u Xcode-u: target -> Signing & Capabilities -> Team (bez tima grupa ostaje crvena)
--> App Groups -> kruzna strelica; za AstroShop i NeboWidget. Za probni build bez sata grupa se skida iz
-`ios/.targets/NeboSat*/generated.entitlements`. Profili za sat se prave i bez registrovanog sata.
-NIJE PROVERENO (13.10.2026): Android na pravom telefonu i pravi sat; kruna, druga strana i komplikacije na satu (simulator: samo prvi ekran, sa i bez mesta);
-Wear OS je samo PREVEDEN (nema Wear emulatora); prenos mesta telefon -> sat na obe platforme; potpisivanje sa App Group i
-tri nova bundle id-ja na EAS-u; ikonica Wear aplikacije je privremena.
+-> App Groups -> kruzna strelica; za AstroShop i NeboWidget. Kad je grupa jednom registrovana, komandna linija prolazi i
+posle `prebuild --clean`. Isto ce trebati za `watch/` (grupa `group.com.krcky.astroshop.nebo`) pri prvom buildu za pravi sat.
+NIJE PROVERENO (13.10.2026): Android widget na pravom telefonu; pravi sat (Ivan ih trenutno nema); na Apple Watch-u kruna,
+druga strana, izbor mesta i komplikacije (simulator: samo prvi ekran, mesto iz zone); Wear OS je samo PREVEDEN (nema Wear
+emulatora); potpisivanje widgeta sa App Group na EAS-u; pregled u prodavnicama za aplikacije samo za sat. FALI ZA PRODAJU SATA:
+ime proizvoda i konacan bundle id / paket, ikonice (Wear je privremena), listing i cena, prevod imena delova sveta.
 
 ## Kanonski kljucevi sadrzaja
 

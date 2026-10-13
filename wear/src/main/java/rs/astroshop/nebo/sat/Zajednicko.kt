@@ -9,6 +9,9 @@ import rs.astroshop.nebo.core.Place
 import rs.astroshop.nebo.core.Planet
 import rs.astroshop.nebo.core.SIGN_SHAPES
 import rs.astroshop.nebo.core.Sky
+import rs.astroshop.nebo.core.ZONE_PLACES
+import rs.astroshop.nebo.core.ZonePlace
+import java.util.TimeZone
 import rs.astroshop.nebo.core.chartAngle
 import rs.astroshop.nebo.core.spreadAngles
 import rs.astroshop.nebo.crtez.SkyWheelCrtez
@@ -16,23 +19,34 @@ import rs.astroshop.nebo.crtez.Stil
 import kotlin.math.cos
 import kotlin.math.sin
 
-/** Mesto posmatranja na satu: stize sa telefona (`MestoSaTelefona`), cuva se ovde. */
+/**
+ * Mesto posmatranja na satu. Sat je ZASEBNA aplikacija i telefon mu nista ne salje: mesto je
+ * grad vremenske zone sata (bez dozvole za lokaciju) ili grad koji je korisnik izabrao.
+ */
 object Mesto {
     private const val FAJL = "nebo"
+    private val poImenu by lazy { ZONE_PLACES.associateBy { it.id } }
 
-    fun procitaj(context: Context): Place? {
-        val p = context.getSharedPreferences(FAJL, Context.MODE_PRIVATE)
-        if (!p.contains("lat") || !p.contains("lon")) return null
-        return Place(Double.fromBits(p.getLong("lat", 0)), Double.fromBits(p.getLong("lon", 0)))
+    /** Rucno izabrana zona; `null` = prati zonu sata. */
+    fun izabrana(context: Context): String? = context.getSharedPreferences(FAJL, Context.MODE_PRIVATE).getString("zona", null)
+
+    fun izaberi(context: Context, zona: String?) {
+        context.getSharedPreferences(FAJL, Context.MODE_PRIVATE).edit().apply {
+            if (zona != null) putString("zona", zona) else remove("zona")
+        }.apply()
     }
 
-    fun upisi(context: Context, place: Place?) {
-        val e = context.getSharedPreferences(FAJL, Context.MODE_PRIVATE).edit()
-        if (place != null) e.putLong("lat", place.latitude.toBits()).putLong("lon", place.longitude.toBits())
-        else e.remove("lat").remove("lon")
-        e.apply()
-    }
+    fun grad(context: Context): ZonePlace? = izabrana(context)?.let { poImenu[it] } ?: gradSata()
+
+    fun gradSata(): ZonePlace? = poImenu[TimeZone.getDefault().id]
+
+    fun procitaj(context: Context): Place? = grad(context)?.let { Place(it.latitude, it.longitude) }
 }
+
+/** Ime grada iz imena zone ("America/Argentina/Buenos_Aires" -> "Buenos Aires"). */
+val ZonePlace.ime get() = id.substringAfterLast('/').replace('_', ' ')
+/** Deo sveta, kako ga zove tz baza ("Europe"). */
+val ZonePlace.deoSveta get() = id.substringBefore('/')
 
 object Slike {
     /** Krug neba na crnoj (providnoj) podlozi, `px` piksela — za plocicu. */
