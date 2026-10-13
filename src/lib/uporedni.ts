@@ -40,3 +40,14 @@ export function ocenaZnakova(kljucA: string, kljucB: string): OcenaPara | null {
   if (a < 0 || b < 0) return null;
   return ocenaPara(a, b);
 }
+
+/** Oblasti tekstova astrologa za par (`lib/uporedni-texts.ts`, tabela `uporedni_texts`). */
+export type OblastPara = 'ljubav' | 'prijateljstvo' | 'posao';
+
+/** Redosled oblasti na ekranu. */
+export const OBLASTI_PARA: readonly OblastPara[] = ['ljubav', 'prijateljstvo', 'posao'];
+
+/** Kanonski kljuc teksta: uporedni.<prvi>.<drugi>.<oblast> (ne menja se posle uvoza). Prvi je znak u kom je "ti". */
+export function uporedniKey(prvi: string, drugi: string, oblast: OblastPara): string {
+  return `uporedni.${prvi}.${drugi}.${oblast}`;
+}

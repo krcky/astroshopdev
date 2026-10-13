@@ -66,7 +66,10 @@ export const ostalo: Recnik['ostalo'] = {
       manje: { naslov: 'Помалку поволно', opis: 'Добро, но врската бара работа' },
       nepovoljno: { naslov: 'Неповолно', opis: 'Ќе биде тешко' },
     },
-    tekstoviNema: 'Текстовите за љубовта, пријателството и работата за овој пар сè уште ги нема во апликацијата.',
+    oblasti: { ljubav: 'Љубов', prijateljstvo: 'Пријателство', posao: 'Работа' },
+    tekstoviNema: 'За овој пар сè уште нема текстови.',
+    /** Dok tekstovi nisu prevedeni (`uporedni_texts` ima samo srpski), jedna recenica ispod ocene. */
+    naSrpskom: 'Текстовите се на српски.',
     bezTvogZnaka: 'Не можеме да го одредиме твојот знак: раѓањето е на границата на знак, а временската зона не е сигурна. Провери ги податоците за раѓање во профилот.',
   },
 };

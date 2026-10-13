@@ -49,6 +49,12 @@ src/
     natal.tsx        tumacenje iz natalne karte (?tema=sun | ascendant | natal.moon.square.sun)
     natalna-karta-info.tsx  list "Šta je natalna karta" (ikonica "i" pored tocka): sazetak, legenda aspekata, elementi
     widget-uputstvo.tsx  list "Nebo na početnom ekranu": tri koraka za dodavanje widgeta (pravilo 27, POZIV)
+    nebo.tsx         "Trenutno na nebu" — OBICAN EKRAN (`pushed`, strelica nazad), do 14.10.2026 peti tab; otvara se sa kartice na tabu "Ostalo"
+                     i sa widgeta (`astroshop:///?tab=sky` kroz kapiju -> `/nebo`; nazad bez istorije vodi na pocetnu)
+    uporedni.tsx     UPOREDNI HOROSKOP (14.10.2026) — SIV list odozdo: moj znak levo, izbor znaka druge osobe, ocena para (`lib/uporedni.ts`);
+                     `?dev=leo` zadaje znak bez profila. TEKSTOVA (431, sa sajta) JOS NEMA u aplikaciji
+    proizvod.tsx     list sa JEDNIM proizvodom (?id=): sajt (narukvica, konsultacije uzivo -> dugme otvara astroshop.rs) i sat (jos nije u prodavnici)
+    dev-ostalo.tsx   SAMO DEV: sadrzaj taba "Ostalo" bez naloga i tabova (znak Lav)
     nebo-info.tsx    list "Šta je trenutno nebo" (ikonica "i" pored tocka na Nebu): krug, R, tacke, aspekti
     moon.tsx         lunarni kalendar — LIST odozdo (formSheet, SIVI: `SheetScroll siva`) sa kartice na pocetnoj (?day=pomeraj); dan se menja strelicama
                      i MESECNIM KALENDAROM (`lib/lunarni-kalendar.ts`), znak je dole desno uz crtez
@@ -66,7 +72,9 @@ src/
     prica.tsx        DNEVNA PRICA (pravilo 23) — preko celog ekrana (transparentModal), sa prstena oko planete "Tvog dana"
     prica-znak.tsx   PRICA O ZNAKU (pravilo 25) — devet slika o Suncevom znaku, sa prstena oko Sunca u velikoj trojci ("Ti")
     video-price.tsx  "Tvoj video" — LIST odozdo (traka iznad tabova, obavestenje, "Podeli" u prici): pregled, "Podeli", "Sačuvaj u Fotografije"
-    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), sky (Nebo)
+    (tabs)/          home (Danas), daily (Tranziti), ask (Pitaj), chart (Ti), ostalo (Ostalo — od 14.10.2026 umesto taba Nebo; ikonica tri tackice)
+                     ostalo = Uporedni horoskop (prva i najveca kartica), Trenutno na nebu (-> `/nebo`) i lista PROIZVODI: JEDNA lista (Ivan) za ono
+                     sto se kupuje u aplikaciji i ono sto vodi na sajt (strelica nagore); `components/ostalo/`, katalog `lib/proizvodi.ts`
                      svaki tab je FOLDER: index.tsx + _layout.tsx = TabStack (native traka, pravilo 17)
   i18n/              JEZIK (pravilo 26): `useT()` u komponenti, `tr()` van nje; `jezik.ts` = tekuci jezik
     sr/              SRPSKI RECNIK = osnova i tip svih jezika; deo po delu aplikacije (onboarding,
@@ -1017,8 +1025,11 @@ MESTO NA WIDGETU je ono sa taba "Nebo": `lib/nebo-widget.ts` (`useNeboWidget` u 
 probni build `….test` ima svoju, prava ostaje slobodna za nalog firme). Android: SharedPreferences. Bez mesta krug je BEZ kuca,
 0° Ovna levo (kao pravilo 5). Dodir na widget otvara `astroshop:///?tab=sky` — KROZ KAPIJU (pravilo 11). Trenutna lokacija
 telefona (GPS) NIJE uvedena (Ivan: "za sada nista") — trazila bi dozvolu u aplikaciji, a na Androidu lokaciju u pozadini.
-ASTRODIAL IMA CETIRI STRANE (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
-nagore: 1 KRUG (kruna pomera vreme; strelica nema — prekrivale su znake), 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
+ASTRODIAL IMA SEST STRANA (Ivan, 14.10.2026; predlog i istrazivanje: claude.ai/artifact/C28uWyWBa8GgPNdeRiPBUD), prevlacenjem
+nagore: KRUG (kruna pomera vreme; strelica nema — prekrivale su znake), PLANETE (spisak sa stepenom i minutom, odmah posle
+kruga — Ivan), MESEC, KRUG MESECEVIH MENA (30 lunarnih dana ukrug, tekuci istaknut, u sredini lunarni dan; Ivan je trazio 28
+polja, ali od mladog do mladog prodje 29,5 dana i lunarni dan ide 1—30 kao u `moon.ts`, pa je 30 — CEKA NJEGOVU POTVRDU), SAT, SLEDECE.
+Opis strana: 2 MESEC (faza, %, znak sa trakom napretka, kad ulazi u sledeci,
 Mesec bez kursa), 3 SAT (vladar planetarnog sata i do kada, sledeci, ASC i MC, izlazak i zalazak Sunca), 4 SLEDECE (dogadjaji po
 vremenu za 30 dana: promena Mesecevog znaka, pocetak Meseca bez kursa, cetvrti, ulasci planeta u znak, stanice; pa planete i izbor
 mesta). RACUN: `src/lib/sat.ts` -> `Sat.swift` / `Sat.kt`, isti golden (14.10.2026: vremena se slazu do 0,75 s na 52 trenutka);
@@ -1098,6 +1109,7 @@ npm run check:natal-tekst kljucevi natalnih tumacenja postoje u korpusu (files/n
 npm run check:oblasti     lista Tranziti, ocene oblasti, mnozina, naslov tumacenja
 npm run check:krug        krug zivota: osam oblasti, 12 kuca pokriveno, stanje iz proseka 3 dana, bez vremena rodjenja
 npm run check:avatar      avatar profila: granice putanje znaka, svih 12 znakova centrirano u krugu, mali krug unutar kvadrata
+npm run check:uporedni    uporedni horoskop: ocena para znakova = tabela 12 x 12 sa astroshop.rs (svih 144 polja), simetrija, raspodela 72/48/24
 npm run check:uvod        uvod: splash u app.json, krug i vrtenje iz logo-krug-uvod.json, prozor
 npm run check:pitanja     Pitaj astrologa: provera pitanja, snimak karte, natpisi
 npm run check:pitanja-baza pitanja.sql u PGlite-u: ko sme sta (RLS, funkcije, skladiste)
@@ -1227,6 +1239,13 @@ npm run panel:build       panel za objavu -> panel/dist
       pitanje o osobi i o odnosu, panel. FALI: politika privatnosti i App Privacy (podaci trece
       osobe, astrolog ih vidi); pitanja za astrologa (ASTRO-LOGIKA, pogl. 9, tacke 14 i 15).
       Faza 2: kompatibilnost/sinastrija (novi korpus), "Tvoj dan" za osobe, "Posalji joj kartu".
+      UPOREDNI HOROSKOP (14.10.2026) — URADJENO: tab "Ostalo", kartica, list sa izborom znaka i ocenom (SAMO po znaku Sunca, bez osobe).
+      Tekstovi su vec napisani i javni na astroshop.rs/uporedni-horoskop/<znak>-<znak>/ (144 USMERENA para x Ljubav / Prijateljstvo /
+      Posao = 431, fali Posao za strelac-rak; ~68.000 reci, pisani na "Vi", sa slovnim greskama — treba lektura i odluka o "ti");
+      FALI: uvod u bazu sa kolonom `jezik` (kao ostali korpus, pravilo 26), prikaz tri taba na listu, "Zameni mesta" (druga strana),
+      prevod hr/bs/en, i tacno poredjenje po celoj karti (osoba iz "Tvojih ljudi") kao Premium dubina. Dete/roditelj nemaju tekst
+      ("Ljubav" je romanticna). PROIZVODI: cene u aplikaciji su probne (`PROBNE_CENE`) dok ne stigne RevenueCat, "Zodiac Wheel" (sat)
+      nije u prodavnici; PDF proizvodi sa sajta NAMERNO nisu u listi (digitalno, Apple 3.1.1). Pitanje kosta isto za sve (19,99 €).
 - [x] Kartica MESEC na pocetnom ekranu, posle "Danas ukratko" — faza, znak (i sat
       prelaska u sledeci), najjaci Mesecev tranzit DANA: `moonDay` u `transits.ts`
       trazi aspekte koji postaju egzaktni izmedju dve lokalne ponoci, pa je kartica

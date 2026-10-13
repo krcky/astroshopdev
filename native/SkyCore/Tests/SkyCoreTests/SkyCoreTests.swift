@@ -16,7 +16,7 @@ struct Golden: Decodable {
     let sat: Sat
   }
   struct Sat: Decodable {
-    struct Mesec: Decodable { let znak: Int; let stepen: Double; let usao, izlazi: Double; let osvetljen: Double; let faza: Int }
+    struct Mesec: Decodable { let znak: Int; let stepen: Double; let usao, izlazi: Double; let osvetljen: Double; let faza: Int; let mlad: Double; let dan: Int }
     struct Voc: Decodable { let od: Double; let `do`: Double; let sada: Bool }
     struct Sati: Decodable { let vladar, sledeci: String; let od: Double; let `do`: Double; let indeks: Int; let dan: Bool; let izlazak, zalazak: Double }
     struct Dogadjaj: Decodable { let vrsta: String; let kad: Double; let telo: String; let broj: Int }
@@ -101,6 +101,8 @@ final class SkyCoreTests: XCTestCase {
       vreme(m.ingressAt, s.sat.mesec.izlazi, "izlazak Meseca iz znaka, \(gde)")
       XCTAssertEqual(m.illumination, s.sat.mesec.osvetljen, accuracy: 1e-6, "osvetljenost, \(gde)")
       XCTAssertEqual(m.phase, s.sat.mesec.faza, "faza, \(gde)")
+      vreme(m.lastNew, s.sat.mesec.mlad, "poslednji mlad Mesec, \(gde)")
+      XCTAssertEqual(m.lunarDay, s.sat.mesec.dan, "lunarni dan, \(gde)")
 
       let v = voidOfCourse(at: date, moon: m)
       vreme(v.start, s.sat.voc.od, "pocetak Meseca bez kursa, \(gde)")

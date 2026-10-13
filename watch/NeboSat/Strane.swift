@@ -10,7 +10,7 @@ private struct Naslov: View {
   }
 }
 
-/// Strana 2 — Mesec: faza, znak sa trakom napretka, kad ulazi u sledeci, Mesec bez kursa.
+/// Mesec: faza, znak sa trakom napretka, kad ulazi u sledeci, Mesec bez kursa.
 struct StranaMesec: View {
   let s: Slika
 
@@ -51,7 +51,43 @@ struct StranaMesec: View {
   }
 }
 
-/// Strana 3 — Sat: vladar planetarnog sata, sledeci, ascendent i MC, izlazak i zalazak Sunca.
+/// Krug Mesecevih mena: 30 lunarnih dana ukrug, tekuci istaknut; u sredini broj lunarnog dana i faza.
+struct StranaLuna: View {
+  let s: Slika
+
+  var body: some View {
+    MoonWheelView(lunarDay: s.moon.lunarDay) {
+      VStack(spacing: 0) {
+        Text("\(s.moon.lunarDay)").font(.system(size: 34, weight: .bold, design: .rounded))
+        Text(Tekst.t("ui.lunarDay")).font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(Brend.lila)
+        Text(Tekst.phase(s.moon.phase)).font(.system(size: 11, design: .rounded)).foregroundStyle(.secondary)
+      }
+      .lineLimit(1).minimumScaleFactor(0.7)
+      .padding(.horizontal, 34)
+    }
+    .padding(.bottom, 8)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .ignoresSafeArea(.container, edges: .bottom)
+  }
+}
+
+/// Planete: simbol, znak, stepen i minut, "R" — sve planete i tacke.
+struct StranaPlanete: View {
+  let sky: Sky
+
+  var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 8) {
+        Naslov(tekst: Tekst.t("ui.planets"))
+        NeboLista(sky: sky).padding(.horizontal, 4)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 8)
+    }
+  }
+}
+
+/// Sat: vladar planetarnog sata, sledeci, ascendent i MC, izlazak i zalazak Sunca.
 struct StranaSat: View {
   let s: Slika
   let sky: Sky
@@ -112,10 +148,9 @@ struct StranaSat: View {
   }
 }
 
-/// Strana 4 — Sledece: dogadjaji po vremenu, pa sve planete, pa izbor mesta.
+/// Sledece: dogadjaji po vremenu, pa izbor mesta.
 struct StranaSledece: View {
   let s: Slika
-  let sky: Sky
   let grad: String
 
   var body: some View {
@@ -133,7 +168,6 @@ struct StranaSledece: View {
           .padding(.horizontal, 10).padding(.vertical, 8)
           .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
         }
-        NeboLista(sky: sky).padding(.top, 8).padding(.horizontal, 4)
         NavigationLink { IzborMesta() } label: {
           Label(grad, systemImage: "mappin.and.ellipse")
         }

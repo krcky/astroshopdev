@@ -74,7 +74,7 @@ const slucajevi = trenuci().map((date, i) => {
       const h = planetaryHour(ms, mesto.lat, mesto.lon);
       const sek = (t: number) => Math.round(t / 1000);
       return {
-        mesec: { znak: m.sign, stepen: z(m.degree), usao: sek(m.enteredAt), izlazi: sek(m.ingressAt), osvetljen: z(m.illumination), faza: m.phase },
+        mesec: { znak: m.sign, stepen: z(m.degree), usao: sek(m.enteredAt), izlazi: sek(m.ingressAt), osvetljen: z(m.illumination), faza: m.phase, mlad: sek(m.lastNew), dan: m.lunarDay },
         voc: { od: sek(v.start), do: sek(v.end), sada: v.active },
         sat: h && { vladar: h.ruler, sledeci: h.next, od: sek(h.start), do: sek(h.end), indeks: h.index, dan: h.day, izlazak: sek(h.sunrise), zalazak: sek(h.sunset) },
         dogadjaji: upcomingEvents(ms).map((e) => ({

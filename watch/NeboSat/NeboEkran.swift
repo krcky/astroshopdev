@@ -1,7 +1,7 @@
 import SkyCore
 import SwiftUI
 
-/// Cetiri strane, prevlacenjem nagore: krug, Mesec, Sat, Sledece. Na PRVOJ kruna pomera
+/// Sest strana, prevlacenjem nagore: krug, planete, Mesec, krug Mesecevih mena, Sat, Sledece. Na PRVOJ kruna pomera
 /// vreme — zarez je 15 minuta, pa brz okret prelazi dane; dok je vreme pomereno pise koje je,
 /// a dodir na taj natpis vraca na sada. Strelica u uglovima NEMA (Ivan, 14.10.2026: prekrivale su znake).
 /// Komplikacije otvaraju svoju stranu (`astrodial://moon` …).
@@ -51,10 +51,17 @@ struct NeboEkran: View {
                                 sensitivity: .medium, isContinuous: false, isHapticFeedbackEnabled: true)
           .tag("wheel")
 
+          StranaPlanete(sky: sky).tag("planets")
+
           Group {
             if let s = stanje.slika { StranaMesec(s: s) } else { ProgressView() }
           }
           .tag("moon")
+
+          Group {
+            if let s = stanje.slika { StranaLuna(s: s) } else { ProgressView() }
+          }
+          .tag("lunar")
 
           Group {
             if let s = stanje.slika { StranaSat(s: s, sky: sky) } else { ProgressView() }
@@ -62,7 +69,7 @@ struct NeboEkran: View {
           .tag("hour")
 
           Group {
-            if let s = stanje.slika { StranaSledece(s: s, sky: sky, grad: mesto.grad?.name ?? "—") } else { ProgressView() }
+            if let s = stanje.slika { StranaSledece(s: s, grad: mesto.grad?.name ?? "—") } else { ProgressView() }
           }
           .tag("next")
         }
@@ -73,7 +80,7 @@ struct NeboEkran: View {
         .onChange(of: mesto.izabrana) { _, _ in stanje.osvezi(trenutak, grad: mesto.grad) }
       }
       .onOpenURL { url in
-        if let ime = url.host, ["wheel", "moon", "hour", "next"].contains(ime) { strana = ime }
+        if let ime = url.host, ["wheel", "planets", "moon", "lunar", "hour", "next"].contains(ime) { strana = ime }
       }
     }
   }

@@ -15,6 +15,8 @@ import { SIGNS } from '../../src/lib/zodiac';
 /** Natpisi koje ima samo sat. Kratki: staju u red na satu od 40 mm. */
 const SAT: Record<string, Record<Jezik, string>> = {
   'ui.hour': { en: 'Hour', sr: 'Sat', hr: 'Sat', bs: 'Sat', sl: 'Ura', mk: 'Час' },
+  'ui.planets': { en: 'Planets', sr: 'Planete', hr: 'Planeti', bs: 'Planete', sl: 'Planeti', mk: 'Планети' },
+  'ui.lunarDay': { en: 'Lunar day', sr: 'Lunarni dan', hr: 'Lunarni dan', bs: 'Lunarni dan', sl: 'Lunin dan', mk: 'Лунарен ден' },
   'ui.next': { en: 'Next', sr: 'Sledeće', hr: 'Sljedeće', bs: 'Sljedeće', sl: 'Naslednje', mk: 'Следно' },
   'ui.voc': { en: 'Void of course', sr: 'Bez kursa', hr: 'Bez kursa', bs: 'Bez kursa', sl: 'Brez smeri', mk: 'Без курс' },
   'ui.planetaryHour': { en: 'Planetary hour', sr: 'Planetarni sat', hr: 'Planetarni sat', bs: 'Planetarni sat', sl: 'Planetarna ura', mk: 'Планетарен час' },

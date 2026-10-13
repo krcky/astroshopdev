@@ -64,7 +64,7 @@ import kotlin.math.min
 import kotlin.math.roundToLong
 
 /**
- * Astrodial za Wear OS: cetiri strane, prevlacenjem nagore — krug, Mesec, Sat, Sledece
+ * Astrodial za Wear OS: sest strana, prevlacenjem nagore — krug, planete, Mesec, krug Mesecevih mena, Sat, Sledece
  * (`Strane.kt`). KRUNA ILI OBOD POMERAJU VREME — jedan zarez je 15 minuta; dok
  * je vreme pomereno, pise koje je, a dodir na taj natpis vraca na sada. Na dnu liste je izbor mesta.
  */
@@ -143,7 +143,7 @@ private fun NeboEkran(verzija: Int, onMesto: () -> Unit) {
     val trenutak = sada + koraka * KORAK_MS
     val sky = remember(trenutak, verzija) { buildSky(trenutak, Mesto.procitaj(context)) }
     val fokus = remember { FocusRequester() }
-    val strane = rememberPagerState { 4 }
+    val strane = rememberPagerState { 6 }
     // Strane Mesec, Sat i Sledece: racun traje (Mesec bez kursa, dogadjaji za 30 dana), pa ide van glavne niti,
     // za tekuci trenutak, najvise jednom u minutu.
     var slika by remember { mutableStateOf<Slika?>(null) }
@@ -189,9 +189,11 @@ private fun NeboEkran(verzija: Int, onMesto: () -> Unit) {
                     )
                 }
             }
+            strana == 1 -> StranaPlanete(sky)
             s == null -> Box(Modifier.fillMaxSize())
-            strana == 1 -> StranaMesec(s)
-            strana == 2 -> StranaSat(s, sky)
+            strana == 2 -> StranaMesec(s)
+            strana == 3 -> StranaLuna(s)
+            strana == 4 -> StranaSat(s, sky)
             else -> StranaSledece(s, Mesto.grad(context)?.ime ?: "—", onMesto)
         }
     }

@@ -69,6 +69,9 @@ class MoonNow(
     val illumination: Double,
     /** Indeks faze 0—7 (0 = mlad Mesec). */
     val phase: Int,
+    /** Poslednji mlad Mesec (ms) i lunarni dan 1—30 (dani od njega, pocev od 1). */
+    val lastNew: Double,
+    val lunarDay: Int,
 )
 
 fun moonNow(ms: Double): MoonNow {
@@ -79,9 +82,14 @@ fun moonNow(ms: Double): MoonNow {
     val usao = bisekcija(t - SAT_MS, t) { znak(Planet.MOON, it) == sign }
     val izlazi = sledeciUlazak(Planet.MOON, ms, SAT_MS, 4.0)!!.first
     val faza = moonPhase(vreme(ms))
+    fun ugao(x: Double) = moonPhase(vreme(x))
+    var m = ms
+    while (ugao(m - 6 * SAT_MS) < ugao(m)) m -= 6 * SAT_MS
+    val mlad = bisekcija(m - 6 * SAT_MS, m) { ugao(it) < 180 }
     return MoonNow(
         sign, l - sign * 30, usao, izlazi, (ms - usao) / (izlazi - usao), faza,
         (1 - cos(faza * Math.PI / 180)) / 2, floor(norm360(faza + 22.5) / 45).toInt(),
+        mlad, min(30, floor((ms - mlad) / DAN_MS).toInt() + 1),
     )
 }
 

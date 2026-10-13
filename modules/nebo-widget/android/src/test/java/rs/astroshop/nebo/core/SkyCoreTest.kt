@@ -95,6 +95,8 @@ class SkyCoreTest {
             vreme(m.ingressAt, gm.getDouble("izlazi"), "izlazak Meseca iz znaka, $gde")
             assertEquals("osvetljenost, $gde", gm.getDouble("osvetljen"), m.illumination, 1e-6)
             assertEquals("faza, $gde", gm.getInt("faza"), m.phase)
+            vreme(m.lastNew, gm.getDouble("mlad"), "poslednji mlad Mesec, $gde")
+            assertEquals("lunarni dan, $gde", gm.getInt("dan"), m.lunarDay)
 
             val gv = g.getJSONObject("voc")
             val v = voidOfCourse(ms, m)

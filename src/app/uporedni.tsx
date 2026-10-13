@@ -5,14 +5,17 @@ import { Heart, HeartCrack, Plus } from 'lucide-react-native';
 
 import { useMojZnak } from '@/components/ostalo/moj-znak';
 import { SheetScroll } from '@/components/sheet';
+import { TumacenjeTekst } from '@/components/tumacenje-tekst';
+import { KapsuleRed } from '@/components/ui/kapsule';
 import { CARD_SURFACE } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { ZnakIkona } from '@/components/znak-ikona';
 import { ocenaZnakova, type OcenaPara } from '@/lib/uporedni';
+import { OBLASTI_PARA, useUporedniTexts, type OblastPara } from '@/lib/uporedni-texts';
 import { SIGNS } from '@/lib/zodiac';
 import { cn } from '@/lib/utils';
 import { DEV_TOOLS_ENABLED } from '@/store/dev';
-import { useT } from '@/i18n';
+import { useJezik, useT } from '@/i18n';
 import { brand, neutral } from '@/theme/tokens';
 
 const KRUG = 56;
@@ -27,8 +30,9 @@ function IkonaOcene({ ocena }: { ocena: OcenaPara }) {
 /**
  * Uporedni horoskop (Ivan, 14.10.2026): list odozdo sa kartice na tabu "Ostalo". Levo je UVEK korisnikov znak
  * (tekstovi astrologa su usmereni, "ti" je prvi znak), a znak druge osobe se bira — bez datuma rodjenja i bez
- * dodavanja osobe. Ocena je racun (`lib/uporedni.ts`, tabela sa sajta). TEKSTOVA (Ljubav / Prijateljstvo / Posao,
- * 144 usmerena para) JOS NEMA u aplikaciji: do uvoza u bazu ekran to iskreno kaze (`tekstoviNema`).
+ * dodavanja osobe. Ocena je racun (`lib/uporedni.ts`, tabela sa sajta), a ispod nje tri taba sa tekstovima astrologa
+ * (Ljubav / Prijateljstvo / Posao) za USMEREN par — "ti" je prvi znak (`lib/uporedni-texts.ts`, baza). Paru kome neka
+ * oblast fali pokazuju se samo one koje postoje; bez ijedne ekran kaze `tekstoviNema`.
  */
 export default function Uporedni() {
   const t = useT();
@@ -40,6 +44,12 @@ export default function Uporedni() {
   const [izabran, setIzabran] = React.useState<string | null>(null);
   const drugi = SIGNS.find((s) => s.key === izabran) ?? null;
   const ocena = moj && drugi ? ocenaZnakova(moj.key, drugi.key) : null;
+  const jezik = useJezik();
+  const { texts, loading } = useUporedniTexts(moj?.key ?? null, drugi?.key ?? null);
+  const [oblast, setOblast] = React.useState<OblastPara>('ljubav');
+  const dostupne = OBLASTI_PARA.filter((o) => texts.has(o));
+  // Izabrana oblast koje za ovaj par nema prelazi na prvu koja ima.
+  const aktivna = dostupne.includes(oblast) ? oblast : dostupne[0];
 
   return (
     <SheetScroll siva>
@@ -86,7 +96,21 @@ export default function Uporedni() {
                 </View>
               </View>
             ) : null}
-            {ocena ? <Text variant="muted" className="mt-3">{te.tekstoviNema}</Text> : null}
+            {ocena && jezik !== 'sr' ? <Text variant="caption" className="mt-3">{te.naSrpskom}</Text> : null}
+            {ocena && aktivna ? (
+              <View className={cn(CARD_SURFACE, 'mt-3 p-4')}>
+                <KapsuleRed
+                  stavke={dostupne.map((o) => ({ key: o, label: te.oblasti[o] }))}
+                  izabrana={aktivna}
+                  onIzbor={setOblast}
+                  tabovi
+                />
+                <View className="mt-4">
+                  <TumacenjeTekst tekst={texts.get(aktivna) ?? ''} />
+                </View>
+              </View>
+            ) : null}
+            {ocena && !aktivna && !loading ? <Text variant="muted" className="mt-3">{te.tekstoviNema}</Text> : null}
 
             <Text variant="oznaka" className="mb-3 mt-8">{te.izaberi}</Text>
             <View className="flex-row flex-wrap">

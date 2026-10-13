@@ -164,7 +164,71 @@ fun StranaMesec(s: Slika) {
     }
 }
 
-/** Strana 3 — Sat: vladar planetarnog sata, sledeci, ascendent i MC, izlazak i zalazak Sunca. */
+/** Krug Mesecevih mena: 30 lunarnih dana ukrug (od prvog na vrhu, u smeru kazaljke), tekuci istaknut. */
+@Composable
+fun StranaLuna(s: Slika) {
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.fillMaxSize().padding(6.dp)) {
+            // TRIDESET, ne 28: od mladog do mladog Meseca prodje 29,5 dana, pa lunarni dan ide od 1 do 30.
+            val n = 30
+            val r = size.minDimension / 2 * 0.085f
+            val veliki = size.minDimension / 2 - r * 1.7f
+            for (i in 0 until n) {
+                val ugao = (i.toDouble() / n) * 2 * Math.PI - Math.PI / 2
+                val c = Offset(center.x + veliki * cos(ugao).toFloat(), center.y + veliki * kotlin.math.sin(ugao).toFloat())
+                val tekuci = i + 1 == s.moon.lunarDay
+                val rr = if (tekuci) r * 1.5f else r
+                val faza = (i + 0.5) / 29.530588 * 360
+                drawCircle(Color(0xFF26262E), rr, c)
+                val strana = if (faza % 360 < 180) 1f else -1f
+                val k = cos(Math.toRadians(faza)).toFloat()
+                val p = androidx.compose.ui.graphics.Path()
+                val koraka = 24
+                for (j in 0..koraka) {
+                    val y = -rr + 2 * rr * j / koraka
+                    val x = sqrt(maxOf(0f, rr * rr - y * y))
+                    if (j == 0) p.moveTo(c.x + strana * x, c.y + y) else p.lineTo(c.x + strana * x, c.y + y)
+                }
+                for (j in koraka downTo 0) {
+                    val y = -rr + 2 * rr * j / koraka
+                    p.lineTo(c.x + strana * k * sqrt(maxOf(0f, rr * rr - y * y)), c.y + y)
+                }
+                p.close()
+                drawPath(p, if (tekuci) Color.White else Color(0xCCF3F4FA))
+                if (tekuci) drawCircle(LILA, rr + 2.5.dp.toPx(), c, style = Stroke(1.5.dp.toPx()))
+            }
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("${s.moon.lunarDay}", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text(Tekst.t("ui.lunarDay"), color = LILA, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            Text(Tekst.t("phase.${s.moon.phase}"), color = SIVA, fontSize = 10.sp, maxLines = 1)
+        }
+    }
+}
+
+/** Planete: simbol, znak, stepen i minut, "R" — sve planete. */
+@Composable
+fun StranaPlanete(sky: Sky) {
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(start = 30.dp, end = 22.dp, top = 30.dp, bottom = 36.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        Naslov(Tekst.t("ui.planets"))
+        for (key in listOf("sun", "moon", "mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto")) {
+            val p = sky.planets.first { it.key == key }
+            val pos = p.position
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Simbol(key, 17.dp)
+                Spacer(Modifier.width(6.dp))
+                Znak(pos.signIndex, 17.dp)
+                Text("  ${pos.deg}° ${pos.min.toString().padStart(2, '0')}′", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                if (p.retrograde) Text("  R", color = SIVA, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+}
+
+/** Sat: vladar planetarnog sata, sledeci, ascendent i MC, izlazak i zalazak Sunca. */
 @Composable
 fun StranaSat(s: Slika, sky: Sky) {
     Column(Modifier.fillMaxSize().padding(horizontal = 26.dp), verticalArrangement = Arrangement.Center) {

@@ -54,6 +54,9 @@ public struct MoonNow: Sendable {
   public let illumination: Double
   /// Indeks faze 0—7 (0 = mlad Mesec).
   public let phase: Int
+  /// Poslednji mlad Mesec i lunarni dan 1—30 (dani od njega, pocev od 1).
+  public let lastNew: Date
+  public let lunarDay: Int
 }
 
 private func ms(_ d: Date) -> Double { d.timeIntervalSince1970 * 1000 }
@@ -68,11 +71,16 @@ public func moonNow(at date: Date) -> MoonNow {
   let usao = bisekcija(t - SAT_MS, t) { znak(.moon, $0) == sign }
   let izlazi = sledeciUlazak(.moon, t0, korak: SAT_MS, dana: 4)!.at
   let faza = moonPhaseAngle(at: date)
+  func ugao(_ x: Double) -> Double { moonPhaseAngle(at: datum(x)) }
+  var m = t0
+  while ugao(m - 6 * SAT_MS) < ugao(m) { m -= 6 * SAT_MS }
+  let mlad = bisekcija(m - 6 * SAT_MS, m) { ugao($0) < 180 }
   return MoonNow(
     sign: sign, degree: l - Double(sign) * 30, enteredAt: datum(usao), ingressAt: datum(izlazi),
     progress: (t0 - usao) / (izlazi - usao), phaseAngle: faza,
     illumination: (1 - cos(faza * .pi / 180)) / 2,
-    phase: Int((norm360(faza + 22.5) / 45).rounded(.down)))
+    phase: Int((norm360(faza + 22.5) / 45).rounded(.down)),
+    lastNew: datum(mlad), lunarDay: min(30, Int(((t0 - mlad) / DAN_MS).rounded(.down)) + 1))
 }
 
 public struct VoidOfCourse: Sendable {

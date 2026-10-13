@@ -73,7 +73,10 @@ export const ostalo = {
       manje: { naslov: 'Manje povoljno', opis: 'Dobro, ali treba raditi na vezi' },
       nepovoljno: { naslov: 'Nepovoljno', opis: 'Biće teško' },
     },
-    tekstoviNema: 'Tekstovi o ljubavi, prijateljstvu i poslu za ovaj par još nisu u aplikaciji.',
+    oblasti: { ljubav: 'Ljubav', prijateljstvo: 'Prijateljstvo', posao: 'Posao' },
+    tekstoviNema: 'Za ovaj par još nema tekstova.',
+    /** Dok tekstovi nisu prevedeni (`uporedni_texts` ima samo srpski), jedna recenica ispod ocene. */
+    naSrpskom: 'Tekstovi su na srpskom.',
     bezTvogZnaka: 'Ne možemo da odredimo tvoj znak: rođenje je na granici znaka, a vreme zone nije pouzdano. Proveri podatke o rođenju na profilu.',
   },
 };

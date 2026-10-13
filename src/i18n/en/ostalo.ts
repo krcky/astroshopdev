@@ -66,7 +66,10 @@ export const ostalo: Recnik['ostalo'] = {
       manje: { naslov: 'Less favourable', opis: 'Good, but the relationship takes work' },
       nepovoljno: { naslov: 'Unfavourable', opis: 'It will be hard' },
     },
-    tekstoviNema: 'The texts about love, friendship and work for this pair are not in the app yet.',
+    oblasti: { ljubav: 'Love', prijateljstvo: 'Friendship', posao: 'Work' },
+    tekstoviNema: 'There are no texts for this pair yet.',
+    /** Dok tekstovi nisu prevedeni (`uporedni_texts` ima samo srpski), jedna recenica ispod ocene. */
+    naSrpskom: 'The texts are in Serbian.',
     bezTvogZnaka: 'We cannot determine your sign: you were born on the edge of a sign and the time zone is not reliable. Check your birth data in your profile.',
   },
 };

@@ -69,6 +69,9 @@ export type MoonNow = {
   phaseAngle: number;
   illumination: number;
   phase: number;
+  /** Poslednji mlad Mesec (ms) i lunarni dan 1—30: dani od njega, pocev od 1 — kao `moonState` u `moon.ts`. */
+  lastNew: number;
+  lunarDay: number;
 };
 
 export function moonNow(ms: number): MoonNow {
@@ -80,6 +83,11 @@ export function moonNow(ms: number): MoonNow {
   const enteredAt = bisekcija(t - SAT_MS, t, (x) => znak('moon', x) === sign);
   const ingressAt = sledeciUlazak('moon', ms, SAT_MS, 4)!.at;
   const phaseAngle = moonPhase(new Date(ms)).angle;
+  // Poslednji mlad Mesec: unazad po 6 sati dok ugao faze ne preskoci sa ~0 na ~360, pa bisekcija.
+  const faza = (x: number) => moonPhase(new Date(x)).angle;
+  let m = ms;
+  while (faza(m - 6 * SAT_MS) < faza(m)) m -= 6 * SAT_MS;
+  const lastNew = bisekcija(m - 6 * SAT_MS, m, (x) => faza(x) < 180);
   return {
     sign,
     degree: l - sign * 30,
@@ -89,6 +97,8 @@ export function moonNow(ms: number): MoonNow {
     phaseAngle,
     illumination: (1 - Math.cos((phaseAngle * Math.PI) / 180)) / 2,
     phase: Math.floor(norm360(phaseAngle + 22.5) / 45),
+    lastNew,
+    lunarDay: Math.min(30, Math.floor((ms - lastNew) / DAN_MS) + 1),
   };
 }
 

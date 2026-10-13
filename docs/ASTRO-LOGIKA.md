@@ -325,7 +325,7 @@ Dodir na planetu, Ascendent ili aspekt otvara tekst astrologa:
 
 Kratke osobine po Sunčevom znaku (3 reda po znaku) su **moje privremene formulacije**. Treba ih zameniti tekstom astrologa: 12 znakova × 3 reda. ⏳
 
-## 7. Tab „Nebo" (trenutno nebo nad gradom iz profila)
+## 7. Tab „Nebo" (trenutno nebo nad gradom iz profila) — od 14.10.2026 običan ekran „Trenutno na nebu", sa kartice na tabu „Ostalo"
 
 | Tačka | Kako se računa | Status |
 |---|---|---|
@@ -539,3 +539,17 @@ pripremljena tabela `Recenice-oblasti-za-astrologa.xlsx` (144 rečenice planeta 
 60% dana (po 240–280 dana zaredom isti tekst), a bez vremena rođenja ostaju na 3 cele godine — planete drže oblast živom.
 
 Besplatni: `BESPLATNO.krug` = Partner i Zdravlje (potpuno otvoreni), ostale oblasti pokazuju stanje i tačkice, a ostalo je pod katancem. Provere: `npm run check:krug`.
+
+## 13. Uporedni horoskop, poređenje po znaku Sunca (od 14.10.2026) ⏳
+
+Tab „Ostalo" → kartica „Uporedni horoskop" → list sa izborom znaka. Levo je uvek korisnikov znak Sunca, desno se bira znak druge osobe (bez datuma rođenja i bez dodavanja osobe). **Ocena para** je tabela 12 × 12 sa astroshop.rs/uporedni-horoskop; ispostavilo se da zavisi **samo od rastojanja dva znaka** na krugu zodijaka, pa se računa (`lib/uporedni.ts`):
+
+| Rastojanje (znakova) | Odnos | Ocena |
+|---|---|---|
+| 0, 2, 4, 6 | isti znak, sekstil, trigon, opozicija | **povoljno** (srce) — „Odličan par" |
+| 1, 5 | susedni znak, kvinkunks | **manje povoljno** (pola srca) — „Dobro, ali treba raditi na vezi" |
+| 3 | kvadrat | **nepovoljno** (X) — „Biće teško" |
+
+Raspodela 72 / 48 / 24 polja od 144. **Za astrologa:** opozicija je ovde „odličan par", a jedini X je kvadrat. To je izbor sajta, preuzet bez izmene — potvrditi ili promeniti (menja se na jednom mestu). Provera: `npm run check:uporedni`.
+
+**Tekstovi** (Ljubav / Prijateljstvo / Posao) postoje na sajtu za svih 144 *usmerenih* parova (Ovan→Bik se razlikuje od Bik→Ovan; „vi" je prvi znak), 431 tekst, oko 68.000 reči; fali „Posao" za Strelac→Rak. Pisani su na „Vi" i imaju slovnih grešaka (npr. „intezivno", „zajedniči", „senzalani"), pa pre uvoza treba lektura i odluka o obraćanju. Dete i roditelj nemaju odgovarajući tekst („Ljubav" je romantična). **Još nisu u aplikaciji.**
