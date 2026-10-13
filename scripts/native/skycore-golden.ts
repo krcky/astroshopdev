@@ -14,6 +14,7 @@ import * as path from 'node:path';
 import { moonPhase } from '../../src/lib/astro';
 import { obliquity, rightAscensionMC } from '../../src/lib/natal';
 import { meanLilithLongitude, nodeSpeed, trueNodeLongitude } from '../../src/lib/points';
+import { moonNow, planetaryHour, upcomingEvents, voidOfCourse } from '../../src/lib/sat';
 import { buildSky } from '../../src/lib/sky';
 import { signFromLongitude } from '../../src/lib/zodiac';
 import { spreadAngles } from '../../src/lib/wheel';
@@ -65,6 +66,23 @@ const slucajevi = trenuci().map((date, i) => {
     faza: z(moonPhase(date).angle),
     aspekti: sky.aspects.map((a) => ({ key: a.contentKey, orb: z(a.orb) })),
     // Razmicanje simbola na krugu — isti ulaz (longitude planeta, ASC levo), dva razmaka.
+    // Racun za sat (`src/lib/sat.ts`): vremena u sekundama od 1970.
+    sat: (() => {
+      const ms = date.getTime();
+      const m = moonNow(ms);
+      const v = voidOfCourse(ms, m);
+      const h = planetaryHour(ms, mesto.lat, mesto.lon);
+      const sek = (t: number) => Math.round(t / 1000);
+      return {
+        mesec: { znak: m.sign, stepen: z(m.degree), usao: sek(m.enteredAt), izlazi: sek(m.ingressAt), osvetljen: z(m.illumination), faza: m.phase },
+        voc: { od: sek(v.start), do: sek(v.end), sada: v.active },
+        sat: h && { vladar: h.ruler, sledeci: h.next, od: sek(h.start), do: sek(h.end), indeks: h.index, dan: h.day, izlazak: sek(h.sunrise), zalazak: sek(h.sunset) },
+        dogadjaji: upcomingEvents(ms).map((e) => ({
+          vrsta: e.kind, kad: sek(e.at),
+          telo: 'body' in e ? e.body : '', broj: e.kind === 'moonSign' || e.kind === 'ingress' ? e.sign : e.kind === 'phase' ? e.quarter : e.kind === 'station' ? (e.retrograde ? 1 : 0) : 0,
+        })),
+      };
+    })(),
     razmaknuto: spreadAngles(sky.chart.planets.map((p) => 180 + (p.longitude - sky.chart.houses.ascendant)), 9.5).map(z),
   };
 });

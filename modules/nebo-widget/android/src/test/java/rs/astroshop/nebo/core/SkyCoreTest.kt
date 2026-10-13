@@ -72,6 +72,62 @@ class SkyCoreTest {
         println("SkyCore (Kotlin): ${slucajevi.length()} trenutaka, najvece odstupanje ugla $najvece°")
     }
 
+    /** Racun za sat (`Sat.kt`) protiv `src/lib/sat.ts`; vremena do 2 s, stanice do minut. */
+    @Test
+    fun sat() {
+        val slucajevi = JSONObject(File(System.getProperty("golden")!!).readText()).getJSONArray("slucajevi")
+        var najvece = 0.0
+        fun vreme(ms: Double, g: Double, sta: String, tol: Double = 2.0) {
+            val r = abs(ms / 1000 - g)
+            najvece = maxOf(najvece, r)
+            assertTrue("$sta: ${ms / 1000} umesto $g", r < tol)
+        }
+        for (n in 0 until slucajevi.length()) {
+            val s = slucajevi.getJSONObject(n)
+            val ms = s.getDouble("unix") * 1000
+            val gde = "${s.getString("mesto")} ${s.getDouble("unix")}"
+            val g = s.getJSONObject("sat")
+            val gm = g.getJSONObject("mesec")
+            val m = moonNow(ms)
+            assertEquals("znak Meseca, $gde", gm.getInt("znak"), m.sign)
+            assertEquals("stepen Meseca, $gde", gm.getDouble("stepen"), m.degree, 1e-6)
+            vreme(m.enteredAt, gm.getDouble("usao"), "ulazak Meseca u znak, $gde")
+            vreme(m.ingressAt, gm.getDouble("izlazi"), "izlazak Meseca iz znaka, $gde")
+            assertEquals("osvetljenost, $gde", gm.getDouble("osvetljen"), m.illumination, 1e-6)
+            assertEquals("faza, $gde", gm.getInt("faza"), m.phase)
+
+            val gv = g.getJSONObject("voc")
+            val v = voidOfCourse(ms, m)
+            vreme(v.start, gv.getDouble("od"), "pocetak Meseca bez kursa, $gde")
+            vreme(v.end, gv.getDouble("do"), "kraj Meseca bez kursa, $gde")
+            assertEquals("bez kursa sada, $gde", gv.getBoolean("sada"), v.active)
+
+            val h = planetaryHour(ms, Place(s.getDouble("lat"), s.getDouble("lon")))
+            assertEquals("ima li planetarnog sata, $gde", g.isNull("sat"), h == null)
+            if (h != null) {
+                val gh = g.getJSONObject("sat")
+                assertEquals("vladar sata, $gde", gh.getString("vladar"), h.ruler.key)
+                assertEquals("sledeci vladar, $gde", gh.getString("sledeci"), h.next.key)
+                assertEquals("redni broj sata, $gde", gh.getInt("indeks"), h.index)
+                assertEquals("dan ili noc, $gde", gh.getBoolean("dan"), h.day)
+                vreme(h.start, gh.getDouble("od"), "pocetak sata, $gde")
+                vreme(h.end, gh.getDouble("do"), "kraj sata, $gde")
+                vreme(h.sunrise, gh.getDouble("izlazak"), "izlazak Sunca, $gde")
+                vreme(h.sunset, gh.getDouble("zalazak"), "zalazak Sunca, $gde")
+            }
+
+            val gd = g.getJSONArray("dogadjaji")
+            val e = upcomingEvents(ms)
+            assertEquals("broj dogadjaja, $gde", gd.length(), e.size)
+            for (i in e.indices) {
+                val x = gd.getJSONObject(i)
+                assertEquals("dogadjaj $i, $gde", "${x.getString("vrsta")} ${x.getString("telo")} ${x.getInt("broj")}", "${e[i].kind} ${e[i].body?.key ?: ""} ${e[i].number}")
+                vreme(e[i].at, x.getDouble("kad"), "vreme dogadjaja ${e[i].kind}, $gde", if (e[i].kind == "station") 60.0 else 2.0)
+            }
+        }
+        println("SkyCore sat (Kotlin): ${slucajevi.length()} trenutaka, najvece odstupanje vremena $najvece s")
+    }
+
     /** Bez mesta nema kuca ni Tacke srece — ne izmislja se ascendent. */
     @Test
     fun bezMesta() {

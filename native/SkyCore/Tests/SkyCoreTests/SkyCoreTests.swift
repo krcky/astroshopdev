@@ -13,6 +13,14 @@ struct Golden: Decodable {
     let cvor, cvorBrzina, lilit, sreca, faza: Double
     let aspekti: [Aspekt]
     let razmaknuto: [Double]
+    let sat: Sat
+  }
+  struct Sat: Decodable {
+    struct Mesec: Decodable { let znak: Int; let stepen: Double; let usao, izlazi: Double; let osvetljen: Double; let faza: Int }
+    struct Voc: Decodable { let od: Double; let `do`: Double; let sada: Bool }
+    struct Sati: Decodable { let vladar, sledeci: String; let od: Double; let `do`: Double; let indeks: Int; let dan: Bool; let izlazak, zalazak: Double }
+    struct Dogadjaj: Decodable { let vrsta: String; let kad: Double; let telo: String; let broj: Int }
+    let mesec: Mesec; let voc: Voc; let sat: Sati?; let dogadjaji: [Dogadjaj]
   }
   let slucajevi: [Slucaj]
 }
@@ -70,6 +78,65 @@ final class SkyCoreTests: XCTestCase {
       for (a, g) in zip(razmaknuto, s.razmaknuto) { XCTAssertEqual(a, g, accuracy: 1e-5, "razmicanje simbola, \(gde)") }
     }
     print("SkyCore: \(golden.slucajevi.count) trenutaka, najvece odstupanje ugla \(najvece)°")
+  }
+
+  /// Racun za sat (`Sat.swift`) protiv `src/lib/sat.ts`. Vremena smeju da se razidju do 2 sekunde
+  /// (bisekcija staje na pola sekunde, a zapis je zaokruzen na sekundu); stanice do minut.
+  func testSat() throws {
+    let url = try XCTUnwrap(Bundle.module.url(forResource: "golden", withExtension: "json"))
+    let golden = try JSONDecoder().decode(Golden.self, from: Data(contentsOf: url))
+    var najveceVreme = 0.0
+    func vreme(_ d: Date, _ g: Double, _ sta: String, tol: Double = 2, line: UInt = #line) {
+      let r = abs(d.timeIntervalSince1970 - g)
+      najveceVreme = max(najveceVreme, r)
+      XCTAssertLessThan(r, tol, sta, line: line)
+    }
+    for s in golden.slucajevi {
+      let date = Date(timeIntervalSince1970: s.unix)
+      let gde = "\(s.mesto) \(s.unix)"
+      let m = moonNow(at: date)
+      XCTAssertEqual(m.sign, s.sat.mesec.znak, "znak Meseca, \(gde)")
+      XCTAssertEqual(m.degree, s.sat.mesec.stepen, accuracy: 1e-6, "stepen Meseca, \(gde)")
+      vreme(m.enteredAt, s.sat.mesec.usao, "ulazak Meseca u znak, \(gde)")
+      vreme(m.ingressAt, s.sat.mesec.izlazi, "izlazak Meseca iz znaka, \(gde)")
+      XCTAssertEqual(m.illumination, s.sat.mesec.osvetljen, accuracy: 1e-6, "osvetljenost, \(gde)")
+      XCTAssertEqual(m.phase, s.sat.mesec.faza, "faza, \(gde)")
+
+      let v = voidOfCourse(at: date, moon: m)
+      vreme(v.start, s.sat.voc.od, "pocetak Meseca bez kursa, \(gde)")
+      vreme(v.end, s.sat.voc.do, "kraj Meseca bez kursa, \(gde)")
+      XCTAssertEqual(v.active, s.sat.voc.sada, "bez kursa sada, \(gde)")
+
+      let h = planetaryHour(at: date, place: Place(latitude: s.lat, longitude: s.lon))
+      XCTAssertEqual(h == nil, s.sat.sat == nil, "ima li planetarnog sata, \(gde)")
+      if let h, let g = s.sat.sat {
+        XCTAssertEqual(h.ruler.rawValue, g.vladar, "vladar sata, \(gde)")
+        XCTAssertEqual(h.next.rawValue, g.sledeci, "sledeci vladar, \(gde)")
+        XCTAssertEqual(h.index, g.indeks, "redni broj sata, \(gde)")
+        XCTAssertEqual(h.day, g.dan, "dan ili noc, \(gde)")
+        vreme(h.start, g.od, "pocetak sata, \(gde)")
+        vreme(h.end, g.do, "kraj sata, \(gde)")
+        vreme(h.sunrise, g.izlazak, "izlazak Sunca, \(gde)")
+        vreme(h.sunset, g.zalazak, "zalazak Sunca, \(gde)")
+      }
+
+      let e = upcomingEvents(at: date)
+      XCTAssertEqual(e.count, s.sat.dogadjaji.count, "broj dogadjaja, \(gde)")
+      for (a, g) in zip(e, s.sat.dogadjaji) {
+        let (vrsta, telo, broj): (String, String, Int) = {
+          switch a {
+          case let .moonSign(_, sign): return ("moonSign", "", sign)
+          case .voc: return ("voc", "", 0)
+          case let .phase(_, q): return ("phase", "", q)
+          case let .ingress(_, b, sign): return ("ingress", b.rawValue, sign)
+          case let .station(_, b, r): return ("station", b.rawValue, r ? 1 : 0)
+          }
+        }()
+        XCTAssertEqual("\(vrsta) \(telo) \(broj)", "\(g.vrsta) \(g.telo) \(g.broj)", "dogadjaj, \(gde)")
+        vreme(a.at, g.kad, "vreme dogadjaja \(g.vrsta) \(g.telo), \(gde)", tol: vrsta == "station" ? 60 : 2)
+      }
+    }
+    print("SkyCore sat: \(golden.slucajevi.count) trenutaka, najvece odstupanje vremena \(najveceVreme) s")
   }
 
   /// Bez mesta nema kuca ni Tacke srece — ne izmislja se ascendent.

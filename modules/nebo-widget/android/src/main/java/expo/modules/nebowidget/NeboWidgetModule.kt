@@ -4,9 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.os.Build
 import expo.modules.kotlin.modules.Module
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.os.Build
 import expo.modules.kotlin.modules.ModuleDefinition
 import rs.astroshop.nebo.core.Place
 import rs.astroshop.nebo.widget.Mesto

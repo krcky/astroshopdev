@@ -179,6 +179,111 @@
      "orb": 3.663774545
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 18.165655668,
+     "usao": -622941789,
+     "izlazi": -622762240,
+     "osvetljen": 0.740229588,
+     "faza": 5
+    },
+    "voc": {
+     "od": -622767344,
+     "do": -622762240,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": -622834807,
+     "do": -622830893,
+     "indeks": 2,
+     "dan": true,
+     "izlazak": -622842637,
+     "zalazak": -622795659
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": -622767344,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": -622762240,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -622730900,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": -622642624,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -622133710,
+      "telo": "jupiter",
+      "broj": 11
+     },
+     {
+      "vrsta": "phase",
+      "kad": -621963240,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -621676855,
+      "telo": "sun",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": -621263965,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "station",
+      "kad": -621033574,
+      "telo": "pluto",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": -620678400,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "station",
+      "kad": -620575566,
+      "telo": "mars",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": -620574490,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -620368866,
+      "telo": "venus",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     369.515793163,
     128.225504873,
@@ -351,6 +456,99 @@
      "orb": 7.868070721
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 25.043463776,
+     "usao": -303876543,
+     "izlazi": -303690999,
+     "osvetljen": 0.514992556,
+     "faza": 6
+    },
+    "voc": {
+     "od": -303708991,
+     "do": -303690999,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": -303725477,
+     "do": -303721131,
+     "indeks": 9,
+     "dan": true,
+     "izlazak": -303764593,
+     "zalazak": -303712438
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "phase",
+      "kad": -303710725,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "voc",
+      "kad": -303708991,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": -303690999,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -303597192,
+      "telo": "mercury",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -303431195,
+      "telo": "sun",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": -303046388,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -302809764,
+      "telo": "venus",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": -302342295,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": -301748264,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": -301700514,
+      "telo": "jupiter",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": -301173837,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     298.974287741,
     390.686939616,
@@ -515,6 +713,93 @@
      "orb": 3.790359471
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 0,
+     "stepen": 17.204598251,
+     "usao": 15195110,
+     "izlazi": 15384872,
+     "osvetljen": 0.394784488,
+     "faza": 6
+    },
+    "voc": {
+     "od": 15359765,
+     "do": 15384872,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 15302850,
+     "do": 15305822,
+     "indeks": 7,
+     "dan": true,
+     "izlazak": 15282046,
+     "zalazak": 15317709
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 15359765,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 15384872,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 15574992,
+      "telo": "mercury",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 15866309,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 16573420,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 16632988,
+      "telo": "venus",
+      "broj": 5
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 17131350,
+      "telo": "mars",
+      "broj": 4
+     },
+     {
+      "vrsta": "phase",
+      "kad": 17179142,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 17563015,
+      "telo": "sun",
+      "broj": 4
+     },
+     {
+      "vrsta": "phase",
+      "kad": 17751611,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     349.426325796,
     427.273114144,
@@ -719,6 +1004,90 @@
      "orb": 5.847769402
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 2,
+     "stepen": 26.180771537,
+     "usao": 331914807,
+     "izlazi": 332102665,
+     "osvetljen": 0.037021076,
+     "faza": 0
+    },
+    "voc": {
+     "od": 332052784,
+     "do": 332102665,
+     "sada": true
+    },
+    "sat": null,
+    "dogadjaji": [
+     {
+      "vrsta": "ingress",
+      "kad": 332099945,
+      "telo": "mars",
+      "broj": 6
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 332102665,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 332232378,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 332920277,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "station",
+      "kad": 333110159,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 333132106,
+      "telo": "sun",
+      "broj": 4
+     },
+     {
+      "vrsta": "phase",
+      "kad": 333572057,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "station",
+      "kad": 333783998,
+      "telo": "uranus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 334152053,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 334419915,
+      "telo": "venus",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 334639841,
+      "telo": "mercury",
+      "broj": 4
+     }
+    ]
+   },
    "razmaknuto": [
     66.565252068,
     88.746415075,
@@ -891,6 +1260,99 @@
      "orb": 7.477918262
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 5,
+     "stepen": 2.589624846,
+     "usao": 651173575,
+     "izlazi": 651370592,
+     "osvetljen": 0.001872604,
+     "faza": 0
+    },
+    "voc": {
+     "od": 651339666,
+     "do": 651370592,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 651187161,
+     "do": 651190793,
+     "indeks": 10,
+     "dan": true,
+     "izlazak": 651150844,
+     "zalazak": 651194425
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 651339666,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 651370592,
+      "telo": "",
+      "broj": 6
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 651403258,
+      "telo": "sun",
+      "broj": 5
+     },
+     {
+      "vrsta": "station",
+      "kad": 651571638,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 651828891,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 652102783,
+      "telo": "mars",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 652499172,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 652695651,
+      "telo": "venus",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 653086429,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "station",
+      "kad": 653315058,
+      "telo": "uranus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 653705221,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     385.04823708,
     375.54823708,
@@ -1067,6 +1529,105 @@
      "orb": 5.866649803
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 7,
+     "stepen": 14.362555362,
+     "usao": 967874101,
+     "izlazi": 968076496,
+     "osvetljen": 0.274733982,
+     "faza": 1
+    },
+    "voc": {
+     "od": 968031268,
+     "do": 968076496,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 967965594,
+     "do": 967969536,
+     "indeks": 3,
+     "dan": true,
+     "izlazak": 967953770,
+     "zalazak": 968001067
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 968031268,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 968076496,
+      "telo": "",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 968171283,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 968365339,
+      "telo": "mercury",
+      "broj": 6
+     },
+     {
+      "vrsta": "station",
+      "kad": 968736991,
+      "telo": "saturn",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 968873849,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 969149939,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 969499735,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 969643679,
+      "telo": "sun",
+      "broj": 6
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 969809133,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "phase",
+      "kad": 970084412,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 970210221,
+      "telo": "jupiter",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     195.318167141,
     132.090346767,
@@ -1235,6 +1796,99 @@
      "orb": 5.876317044
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 7.514371119,
+     "usao": 1286943409,
+     "izlazi": 1287152619,
+     "osvetljen": 0.389150739,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1287136126,
+     "do": 1287152619,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "sun",
+     "sledeci": "venus",
+     "od": 1286991494,
+     "do": 1286995325,
+     "indeks": 12,
+     "dan": false,
+     "izlazak": 1286951000,
+     "zalazak": 1286991494
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "phase",
+      "kad": 1287091681,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1287136126,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1287152619,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1287609533,
+      "telo": "mercury",
+      "broj": 7
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1287797831,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1287837327,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1288248420,
+      "telo": "mars",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1288442788,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1289019139,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1289090686,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1289185277,
+      "telo": "venus",
+      "broj": 6
+     }
+    ]
+   },
    "razmaknuto": [
     418.089681068,
     343.882720801,
@@ -1407,6 +2061,105 @@
      "orb": 3.61816814
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 11,
+     "stepen": 12.661601231,
+     "usao": 1606017948,
+     "izlazi": 1606230281,
+     "osvetljen": 0.598045257,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1606214662,
+     "do": 1606230281,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1606104152,
+     "do": 1606108376,
+     "indeks": 8,
+     "dan": true,
+     "izlazak": 1606070365,
+     "zalazak": 1606121046
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1606214662,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1606230281,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1606587443,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1606728625,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1606852304,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1607387833,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1607962628,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1608049289,
+      "telo": "venus",
+      "broj": 8
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1608181318,
+      "telo": "saturn",
+      "broj": 10
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1608383347,
+      "telo": "jupiter",
+      "broj": 10
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1608544955,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1608594116,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     148.376080888,
     47.061881618,
@@ -1603,6 +2356,90 @@
      "orb": 5.402795372
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 1,
+     "stepen": 8.367937005,
+     "usao": 1922739213,
+     "izlazi": 1922955589,
+     "osvetljen": 0.903684423,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1922811591,
+     "do": 1922955589,
+     "sada": false
+    },
+    "sat": null,
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1922811591,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1922955589,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1923058327,
+      "telo": "venus",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1923086466,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1923145686,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1923782506,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "station",
+      "kad": 1924095527,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1924114168,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1924363962,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1924442245,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1924954604,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     455.619482802,
     316.53142461,
@@ -1791,6 +2628,111 @@
      "orb": 5.369509278
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 21.416920275,
+     "usao": 2210161070,
+     "izlazi": 2210335521,
+     "osvetljen": 0.050474642,
+     "faza": 1
+    },
+    "voc": {
+     "od": 2210302397,
+     "do": 2210335521,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "jupiter",
+     "sledeci": "mars",
+     "od": 2210282828,
+     "do": 2210286390,
+     "indeks": 12,
+     "dan": false,
+     "izlazak": 2210239154,
+     "zalazak": 2210282828
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 2210302397,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 2210311104,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 2210335521,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2210671246,
+      "telo": "sun",
+      "broj": 10
+     },
+     {
+      "vrsta": "station",
+      "kad": 2210710345,
+      "telo": "saturn",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2210725304,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2210836598,
+      "telo": "venus",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2211436518,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2211743823,
+      "telo": "mercury",
+      "broj": 11
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2212093977,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "station",
+      "kad": 2212379241,
+      "telo": "mars",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 2212644980,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2212669491,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     376.304010735,
     350.331789747,
@@ -1971,6 +2913,99 @@
      "orb": 5.951191064
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 1,
+     "stepen": 13.221158066,
+     "usao": 2529399962,
+     "izlazi": 2529592603,
+     "osvetljen": 0.290390976,
+     "faza": 1
+    },
+    "voc": {
+     "od": 2529559586,
+     "do": 2529592603,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mercury",
+     "sledeci": "moon",
+     "od": 2529482173,
+     "do": 2529485477,
+     "indeks": 5,
+     "dan": true,
+     "izlazak": 2529465655,
+     "zalazak": 2529505299
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 2529559586,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 2529592603,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2529660604,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2530036683,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2530365818,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2530422553,
+      "telo": "mars",
+      "broj": 9
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2530749143,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2531038098,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "station",
+      "kad": 2531358319,
+      "telo": "jupiter",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2531384366,
+      "telo": "sun",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2531608874,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     495.493037799,
     434.002962753,
@@ -2163,6 +3198,99 @@
      "orb": 5.48668
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 2,
+     "stepen": 26.439192312,
+     "usao": 2845921328,
+     "izlazi": 2846112462,
+     "osvetljen": 0.555825879,
+     "faza": 2
+    },
+    "voc": {
+     "od": 2846086000,
+     "do": 2846112462,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 2846089124,
+     "do": 2846092812,
+     "indeks": 14,
+     "dan": false,
+     "izlazak": 2846039700,
+     "zalazak": 2846081748
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 2846112462,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2846534679,
+      "telo": "mars",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2846720491,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2846726891,
+      "telo": "mercury",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2846954295,
+      "telo": "sun",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2847424111,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2847959001,
+      "telo": "saturn",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2848009079,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2848269258,
+      "telo": "jupiter",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 2848383738,
+      "telo": "venus",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 2848592568,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     428.05996122,
     331.643688706,
@@ -2347,6 +3475,93 @@
      "orb": 5.988395551
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 7,
+     "stepen": 17.15966213,
+     "usao": 1791732070,
+     "izlazi": 1791939559,
+     "osvetljen": 0.056407992,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1791881136,
+     "do": 1791939559,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1791848009,
+     "do": 1791851858,
+     "indeks": 4,
+     "dan": true,
+     "izlazak": 1791832614,
+     "zalazak": 1791878800
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1791881136,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1791939559,
+      "telo": "",
+      "broj": 8
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792095827,
+      "telo": "pluto",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792340000,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804472,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     495.807633943,
     459.847639901,
@@ -2539,6 +3754,93 @@
      "orb": 5.788856142
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 6.199228708,
+     "usao": 1791939559,
+     "izlazi": 1792155418,
+     "osvetljen": 0.146337106,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1792101334,
+     "do": 1792155418,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1791982117,
+     "do": 1791984902,
+     "indeks": 9,
+     "dan": true,
+     "izlazak": 1791957050,
+     "zalazak": 1791990473
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "station",
+      "kad": 1792095820,
+      "telo": "pluto",
+      "broj": 0
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1792101334,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792155418,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792340000,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804464,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     185.117878046,
     140.129918694,
@@ -2723,6 +4025,87 @@
      "orb": 7.938351505
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 24.797415306,
+     "usao": 1791939559,
+     "izlazi": 1792155418,
+     "osvetljen": 0.265598418,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1792101334,
+     "do": 1792155418,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1792116076,
+     "do": 1792119640,
+     "indeks": 15,
+     "dan": false,
+     "izlazak": 1792061771,
+     "zalazak": 1792105382
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1792155418,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792340000,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804478,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594072,
+      "telo": "venus",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     370.694841895,
     308.645767453,
@@ -2895,6 +4278,93 @@
      "orb": 7.860856186
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 13.167532746,
+     "usao": 1792155418,
+     "izlazi": 1792373991,
+     "osvetljen": 0.40352679,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1792339954,
+     "do": 1792373991,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1792248949,
+     "do": 1792252220,
+     "indeks": 11,
+     "dan": true,
+     "izlazak": 1792212961,
+     "zalazak": 1792252220
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1792339954,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792340000,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792373991,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804470,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594064,
+      "telo": "venus",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     441.648105475,
     362.767177963,
@@ -3087,6 +4557,93 @@
      "orb": 7.784168367
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 1.596187676,
+     "usao": 1792373991,
+     "izlazi": 1792586102,
+     "osvetljen": 0.550219588,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1792572133,
+     "do": 1792586102,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1792383601,
+     "do": 1792387497,
+     "indeks": 22,
+     "dan": false,
+     "izlazak": 1792304929,
+     "zalazak": 1792344633
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1792572133,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792586102,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804463,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594078,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     294.900638247,
     559.130464269,
@@ -3271,6 +4828,93 @@
      "orb": 7.708402258
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 20.407437391,
+     "usao": 1792373991,
+     "izlazi": 1792586102,
+     "osvetljen": 0.695648111,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1792572133,
+     "do": 1792586102,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "sun",
+     "sledeci": "venus",
+     "od": 1792516677,
+     "do": 1792519951,
+     "indeks": 22,
+     "dan": false,
+     "izlazak": 1792436895,
+     "zalazak": 1792483942
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1792572133,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792586102,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804477,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594070,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     317.248649684,
     564.207756542,
@@ -3447,6 +5091,93 @@
      "orb": 7.633668108
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 11,
+     "stepen": 9.914546809,
+     "usao": 1792586102,
+     "izlazi": 1792785205,
+     "osvetljen": 0.828033606,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1792726271,
+     "do": 1792785205,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1792652717,
+     "do": 1792655148,
+     "indeks": 1,
+     "dan": true,
+     "izlazak": 1792650285,
+     "zalazak": 1792679463
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1792726271,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792748302,
+      "telo": "sun",
+      "broj": 7
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792785205,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1792804469,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594063,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     305.30253086,
     534.296192782,
@@ -3627,6 +5358,93 @@
      "orb": 7.560072299
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 0,
+     "stepen": 0.352421748,
+     "usao": 1792785205,
+     "izlazi": 1792971274,
+     "osvetljen": 0.93255668,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1792969125,
+     "do": 1792971274,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1792785596,
+     "do": 1792789231,
+     "indeks": 9,
+     "dan": true,
+     "izlazak": 1792752880,
+     "zalazak": 1792796501
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "station",
+      "kad": 1792804462,
+      "telo": "mercury",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1792918618,
+      "telo": "venus",
+      "broj": 6
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1792969125,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792971274,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594076,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     }
+    ]
+   },
    "razmaknuto": [
     186.854738144,
     396.953367202,
@@ -3807,6 +5625,87 @@
      "orb": 7.487717756
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 0,
+     "stepen": 21.793421033,
+     "usao": 1792785205,
+     "izlazi": 1792971274,
+     "osvetljen": 0.99208631,
+     "faza": 4
+    },
+    "voc": {
+     "od": 1792969125,
+     "do": 1792971274,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "jupiter",
+     "sledeci": "mars",
+     "od": 1792920561,
+     "do": 1792923715,
+     "indeks": 5,
+     "dan": true,
+     "izlazak": 1792904793,
+     "zalazak": 1792942636
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1792969125,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1792971274,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1792987936,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563588,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594069,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     }
+    ]
+   },
    "razmaknuto": [
     295.438758098,
     493.125393348,
@@ -3991,6 +5890,87 @@
      "orb": 7.639245802
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 1,
+     "stepen": 14.078581244,
+     "usao": 1792971274,
+     "izlazi": 1793149307,
+     "osvetljen": 0.991575966,
+     "faza": 4
+    },
+    "voc": {
+     "od": 1793112659,
+     "do": 1793149307,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1793055147,
+     "do": 1793059144,
+     "indeks": 17,
+     "dan": false,
+     "izlazak": 1792996659,
+     "zalazak": 1793035162
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1793112659,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1793149307,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563581,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594061,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     }
+    ]
+   },
    "razmaknuto": [
     101.673311731,
     276.136042843,
@@ -4179,6 +6159,93 @@
      "orb": 7.347131158
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 2,
+     "stepen": 6.828471541,
+     "usao": 1793149306,
+     "izlazi": 1793325928,
+     "osvetljen": 0.925242924,
+     "faza": 5
+    },
+    "voc": {
+     "od": 1793310168,
+     "do": 1793325928,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1793188334,
+     "do": 1793191529,
+     "indeks": 16,
+     "dan": false,
+     "izlazak": 1793127555,
+     "zalazak": 1793175556
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1793310168,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1793325928,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563595,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594075,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532045,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     }
+    ]
+   },
    "razmaknuto": [
     168.572418214,
     311.901187455,
@@ -4363,6 +6430,87 @@
      "orb": 5.857593446
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 2,
+     "stepen": 29.570491202,
+     "usao": 1793149306,
+     "izlazi": 1793325928,
+     "osvetljen": 0.8014001,
+     "faza": 5
+    },
+    "voc": {
+     "od": 1793310168,
+     "do": 1793325928,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1793323201,
+     "do": 1793328316,
+     "indeks": 20,
+     "dan": false,
+     "izlazak": 1793256977,
+     "zalazak": 1793282287
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1793325928,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563587,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594068,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     }
+    ]
+   },
    "razmaknuto": [
     455.010681946,
     582.196904669,
@@ -4539,6 +6687,93 @@
      "orb": 7.212691351
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 3,
+     "stepen": 21.917359564,
+     "usao": 1793325927,
+     "izlazi": 1793506686,
+     "osvetljen": 0.640110947,
+     "faza": 6
+    },
+    "voc": {
+     "od": 1793483946,
+     "do": 1793506686,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "sun",
+     "sledeci": "venus",
+     "od": 1793454940,
+     "do": 1793458576,
+     "indeks": 3,
+     "dan": true,
+     "izlazak": 1793444032,
+     "zalazak": 1793487665
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1793483946,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1793506686,
+      "telo": "",
+      "broj": 4
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1793564939,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563580,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594060,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     }
+    ]
+   },
    "razmaknuto": [
     380.782943827,
     487.050660177,
@@ -4723,6 +6958,93 @@
      "orb": 7.148018124
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 4,
+     "stepen": 13.673716928,
+     "usao": 1793506686,
+     "izlazi": 1793694459,
+     "osvetljen": 0.465714807,
+     "faza": 6
+    },
+    "voc": {
+     "od": 1793664597,
+     "do": 1793694459,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1793588336,
+     "do": 1793592489,
+     "indeks": 22,
+     "dan": false,
+     "izlazak": 1793510159,
+     "zalazak": 1793546812
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1793664597,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1793694459,
+      "telo": "",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563593,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594074,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     469.672720595,
     555.735106388,
@@ -4891,6 +7213,93 @@
      "orb": 7.085170717
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 5,
+     "stepen": 4.819652937,
+     "usao": 1793694459,
+     "izlazi": 1793889492,
+     "osvetljen": 0.300422425,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1793775453,
+     "do": 1793889492,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1793722653,
+     "do": 1793725767,
+     "indeks": 11,
+     "dan": true,
+     "izlazak": 1793688408,
+     "zalazak": 1793725767
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1793775453,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1793889492,
+      "telo": "",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563586,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594066,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532045,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     296.813068112,
     359.127396986,
@@ -5063,6 +7472,93 @@
      "orb": 7.024243855
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 5,
+     "stepen": 25.423678855,
+     "usao": 1793694459,
+     "izlazi": 1793889492,
+     "osvetljen": 0.161719,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1793775453,
+     "do": 1793889492,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1793859042,
+     "do": 1793863118,
+     "indeks": 10,
+     "dan": true,
+     "izlazak": 1793818286,
+     "zalazak": 1793867193
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1793889492,
+      "telo": "",
+      "broj": 6
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207762,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563578,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594080,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     }
+    ]
+   },
    "razmaknuto": [
     337.439003577,
     392.839282545,
@@ -5235,6 +7731,105 @@
      "orb": 6.965330203
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 6,
+     "stepen": 15.55912246,
+     "usao": 1793889492,
+     "izlazi": 1794091191,
+     "osvetljen": 0.062032556,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1794057577,
+     "do": 1794091191,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1793993171,
+     "do": 1793998679,
+     "indeks": 16,
+     "dan": false,
+     "izlazak": 1793950522,
+     "zalazak": 1793971141
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1794057577,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794091191,
+      "telo": "",
+      "broj": 7
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563592,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594072,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     }
+    ]
+   },
    "razmaknuto": [
     598.4208823,
     631.758235793,
@@ -5411,6 +8006,105 @@
      "orb": 6.908519442
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 7,
+     "stepen": 5.26230973,
+     "usao": 1794091191,
+     "izlazi": 1794299741,
+     "osvetljen": 0.008689583,
+     "faza": 0
+    },
+    "voc": {
+     "od": 1794266706,
+     "do": 1794299741,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1794124545,
+     "do": 1794128108,
+     "indeks": 21,
+     "dan": false,
+     "izlazak": 1794048831,
+     "zalazak": 1794092476
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "phase",
+      "kad": 1794207763,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1794266706,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794299741,
+      "telo": "",
+      "broj": 8
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563584,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594065,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     }
+    ]
+   },
    "razmaknuto": [
     202.633999665,
     221.633999665,
@@ -5595,6 +8289,105 @@
      "orb": 6.853897462
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 7,
+     "stepen": 24.538766274,
+     "usao": 1794091191,
+     "izlazi": 1794299740,
+     "osvetljen": 0.003749456,
+     "faza": 0
+    },
+    "voc": {
+     "od": 1794266705,
+     "do": 1794299740,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1794258684,
+     "do": 1794262943,
+     "indeks": 17,
+     "dan": false,
+     "izlazak": 1794202015,
+     "zalazak": 1794237388
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1794266705,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794299740,
+      "telo": "",
+      "broj": 8
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563598,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594078,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532045,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     275.125779752,
     265.625779752,
@@ -5771,6 +8564,111 @@
      "orb": 6.801545731
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 13.402049887,
+     "usao": 1794299740,
+     "izlazi": 1794515230,
+     "osvetljen": 0.044389876,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1794482938,
+     "do": 1794515230,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1794392267,
+     "do": 1794395292,
+     "indeks": 4,
+     "dan": true,
+     "izlazak": 1794380168,
+     "zalazak": 1794416466
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1794482938,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794515230,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794563590,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594071,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923411,
+      "telo": "saturn",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     150.828070734,
     126.496849261,
@@ -5955,6 +8853,123 @@
      "orb": 6.751540819
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 1.918134659,
+     "usao": 1794515230,
+     "izlazi": 1794734650,
+     "osvetljen": 0.124261392,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1794682511,
+     "do": 1794734650,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "jupiter",
+     "sledeci": "mars",
+     "od": 1794525687,
+     "do": 1794529832,
+     "indeks": 4,
+     "dan": true,
+     "izlazak": 1794509106,
+     "zalazak": 1794558848
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "station",
+      "kad": 1794563583,
+      "telo": "mercury",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1794594063,
+      "telo": "venus",
+      "broj": 0
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1794682511,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794734650,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777552,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923404,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092027,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101941,
+      "telo": "jupiter",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     142.207915271,
     100.920664363,
@@ -6139,6 +9154,111 @@
      "orb": 6.70395403
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 20.233990409,
+     "usao": 1794515230,
+     "izlazi": 1794734650,
+     "osvetljen": 0.235309096,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1794682511,
+     "do": 1794734650,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mercury",
+     "sledeci": "moon",
+     "od": 1794659802,
+     "do": 1794665746,
+     "indeks": 12,
+     "dan": false,
+     "izlazak": 1794644368,
+     "zalazak": 1794659802
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1794682511,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794734650,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777552,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923418,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092020,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101934,
+      "telo": "jupiter",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     321.728496599,
     263.686438403,
@@ -6331,6 +9451,111 @@
      "orb": 6.658851073
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 8.583422146,
+     "usao": 1794734650,
+     "izlazi": 1794950362,
+     "osvetljen": 0.369105655,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1794925545,
+     "do": 1794950362,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1794794427,
+     "do": 1794797990,
+     "indeks": 15,
+     "dan": false,
+     "izlazak": 1794740082,
+     "zalazak": 1794783739
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "phase",
+      "kad": 1794916107,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1794925545,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1794950362,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923410,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092033,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101948,
+      "telo": "jupiter",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     384.400435634,
     305.358849816,
@@ -6523,6 +9748,105 @@
      "orb": 6.616291817
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 10,
+     "stepen": 27.271337941,
+     "usao": 1794734650,
+     "izlazi": 1794950362,
+     "osvetljen": 0.517003906,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1794925546,
+     "do": 1794950362,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "saturn",
+     "sledeci": "jupiter",
+     "od": 1794928079,
+     "do": 1794932435,
+     "indeks": 12,
+     "dan": false,
+     "izlazak": 1794893865,
+     "zalazak": 1794928079
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1794950362,
+      "telo": "",
+      "broj": 11
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923424,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092026,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101940,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     433.643102298,
     341.688466153,
@@ -6707,6 +10031,111 @@
      "orb": 3.794859164
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 11,
+     "stepen": 16.636395599,
+     "usao": 1794950362,
+     "izlazi": 1795153927,
+     "osvetljen": 0.668960764,
+     "faza": 2
+    },
+    "voc": {
+     "od": 1795139161,
+     "do": 1795153927,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1795063424,
+     "do": 1795067674,
+     "indeks": 22,
+     "dan": false,
+     "izlazak": 1794985456,
+     "zalazak": 1795020919
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1795139161,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795153927,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923416,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092018,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101954,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     311.816544885,
     202.060494572,
@@ -6903,6 +10332,111 @@
      "orb": 5.596003415
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 0,
+     "stepen": 6.986358539,
+     "usao": 1795153927,
+     "izlazi": 1795342175,
+     "osvetljen": 0.811501541,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1795333108,
+     "do": 1795342175,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1795197029,
+     "do": 1795200027,
+     "indeks": 23,
+     "dan": false,
+     "izlazak": 1795113656,
+     "zalazak": 1795164050
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "ingress",
+      "kad": 1795332208,
+      "telo": "sun",
+      "broj": 8
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1795333108,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795342175,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777552,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923409,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092032,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101946,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     316.236989846,
     183.427072072,
@@ -7103,6 +10637,111 @@
      "orb": 5.325189525
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 0,
+     "stepen": 28.497704537,
+     "usao": 1795153927,
+     "izlazi": 1795342175,
+     "osvetljen": 0.926236862,
+     "faza": 3
+    },
+    "voc": {
+     "od": 1795333108,
+     "do": 1795342175,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1795332449,
+     "do": 1795338856,
+     "indeks": 23,
+     "dan": false,
+     "izlazak": 1795251975,
+     "zalazak": 1795261976
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1795333108,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795342175,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923422,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092025,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101939,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     }
+    ]
+   },
    "razmaknuto": [
     338.394172278,
     189.906658982,
@@ -7291,6 +10930,111 @@
      "orb": 5.337477782
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 1,
+     "stepen": 21.095387519,
+     "usao": 1795342175,
+     "izlazi": 1795518573,
+     "osvetljen": 0.991648372,
+     "faza": 4
+    },
+    "voc": {
+     "od": 1795514946,
+     "do": 1795518573,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "jupiter",
+     "sledeci": "mars",
+     "od": 1795464136,
+     "do": 1795467775,
+     "indeks": 9,
+     "dan": true,
+     "izlazak": 1795431385,
+     "zalazak": 1795475053
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1795514946,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795518573,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1795532044,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923415,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092017,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101952,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     }
+    ]
+   },
    "razmaknuto": [
     560.977247226,
     391.458324115,
@@ -7475,6 +11219,111 @@
      "orb": 6.443356019
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 2,
+     "stepen": 14.392207362,
+     "usao": 1795518573,
+     "izlazi": 1795690263,
+     "osvetljen": 0.990404962,
+     "faza": 4
+    },
+    "voc": {
+     "od": 1795670606,
+     "do": 1795690263,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "sun",
+     "sledeci": "venus",
+     "od": 1795599527,
+     "do": 1795602295,
+     "indeks": 5,
+     "dan": true,
+     "izlazak": 1795585686,
+     "zalazak": 1795618905
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "ingress",
+      "kad": 1795649845,
+      "telo": "mars",
+      "broj": 5
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1795670606,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795690263,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923407,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092031,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101945,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     }
+    ]
+   },
    "razmaknuto": [
     310.520412438,
     119.27188924,
@@ -7663,6 +11512,105 @@
      "orb": 6.417021115
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 3,
+     "stepen": 7.787014761,
+     "usao": 1795690263,
+     "izlazi": 1795864830,
+     "osvetljen": 0.919005234,
+     "faza": 5
+    },
+    "voc": {
+     "od": 1795844398,
+     "do": 1795864830,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1795733431,
+     "do": 1795737749,
+     "indeks": 17,
+     "dan": false,
+     "izlazak": 1795677193,
+     "zalazak": 1795711840
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1795844398,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1795864830,
+      "telo": "",
+      "broj": 4
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777552,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923421,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092023,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101937,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     }
+    ]
+   },
    "razmaknuto": [
     487.453221714,
     634.378078926,
@@ -7867,6 +11815,105 @@
      "orb": 5.579165359
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 4,
+     "stepen": 0.701871827,
+     "usao": 1795864830,
+     "izlazi": 1796047954,
+     "osvetljen": 0.790954563,
+     "faza": 5
+    },
+    "voc": {
+     "od": 1796033413,
+     "do": 1796047954,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1795867486,
+     "do": 1795870433,
+     "indeks": 16,
+     "dan": false,
+     "izlazak": 1795804676,
+     "zalazak": 1795855698
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1796033413,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796047954,
+      "telo": "",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923413,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092016,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101951,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     }
+    ]
+   },
    "razmaknuto": [
     180.218228846,
     305.797394205,
@@ -8047,6 +12094,96 @@
      "orb": 6.372880258
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 4,
+     "stepen": 22.790143312,
+     "usao": 1795864830,
+     "izlazi": 1796047954,
+     "osvetljen": 0.629972572,
+     "faza": 6
+    },
+    "voc": {
+     "od": 1796033413,
+     "do": 1796047954,
+     "sada": false
+    },
+    "sat": null,
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1796033413,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796047954,
+      "telo": "",
+      "broj": 5
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796105355,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923406,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092029,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101943,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     }
+    ]
+   },
    "razmaknuto": [
     129.053965118,
     234.115002804,
@@ -8235,6 +12372,105 @@
      "orb": 3.812703387
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 5,
+     "stepen": 13.978280368,
+     "usao": 1796047954,
+     "izlazi": 1796241828,
+     "osvetljen": 0.460333666,
+     "faza": 6
+    },
+    "voc": {
+     "od": 1796202642,
+     "do": 1796241828,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mercury",
+     "sledeci": "moon",
+     "od": 1796133658,
+     "do": 1796137298,
+     "indeks": 3,
+     "dan": true,
+     "izlazak": 1796122739,
+     "zalazak": 1796166417
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1796202642,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796241828,
+      "telo": "",
+      "broj": 6
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923419,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092022,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101936,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657208,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     41.13604281,
     124.746417935,
@@ -8435,6 +12671,105 @@
      "orb": 7.62167355
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 6,
+     "stepen": 4.3722932,
+     "usao": 1796241828,
+     "izlazi": 1796445297,
+     "osvetljen": 0.301649261,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1796424016,
+     "do": 1796445297,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1796268458,
+     "do": 1796272954,
+     "indeks": 22,
+     "dan": false,
+     "izlazak": 1796190983,
+     "zalazak": 1796223502
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "ingress",
+      "kad": 1796372076,
+      "telo": "venus",
+      "broj": 7
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1796424016,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796445297,
+      "telo": "",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777552,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923412,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092014,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101949,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657207,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     134.725180867,
     201.347273627,
@@ -8635,6 +12970,99 @@
      "orb": 5.731444187
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 6,
+     "stepen": 24.140899146,
+     "usao": 1796241828,
+     "izlazi": 1796445297,
+     "osvetljen": 0.168247706,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1796424016,
+     "do": 1796445297,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1796402901,
+     "do": 1796407271,
+     "indeks": 12,
+     "dan": false,
+     "izlazak": 1796368885,
+     "zalazak": 1796402901
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1796424016,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796445297,
+      "telo": "",
+      "broj": 7
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923404,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092028,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101942,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657207,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     300.73318976,
     349.159710145,
@@ -8823,6 +13251,99 @@
      "orb": 3.796477345
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 7,
+     "stepen": 13.437538291,
+     "usao": 1796445296,
+     "izlazi": 1796655988,
+     "osvetljen": 0.070116649,
+     "faza": 7
+    },
+    "voc": {
+     "od": 1796634448,
+     "do": 1796655988,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "moon",
+     "sledeci": "saturn",
+     "od": 1796538732,
+     "do": 1796543024,
+     "indeks": 10,
+     "dan": true,
+     "izlazak": 1796495818,
+     "zalazak": 1796547315
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "ingress",
+      "kad": 1796546032,
+      "telo": "mercury",
+      "broj": 8
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1796634448,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796655988,
+      "telo": "",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923418,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092020,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101934,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657208,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     356.911266264,
     387.615090059,
@@ -9043,6 +13564,90 @@
      "orb": 5.712747979
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 2.369540526,
+     "usao": 1796655988,
+     "izlazi": 1796872117,
+     "osvetljen": 0.013515938,
+     "faza": 0
+    },
+    "voc": {
+     "od": 1796850362,
+     "do": 1796872117,
+     "sada": false
+    },
+    "sat": null,
+    "dogadjaji": [
+     {
+      "vrsta": "phase",
+      "kad": 1796777551,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "voc",
+      "kad": 1796850362,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796872117,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923410,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092034,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101948,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1798222975,
+      "telo": "mercury",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657208,
+      "telo": "",
+      "broj": 3
+     }
+    ]
+   },
    "razmaknuto": [
     277.995463045,
     287.495463045,
@@ -9239,6 +13844,105 @@
      "orb": 5.993902844
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 8,
+     "stepen": 21.008184155,
+     "usao": 1796655988,
+     "izlazi": 1796872117,
+     "osvetljen": 0.001048236,
+     "faza": 0
+    },
+    "voc": {
+     "od": 1796850362,
+     "do": 1796872117,
+     "sada": false
+    },
+    "sat": {
+     "vladar": "mars",
+     "sledeci": "sun",
+     "od": 1796803449,
+     "do": 1796807011,
+     "indeks": 21,
+     "dan": false,
+     "izlazak": 1796727708,
+     "zalazak": 1796771393
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "voc",
+      "kad": 1796850362,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "moonSign",
+      "kad": 1796872117,
+      "telo": "",
+      "broj": 9
+     },
+     {
+      "vrsta": "station",
+      "kad": 1796923424,
+      "telo": "saturn",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092026,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101940,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1798222975,
+      "telo": "mercury",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657207,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1799312015,
+      "telo": "venus",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1799353506,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     218.300091692,
     208.800091692,
@@ -9431,6 +14135,93 @@
      "orb": 5.342435331
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 9.422988599,
+     "usao": 1796872117,
+     "izlazi": 1797091532,
+     "osvetljen": 0.031814894,
+     "faza": 0
+    },
+    "voc": {
+     "od": 1796929920,
+     "do": 1797091532,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "venus",
+     "sledeci": "mercury",
+     "od": 1796937333,
+     "do": 1796941875,
+     "indeks": 17,
+     "dan": false,
+     "izlazak": 1796882673,
+     "zalazak": 1796914624
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1797091532,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092019,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101954,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1798222975,
+      "telo": "mercury",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657207,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1799312015,
+      "telo": "venus",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1799353506,
+      "telo": "",
+      "broj": 0
+     }
+    ]
+   },
    "razmaknuto": [
     291.452911222,
     270.897781056,
@@ -9623,6 +14414,99 @@
      "orb": 5.970702426
     }
    ],
+   "sat": {
+    "mesec": {
+     "znak": 9,
+     "stepen": 27.718744306,
+     "usao": 1796872117,
+     "izlazi": 1797091532,
+     "osvetljen": 0.102096275,
+     "faza": 1
+    },
+    "voc": {
+     "od": 1796929920,
+     "do": 1797091532,
+     "sada": true
+    },
+    "sat": {
+     "vladar": "mercury",
+     "sledeci": "moon",
+     "od": 1797074507,
+     "do": 1797077307,
+     "indeks": 5,
+     "dan": true,
+     "izlazak": 1797060506,
+     "zalazak": 1797094108
+    },
+    "dogadjaji": [
+     {
+      "vrsta": "moonSign",
+      "kad": 1797091532,
+      "telo": "",
+      "broj": 10
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797092033,
+      "telo": "neptune",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1797101947,
+      "telo": "jupiter",
+      "broj": 1
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1797486195,
+      "telo": "",
+      "broj": 1
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1797886214,
+      "telo": "sun",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798075725,
+      "telo": "",
+      "broj": 2
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1798222975,
+      "telo": "mercury",
+      "broj": 9
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1798657208,
+      "telo": "",
+      "broj": 3
+     },
+     {
+      "vrsta": "ingress",
+      "kad": 1799312015,
+      "telo": "venus",
+      "broj": 8
+     },
+     {
+      "vrsta": "phase",
+      "kad": 1799353506,
+      "telo": "",
+      "broj": 0
+     },
+     {
+      "vrsta": "station",
+      "kad": 1799564473,
+      "telo": "mars",
+      "broj": 1
+     }
+    ]
+   },
    "razmaknuto": [
     151.323532774,
     114.049338341,
