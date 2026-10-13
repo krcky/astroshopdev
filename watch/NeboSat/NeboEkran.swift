@@ -1,63 +1,97 @@
 import SkyCore
 import SwiftUI
 
-/// Dve strane: krug preko celog ekrana i lista planeta. KRUNA POMERA VREME —
-/// jedan zarez je 15 minuta, pa brz okret prelazi dane; dok je vreme pomereno,
-/// pise koje je, a dodir na taj natpis vraca na sada. Na dnu liste je izbor mesta.
+/// Cetiri strane, prevlacenjem nagore: krug, Mesec, Sat, Sledece. Na PRVOJ kruna pomera
+/// vreme — zarez je 15 minuta, pa brz okret prelazi dane; dok je vreme pomereno pise koje je,
+/// a dodir na taj natpis vraca na sada (strelice u uglovima su isto to na dodir, po sat).
+/// Komplikacije otvaraju svoju stranu (`zodiacwheel://moon` …).
 struct NeboEkran: View {
   @EnvironmentObject private var mesto: Mesto
+  @StateObject private var stanje = Stanje()
   /// Pomeraj od sadasnjeg trenutka, u cetvrtima sata.
   @State private var pomeraj = 0.0
+  /// Pocetna strana; argument pri pokretanju (`-strana moon`) sluzi proveri u simulatoru, gde `openurl` ne radi.
+  @State private var strana = UserDefaults.standard.string(forKey: "strana") ?? "wheel"
   @Environment(\.isLuminanceReduced) private var priguseno
 
   private var pomereno: Bool { pomeraj.rounded() != 0 }
 
   var body: some View {
     NavigationStack {
-      // Dok je sadasnjost, krug se osvezava svakog minuta; pomereno vreme stoji.
+      // Dok je sadasnjost, sve se osvezava svakog minuta; pomereno vreme stoji.
       TimelineView(.periodic(from: .now, by: 60)) { vreme in
         let trenutak = vreme.date.addingTimeInterval(pomeraj.rounded() * 15 * 60)
         let sky = buildSky(at: trenutak, place: mesto.grad?.place)
 
-        TabView {
+        TabView(selection: $strana) {
           ZStack(alignment: .bottom) {
             SkyWheelView(sky: sky, style: WheelStyle(theme: .dark, detail: .compact, dimmed: priguseno))
               .padding(-6)
               .ignoresSafeArea(.container, edges: [.bottom, .horizontal])
-            if pomereno {
-              Button { withAnimation { pomeraj = 0 } } label: {
-                HStack(spacing: 4) {
-                  Image(systemName: "arrow.uturn.backward")
-                  Text(trenutak, format: .dateTime.day().month(.abbreviated).hour().minute())
+            HStack {
+              korak("chevron.left", -4)
+              Spacer()
+              if pomereno {
+                Button { withAnimation { pomeraj = 0 } } label: {
+                  HStack(spacing: 4) {
+                    Image(systemName: "arrow.uturn.backward")
+                    Text(trenutak, format: .dateTime.day().month(.abbreviated).hour().minute())
+                  }
+                  .font(.system(size: 12, weight: .semibold, design: .rounded))
+                  .padding(.horizontal, 8).padding(.vertical, 3)
+                  .background(.black.opacity(0.75), in: Capsule())
+                  .overlay(Capsule().stroke(Brend.lila.opacity(0.6), lineWidth: 1))
                 }
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .padding(.horizontal, 8).padding(.vertical, 3)
-                .background(.black.opacity(0.75), in: Capsule())
-                .overlay(Capsule().stroke(Brend.lila.opacity(0.6), lineWidth: 1))
+                .buttonStyle(.plain)
+                .foregroundStyle(Brend.lila)
               }
-              .buttonStyle(.plain)
-              .foregroundStyle(Brend.lila)
+              Spacer()
+              korak("chevron.right", 4)
             }
+            .ignoresSafeArea(.container, edges: .bottom)
           }
           .focusable()
           .digitalCrownRotation($pomeraj, from: -96 * 366, through: 96 * 366, by: 1,
                                 sensitivity: .medium, isContinuous: false, isHapticFeedbackEnabled: true)
+          .tag("wheel")
 
-          ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-              NeboLista(sky: sky)
-              NavigationLink { IzborMesta() } label: {
-                Label(mesto.grad?.name ?? "—", systemImage: "mappin.and.ellipse")
-              }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 6)
+          Group {
+            if let s = stanje.slika { StranaMesec(s: s) } else { ProgressView() }
           }
+          .tag("moon")
+
+          Group {
+            if let s = stanje.slika { StranaSat(s: s, sky: sky) } else { ProgressView() }
+          }
+          .tag("hour")
+
+          Group {
+            if let s = stanje.slika { StranaSledece(s: s, sky: sky, grad: mesto.grad?.name ?? "—") } else { ProgressView() }
+          }
+          .tag("next")
         }
         .tabViewStyle(.verticalPage)
         .background(.black)
+        .onAppear { stanje.osvezi(trenutak, grad: mesto.grad) }
+        .onChange(of: trenutak) { _, novo in stanje.osvezi(novo, grad: mesto.grad) }
+        .onChange(of: mesto.izabrana) { _, _ in stanje.osvezi(trenutak, grad: mesto.grad) }
+      }
+      .onOpenURL { url in
+        if let ime = url.host, ["wheel", "moon", "hour", "next"].contains(ime) { strana = ime }
       }
     }
+  }
+
+  /// Dugme u uglu prve strane: sat nazad ili napred (dodirna zamena za krunu).
+  private func korak(_ ikona: String, _ cetvrti: Double) -> some View {
+    Button { pomeraj += cetvrti } label: {
+      Image(systemName: ikona).font(.system(size: 13, weight: .bold))
+        .frame(width: 30, height: 30)
+        .background(.black.opacity(0.6), in: Circle())
+        .overlay(Circle().stroke(Brend.lila.opacity(0.45), lineWidth: 1))
+    }
+    .buttonStyle(.plain)
+    .foregroundStyle(Brend.lila)
   }
 }
 

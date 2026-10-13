@@ -36,6 +36,9 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         WKApplication: true
         WKWatchOnly: true
+        # Komplikacije otvaraju svoju stranu (`zodiacwheel://moon` …).
+        CFBundleURLTypes:
+          - CFBundleURLSchemes: [zodiacwheel]
     entitlements:
       path: NeboSat/NeboSat.entitlements
       properties:
