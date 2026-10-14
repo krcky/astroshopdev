@@ -1,0 +1,1002 @@
+{
+ "od": "1. 1. 2027.",
+ "do": "1. 1. 2028.",
+ "stavke": [
+  {
+   "kljuc": "sky.venus.sign.sagittarius",
+   "naslov": "Venera u Strelcu",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Strelac",
+   "znakKey": "sagittarius",
+   "retro": false,
+   "prvi": 1799312015138.0024,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "7. 1. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "1. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.retrograde.virgo",
+   "naslov": "Retrogradni Mars u Devici",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": true,
+   "prvi": 1799586071887.0103,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "10. 1. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.aquarius",
+   "naslov": "Merkur u Vodoliji",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": false,
+   "prvi": 1799820382328.0073,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "13. 1. 2027."
+    },
+    {
+     "vrsta": "direct",
+     "datum": "3. 3. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.aquarius",
+   "naslov": "Sunce u Vodoliji",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": false,
+   "prvi": 1800430194607.0166,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "20. 1. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.pisces",
+   "naslov": "Merkur u Ribama",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Ribe",
+   "znakKey": "pisces",
+   "retro": false,
+   "prvi": 1801445206653.0168,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "1. 2. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "18. 3. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.capricorn",
+   "naslov": "Venera u Jarcu",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Jarac",
+   "znakKey": "capricorn",
+   "retro": false,
+   "prvi": 1801665032788.007,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "3. 2. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "25. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.uranus.sign.gemini",
+   "naslov": "Uran u Blizancima",
+   "planeta": "Uran",
+   "planetaKey": "uranus",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": false,
+   "prvi": 1802089396960.0015,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "8. 2. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.pisces",
+   "naslov": "Retrogradni Merkur u Ribama",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Ribe",
+   "znakKey": "pisces",
+   "retro": true,
+   "prvi": 1802194543015.0105,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "9. 2. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.aquarius",
+   "naslov": "Retrogradni Merkur u Vodoliji",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": true,
+   "prvi": 1802953026320.0083,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak-retro",
+     "datum": "18. 2. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.pisces",
+   "naslov": "Sunce u Ribama",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Ribe",
+   "znakKey": "pisces",
+   "retro": false,
+   "prvi": 1802986416353.0007,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "18. 2. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.retrograde.leo",
+   "naslov": "Retrogradni Mars u Lavu",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": true,
+   "prvi": 1803219352572.001,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak-retro",
+     "datum": "21. 2. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.aquarius",
+   "naslov": "Venera u Vodoliji",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": false,
+   "prvi": 1803882731293.0117,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "1. 3. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "19. 12. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.aries",
+   "naslov": "Sunce u Ovnu",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": false,
+   "prvi": 1805574281372.009,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "20. 3. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.pisces",
+   "naslov": "Venera u Ribama",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Ribe",
+   "znakKey": "pisces",
+   "retro": false,
+   "prvi": 1806048976783.0142,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "26. 3. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.leo",
+   "naslov": "Mars u Lavu",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": false,
+   "prvi": 1806588630172.0195,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "1. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.aries",
+   "naslov": "Merkur u Ovnu",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": false,
+   "prvi": 1807226433461.0024,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "9. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.jupiter.sign.leo",
+   "naslov": "Jupiter u Lavu",
+   "planeta": "Jupiter",
+   "planetaKey": "jupiter",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": false,
+   "prvi": 1807582388146.0166,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "13. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.aries",
+   "naslov": "Venera u Ovnu",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": false,
+   "prvi": 1808193404196.006,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "20. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.taurus",
+   "naslov": "Sunce u Biku",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Bik",
+   "znakKey": "taurus",
+   "retro": false,
+   "prvi": 1808205444873.002,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "20. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.taurus",
+   "naslov": "Merkur u Biku",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Bik",
+   "znakKey": "taurus",
+   "retro": false,
+   "prvi": 1808605115837.0107,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "25. 4. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.pluto.retrograde.aquarius",
+   "naslov": "Retrogradni Pluton u Vodoliji",
+   "planeta": "Pluton",
+   "planetaKey": "pluto",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": true,
+   "prvi": 1809778493135.0137,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "8. 5. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.gemini",
+   "naslov": "Merkur u Blizancima",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": false,
+   "prvi": 1809827880665.0005,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "9. 5. 2027."
+    },
+    {
+     "vrsta": "direct",
+     "datum": "4. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.virgo",
+   "naslov": "Mars u Devici",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": false,
+   "prvi": 1810306049999.0054,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "14. 5. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.taurus",
+   "naslov": "Venera u Biku",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Bik",
+   "znakKey": "taurus",
+   "retro": false,
+   "prvi": 1810328467032.011,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "14. 5. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.gemini",
+   "naslov": "Sunce u Blizancima",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": false,
+   "prvi": 1810880280356.0059,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "21. 5. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.cancer",
+   "naslov": "Merkur u Raku",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Rak",
+   "znakKey": "cancer",
+   "retro": false,
+   "prvi": 1811524040845.004,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "28. 5. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "12. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.gemini",
+   "naslov": "Venera u Blizancima",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": false,
+   "prvi": 1812457916560.0195,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "8. 6. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.cancer",
+   "naslov": "Retrogradni Merkur u Raku",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Rak",
+   "znakKey": "cancer",
+   "retro": true,
+   "prvi": 1812651533412.0044,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "10. 6. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.cancer",
+   "naslov": "Sunce u Raku",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Rak",
+   "znakKey": "cancer",
+   "retro": false,
+   "prvi": 1813587041843.0083,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "21. 6. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.gemini",
+   "naslov": "Retrogradni Merkur u Blizancima",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": true,
+   "prvi": 1813994609930.0044,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak-retro",
+     "datum": "26. 6. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.cancer",
+   "naslov": "Venera u Raku",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Rak",
+   "znakKey": "cancer",
+   "retro": false,
+   "prvi": 1814580034398.0027,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "3. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.neptune.retrograde.aries",
+   "naslov": "Retrogradni Neptun u Ovnu",
+   "planeta": "Neptun",
+   "planetaKey": "neptune",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": true,
+   "prvi": 1815173398705.0117,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "10. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.libra",
+   "naslov": "Mars u Vagi",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Vaga",
+   "znakKey": "libra",
+   "retro": false,
+   "prvi": 1815630014591.007,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "15. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.leo",
+   "naslov": "Sunce u Lavu",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": false,
+   "prvi": 1816304671806.0024,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "23. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.jupiter.sign.virgo",
+   "naslov": "Jupiter u Devici",
+   "planeta": "Jupiter",
+   "planetaKey": "jupiter",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": false,
+   "prvi": 1816577120432.0088,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "26. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.leo",
+   "naslov": "Venera u Lavu",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": false,
+   "prvi": 1816691393700.0142,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "27. 7. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.leo",
+   "naslov": "Merkur u Lavu",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Lav",
+   "znakKey": "leo",
+   "retro": false,
+   "prvi": 1817203942525.0122,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "2. 8. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.saturn.retrograde.aries",
+   "naslov": "Retrogradni Saturn u Ovnu",
+   "planeta": "Saturn",
+   "planetaKey": "saturn",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": true,
+   "prvi": 1817833936448.0044,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "9. 8. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.virgo",
+   "naslov": "Merkur u Devici",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": false,
+   "prvi": 1818477787415.0073,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "17. 8. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.virgo",
+   "naslov": "Venera u Devici",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": false,
+   "prvi": 1818790914690.0146,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "20. 8. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.virgo",
+   "naslov": "Sunce u Devici",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Devica",
+   "znakKey": "virgo",
+   "retro": false,
+   "prvi": 1819008839494.0183,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "23. 8. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.scorpio",
+   "naslov": "Mars u Škorpiji",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Škorpija",
+   "znakKey": "scorpio",
+   "retro": false,
+   "prvi": 1819849899806.0122,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "2. 9. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.libra",
+   "naslov": "Merkur u Vagi",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Vaga",
+   "znakKey": "libra",
+   "retro": false,
+   "prvi": 1819971391475.0173,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "3. 9. 2027."
+    },
+    {
+     "vrsta": "direct",
+     "datum": "28. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.libra",
+   "naslov": "Venera u Vagi",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Vaga",
+   "znakKey": "libra",
+   "retro": false,
+   "prvi": 1820881448509.0078,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "14. 9. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.uranus.retrograde.gemini",
+   "naslov": "Retrogradni Uran u Blizancima",
+   "planeta": "Uran",
+   "planetaKey": "uranus",
+   "znak": "Blizanci",
+   "znakKey": "gemini",
+   "retro": true,
+   "prvi": 1820999696610.0098,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "15. 9. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.libra",
+   "naslov": "Sunce u Vagi",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Vaga",
+   "znakKey": "libra",
+   "retro": false,
+   "prvi": 1821679280113.01,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "23. 9. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.scorpio",
+   "naslov": "Merkur u Škorpiji",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Škorpija",
+   "znakKey": "scorpio",
+   "retro": false,
+   "prvi": 1822036115630,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "27. 9. 2027."
+    },
+    {
+     "vrsta": "ulazak",
+     "datum": "10. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.scorpio",
+   "naslov": "Retrogradni Merkur u Škorpiji",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Škorpija",
+   "znakKey": "scorpio",
+   "retro": true,
+   "prvi": 1822920000863.0186,
+   "dogadjaji": [
+    {
+     "vrsta": "retrograde",
+     "datum": "7. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.venus.sign.scorpio",
+   "naslov": "Venera u Škorpiji",
+   "planeta": "Venera",
+   "planetaKey": "venus",
+   "znak": "Škorpija",
+   "znakKey": "scorpio",
+   "retro": false,
+   "prvi": 1822967923338.0068,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "8. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.sagittarius",
+   "naslov": "Mars u Strelcu",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Strelac",
+   "znakKey": "sagittarius",
+   "retro": false,
+   "prvi": 1823642007475.0007,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "16. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.retrograde.libra",
+   "naslov": "Retrogradni Merkur u Vagi",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Vaga",
+   "znakKey": "libra",
+   "retro": true,
+   "prvi": 1823672280702.0059,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak-retro",
+     "datum": "16. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.pluto.sign.aquarius",
+   "naslov": "Pluton u Vodoliji",
+   "planeta": "Pluton",
+   "planetaKey": "pluto",
+   "znak": "Vodolija",
+   "znakKey": "aquarius",
+   "retro": false,
+   "prvi": 1823831461709.0083,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "18. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.scorpio",
+   "naslov": "Sunce u Škorpiji",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Škorpija",
+   "znakKey": "scorpio",
+   "retro": false,
+   "prvi": 1824305562212.0151,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "23. 10. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.sagittarius",
+   "naslov": "Sunce u Strelcu",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Strelac",
+   "znakKey": "sagittarius",
+   "retro": false,
+   "prvi": 1826889374598.0059,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "22. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mars.sign.capricorn",
+   "naslov": "Mars u Jarcu",
+   "planeta": "Mars",
+   "planetaKey": "mars",
+   "znak": "Jarac",
+   "znakKey": "capricorn",
+   "retro": false,
+   "prvi": 1827167871763.0015,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "25. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.sagittarius",
+   "naslov": "Merkur u Strelcu",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Strelac",
+   "znakKey": "sagittarius",
+   "retro": false,
+   "prvi": 1827483819355.0183,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "29. 11. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.neptune.sign.aries",
+   "naslov": "Neptun u Ovnu",
+   "planeta": "Neptun",
+   "planetaKey": "neptune",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": false,
+   "prvi": 1828863760854.0105,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "15. 12. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.mercury.sign.capricorn",
+   "naslov": "Merkur u Jarcu",
+   "planeta": "Merkur",
+   "planetaKey": "mercury",
+   "znak": "Jarac",
+   "znakKey": "capricorn",
+   "retro": false,
+   "prvi": 1829131092273.0112,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "18. 12. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.sun.sign.capricorn",
+   "naslov": "Sunce u Jarcu",
+   "planeta": "Sunce",
+   "planetaKey": "sun",
+   "znak": "Jarac",
+   "znakKey": "capricorn",
+   "retro": false,
+   "prvi": 1829443330503.0117,
+   "dogadjaji": [
+    {
+     "vrsta": "ulazak",
+     "datum": "22. 12. 2027."
+    }
+   ]
+  },
+  {
+   "kljuc": "sky.saturn.sign.aries",
+   "naslov": "Saturn u Ovnu",
+   "planeta": "Saturn",
+   "planetaKey": "saturn",
+   "znak": "Ovan",
+   "znakKey": "aries",
+   "retro": false,
+   "prvi": 1829616569190.0103,
+   "dogadjaji": [
+    {
+     "vrsta": "direct",
+     "datum": "24. 12. 2027."
+    }
+   ]
+  }
+ ]
+}
